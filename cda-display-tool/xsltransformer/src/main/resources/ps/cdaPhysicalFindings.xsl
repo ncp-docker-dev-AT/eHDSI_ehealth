@@ -67,7 +67,7 @@
                                         <tr>
                                             <td style="background-color:#ffffcc">
                                                 <i class="fas fa-exclamation-triangle" style="color:#085a9f" aria-hidden="true"/>
-                                                <!-- HOTFIX - Has to be replaced with a value from the epSOSDisplayLabel value set -->
+                                                <!-- TODO - Has to be replaced with a value from the epSOSDisplayLabel value set -->
                                                 The date of the organizer should match the date of the observations.<br/>
                                             </td>
                                         </tr>
