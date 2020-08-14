@@ -36,7 +36,7 @@ import java.util.UUID;
  * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
  * It uses the Builder Design Pattern to create the request, in order to create a immutable final object.
  *
- * @author Jerry Dimitriou <jerouris at netsmart.gr>
+ * @author Jerry Dimitriou jerouris at netsmart.gr
  */
 public class TRCAssertionRequest {
 

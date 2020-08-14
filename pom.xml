@@ -102,6 +102,7 @@
         <commons-io.version>2.5</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-lang3.version>3.5</commons-lang3.version>
+        <dependency-check-maven.version>5.3.2</dependency-check-maven.version>
         <dynamic-discovery-client.version>1.11</dynamic-discovery-client.version>
         <esapi.version>2.2.0.0</esapi.version>
         <ibatis-sqlmap.version>2.3.4.726</ibatis-sqlmap.version>
@@ -365,7 +366,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -442,23 +443,44 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>5.3.2</version>
+                    <version>${dependency-check-maven.version}</version>
+                    <configuration>
+                    	<skipProvidedScope>true</skipProvidedScope>
+                    	<skipRuntimeScope>true</skipRuntimeScope>
+                	</configuration>
                     <executions>
                         <execution>
                             <goals>
-                                <goal>check</goal>
+                                <goal>aggregate</goal>
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
+                </plugin> 
             </plugins>
         </pluginManagement>
+            <!-- To use the plugin goals in your POM or parent POM -->
+		<plugins>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>${dependency-check-maven.version}</version>
+			</plugin>
+		</plugins>
     </build>
-
+    <!-- To use the report goals in your POM or parent POM -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>${dependency-check-maven.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
     <!-- You might add this profile to your general Maven settings.xml -->
-    <profiles>
-        <profile>
-            <id>national-build</id>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>national-build</id>
+		</profile>
+	</profiles>
 </project>
