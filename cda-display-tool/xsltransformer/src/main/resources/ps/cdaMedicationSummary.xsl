@@ -95,8 +95,7 @@
                                                     <colgroup class="unitsperintake"/>
                                                     <colgroup class="frequencyofintakes"/>
                                                     <colgroup class="routeofadministration"/>
-                                                    <colgroup class="onsetdate"/>
-                                                    <colgroup class="enddate"/>
+                                                    <colgroup class="duration"/>
                                                     <xsl:choose>
                                                         <xsl:when test="$medCode/@code='no-known-medications' or $medCode/@code='no-medication-info'">
                                                             <tr bgcolor="#E6F2FF">
@@ -154,16 +153,8 @@
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
-                                                                    <!-- Onset Date -->
-                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                        <xsl:with-param name="code" select="'45'"/>
-                                                                    </xsl:call-template>
-                                                                </th>
-                                                                <th>
-                                                                    <!-- End Date -->
-                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                        <xsl:with-param name="code" select="'26'"/>
-                                                                    </xsl:call-template>
+                                                                    <!-- TODO add label to eHDSIDisplayLabel value set -->
+                                                                    Duration of treatment
                                                                 </th>
                                                             </tr>
                                                             <xsl:for-each select="n1:entry">
@@ -201,10 +192,8 @@
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[2]/@xsi:type"/>
         <xsl:variable name="medRouteAdministration"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:routeCode"/>
-        <xsl:variable name="medOnSetDate"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:low"/>
-        <xsl:variable name="medEndDate"
-                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']/n1:high"/>
+        <xsl:variable name="medRegimen"
+                      select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:effectiveTime[1][@xsi:type='IVL_TS' or substring-after(@xsi:type, ':')='IVL_TS']"/>
         <xsl:variable name="medCode"
                       select="n1:substanceAdministration/n1:templateId[@root= '1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/../n1:code/@code"/>
 
@@ -276,17 +265,10 @@
                                     </xsl:call-template>
                                 </td>
                                 <td>
-                                    <!-- Onset Date -->
-                                    <xsl:call-template name="show-TS">
-                                        <xsl:with-param name="node" select="$medOnSetDate"/>
+                                    <xsl:call-template name="show-IVL_TS">
+                                        <xsl:with-param name="node"
+                                                        select="$medRegimen"/>
                                     </xsl:call-template>
-                                </td>
-                                <td>
-                                    <!-- End Date -->
-                                    <xsl:call-template name="show-TS">
-                                        <xsl:with-param name="node" select="$medEndDate"/>
-                                    </xsl:call-template>
-                                    &#160;
                                 </td>
                             </tr>
                             <xsl:for-each select="epsos:ingredient[@classCode='ACTI']">
@@ -302,7 +284,6 @@
                                                 <xsl:with-param name="node" select="$medStrength"/>
                                             </xsl:call-template>
                                         </td>
-                                        <td/>
                                         <td/>
                                         <td/>
                                         <td/>
