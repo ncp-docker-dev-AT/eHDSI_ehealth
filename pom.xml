@@ -447,6 +447,7 @@
                     <configuration>
                     	<skipProvidedScope>true</skipProvidedScope>
                     	<skipRuntimeScope>true</skipRuntimeScope>
+                    	<suppressionFile>suppressions.xml</suppressionFile>
                 	</configuration>
                     <executions>
                         <execution>
