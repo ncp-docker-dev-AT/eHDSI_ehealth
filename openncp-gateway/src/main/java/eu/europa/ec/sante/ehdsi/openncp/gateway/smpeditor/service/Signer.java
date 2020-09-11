@@ -30,7 +30,7 @@ public class Signer {
 
     private static final Logger logger = LoggerFactory.getLogger(Signer.class);
 
-    private XMLSignatureFactory sigFactory;
+    private final XMLSignatureFactory xmlSignatureFactory;
 
     private KeyStore.PrivateKeyEntry privateKeyEntry;
     private KeyInfo keyInfo;
@@ -38,17 +38,23 @@ public class Signer {
     private boolean invalidKeystore;
     private boolean invalidKeyPair;
 
+    /**
+     * @param keystoreResPath
+     * @param keystorePass
+     * @param keyPairAlias
+     * @param keyPairPass
+     */
     public Signer(MultipartFile keystoreResPath, String keystorePass, String keyPairAlias, String keyPairPass) {
 
         // Initialize all stuff needed for signing: Load keys from keystore and prepare signature factory
         invalidKeystore = false;
         invalidKeyPair = false;
 
-        sigFactory = XMLSignatureFactory.getInstance("DOM");
-        KeyStore ks = null;
+        xmlSignatureFactory = XMLSignatureFactory.getInstance("DOM");
+        KeyStore keyStore;
         try {
-            ks = KeyStore.getInstance("JKS");
-            ks.load(keystoreResPath.getInputStream(), keystorePass.toCharArray());
+            keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(keystoreResPath.getInputStream(), keystorePass.toCharArray());
         } catch (KeyStoreException ex) {
             logger.error("\nKeyStoreException 1 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);
             return;
@@ -68,7 +74,7 @@ public class Signer {
         KeyStore.PasswordProtection passProtection = new KeyStore.PasswordProtection(keyPairPass.toCharArray());
 
         try {
-            privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(keyPairAlias, passProtection);
+            privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(keyPairAlias, passProtection);
         } catch (KeyStoreException ex) {
             invalidKeyPair = true;
             logger.error("\nKeyStoreException 3 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);
@@ -91,7 +97,7 @@ public class Signer {
             logger.error("\nKeyStoreException 3 - " + SimpleErrorHandler.printExceptionStackTrace(ex), ex);
             return;
         }
-        KeyInfoFactory keyInfoFactory = sigFactory.getKeyInfoFactory();
+        KeyInfoFactory keyInfoFactory = xmlSignatureFactory.getKeyInfoFactory();
         List x509Content = new ArrayList();
         x509Content.add(cert.getSubjectX500Principal().getName());
         x509Content.add(cert);
@@ -102,20 +108,20 @@ public class Signer {
 
     public void sign(String refUri, Element xtPointer, String c14nMethod) throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, MarshalException, XMLSignatureException {
 
-        Reference ref = sigFactory.newReference(
-                refUri, sigFactory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
-                Collections.singletonList(sigFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
+        Reference ref = xmlSignatureFactory.newReference(
+                refUri, xmlSignatureFactory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
+                Collections.singletonList(xmlSignatureFactory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
                 null, null);
 
-        SignedInfo signedInfo = sigFactory.newSignedInfo(
-                sigFactory.newCanonicalizationMethod(c14nMethod, (C14NMethodParameterSpec) null),
-                sigFactory.newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null),
+        SignedInfo signedInfo = xmlSignatureFactory.newSignedInfo(
+                xmlSignatureFactory.newCanonicalizationMethod(c14nMethod, (C14NMethodParameterSpec) null),
+                xmlSignatureFactory.newSignatureMethod(CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null),
                 Collections.singletonList(ref));
 
         DOMSignContext signContext = new DOMSignContext(privateKeyEntry.getPrivateKey(), xtPointer);
 
         // Create the XMLSignature, but don't sign it yet.
-        XMLSignature signature = sigFactory.newXMLSignature(signedInfo, keyInfo);
+        XMLSignature signature = xmlSignatureFactory.newXMLSignature(signedInfo, keyInfo);
 
         // Marshal, generate, and sign the enveloped signature.
         signature.sign(signContext);
