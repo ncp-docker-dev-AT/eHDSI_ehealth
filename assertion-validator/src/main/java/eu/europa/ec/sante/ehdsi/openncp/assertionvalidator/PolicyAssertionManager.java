@@ -21,6 +21,8 @@ public interface PolicyAssertionManager {
 
     void PurposeOfUseValidator(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException;
 
+    void PurposeOfUseValidatorForTRC(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException;
+
     void XSPALocalityValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException;
 
     void XCPDPermissionValidator(Assertion assertion) throws InsufficientRightsException;

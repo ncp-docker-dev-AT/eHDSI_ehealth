@@ -379,7 +379,7 @@ public class SAML2Validator {
      * @throws InvalidFieldException
      */
     private static void checkTRCAssertion(Assertion assertion, String classCode) throws MissingFieldException,
-            InvalidFieldException {
+            InvalidFieldException, InsufficientRightsException {
 
         RequiredFieldValidators.validateVersion(assertion);
         RequiredFieldValidators.validateID(assertion);
@@ -411,6 +411,7 @@ public class SAML2Validator {
         FieldValueValidators.validateTimeSpanForTRC(assertion);
         FieldValueValidators.validateAuthnContextClassRefValueForTRC(assertion);
 
+        policyManager.PurposeOfUseValidatorForTRC(assertion, classCode);
         policyManager.XSPASubjectValidatorForTRC(assertion, classCode);
     }
 

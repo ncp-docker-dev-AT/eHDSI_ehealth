@@ -19,7 +19,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     public void XSPASubjectValidatorForTRC(final Assertion assertion, String documentClass)
             throws MissingFieldException, InvalidFieldException {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -53,6 +52,11 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             throws MissingFieldException, InsufficientRightsException {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void PurposeOfUseValidatorForTRC(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException {
+        // TODO Auto-generated method stub
     }
 
     @Override
