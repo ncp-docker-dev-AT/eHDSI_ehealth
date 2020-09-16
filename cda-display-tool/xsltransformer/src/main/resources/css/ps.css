@@ -122,7 +122,7 @@
     text-align: left;
 }
 .medicinalproduct {
-    width: 12%;
+    width: 14%;
 }
 .activeingredient {
     width: 12%;
@@ -142,11 +142,8 @@
 .routeofadministration {
     width: 14%;
 }
-.onsetdate {
-    width: 8%;
-}
-.enddate {
-    width: 8%;
+.duration {
+    width: 14%;
 }
 
 ]]></root>
