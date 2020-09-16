@@ -19,7 +19,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSAdministrativeGender -->
+        <!-- eHDSIAdministrativeGender -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.34</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -39,7 +39,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>O</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSPersonalRelationship -->
+        <!-- eHDSIPersonalRelationship -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.38</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -79,7 +79,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>O</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSHealthcareProfessionalRoles -->
+        <!-- eHDSIHealthcareProfessionalRole -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.1</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -99,7 +99,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSHealthcareProfessionalRoles -->
+        <!-- eHDSIHealthcareProfessionalRole -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.1</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -119,7 +119,7 @@
             <MRODocCDAl3>R</MRODocCDAl3>
             <MRODocCDAl1pdf>R</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSDocumentCode -->
+        <!-- eHDSIDocumentCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.32</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -139,7 +139,7 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>RNFA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSConfidentiality (ConfidentialityByAccessKind) -->
+        <!-- eHDSIConfidentiality (ConfidentialityByAccessKind) -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.31</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -162,7 +162,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -182,7 +182,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -202,7 +202,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -222,7 +222,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -242,7 +242,7 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -262,7 +262,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- eHDSI-AbsentOrUnknownMedication -->
+        <!-- eHDSIAbsentOrUnknownMedication -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.49</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -282,7 +282,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSDoseForm -->
+        <!-- eHDSIDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -302,7 +302,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSDoseForm -->
+        <!-- eHDSIDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -322,7 +322,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSDoseForm -->
+        <!-- eHDSIDoseForm -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -342,7 +342,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRouteofAdministration -->
+        <!-- eHDSIRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -382,7 +382,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRouteofAdministration -->
+        <!-- eHDSIRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -402,7 +402,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSRouteofAdministration -->
+        <!-- eHDSIRouteofAdministration -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.12</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -422,7 +422,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSPackage -->
+        <!-- eHDSIPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -442,7 +442,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSPackage -->
+        <!-- eHDSIPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -462,8 +462,28 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSPackage -->
+        <!-- eHDSIPackage -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
+    <!-- Medication Summary - Classification of the substance -->
+    <codedElement>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <usage>
+            <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- eHDSIActiveIngredient -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
@@ -483,7 +503,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSSubstitutionCode -->
+        <!-- eHDSISubstitutionCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.7</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -503,7 +523,7 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSAdverseEventType -->
+        <!-- eHDSIAdverseEventType -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.18</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -523,7 +543,7 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSReactionAllergy -->
+        <!-- eHDSIReactionAllergy -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.11</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -543,7 +563,7 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSCodeProb -->
+        <!-- eHDSICodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -563,9 +583,9 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSActiveIngredient -->
+        <!-- eHDSIActiveIngredient -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
-        <!-- epSOSAllergenNoDrugs -->
+        <!-- eHDSIAllergenNoDrugs -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.19</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -585,7 +605,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- eHDSI-AbsentOrUnknownAllergies -->
+        <!-- eHDSIAbsentOrUnknownAllergies -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.47</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -605,9 +625,9 @@
             <MRODocCDAl3>RNFA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSIllnessesandDisorders -->
+        <!-- eHDSIIllnessandDisorder -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
-        <!-- eHDSI-AbsentOrUnknownProblems -->
+        <!-- eHDSIAbsentOrUnknownProblem -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.50</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -627,7 +647,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSCodeProb -->
+        <!-- eHDSICodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -647,9 +667,9 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSIllnessesandDisorders -->
+        <!-- eHDSIIllnessandDisorder -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
-        <!-- eHDSI-AbsentOrUnknownProblems -->
+        <!-- eHDSIAbsentOrUnknownProblem -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.50</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -669,7 +689,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSCodeProb -->
+        <!-- eHDSICodeProb -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.23</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -689,7 +709,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSSeverity -->
+        <!-- eHDSISeverity -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.13</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -709,7 +729,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSStatusCode -->
+        <!-- eHDSIStatusCode -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.15</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -729,7 +749,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSResolutionOutcome -->
+        <!-- eHDSIResolutionOutcome -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.30</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -749,7 +769,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSVaccine -->
+        <!-- eHDSIVaccine -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.28</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -769,9 +789,9 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSProcedures -->
+        <!-- eHDSIProcedure -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.10</valueSet>
-        <!-- eHDSI-AbsentOrUnknownProcedures -->
+        <!-- eHDSIAbsentOrUnknownProcedure -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.51</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -791,9 +811,9 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSMedicalDevices -->
+        <!-- eHDSIMedicalDevice -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.8</valueSet>
-        <!-- eHDSI-AbsentOrUnknownDevices -->
+        <!-- eHDSIAbsentOrUnknownDevice -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.48</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -813,7 +833,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSSocialHistory -->
+        <!-- eHDSISocialHistory -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.14</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -833,7 +853,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSBloodGroup -->
+        <!-- eHDSIBloodGroup -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.20</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -853,7 +873,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSPregnancyInformation -->
+        <!-- eHDSIPregnancyInformation -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.9</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -873,7 +893,7 @@
             <MRODocCDAl3>NA</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSBloodPressure -->
+        <!-- eHDSIBloodPressure -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.21</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
@@ -893,7 +913,7 @@
             <MRODocCDAl3>O</MRODocCDAl3>
             <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
         </usage>
-        <!-- epSOSSections -->
+        <!-- eHDSISection -->
         <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.26</valueSet>
         <valueSetVersion />
         <targetLanguageCode />
