@@ -13,6 +13,7 @@ public class Constants {
 
     public static final String EP_CLASSCODE = "57833-6";
     public static final String PS_CLASSCODE = "60591-5";
+    public static final String EDD_CLASSCODE = "DISCARD-60593-1";
     public static final String ED_CLASSCODE = "60593-1";
     public static final String MRO_CLASSCODE = "56445-0";
     public static final String CONSENT_CLASSCODE = "57016-8";
@@ -43,7 +44,7 @@ public class Constants {
     public static final String HOME_COMM_ID;
     public static final String COUNTRY_CODE;
     public static final String COUNTRY_NAME;
-    public static final String COUNTRY_PRINCIPAL_SUBDIVISION; // ISO 3166-2
+    public static final String COUNTRY_PRINCIPAL_SUBDIVISION;
     public static final String LANGUAGE_CODE;
     public static final String HR_ID_PREFIX = "SPProvidedID";
     /**
@@ -64,7 +65,7 @@ public class Constants {
     public static final String NCP_SIG_KEYSTORE_PASSWORD;
     public static final String NCP_SIG_PRIVATEKEY_ALIAS;
     public static final String NCP_SIG_PRIVATEKEY_PASSWORD;
-    public static final String WRITE_TEST_AUDITS;
+
     /**
      * Name of the System Variable containing the path to the folder containing the configuration files.
      */
@@ -103,8 +104,6 @@ public class Constants {
         NCP_SIG_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
         NCP_SIG_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
         NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
-
-        WRITE_TEST_AUDITS = ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS");
     }
 
     private Constants() {

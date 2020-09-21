@@ -12,12 +12,16 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
@@ -52,10 +56,8 @@ public class EadcUtil {
         watch.start();
         Document reqEnv;
         Document respEnv;
-        EadcEntry eadcEntry;
-        EadcReceiverImpl eadcReceiver;
         Transaction transaction;
-        Document transDoc;
+        Document transactionDocument;
 
         LOGGER.info("[EADC] Transaction Processing Started...");
         reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -71,13 +73,14 @@ public class EadcUtil {
         transaction = buildTransaction(transInfo);
 
         if (cdaDocument != null) {
-            transDoc = TransactionHelper.insertCdaInTransaction(transaction, cdaDocument);
+            transactionDocument = TransactionHelper.insertCdaInTransaction(transaction, cdaDocument);
         } else {
-            transDoc = TransactionHelper.convertTransaction(transaction);
+            transactionDocument = TransactionHelper.convertTransaction(transaction);
         }
-
-        eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transDoc, reqEnv, respEnv);
-        eadcReceiver = new EadcReceiverImpl();
+        printTransaction(transaction);
+        LOGGER.info("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
+        EadcEntry eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transactionDocument, reqEnv, respEnv);
+        EadcReceiverImpl eadcReceiver = new EadcReceiverImpl();
         eadcReceiver.process(eadcEntry);
 
         watch.stop();
@@ -88,13 +91,13 @@ public class EadcUtil {
     /**
      * Fills a Transaction object with a Transaction Info element.
      *
-     * @param transInfo
+     * @param transactionInfo
      * @return
      */
-    private static Transaction buildTransaction(TransactionInfo transInfo) {
+    private static Transaction buildTransaction(TransactionInfo transactionInfo) {
 
         Transaction result = new ObjectFactory().createComplexTypeTransaction();
-        result.setTransactionInfo(transInfo);
+        result.setTransactionInfo(transactionInfo);
         return result;
     }
 
@@ -104,7 +107,7 @@ public class EadcUtil {
     public static String getDefaultDsPath() {
 
         if (defaultDsPath == null) {
-            defaultDsPath = getEpsosPropsPath();
+            defaultDsPath = getApplicationRootPath();
         }
         return defaultDsPath;
     }
@@ -114,7 +117,7 @@ public class EadcUtil {
      *
      * @return the full epSOS Props Path currently on the system.
      */
-    public static String getEpsosPropsPath() {
+    public static String getApplicationRootPath() {
 
         String path = System.getenv("EPSOS_PROPS_PATH");
 
@@ -128,6 +131,42 @@ public class EadcUtil {
         return path;
     }
 
+    private static void printTransaction(Transaction transaction) {
+
+        try {
+            StringWriter stringWriter = new StringWriter();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Transaction.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            QName qName = new QName("com:spirit:SpiritProxy", "transaction");
+            JAXBElement<Transaction> root = new JAXBElement<>(qName, Transaction.class, transaction);
+            jaxbMarshaller.marshal(root, stringWriter);
+            String xmlContent = stringWriter.toString();
+            LOGGER.info("Transaction:\n'{}'", xmlContent);
+
+        } catch (JAXBException e) {
+            LOGGER.error("JAXBException: '{}'", e.getMessage(), e);
+        }
+    }
+
+    public static String xmlToString(Node node) {
+
+        try {
+            Source source = new DOMSource(node);
+            StringWriter stringWriter = new StringWriter();
+            Result result = new StreamResult(stringWriter);
+            TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = factory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(source, result);
+            return stringWriter.getBuffer().toString();
+        } catch (TransformerException e) {
+            LOGGER.error("TransformerException: '{}'", e.getMessage());
+        }
+        return null;
+    }
+
     /**
      * convertXMLDocumentToString
      *
@@ -138,7 +177,6 @@ public class EadcUtil {
     public static String convertXMLDocumentToString(Document xmlDocument) throws Exception {
 
         if (xmlDocument == null) {
-
             LOGGER.warn("XML Document is NULL. Can't convert XML Document to String.");
             return "";
         }
@@ -163,7 +201,7 @@ public class EadcUtil {
     public enum Direction {
 
         INBOUND("INBOUND"), OUTBOUND("OUTBOUND");
-        private String value;
+        private final String value;
 
         Direction(final String value) {
             this.value = value;
