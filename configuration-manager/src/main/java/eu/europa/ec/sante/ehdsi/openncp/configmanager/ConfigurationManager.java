@@ -5,7 +5,8 @@ import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import java.util.Map;
 
 /**
- *
+ * OpenNCP ConfigurationManager interface defining all the services responsible for the application configuration and
+ * properties used by all the components.
  */
 public interface ConfigurationManager {
 

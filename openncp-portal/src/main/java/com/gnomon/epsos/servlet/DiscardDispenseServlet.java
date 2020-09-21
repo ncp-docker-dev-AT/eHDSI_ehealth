@@ -80,7 +80,7 @@ public class DiscardDispenseServlet extends HttpServlet {
     private EpsosDocument1 buildDispenseDocument(User user, String dispenseRoot, String dispenseExtension, byte[] dispense) {
 
         GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
-        classCode.setNodeRepresentation("DISCARD-" + Constants.ED_CLASSCODE);
+        classCode.setNodeRepresentation(Constants.EDD_CLASSCODE);
         classCode.setSchema(IheConstants.ClASSCODE_SCHEME);
         classCode.setValue(Constants.ED_TITLE);
 

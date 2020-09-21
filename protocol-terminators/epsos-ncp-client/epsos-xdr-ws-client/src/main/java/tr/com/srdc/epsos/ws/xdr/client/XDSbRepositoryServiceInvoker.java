@@ -60,15 +60,11 @@ public class XDSbRepositoryServiceInvoker {
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
 
         switch (docClassCode) {
-            case "DISCARD-" + Constants.ED_CLASSCODE:
-                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
-                break;
             case Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
                 break;
             case Constants.CONSENT_CLASSCODE:
-                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
-                break;
             case Constants.HCER_CLASSCODE:
                 endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
                 break;
@@ -196,12 +192,12 @@ public class XDSbRepositoryServiceInvoker {
     private ClassificationType makeClassification0(String classificationScheme, String classifiedObject, String nodeRepresentation) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-        ClassificationType cl = ofRim.createClassificationType();
-        cl.setId(uuid);
-        cl.setNodeRepresentation(nodeRepresentation);
-        cl.setClassificationScheme(classificationScheme);
-        cl.setClassifiedObject(classifiedObject);
-        return cl;
+        ClassificationType rimClassification = ofRim.createClassificationType();
+        rimClassification.setId(uuid);
+        rimClassification.setNodeRepresentation(nodeRepresentation);
+        rimClassification.setClassificationScheme(classificationScheme);
+        rimClassification.setClassifiedObject(classifiedObject);
+        return rimClassification;
     }
 
     /**
@@ -301,9 +297,9 @@ public class XDSbRepositoryServiceInvoker {
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
                         Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_ED_STR));
                 break;
-            case "DISCARD-" + Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
-                        "DISCARD-" + Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
+                        Constants.EDD_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
                         XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
                 break;
             case Constants.CONSENT_CLASSCODE:
@@ -333,7 +329,7 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.CODING_SCHEME,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.DISPLAY_NAME));
                 break;
-            case "DISCARD-" + Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.FormatCode.FORMAT_CODE_SCHEME, uuid,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.CODING_SCHEME,
@@ -393,7 +389,7 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.Consent.DISPLAY_NAME));
                 break;
             case Constants.ED_CLASSCODE:
-            case "DISCARD-" + Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
                         uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.CODING_SCHEME,
