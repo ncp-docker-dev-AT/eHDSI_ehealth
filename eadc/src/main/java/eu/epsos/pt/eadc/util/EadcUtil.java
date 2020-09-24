@@ -27,10 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 /**
- * The purpose of this class is to help the eADC invocation process, by
- * providing utility methods to invoke the service.
- *
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
+ * The purpose of this class is to help the eADC invocation process, by providing utility methods to invoke the service.
  */
 public class EadcUtil {
 
@@ -44,8 +41,7 @@ public class EadcUtil {
      *
      * @param reqMsgContext the Servlet request message context
      * @param rspMsgContext the Servlet response message context
-     * @param cdaDocument   the optional CDA document, leave as null if not
-     *                      necessary
+     * @param cdaDocument   the optional CDA document, leave as null if not necessary
      * @param transInfo     the Transaction Info object
      * @throws Exception
      */
@@ -84,8 +80,7 @@ public class EadcUtil {
         eadcReceiver.process(eadcEntry);
 
         watch.stop();
-        LOGGER.debug("[EADC] method invokeEADC executed in: '{}ms'", watch.getTime());
-        LOGGER.info("[EADC] Transaction Processing Finished...");
+        LOGGER.info("[EADC] Transaction Processing Finished in: '{}ms'", watch.getTime());
     }
 
     /**
@@ -115,7 +110,7 @@ public class EadcUtil {
     /**
      * Helper method to return the system epSOS Properties Path
      *
-     * @return the full epSOS Props Path currently on the system.
+     * @return the full OpenNCP Props Path currently used by the system.
      */
     public static String getApplicationRootPath() {
 
