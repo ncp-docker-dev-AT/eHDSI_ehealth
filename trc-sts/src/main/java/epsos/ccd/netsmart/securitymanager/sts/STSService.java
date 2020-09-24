@@ -124,6 +124,8 @@ public class STSService implements Provider<SOAPMessage> {
             // these calls are both getters and checkers of message.
             // So we call them first
             String purposeOfUse = STSUtils.getPurposeOfUse(body);
+            String pinCode = STSUtils.getPinCode(body);
+            String prescriptionId = STSUtils.getPrescriptionId(body);
             String patientID = getPatientID(body);
             String mid = getMessageIdFromHeader(header);
 
@@ -140,7 +142,7 @@ public class STSService implements Provider<SOAPMessage> {
                     logger.info("hcpIdAssertion Issue Instant: '{}'", hcpIdAssertion.getIssueInstant());
                 }
             }
-            Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, null);
+            Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, pinCode, prescriptionId, null);
             if (hcpIdAssertion != null) {
                 logger.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
                         hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),

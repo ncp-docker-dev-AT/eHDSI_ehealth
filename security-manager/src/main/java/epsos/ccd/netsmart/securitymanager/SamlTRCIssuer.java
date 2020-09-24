@@ -191,6 +191,11 @@ public class SamlTRCIssuer {
         }
     }
 
+    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
+                                   List<Attribute> attrValuePair) throws SMgrException {
+        return issueTrcToken(hcpIdentityAssertion, patientID, purposeOfUse, StringUtils.EMPTY, StringUtils.EMPTY, attrValuePair);
+    }
+
     /**
      * Issues a SAML TRC Assertion that proves the treatment relationship between the HCP and the Patient.
      * The Identity of the HCP is provided by the hcpIdentityAssertion. The identity of the patient is inferred from the patientID.
@@ -202,17 +207,18 @@ public class SamlTRCIssuer {
      * @param attrValuePair        SAML {@link Attribute} that will be added to the assertion
      * @return the SAML TRC Assertion
      */
-    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
+    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse, String pinCode, String prescriptionId,
                                    List<Attribute> attrValuePair) throws SMgrException {
+
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                     hcpIdentityAssertion.getID(), patientID, purposeOfUse);
         }
-        //initializing the map
+        // Initializing the Map
         auditDataMap.clear();
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
-        //Doing an indirect copy so, because when cloning, signatures are lost.
+        //  Doing an indirect copy so, because when cloning, signatures are lost.
         SignatureManager signatureManager = new SignatureManager(ksm);
 
         try {
@@ -222,7 +228,6 @@ public class SamlTRCIssuer {
         }
 
         DateTime nowUTC = new DateTime(DateTimeZone.UTC);
-
         logger.info("Assertion validity: '{}' - '{}'", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
         if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
@@ -355,24 +360,26 @@ public class SamlTRCIssuer {
         }
         attrStmt.getAttributes().add(attrPoU);
 
-        Attribute attributePinCode = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-        attributePinCode.setFriendlyName("Pin Code");
-        attributePinCode.setName("urn:ehdsi:names:document:document-id:pinCode");
-        attributePinCode.setNameFormat(Attribute.URI_REFERENCE);
-        XSString attrValPinCode = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-        attrValPinCode.setValue("1234");
-        attributePinCode.getAttributeValues().add(attrValPinCode);
-        attrStmt.getAttributes().add(attributePinCode);
-
-        Attribute attributeDocumentId = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-        attributeDocumentId.setFriendlyName("Prescription ID");
-        attributeDocumentId.setName("urn:ehdsi:names:document:document-id:prescriptionId");
-        attributeDocumentId.setNameFormat(Attribute.URI_REFERENCE);
-        XSString attrValDocumentId = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-        attrValDocumentId.setValue("ABCDEF");
-        attributeDocumentId.getAttributeValues().add(attrValDocumentId);
-        attrStmt.getAttributes().add(attributeDocumentId);
-
+        if (StringUtils.isNotBlank(pinCode)) {
+            Attribute attributePinCode = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+            attributePinCode.setFriendlyName("Pin Code");
+            attributePinCode.setName("urn:ehdsi:names:document:document-id:pinCode");
+            attributePinCode.setNameFormat(Attribute.URI_REFERENCE);
+            XSString attrValPinCode = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+            attrValPinCode.setValue(pinCode);
+            attributePinCode.getAttributeValues().add(attrValPinCode);
+            attrStmt.getAttributes().add(attributePinCode);
+        }
+        if (StringUtils.isNotBlank(prescriptionId)) {
+            Attribute attributeDocumentId = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+            attributeDocumentId.setFriendlyName("Prescription ID");
+            attributeDocumentId.setName("urn:ehdsi:names:document:document-id:prescriptionId");
+            attributeDocumentId.setNameFormat(Attribute.URI_REFERENCE);
+            XSString attrValDocumentId = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+            attrValDocumentId.setValue(prescriptionId);
+            attributeDocumentId.getAttributeValues().add(attrValDocumentId);
+            attrStmt.getAttributes().add(attributeDocumentId);
+        }
         Attribute pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization");
         if (pointOfCareAttr != null) {

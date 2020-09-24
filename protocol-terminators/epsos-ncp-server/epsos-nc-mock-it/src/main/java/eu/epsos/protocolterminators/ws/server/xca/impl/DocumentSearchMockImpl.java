@@ -3,19 +3,13 @@ package eu.epsos.protocolterminators.ws.server.xca.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
+import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
-import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.DocumentFactory;
-import fi.kela.se.epsos.data.model.EPDocumentMetaData;
-import fi.kela.se.epsos.data.model.EPSOSDocument;
-import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
-import fi.kela.se.epsos.data.model.MroDocumentMetaData;
-import fi.kela.se.epsos.data.model.PSDocumentMetaData;
-import fi.kela.se.epsos.data.model.SearchCriteria;
+import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -28,19 +22,20 @@ import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.io.StringWriter;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -55,10 +50,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static final String EHDSI_HL7_NAMESPACE = "urn:hl7-org:v3";
     private static final String EHDSI_EPSOS_MEDICATION_NAMESPACE = "urn:epsos-org:ep:medication";
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentSearchMockImpl.class);
-    private List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
-    private List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
-    private List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
-    private List<EPSOSDocument> documents = new ArrayList<>();
+    private final List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
+    private final List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
+    private final List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
+    private final List<EPSOSDocument> documents = new ArrayList<>();
 
     public DocumentSearchMockImpl() {
 
@@ -216,7 +211,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     Node node1 = nodeList1.item(i);
 
                     if (node1.getNodeType() == Node.ELEMENT_NODE) {
-                        LOGGER.info("Node: '{}'", node1.getLocalName());
+                        LOGGER.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
                                 prefix.append(node1.getTextContent()).append(" ");
@@ -230,14 +225,38 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                             case "family":
                                 family.append(node1.getTextContent()).append(" ");
                                 break;
+                            default:
+                                LOGGER.warn("No Author information to append...");
+                                break;
                         }
                     }
                 }
-                author = String.format("%s %s %s %s", org.apache.commons.lang3.StringUtils.trim(prefix.toString()), org.apache.commons.lang3.StringUtils.trim(given.toString()),
-                        org.apache.commons.lang3.StringUtils.trim(family.toString()), suffix.toString());
+                author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
+                        StringUtils.trim(family.toString()), suffix.toString());
             }
         }
-        return org.apache.commons.lang3.StringUtils.trim(author);
+        return StringUtils.trim(author);
+    }
+
+    public static String asString(Node node) {
+
+        StringWriter writer = new StringWriter();
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer trans = transformerFactory.newTransformer();
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.setOutputProperty(OutputKeys.VERSION, "1.0");
+            if (!(node instanceof Document)) {
+                trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            }
+            trans.transform(new DOMSource(node), new StreamResult(writer));
+        } catch (final TransformerConfigurationException ex) {
+            throw new IllegalStateException(ex);
+        } catch (final TransformerException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return writer.toString();
     }
 
     @Override
@@ -261,7 +280,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 return da;
             }
         }
-
         return null;
     }
 
@@ -272,13 +290,17 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria)");
         }
         List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
+        Element soapHeader = getSOAPHeader();
+        LOGGER.info("[National Connector A] SOAP Header:\n'{}'", asString(soapHeader));
+        LOGGER.info("[National Connector A] HCP Assertion:\n'{}'", NationalConnectorUtil.getHCPAssertionFromSOAPHeader(soapHeader).getID());
+        LOGGER.info("[National Connector A] TRC Assertion:\n'{}'", NationalConnectorUtil.getTRCAssertionFromSOAPHeader(soapHeader).getID());
 
-        for (DocumentAssociation<EPDocumentMetaData> da : epDocumentMetaDatas) {
-            if (da.getXMLDocumentMetaData() != null
-                    && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                metaDatas.add(da);
+        for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
+            if (documentAssociation.getXMLDocumentMetaData() != null
+                    && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
+                metaDatas.add(documentAssociation);
                 if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
+                    LOGGER.info("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation.toString());
                 }
             }
         }

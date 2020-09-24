@@ -27,7 +27,6 @@ import java.io.StringWriter;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
@@ -45,6 +44,42 @@ public class STSUtils {
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
 
     private STSUtils() {
+    }
+
+    /**
+     * @param body
+     * @return
+     */
+    public static String getPinCode(SOAPElement body) {
+
+        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
+            throw new WebServiceException("No TRC Parameters in RST");
+        }
+
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "PinCode").item(0) == null) {
+            return StringUtils.EMPTY;
+        }
+
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "PinCode").item(0).getTextContent();
+    }
+
+    /**
+     * @param body
+     * @return
+     */
+    public static String getPrescriptionId(SOAPElement body) {
+
+        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
+            throw new WebServiceException("No TRC Parameters in RST");
+        }
+
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "PrescriptionId").item(0) == null) {
+            return StringUtils.EMPTY;
+        }
+
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "PrescriptionId").item(0).getTextContent();
     }
 
     /**

@@ -17,115 +17,98 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * list resources available from the classpath
+ * List resources available from the classpath.
  *
  * @author stoughto http://forums.devx.com/showthread.php?153784-how-to-list-resources-in-a-package
  */
 public class ResourceList {
 
-    private static Logger logger = LoggerFactory.getLogger(ResourceList.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceList.class);
+
+    private ResourceList() {
+    }
 
     /**
-     * for all elements of java.class.path get a Collection of resources Pattern
-     * pattern = Pattern.compile(".*"); gets all resources
+     * Gets all resources.
+     * For all elements of java.class.path get a Collection of resources Pattern pattern = Pattern.compile(".*").
      *
      * @param pattern the pattern to match
      * @return the resources in the order they are found
      */
     public static Collection<String> getResources(Pattern pattern) {
 
-        ArrayList<String> retval = new ArrayList<>();
+        ArrayList<String> resources = new ArrayList<>();
         URLClassLoader classLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
         URL[] classPathElements = classLoader.getURLs();
         for (URL element : classPathElements) {
             try {
                 if (!element.toString().contains("mock")) continue;
-                logger.debug("Found URL '{}'", element);
-                retval.addAll(getResources(element.toURI(), pattern));
+                LOGGER.debug("Found URL '{}'", element);
+                resources.addAll(getResources(element.toURI(), pattern));
             } catch (URISyntaxException e) {
-                logger.debug("Could not convert URL " + element + " into URI");
+                LOGGER.debug("Could not convert URL " + element + " into URI");
             }
         }
-        return retval;
+        return resources;
     }
 
     private static Collection<String> getResources(URI element, Pattern pattern) {
 
-        ArrayList<String> retval = new ArrayList<>();
+        ArrayList<String> resources = new ArrayList<>();
         File file = new File(element);
         if (file.isDirectory()) {
-            retval.addAll(getResourcesFromDirectory(file, pattern));
+            resources.addAll(getResourcesFromDirectory(file, pattern));
         } else {
-            retval.addAll(getResourcesFromJarFile(file, pattern));
+            resources.addAll(getResourcesFromJarFile(file, pattern));
         }
-        return retval;
+        return resources;
     }
 
     private static Collection<String> getResourcesFromJarFile(File file, Pattern pattern) {
 
-        ArrayList<String> retval = new ArrayList<>();
-        ZipFile zf;
+        ArrayList<String> resources = new ArrayList<>();
+        ZipFile zipFile;
         try {
-            zf = new ZipFile(file);
+            zipFile = new ZipFile(file);
         } catch (IOException e) {
             throw new Error(e);
         }
-        Enumeration e = zf.entries();
+        Enumeration e = zipFile.entries();
         while (e.hasMoreElements()) {
             ZipEntry ze = (ZipEntry) e.nextElement();
             String fileName = ze.getName();
             boolean accept = pattern.matcher(fileName).matches();
             if (accept) {
-                retval.add(fileName);
+                resources.add(fileName);
             }
         }
         try {
-            zf.close();
+            zipFile.close();
         } catch (IOException e1) {
             throw new Error(e1);
         }
-        return retval;
+        return resources;
     }
 
     private static Collection<String> getResourcesFromDirectory(File directory, Pattern pattern) {
 
-        ArrayList<String> retval = new ArrayList<>();
+        ArrayList<String> resources = new ArrayList<>();
         File[] fileList = directory.listFiles();
         for (File file : fileList) {
             if (file.isDirectory()) {
-                retval.addAll(getResourcesFromDirectory(file, pattern));
+                resources.addAll(getResourcesFromDirectory(file, pattern));
             } else {
                 try {
                     String fileName = file.getCanonicalPath();
                     boolean accept = pattern.matcher(fileName).matches();
                     if (accept) {
-                        retval.add(fileName);
+                        resources.add(fileName);
                     }
                 } catch (IOException e) {
                     throw new Error(e);
                 }
             }
         }
-        return retval;
-    }
-
-    /**
-     * list the resources that match args[0]
-     *
-     * @param args args[0] is the pattern to match, or list all resources if
-     *             there are no args
-     */
-    public static void main(String[] args) {
-
-        Pattern pattern;
-        if (args.length < 1) {
-            pattern = Pattern.compile(".*");
-        } else {
-            pattern = Pattern.compile(args[0]);
-        }
-        Collection<String> list = ResourceList.getResources(pattern);
-        for (String name : list) {
-            logger.info("Name: '{}'", name);
-        }
+        return resources;
     }
 }
