@@ -24,12 +24,12 @@
 
     <xs:complexType name="patientSearch">
         <xs:sequence>
-            <xs:element ref="id" maxOccurs="unbounded"/>
+            <xs:element ref="identifiers" maxOccurs="unbounded"/>
             <xs:element ref="textField" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="birthDate" minOccurs="0"/>
             <xs:element ref="sex" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="scope" type="scope" default="0" />
+        <xs:attribute name="scope" type="scope" default="0"/>
     </xs:complexType>
 
     <xs:complexType name="documentSearch">
@@ -39,7 +39,7 @@
         </xs:sequence>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectID -->
@@ -50,8 +50,23 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string" use="required"/>
-        <xs:attribute name="scope" type="scope" default="0" />
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="scope" type="scope" default="0"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
+    </xs:complexType>
+
+    <!-- LivingSubjectID container allowing to represent required Patient ID or to express logical OR for these
+    identifiers (ie National or Regional ID) -->
+    <xs:complexType name="identifiers">
+        <xs:sequence>
+            <xs:element name="id" type="id"/>
+            <xs:element name="ids">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="id" minOccurs="2" maxOccurs="unbounded" type="id"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectBirthTime -->
@@ -60,8 +75,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" />
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="scope" type="scope" default="0"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Deprecated Element -->
@@ -70,8 +85,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" />
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="scope" type="scope" default="0"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectGender -->
@@ -80,8 +95,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" />
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="scope" type="scope" default="0"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Patient element  generic Identity Traits- LivingSubjectName, PatientAddress -->
@@ -90,8 +105,8 @@
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
-        <xs:attribute name="scope" type="scope" default="0" />
-        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="scope" type="scope" default="0"/>
+        <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <xs:simpleType name="scope">
@@ -102,7 +117,7 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:element name="id" type="id"/>
+    <xs:element name="identifiers" type="identifiers"/>
     <xs:element name="textField" type="textField"/>
     <xs:element name="birthDate" type="birthDate"/>
     <xs:element name="sex" type="sex"/>
