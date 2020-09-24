@@ -1658,7 +1658,6 @@ public class EpsosHelperService {
             LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
-
     }
 
     public static String getCountriesLabelsFromCS(String language) {
@@ -1732,8 +1731,8 @@ public class EpsosHelperService {
 
         List<Identifier> identifiers = new ArrayList<>();
 
-        List<SearchMask> vec = EpsosHelperService.getCountryIdsFromCS(country, path);
-        for (SearchMask aVec : vec) {
+        List<SearchMask> searchMaskList = EpsosHelperService.getCountryIdsFromCS(country, path);
+        for (SearchMask aVec : searchMaskList) {
             Identifier id = new Identifier();
             id.setKey(EpsosHelperService.getPortalTranslation(aVec.getLabel(), language) + "*");
             id.setDomain(aVec.getDomain());
@@ -1744,11 +1743,8 @@ public class EpsosHelperService {
             id.setFriendlyName(aVec.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
-                String idvalue = (String) user.getExpandoBridge().getAttribute(id.getDomain());
-                LOGGER.info("Identifiers: '{}_{}'", id.getKey(), idvalue);
-                id.setUserValue(idvalue);
+                id.setUserValue((String) user.getExpandoBridge().getAttribute(id.getDomain()));
             }
-
             identifiers.add(id);
         }
         return identifiers;
@@ -1772,8 +1768,7 @@ public class EpsosHelperService {
             id.setFriendlyName(demo.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
-                String idvalue = (String) user.getExpandoBridge().getAttribute(id.getKey());
-                id.setUserValue(idvalue);
+                id.setUserValue((String) user.getExpandoBridge().getAttribute(id.getKey()));
             }
             demographics.add(id);
         }
@@ -1886,65 +1881,84 @@ public class EpsosHelperService {
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static String getPortalTranslationFromServlet(HttpServletRequest req, String key, String language) {
+    public static String getPortalTranslationFromServlet(HttpServletRequest httpServletRequest, String key, String language) {
 
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static void printAssertion(Assertion ass) throws MarshallingException {
+    public static void printAssertion(Assertion assertion) throws MarshallingException {
 
-        AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element;
-        element = marshaller.marshall(ass);
-        Document document = element.getOwnerDocument();
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            String asstring = Utils.getDocumentAsXml(document, false);
-
-            LOGGER_CLINICAL.info("##################### ASSERTION Start");
-            LOGGER_CLINICAL.info(asstring);
-            LOGGER_CLINICAL.info("##################### ASSERTION End");
+            AssertionMarshaller marshaller = new AssertionMarshaller();
+            Element element;
+            element = marshaller.marshall(assertion);
+            Document document = element.getOwnerDocument();
+            LOGGER_CLINICAL.info("Assertion:\n'{}'", Utils.getDocumentAsXml(document, false));
         }
     }
 
-    public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
+    /**
+     * Creates TRC Assertions required to proceed with documents list, retrieve and submit operations.
+     *
+     * @param purposeOfUse - Clinician purpose of use access request.
+     * @param assertionHCP - Clinician assertion.
+     * @param patient      - Patient information receiving treatment.
+     * @return Signed TRC Assertions.
+     * @throws Exception - Exception returned by TRC-STS component.
+     */
+    public static Assertion createPatientConfirmationPlain(Assertion assertionHCP, PatientId patient, String purposeOfUse) throws Exception {
 
-        Assertion trc;
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
-        }
-        String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
-        }
-        LOGGER.info("Assertion ID: '{}'", idAs.getID());
-        LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest trcAssertionRequest = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).pinCode("1234").prescriptionId("ABCDE").build();
-        LOGGER.info("TRCAssertionRequest: '{}", trcAssertionRequest);
-        trc = trcAssertionRequest.request();
+        return createPatientConfirmationPlain(assertionHCP, patient, purposeOfUse, StringUtils.EMPTY, StringUtils.EMPTY);
+    }
 
+    /**
+     * Creates TRC Assertions required to proceed with documents list, retrieve and submit operations.
+     *
+     * @param assertionHCP   - Clinician assertion.
+     * @param patient        - Patient information receiving treatment.
+     * @param purposeOfUse   - Clinician purpose of use access request.
+     * @param prescriptionId - Identifier of the prescription.
+     * @param pinCode        - Pin Code to unlock documents.
+     * @return Signed TRC Assertions.
+     * @throws Exception - Exception returned by TRC-STS component.
+     */
+    public static Assertion createPatientConfirmationPlain(Assertion assertionHCP, PatientId patient, String purposeOfUse,
+                                                           String prescriptionId, String pinCode) throws Exception {
+
+        LOGGER.info("HCP Assertion ID: '{}'", assertionHCP.getID());
+        String patientId = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.info("Creates TRC Assertion with parameters -> Patient ID: '{}' - Prescription Id: '{}' - PinCode: '{}'",
+                    patientId, prescriptionId, pinCode);
+        }
+        LOGGER.info("TRC-STS URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+        TRCAssertionRequest.Builder builder = new TRCAssertionRequest.Builder(assertionHCP, patientId)
+                .purposeOfUse(purposeOfUse);
+        if (StringUtils.isNotBlank(prescriptionId)) {
+            builder.prescriptionId(prescriptionId);
+        }
+        if (StringUtils.isNotBlank(pinCode)) {
+            builder.pinCode(pinCode);
+        }
+        Assertion assertionTRC = builder.build().request();
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = marshaller.marshall(trc);
+        Element element = marshaller.marshall(assertionTRC);
         Document document = element.getOwnerDocument();
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            String trca = Utils.getDocumentAsXml(document, false);
-
-            LOGGER_CLINICAL.info("#### TRCA Start");
-            LOGGER_CLINICAL.info(trca);
-            LOGGER_CLINICAL.info("#### TRCA End");
+            LOGGER_CLINICAL.info("TRC Assertion:\n'{}'", Utils.getDocumentAsXml(document, false));
         }
-        LOGGER.debug("TRCA CREATED: '{}'", trc.getID());
-        LOGGER.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
-        LiferayUtils.storeToSession("trcAssertion", trc);
-        return trc;
+        LOGGER.debug("TRC Assertion created and stored into session: '{}'", assertionTRC.getID());
+        LiferayUtils.storeToSession("trcAssertion", assertionTRC);
+        return assertionTRC;
     }
 
     public static String extractPdfPartOfDocument(String cda) {
 
         String result = cda;
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document dom = db.parse(new ByteArrayInputStream(cda.getBytes()));
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document dom = documentBuilder.parse(new ByteArrayInputStream(cda.getBytes()));
 
             XPath xpath = XPathFactory.newInstance().newXPath();
             xpath.setNamespaceContext(new CDANameSpaceContext());
@@ -1953,7 +1967,7 @@ public class EpsosHelperService {
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                    LOGGER_CLINICAL.info("base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = base64EncodedPdfString;
                 result = "data:application/pdf;base64," + result;
@@ -1963,12 +1977,11 @@ public class EpsosHelperService {
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
                     if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                        LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                        LOGGER_CLINICAL.info("base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = base64EncodedPdfString;
                     result = "data:application/pdf;base64," + result;
                 }
-
             }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));

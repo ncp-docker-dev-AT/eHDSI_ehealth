@@ -16,6 +16,7 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -79,6 +80,8 @@ public class MyBean implements Serializable {
     private Date consentStartDate;
     private Date consentEndDate;
     private String consentOpt;
+    private String pinCode;
+    private String prescriptionId;
     private String purposeOfUse;
     private String purposeOfUseForPS;
     private String purposeOfUseForEP;
@@ -232,7 +235,7 @@ public class MyBean implements Serializable {
 
     public void searchPatients() {
 
-        logger.info("Searching for patients (creating assertions)...");
+        logger.info("[Portal] Searching for Patients (creating assertions)...");
         Object userAssertion = EpsosHelperService.getUserAssertion(emergency);
 
         if (userAssertion instanceof Assertion) {
@@ -243,19 +246,17 @@ public class MyBean implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "ASSERTION", userAssertion.toString()));
             errorUserAssertion = (String) userAssertion;
         }
-        logger.info("Searching for patients (demographics) '{}' (Identifiers) '{}'", demographics.size(), identifiers.size());
-        logger.info("Purpose Of Use: '{}'", emergency);
+        logger.info("Search Criteria --> Demographics list: '{}', Identifiers list: '{}', PIN Code '{}', Prescription ID: '{}', Purpose of Use: '{}'",
+                demographics.size(), identifiers.size(), pinCode, prescriptionId, purposeOfUse);
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
     public List<PatientDocument> getPatientDocuments() {
-
         return patientDocuments;
     }
 
     public void setPatientDocuments(List<PatientDocument> patientDocuments) {
         this.patientDocuments = patientDocuments;
-
     }
 
     public Patient getSelectedPatient() {
@@ -537,11 +538,13 @@ public class MyBean implements Serializable {
         }
     }
 
-    private void createTRCA(String docType, String purposeOfUse) {
+    private void createTRCAssertion(String docType, String purposeOfUse) {
+        createTRCAssertion(docType, purposeOfUse, StringUtils.EMPTY, StringUtils.EMPTY);
+    }
 
-        logger.info("Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
-        String runningMode = MyServletContextListener.getRunningMode();
+    private void createTRCAssertion(String docType, String purposeOfUse, String prescriptionId, String pinCode) {
 
+        logger.info("[Portal] Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         if (StringUtils.equals(docType, "ps")) {
             showPS = false;
         }
@@ -560,10 +563,8 @@ public class MyBean implements Serializable {
                 loggerClinical.info("TRCA: Creating trca for hcpAssertion: '{}' for patient: '{}'. Purpose of use is: '{}'",
                         hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
             }
-            if (runningMode.equals("demo")) {
-                logger.info("demo running so TRCA not created");
-            } else if (getSignedTRC() == null) {
-                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
+            if (getSignedTRC() == null) {
+                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(hcpAssertion, patientId, purposeOfUse, prescriptionId, pinCode);
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("TRCA: Created: '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
                             trcAssertion.getID(), hcpAssertion.getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
@@ -615,11 +616,11 @@ public class MyBean implements Serializable {
     }
 
     public void setPurposeOfUseForConsent(String purposeOfUse) {
-        createTRCA("consent", purposeOfUse);
+        createTRCAssertion("consent", purposeOfUse);
     }
 
     public void setPurposeOfUseForGeneric(String purposeOfUse) {
-        createTRCA("generic", purposeOfUse);
+        createTRCAssertion("generic", purposeOfUse);
     }
 
     private void saveConsent(ActionEvent actionEvent, String docType) {
@@ -738,7 +739,7 @@ public class MyBean implements Serializable {
     }
 
     public void setPurposeOfUseForPS(String purposeOfUse) {
-        createTRCA("ps", purposeOfUse);
+        createTRCAssertion("ps", purposeOfUse);
     }
 
     /**
@@ -932,10 +933,9 @@ public class MyBean implements Serializable {
     }
 
     /**
-     * The main goal of this method is to define an action to be taken by the
-     * portal if the Patient does not agrees with the specific and final consent
-     * (answer obtained through a last question in the work-flow). This action
-     * will force the portal to submit new consent for the patient.
+     * The main goal of this method is to define an action to be taken by the portal if the Patient does not agrees
+     * with the specific and final consent (answer obtained through a last question in the work-flow).
+     * This action will force the portal to submit new consent for the patient.
      *
      * @param confirmation
      */
@@ -947,31 +947,46 @@ public class MyBean implements Serializable {
                             null,
                             new FacesMessage(
                                     FacesMessage.SEVERITY_ERROR,
-                                    LiferayUtils
-                                            .getPortalTranslation("message.error"),
-                                    LiferayUtils
-                                            .getPortalTranslation("consent.not.given")));
+                                    LiferayUtils.getPortalTranslation("message.error"),
+                                    LiferayUtils.getPortalTranslation("consent.not.given")));
             showPS = false;
         }
     }
 
     public String checkConfirmationDocuments() {
+
         if (!trcassertionexists) {
-            ExternalContext ec = FacesContext.getCurrentInstance()
-                    .getExternalContext();
+            ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
             ec.getRequestMap().put("selectedPatient", selectedPatient);
             return "viewPatientConfirmationForDocuments";
         }
-        return "";
+        return StringUtils.EMPTY;
     }
 
     public String submitConfirmation() {
 
-        createTRCA("generic", purposeOfUse);
-        logger.info("### Selected patient: " + selectedPatient.getFamilyName());
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-        ec.getRequestMap().put("trcAssertion", trcAssertion);
+        createTRCAssertion("generic", purposeOfUse);
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        externalContext.getRequestMap().put("trcAssertion", trcAssertion);
         return "genericPatientConfirmation";
+    }
+
+    public String getPinCode() {
+        return pinCode;
+    }
+
+    public void setPinCode(String pinCode) {
+        logger.info("[Portal] Set PIN Code for ePrescription: '{}'", pinCode);
+        this.pinCode = pinCode;
+    }
+
+    public String getPrescriptionId() {
+        return prescriptionId;
+    }
+
+    public void setPrescriptionId(String prescriptionId) {
+        logger.info("[Portal] Set PrescriptionId for ePrescription: '{}'", prescriptionId);
+        this.prescriptionId = prescriptionId;
     }
 
     public String getPurposeOfUseForEP() {
@@ -979,7 +994,7 @@ public class MyBean implements Serializable {
     }
 
     public void setPurposeOfUseForEP(String purposeOfUse) {
-        createTRCA("ep", purposeOfUse);
+        createTRCAssertion("ep", purposeOfUse, pinCode, prescriptionId);
     }
 
     public boolean getEnableMRO() {
@@ -1023,25 +1038,25 @@ public class MyBean implements Serializable {
             String checkPermissions = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CHECK_PERMISSIONS);
             String checkHCER = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_HCER_ENABLED);
             boolean hcer = false;
-            if (Validator.isNotNull(checkHCER) && checkHCER.equalsIgnoreCase("true")) {
+            if (BooleanUtils.isTrue(Boolean.parseBoolean(checkHCER))) {
                 hcer = true;
             }
             String checkMRO = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_MRO_ENABLED);
             boolean mro = false;
-            if (Validator.isNotNull(checkMRO) && checkMRO.equalsIgnoreCase("true")) {
+
+            if (BooleanUtils.isTrue(Boolean.parseBoolean(checkMRO))) {
                 mro = true;
             }
 
             String checkCCD = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CCD_ENABLED);
-            if (StringUtils.equalsIgnoreCase(checkCCD, "true")) {
-
+            if (BooleanUtils.isTrue(Boolean.parseBoolean(checkCCD))) {
                 enableCCD = true;
             }
 
             String checkCONSENT = EpsosHelperService.getConfigProperty(EpsosHelperService.PORTAL_CONSENT_ENABLED);
-            enableCONSENT = StringUtils.equalsIgnoreCase(checkCONSENT, "true");
+            enableCONSENT = BooleanUtils.isTrue(Boolean.parseBoolean(checkCONSENT));
 
-            if (StringUtils.equalsIgnoreCase(checkPermissions, "false")) {
+            if (BooleanUtils.isFalse(Boolean.parseBoolean(checkPermissions))) {
                 enableMRO = true;
                 enableHCER = true;
                 enablePatientDocuments = true;
@@ -1060,8 +1075,8 @@ public class MyBean implements Serializable {
                 enablePatientDocuments = false;
                 enablePrescriptionDocuments = true;
             } else if (isPhysician) {
-                enableMRO = true && mro;
-                enableHCER = true && hcer;
+                enableMRO = mro;
+                enableHCER = hcer;
                 enablePatientDocuments = true;
                 enablePrescriptionDocuments = false;
             } else if (isPharmacist) {
@@ -1084,7 +1099,7 @@ public class MyBean implements Serializable {
             canConvert = false;
             try {
                 String canConvertToCCD = PropsUtil.get("can.convert.to.ccd");
-                if (Validator.isNotNull(canConvertToCCD) && canConvertToCCD.equalsIgnoreCase("true")) {
+                if (BooleanUtils.isTrue(Boolean.parseBoolean(canConvertToCCD))) {
                     canConvert = true;
                 }
             } catch (Exception e) {

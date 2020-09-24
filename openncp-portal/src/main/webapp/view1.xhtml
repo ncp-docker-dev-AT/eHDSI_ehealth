@@ -51,6 +51,10 @@
         </c:forEach>
         <h:outputLabel value="Emergency: (*)"/>
         <p:selectBooleanCheckbox label="emergency label" value="#{myBean.emergency}"/>
+        <h:outputLabel value="PIN Code"/>
+        <p:inputText value="#{myBean.pinCode}"/>
+        <h:outputLabel value="Prescription ID"/>
+        <p:inputText value="#{myBean.prescriptionId}"/>
     </h:panelGrid>
     <p/>
     <p:commandButton id="submitPatient" value="#{msg['ui.search.info']}" ajax="true"
@@ -109,7 +113,8 @@
             </p:commandLink>
             <p:commandLink
                     action="/viewPatientConfirmation.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"
-                    ajax="false" id="p4" title="#{msg['navi.report.prescription']}" rendered="#{myBean.assertionNotExists}"
+                    ajax="false" id="p4" title="#{msg['navi.report.prescription']}"
+                    rendered="#{myBean.assertionNotExists}"
                     disabled="#{!myBean.enablePrescriptionDocuments}">
                 <f:setPropertyActionListener value="#{patient}" target="#{myBean.selectedPatient}"/>
                 #{msg['ui.ep.info']}<br/>
