@@ -52,7 +52,7 @@
         <appender-ref ref="FILE"/>
     </logger>
 
-    <logger name="ee.affecto.epsos.ws.handler" level="DEBUG" additivity="false">
+    <logger name="ee.affecto.epsos.ws.handler" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
     </logger>
 
