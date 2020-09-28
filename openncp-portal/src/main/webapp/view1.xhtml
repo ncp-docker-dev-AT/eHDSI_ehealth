@@ -51,10 +51,12 @@
         </c:forEach>
         <h:outputLabel value="Emergency: (*)"/>
         <p:selectBooleanCheckbox label="emergency label" value="#{myBean.emergency}"/>
-        <h:outputLabel value="PIN Code"/>
-        <p:inputText value="#{myBean.pinCode}"/>
-        <h:outputLabel value="Prescription ID"/>
-        <p:inputText value="#{myBean.prescriptionId}"/>
+        <ui:remove>
+        	<h:outputLabel value="PIN Code"/>
+        	<p:inputText value="#{myBean.pinCode}"/>
+        	<h:outputLabel value="Prescription ID"/>
+        	<p:inputText value="#{myBean.prescriptionId}"/>
+        </ui:remove>
     </h:panelGrid>
     <p/>
     <p:commandButton id="submitPatient" value="#{msg['ui.search.info']}" ajax="true"

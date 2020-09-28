@@ -1787,7 +1787,7 @@ public class EpsosHelperService {
         return Constants.EPSOS_PROPS_PATH;
     }
 
-    public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
+    public static List<Demographics> getCountryDemographicsFromCS_old(String country, String portalPath) {
 
         List<Demographics> demographicsList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
@@ -1861,6 +1861,96 @@ public class EpsosHelperService {
                 dem.setType("text");
                 demographicsList.add(dem);
             }
+        } catch (Exception e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+        }
+        LOGGER.info("Demographics size: '{}'", demographicsList.size());
+        return demographicsList;
+    }
+    public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
+
+        List<Demographics> demographicsList = new ArrayList<>();
+        String filename = "InternationalSearch_" + country + ".xml";
+
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
+        try {
+            File file = new File(path);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(file);
+            doc.getDocumentElement().normalize();
+            
+            NodeList nodeLstPatientSearch = doc.getElementsByTagNameNS("*", "patientSearch");
+            
+            for (int j = 0; j < nodeLstPatientSearch.getLength(); j++) {
+            	 Element linkPatient = (Element) nodeLstPatientSearch.item(j);
+            	 
+            	// textFields
+                 NodeList nodeLst = linkPatient.getElementsByTagNameNS("*", "textField");
+                 for (int s = 0; s < nodeLst.getLength(); s++) {
+                     Element link = (Element) nodeLst.item(s);
+                     Demographics dem = new Demographics();
+                     dem.setLabel(link.getAttribute("label"));
+                     dem.setKey(link.getAttribute("label"));
+                     dem.setType("text");
+                     dem.setLength(Integer.parseInt(link.getAttribute("min")));
+                     dem.setFriendlyName(link.getAttribute("friendlyName"));
+
+                     // search for mandatory items
+                     NodeList nodeLst2 = linkPatient.getElementsByTagNameNS("*", "field");
+                     for (int i = 0; i < nodeLst2.getLength(); i++) {
+                         Element link2 = (Element) nodeLst2.item(i);
+                         if (link2.getAttribute("label").equals(dem.getLabel())) {
+                             dem.setMandatory(true);
+                             break;
+                         }
+                     }
+                     demographicsList.add(dem);
+                 }
+                 // sex
+                 nodeLst = linkPatient.getElementsByTagNameNS("*", "sex");
+                 for (int s = 0; s < nodeLst.getLength(); s++) {
+                     Element link = (Element) nodeLst.item(s);
+                     Demographics dem = new Demographics();
+                     dem.setLabel(link.getAttribute("label"));
+                     dem.setKey(link.getAttribute("label"));
+                     dem.setType("text");
+                     demographicsList.add(dem);
+                 }
+                 // birth date
+                 nodeLst = linkPatient.getElementsByTagNameNS("*", "birthDate");
+                 for (int s = 0; s < nodeLst.getLength(); s++) {
+                     Element link = (Element) nodeLst.item(s);
+                     Demographics dem = new Demographics();
+                     dem.setLabel(link.getAttribute("label"));
+                     dem.setKey(link.getAttribute("label"));
+                     dem.setType("calendar");
+                     demographicsList.add(dem);
+                 }
+                 nodeLst = linkPatient.getElementsByTagNameNS("*", "documentId");
+                 for (int s = 0; s < nodeLst.getLength(); s++) {
+                     Element link = (Element) nodeLst.item(s);
+                     Demographics dem = new Demographics();
+                     dem.setLabel(link.getAttribute("label"));
+                     dem.setKey(link.getAttribute("label"));
+                     dem.setType("text");
+                     demographicsList.add(dem);
+                 }
+
+                 nodeLst = linkPatient.getElementsByTagNameNS("*", "pinCode");
+                 for (int s = 0; s < nodeLst.getLength(); s++) {
+                     Element link = (Element) nodeLst.item(s);
+                     Demographics dem = new Demographics();
+                     dem.setLabel(link.getAttribute("label"));
+                     dem.setKey(link.getAttribute("label"));
+                     dem.setType("text");
+                     demographicsList.add(dem);
+                 }
+            	
+            }
+            
+            
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }

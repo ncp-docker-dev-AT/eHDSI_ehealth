@@ -26,14 +26,23 @@
     </p:commandLink>
     <ui:include src="patient.xhtml"/>
     <ui:include src="confirmation.xhtml"/>
+    
 </h:form>
 <h:form id="confirmationForm">
+ 	<p:panel id="documentsPanelid">
+    	<h:outputLabel value="PIN Code"/>
+    	<p:inputText value="#{confirmationBean.pinCode}"/>
+    	<h:outputLabel value="Prescription ID"/>
+    	<p:inputText value="#{confirmationBean.prescriptionId}"/>
+	</p:panel>
     <h:inputHidden id="trca" value="#{myBean.signedTRC}"/>
     <p:panel id="confirmationPanel">
         <p:commandButton id="submitButton" value="#{msg['trca.confirm']}" ajax="false"
                          action="/viewPrescriptions.xhtml?faces-redirect=true&amp;javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal">
             <f:setPropertyActionListener value="#{confirmationBean.purposeOfUse}" target="#{myBean.purposeOfUseForEP}"/>
             <f:setPropertyActionListener value="#{confirmationBean.confirm}" target="#{myBean.specificConsent}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.pinCode}" target="#{myBean.pinCode}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.prescriptionId}" target="#{myBean.prescriptionId}"/>
             <p:resetInput target="confirmationPanel"/>
         </p:commandButton>
         <p:commandButton id="cancelButton" value="#{msg['trca.cancel']}" ajax="false"
