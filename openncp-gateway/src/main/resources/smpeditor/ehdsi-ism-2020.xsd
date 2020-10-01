@@ -28,6 +28,7 @@
                 <xs:complexType>
                     <xs:attribute name="domain" type="xs:string" use="required"/>
                     <xs:attribute name="min" type="xs:integer" use="required"/>
+                    <xs:attribute name="max" type="xs:integer"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
@@ -35,6 +36,7 @@
                 <xs:complexType>
                     <xs:attribute name="domain" type="xs:string" use="required"/>
                     <xs:attribute name="min" type="xs:integer" use="required"/>
+                    <xs:attribute name="max" type="xs:integer"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
@@ -53,6 +55,9 @@
                             <xs:complexType>
                                 <xs:attribute name="domain" type="xs:string" use="required"/>
                                 <xs:attribute name="label" type="xs:string" use="required"/>
+                                <xs:attribute name="min" type="xs:integer" use="required"/>
+                                <xs:attribute name="max" type="xs:integer"/>
+                                <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                             </xs:complexType>
                         </xs:element>
                         <xs:element name="value" minOccurs="0" maxOccurs="unbounded">
@@ -62,10 +67,13 @@
                                         <xs:complexType>
                                             <xs:attribute name="domain" type="xs:string" use="required"/>
                                             <xs:attribute name="label" type="xs:string" use="required"/>
+                                            <xs:attribute name="min" type="xs:integer" use="required"/>
+                                            <xs:attribute name="max" type="xs:integer"/>
+                                            <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                                         </xs:complexType>
                                     </xs:element>
                                 </xs:sequence>
-                                <xs:attribute name="id" type="xs:string" use="required"/>
+                                <xs:attribute name="label" type="xs:string" use="required"/>
                                 <xs:attribute name="display" type="xs:string" use="required"/>
                             </xs:complexType>
                         </xs:element>
@@ -89,7 +97,7 @@
     </xs:complexType>
 
     <xs:complexType name="administrativeGender">
-        <xs:attribute name="min" type="xs:integer"/>
+        <xs:attribute name="min" type="xs:integer" use="required"/>
         <xs:attribute name="max" type="xs:integer"/>
         <xs:attribute name="friendlyName" type="xs:string"/>
         <xs:attribute name="label" type="xs:string"/>
