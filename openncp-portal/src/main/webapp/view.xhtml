@@ -6,20 +6,20 @@
 <h:head>
 </h:head>
 <body>
-    <f:view locale="#{facesContext.externalContext.requestLocale}"/>
-    <h3>#{msg['ui.flags.info']}</h3>
-    <h:form id="countryForm">
-        <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>
-        <p:dataGrid var="country" value="#{myBean.countries}" columns="6" rows="30">
-            <p:column>
-                <p:panel header="#{country.name}" style="text-align:center">
-                    <p:commandLink ajax="false" actionListener="#{myBean.showForm}">
-                        <f:setPropertyActionListener value="#{country.code}" target="#{myBean.selectedCountry}"/>
-                        <p:graphicImage value="/images/flags/#{country.code}.png" style="text-align:center" width="100"/>
-                    </p:commandLink>
-                </p:panel>
-            </p:column>
-        </p:dataGrid>
-    </h:form>
+<f:view locale="#{facesContext.externalContext.requestLocale}"/>
+<h3>#{msg['ui.flags.info']}</h3>
+<h:form id="countryForm">
+    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true"/>
+    <p:dataGrid var="country" value="#{myBean.countries}" columns="6" rows="30">
+        <p:column>
+            <p:panel header="#{country.name}" style="text-align:center">
+                <p:commandLink ajax="false" actionListener="#{myBean.showForm}">
+                    <f:setPropertyActionListener value="#{country.code}" target="#{myBean.selectedCountry}"/>
+                    <p:graphicImage value="/images/flags/#{country.code}.png" style="text-align:center" width="100"/>
+                </p:commandLink>
+            </p:panel>
+        </p:column>
+    </p:dataGrid>
+</h:form>
 </body>
 </html>
