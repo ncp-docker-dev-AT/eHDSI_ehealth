@@ -5,6 +5,7 @@ import com.gnomon.epsos.FacesService;
 import com.gnomon.epsos.MyServletContextListener;
 import com.gnomon.epsos.service.ConsentException;
 import com.gnomon.epsos.service.Demographics;
+import com.gnomon.epsos.service.DocumentCriteria;
 import com.gnomon.epsos.service.EpsosHelperService;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -60,6 +61,7 @@ public class MyBean implements Serializable {
     private String selectedCountry;
     private List<Identifier> identifiers;
     private List<Demographics> demographics;
+    private List<DocumentCriteria> documentCriteria;
     private List<Patient> patients;
 
     @ManagedProperty(value = "#{selectedPatient}")
@@ -117,6 +119,7 @@ public class MyBean implements Serializable {
                 countries = new ArrayList<>();
                 identifiers = new ArrayList<>();
                 demographics = new ArrayList<>();
+                documentCriteria = new ArrayList<>();
                 countries = EpsosHelperService.getCountriesFromCS(LiferayUtils.getPortalLanguage());
                 logger.info("Countries found: '{}'", countries.size());
             } catch (Exception e) {
@@ -157,10 +160,9 @@ public class MyBean implements Serializable {
         LiferayUtils.storeToSession("user", user);
 
         this.selectedCountry = selectedCountry;
-        identifiers = EpsosHelperService.getCountryIdentifiers(this.selectedCountry, LiferayUtils.getPortalLanguage(),
-                null, null);
-        demographics = EpsosHelperService.getCountryDemographics(this.selectedCountry, LiferayUtils.getPortalLanguage(),
-                null, null);
+        identifiers = EpsosHelperService.getCountryIdentifiers(this.selectedCountry, LiferayUtils.getPortalLanguage(), null, null);
+        demographics = EpsosHelperService.getCountryDemographics(this.selectedCountry, LiferayUtils.getPortalLanguage(), null, null);
+        documentCriteria = EpsosHelperService.getDocumentIdentifiersFromSearchMask(this.selectedCountry);
         showDemographics = !demographics.isEmpty();
         LiferayUtils.storeToSession("selectedCountry", selectedCountry);
         patients = new ArrayList<>();
@@ -275,7 +277,6 @@ public class MyBean implements Serializable {
 
     public void setSelectedDocument(PatientDocument selectedDocument) {
         this.selectedDocument = selectedDocument;
-
     }
 
     public void setDocumentHtml(String documentHtml) {
@@ -283,7 +284,6 @@ public class MyBean implements Serializable {
     }
 
     public List<PatientDocument> getPatientPrescriptions() {
-
         return patientPrescriptions;
     }
 
@@ -354,6 +354,14 @@ public class MyBean implements Serializable {
 
     public void setDemographics(List<Demographics> demographics) {
         this.demographics = demographics;
+    }
+
+    public List<DocumentCriteria> getDocumentCriteria() {
+        return documentCriteria;
+    }
+
+    public void setDocumentCriteria(List<DocumentCriteria> documentCriteria) {
+        this.documentCriteria = documentCriteria;
     }
 
     public Assertion getHcpAssertion() {
