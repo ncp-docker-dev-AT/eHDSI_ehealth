@@ -9,6 +9,7 @@ public class Identifier implements Serializable {
     private String domain;
     private String userValue;
     private String friendlyName;
+    private boolean required;
 
     public Identifier() {
 
@@ -38,13 +39,19 @@ public class Identifier implements Serializable {
         this.userValue = userValue;
     }
 
-	public String getFriendlyName() {
-		return friendlyName;
-	}
+    public String getFriendlyName() {
+        return friendlyName;
+    }
 
-	public void setFriendlyName(String friendlyName) {
-		this.friendlyName = friendlyName;
-	}
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
 
+    public boolean isRequired() {
+        return required;
+    }
 
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
 }
