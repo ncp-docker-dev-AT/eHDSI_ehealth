@@ -192,13 +192,29 @@ public class MessageController {
         if (StringUtils.isNotBlank(bean.getEndDate())) {
             String date = bean.getEndDate();
             try {
-                Date dt = format.parse(date + " " + bean.getEndHour() + ":" + bean.getEndMin());
+                String hours = "00";
+                String min = "00";
+                String sec = "00";
+
+                Date endDate = format.parse(date + " " + bean.getEndHour() + ":" + bean.getEndMin() + ":" + sec);
+
+                if(bean.getEndHour() != null && bean.getEndMin() != null) {
+                    if(bean.getEndHour().equals("00") && bean.getEndMin().equals("00")) {
+                        hours = "23";
+                        min = "59";
+                        sec = "59";
+                        endDate = format.parse(date + " " + hours + ":" + min + ":" + sec);
+                    }
+                }
+
                 if (startDate != null) {
-                    if (dt.after(startDate)) {
-                        query.before(dt);
+                    if (endDate.after(startDate)) {
+                        query.afterSeTotNull();
+                        //query.before(dt);
+                        query.between(startDate, endDate);
                     }
                 } else {
-                    query.before(dt);
+                    query.before(endDate);
                 }
             } catch (ParseException e) {
                 logger.error("ParseException: '{}'", e.getMessage(), e);
