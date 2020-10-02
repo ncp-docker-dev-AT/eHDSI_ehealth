@@ -1,14 +1,13 @@
 package se.sb.epsos.web.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.sb.epsos.web.model.CountryVO;
 import se.sb.epsos.web.model.PatientIdVO;
 import se.sb.epsos.web.util.InternationalConfigManager;
 import se.sb.epsos.web.util.MasterConfigManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,24 +20,34 @@ public class CountryConfigManager {
 
     private static final InternationalConfigManager internationalSearchConfig = new InternationalConfigManager(getCountries());
     private static final String INTERNATIONALSEARCHFIELDS = "country.searchFields";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CountryConfigManager.class);
 
     private CountryConfigManager() {
     }
 
     public static List<Properties> getSearchFields(String countryCode) {
-        return internationalSearchConfig.getProperties(countryCode, INTERNATIONALSEARCHFIELDS);
+        return InternationalConfigManager.getProperties(countryCode, INTERNATIONALSEARCHFIELDS);
     }
 
     public static List<PatientIdVO> getPatientIdentifiers(CountryVO country) {
         List<PatientIdVO> patIds = new ArrayList<>();
         List<Properties> props = getSearchFields(country.getId());
 
-        List<String> list = internationalSearchConfig.getList(country.getId(), "country.searchFields.id[@label]");
+        //List<String> list = InternationalConfigManager.getList(country.getId(), "country.searchFields.id[@label]");
+        List<String> list = InternationalConfigManager.getList(country.getId(), "searchFields.country.patientSearch.identifier.id[@label]");
         int i = 0;
+
         for (String str : list) {
+            LOGGER.info("Get Patient Identifier: '{}'", str);
             PatientIdVO vo = new PatientIdVO();
             vo.setLabel(str);
             for (Properties prop : props) {
+                Set<Object> keys = prop.keySet();
+                for (Object k : keys) {
+                    String key = (String) k;
+                    LOGGER.info("Properties: '{}'", prop.getProperty(key));
+                }
+
                 if (prop.containsKey("country.searchFields.id[@domain]" + i)) {
                     vo.setDomain(prop.getProperty("country.searchFields.id[@domain]" + i));
                 } else if (prop.containsKey("country.searchFields.id[@max]" + i) && !prop.getProperty("country.searchFields.id[@max]" + i).equals("-1")) {
@@ -51,21 +60,21 @@ public class CountryConfigManager {
             i++;
         }
 
-        List<String> listTextField = internationalSearchConfig.getList(country.getId(), "country.searchFields.textField[@label]");
+        List<String> listTextField = InternationalConfigManager.getList(country.getId(), "country.searchFields.textField[@label]");
         for (String str : listTextField) {
             PatientIdVO vo = new PatientIdVO();
             vo.setLabel(str);
             patIds.add(vo);
         }
 
-        List<String> listBirthDate = internationalSearchConfig.getList(country.getId(), "country.searchFields.birthDate[@label]");
+        List<String> listBirthDate = InternationalConfigManager.getList(country.getId(), "country.searchFields.birthDate[@label]");
         for (String str : listBirthDate) {
             PatientIdVO vo = new PatientIdVO();
             vo.setLabel(str);
             patIds.add(vo);
         }
 
-        List<String> listAdministrativeGender = internationalSearchConfig.getList(country.getId(), "country.searchFields.sex[@label]");
+        List<String> listAdministrativeGender = InternationalConfigManager.getList(country.getId(), "country.searchFields.sex[@label]");
         for (String str : listAdministrativeGender) {
             PatientIdVO vo = new PatientIdVO();
             vo.setLabel(str);
