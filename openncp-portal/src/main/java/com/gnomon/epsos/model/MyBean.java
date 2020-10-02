@@ -19,6 +19,7 @@ import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.Unmarshaller;
@@ -948,9 +949,10 @@ public class MyBean implements Serializable {
      * @param confirmation
      */
     public void setSpecificConsent(String confirmation) {
-        if (confirmation.equals("No")) {
-            FacesContext
-                    .getCurrentInstance()
+
+        logger.info("Specific Consent: '{}'", confirmation);
+        if (StringUtils.equals(confirmation, "No")) {
+            FacesContext.getCurrentInstance()
                     .addMessage(
                             null,
                             new FacesMessage(
@@ -1002,7 +1004,8 @@ public class MyBean implements Serializable {
     }
 
     public void setPurposeOfUseForEP(String purposeOfUse) {
-        createTRCAssertion("ep", purposeOfUse, pinCode, prescriptionId);
+        logger.info("MyBean: '{}', PurposeOfUse: '{}', PinCode: '{}', PrescriptionId: '{}'", this.toString(), purposeOfUse, pinCode, prescriptionId);
+        createTRCAssertion("ep", purposeOfUse, prescriptionId, pinCode);
     }
 
     public boolean getEnableMRO() {
@@ -1182,5 +1185,16 @@ public class MyBean implements Serializable {
             LiferayUtils.storeToSession("trcAssertion", trcAssertion);
             this.signedTRC = signedTRC;
         }
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("pinCode", pinCode)
+                .append("prescriptionId", prescriptionId)
+                .append("purposeOfUse", purposeOfUse)
+                .append("purposeOfUseForPS", purposeOfUseForPS)
+                .append("purposeOfUseForEP", purposeOfUseForEP)
+                .toString();
     }
 }

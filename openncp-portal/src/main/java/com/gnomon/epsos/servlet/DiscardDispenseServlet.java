@@ -128,17 +128,6 @@ public class DiscardDispenseServlet extends HttpServlet {
 
         String directoryName = Constants.EPSOS_PROPS_PATH + "integration/" +
                 Constants.HOME_COMM_ID + "/medication/" + documentId;
-        File medication = new File(directoryName);
-//        File[] listOfFiles = folder.listFiles();
-//
-//        List<String> medicationList = new ArrayList<>();
-//        if (listOfFiles != null) {
-//            for (File file : listOfFiles) {
-//                if (file.isFile()) {
-//                    medicationList.add(file.getName());
-//                }
-//            }
-//        }
-        return medication;
+        return new File(directoryName);
     }
 }
