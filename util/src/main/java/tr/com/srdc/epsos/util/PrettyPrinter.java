@@ -129,7 +129,6 @@ public class PrettyPrinter extends DefaultHandler {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            transformer.setOutputProperty("{http://saxon.sf.net/}indent-spaces", "2");
             transformer.transform(new DOMSource(doc), new StreamResult(buffer));
 
             return buffer.toString("UTF-8").replaceAll("(>)([ \t]+<)", "$1\n$2");
