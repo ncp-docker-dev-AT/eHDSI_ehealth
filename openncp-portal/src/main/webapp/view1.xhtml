@@ -24,12 +24,13 @@
 
 <h:form prependId="false" id="searchPatient">
     <h3>#{msg['ui.searchmask.info']}</h3>
+    <h4><c:if test="#{not empty myBean.identifiers}">Identifiers not empty</c:if></h4>
     <h:panelGrid columns="2">
         <c:forEach items="#{myBean.identifiers}" var="identifier" varStatus="idLoop">
             <h:outputLabel value="#{identifier.key}"/>
             <p:inputText
                     id="#{not empty identifier.friendlyName ? identifier.friendlyName : ''.concat('uservalue-').concat(idLoop.index)}"
-                    value="#{identifier.userValue}" required="true"/>
+                    value="#{identifier.userValue}" required="#{identifier.required ? 'true': 'false'}"/>
         </c:forEach>
         <c:forEach items="#{myBean.demographics}" var="demographic" varStatus="demographicsLoop">
             <h:outputLabel value="#{demographic.label}" rendered="#{myBean.showDemographics}"/>
@@ -51,20 +52,25 @@
         </c:forEach>
         <h:outputLabel value="Emergency: (*)"/>
         <p:selectBooleanCheckbox label="emergency label" value="#{myBean.emergency}"/>
-        <ui:remove>
-        	<h:outputLabel value="PIN Code"/>
-        	<p:inputText value="#{myBean.pinCode}"/>
-        	<h:outputLabel value="Prescription ID"/>
-        	<p:inputText value="#{myBean.prescriptionId}"/>
-        </ui:remove>
     </h:panelGrid>
     <p/>
+    <c:if test="#{not empty myBean.documentCriteria}">
+        <h3>Documents search criteria</h3>
+        <h4><strong>Please provide the identifiers to access CDA</strong></h4>
+        <h:panelGrid columns="2">
+            <h:outputLabel value="PIN Code"/>
+            <p:inputText value="#{myBean.pinCode}"/>
+            <h:outputLabel value="Prescription ID"/>
+            <p:inputText value="#{myBean.prescriptionId}"/>
+        </h:panelGrid>
+        <p/>
+    </c:if>
     <p:commandButton id="submitPatient" value="#{msg['ui.search.info']}" ajax="true"
                      actionListener="#{myBean.searchPatients}" update="resultPanel" oncomplete="panelwv.show();">
     </p:commandButton>
     <p/>
-    <h:outputLabel style="font-weight:bold;font-style:italic" value="(*) Emergency flag is only use for testing purpose, it allows to update the value of SAML attribute
-    Purpose of Use and update its default value from TREATMENT to EMERGENCY."/>
+    <h:outputLabel style="font-weight:bold;font-style:italic" value="(*) Emergency flag is only use for testing purpose, it allows to update the value
+    of SAML attribute Purpose of Use and update its default value from TREATMENT to EMERGENCY."/>
     <p/>
     <p:panel widgetVar="panelwv" visible="false" closable="true" toggleable="true" id="resultPanel">
         <h:outputLabel value="#{myBean.queryPatientsException}"/>

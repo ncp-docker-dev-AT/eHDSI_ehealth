@@ -9,6 +9,7 @@ public class SearchMask implements Serializable {
     private String label;
     private String domain;
     private String friendlyName;
+    private boolean required = false;
 
     public String getLabel() {
         return label;
@@ -32,5 +33,13 @@ public class SearchMask implements Serializable {
 
     public void setFriendlyName(String friendlyName) {
         this.friendlyName = friendlyName;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }

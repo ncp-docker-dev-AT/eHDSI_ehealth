@@ -1699,27 +1699,27 @@ public class EpsosHelperService {
 
     public static List<SearchMask> getCountryIdsFromCS(String country, String portalPath) {
 
-        String path;
         List<SearchMask> searchMaskList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
-        path = getSearchMaskPath() + "forms" + File.separator + filename;
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
         LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
 
         try {
             File file = new File(path);
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
             NodeList nodeLst = doc.getElementsByTagNameNS("*", "id");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
-                SearchMask sm = new SearchMask();
-                sm.setDomain(link.getAttribute("domain"));
-                sm.setLabel(link.getAttribute("label"));
-                sm.setFriendlyName(link.getAttribute("friendlyName"));
-                searchMaskList.add(sm);
+                SearchMask searchMask = new SearchMask();
+                searchMask.setDomain(link.getAttribute("domain"));
+                searchMask.setLabel(link.getAttribute("label"));
+                searchMask.setFriendlyName(link.getAttribute("friendlyName"));
+                searchMask.setRequired(Boolean.parseBoolean(link.getAttribute("mandatory")));
+                searchMaskList.add(searchMask);
             }
         } catch (Exception e) {
             LOGGER.error("Error getting country ids '{}'", e.getMessage(), e);
@@ -1732,15 +1732,15 @@ public class EpsosHelperService {
         List<Identifier> identifiers = new ArrayList<>();
 
         List<SearchMask> searchMaskList = EpsosHelperService.getCountryIdsFromCS(country, path);
-        for (SearchMask aVec : searchMaskList) {
+        for (SearchMask searchMask : searchMaskList) {
             Identifier id = new Identifier();
-            id.setKey(EpsosHelperService.getPortalTranslation(aVec.getLabel(), language) + "*");
-            id.setDomain(aVec.getDomain());
+            id.setKey(EpsosHelperService.getPortalTranslation(searchMask.getLabel(), language) + "*");
+            id.setDomain(searchMask.getDomain());
             if (id.getKey().equals("") || id.getKey().equals("*")) {
-                id.setKey(aVec.getLabel() + "*");
+                id.setKey(searchMask.getLabel() + "*");
             }
-
-            id.setFriendlyName(aVec.getFriendlyName());
+            id.setRequired(searchMask.isRequired());
+            id.setFriendlyName(searchMask.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
                 id.setUserValue((String) user.getExpandoBridge().getAttribute(id.getDomain()));
@@ -1780,6 +1780,48 @@ public class EpsosHelperService {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext externalContext = facesContext.getExternalContext();
         return getCountryIdsFromCS(country, externalContext.getRealPath("/"));
+    }
+
+    /**
+     * @param country
+     * @return
+     */
+    public static List<DocumentCriteria> getDocumentIdentifiersFromSearchMask(String country) {
+
+        List<DocumentCriteria> documentCriteriaList = new ArrayList<>();
+        String filename = "InternationalSearch_" + country + ".xml";
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
+        LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
+
+        try {
+            File file = new File(path);
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file);
+            document.getDocumentElement().normalize();
+            NodeList nodeList = document.getElementsByTagNameNS("*", "documentSearch");
+            LOGGER.info("NodeList: '{}'", nodeList != null ? nodeList.getLength() : "NodeList documentSearch is empty");
+            for (int s = 0; s < nodeList.getLength(); s++) {
+                Node link = nodeList.item(s);
+                NodeList child = link.getChildNodes();
+                for (int i = 0; i < child.getLength(); i++) {
+                    if (child.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) child.item(i);
+                        DocumentCriteria criteria = new DocumentCriteria();
+                        LOGGER.info("Document Search: '{}'", element.getLocalName());
+                        criteria.setKey(element.getLocalName());
+                        criteria.setLabel(element.getAttribute("label"));
+                        //criteria.setFriendlyName(element.getAttribute("friendlyName"));
+                        documentCriteriaList.add(criteria);
+                    }
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage());
+            return Collections.emptyList();
+        }
+        return documentCriteriaList;
     }
 
     public static String getSearchMaskPath() {
@@ -1842,25 +1884,25 @@ public class EpsosHelperService {
                 dem.setType("calendar");
                 demographicsList.add(dem);
             }
-            nodeLst = doc.getElementsByTagNameNS("*", "documentId");
-            for (int s = 0; s < nodeLst.getLength(); s++) {
-                Element link = (Element) nodeLst.item(s);
-                Demographics dem = new Demographics();
-                dem.setLabel(link.getAttribute("label"));
-                dem.setKey(link.getAttribute("label"));
-                dem.setType("text");
-                demographicsList.add(dem);
-            }
-
-            nodeLst = doc.getElementsByTagNameNS("*", "pinCode");
-            for (int s = 0; s < nodeLst.getLength(); s++) {
-                Element link = (Element) nodeLst.item(s);
-                Demographics dem = new Demographics();
-                dem.setLabel(link.getAttribute("label"));
-                dem.setKey(link.getAttribute("label"));
-                dem.setType("text");
-                demographicsList.add(dem);
-            }
+//            nodeLst = doc.getElementsByTagNameNS("*", "documentId");
+//            for (int s = 0; s < nodeLst.getLength(); s++) {
+//                Element link = (Element) nodeLst.item(s);
+//                Demographics dem = new Demographics();
+//                dem.setLabel(link.getAttribute("label"));
+//                dem.setKey(link.getAttribute("label"));
+//                dem.setType("text");
+//                demographicsList.add(dem);
+//            }
+//
+//            nodeLst = doc.getElementsByTagNameNS("*", "pinCode");
+//            for (int s = 0; s < nodeLst.getLength(); s++) {
+//                Element link = (Element) nodeLst.item(s);
+//                Demographics dem = new Demographics();
+//                dem.setLabel(link.getAttribute("label"));
+//                dem.setKey(link.getAttribute("label"));
+//                dem.setType("text");
+//                demographicsList.add(dem);
+//            }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -2316,7 +2358,7 @@ public class EpsosHelperService {
                 language = "en_GB";
             }
             String language2 = userLanguage;
-            LOGGER.debug("LANGUAGE=" + language + "-" + userLanguage);
+            LOGGER.debug("LANGUAGE='{}-{}'", language, userLanguage);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("IS_IGNORE_PAGINATION", false);
             String birthDate = patient.getBirthDate();

@@ -3,6 +3,7 @@ package com.gnomon.epsos.model;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import java.io.File;
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean(name = "medicationsDispensed")
-@SessionScoped
+@RequestScoped
 public class MedicationBean implements Serializable {
 
     private static final long serialVersionUID = -3893661360983844773L;

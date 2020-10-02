@@ -218,7 +218,8 @@ public class DispenseServlet extends HttpServlet {
         StringBuilder patientFile = new StringBuilder();
         patientFile.append(Constants.EPSOS_PROPS_PATH).append("integration/");
         String directoryName = patientFile.append(Constants.HOME_COMM_ID).append("/medication").toString();
-        String fileName = dispenseId + ".xml";
+        //String fileName = dispenseId + ".xml";
+        String fileName = UUID.randomUUID().toString() + ".xml";
 
         File directory = new File(directoryName);
         if (!directory.exists()) {

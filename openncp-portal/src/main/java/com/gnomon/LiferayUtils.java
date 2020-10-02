@@ -36,7 +36,7 @@ public class LiferayUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger("LiferayUtils");
 
     private LiferayUtils() {
-        //avoid instantiation
+        // Avoid instantiation
     }
 
     private static PortletRequest getPortletRequest() {
