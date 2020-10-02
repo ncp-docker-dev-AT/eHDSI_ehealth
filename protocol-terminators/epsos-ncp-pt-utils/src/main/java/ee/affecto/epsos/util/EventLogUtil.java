@@ -230,9 +230,9 @@ public class EventLogUtil {
     /**
      * @param eventLog
      * @param request
-     * @param rel
+     * @param registryErrorList
      */
-    public static void prepareXDRCommonLog(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList rel) {
+    public static void prepareXDRCommonLog(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request, RegistryErrorList registryErrorList) {
 
         String id = null;
         String classCode = null;
@@ -240,12 +240,12 @@ public class EventLogUtil {
         String countryCode = null;
         String patientId = null;
         String documentUniqueId = "N/A";
+        String discardId = "N/A";
 
         List<JAXBElement<? extends IdentifiableType>> registryObjectList = request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable();
         if (registryObjectList != null) {
             for (JAXBElement<? extends IdentifiableType> identifiable : registryObjectList) {
 
-                //EHNCP-1631
                 if (identifiable.getValue() instanceof ExtrinsicObjectType) {
 
                     for (ExternalIdentifierType identifierType : ((ExtrinsicObjectType) identifiable.getValue()).getExternalIdentifier()) {
@@ -255,7 +255,14 @@ public class EventLogUtil {
                             documentUniqueId = identifierType.getValue();
                         }
                     }
-
+                } else if (identifiable.getValue() instanceof RegistryPackageType) {
+                    RegistryPackageType registryPackageType = (RegistryPackageType) identifiable.getValue();
+                    for (ExternalIdentifierType externalIdentifier : registryPackageType.getExternalIdentifier()) {
+                        if (StringUtils.equals(externalIdentifier.getIdentificationScheme(), "urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8")) {
+                            discardId = externalIdentifier.getValue();
+                        }
+                    }
+                    continue;
                 } else if (!(identifiable.getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
@@ -281,6 +288,7 @@ public class EventLogUtil {
                 }
             }
         }
+        LOGGER.info("EventLogUtil: '{}'", classCode);
         if (StringUtils.equals(classCode, Constants.CONSENT_CLASSCODE) && eventCode != null) {
 
             if (eventCode.endsWith(Constants.CONSENT_PUT_SUFFIX)) {
@@ -295,10 +303,15 @@ public class EventLogUtil {
                 eventLog.setEI_EventActionCode(EventActionCode.DELETE);
             }
         } else if (StringUtils.equals(classCode, Constants.ED_CLASSCODE)) {
-
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
+
+        } else if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
+            eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
+            eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
+            eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
+            eventLog.getEventTargetParticipantObjectIds().add(discardId);
         }
 
         //  TODO: support dispensation revoke operation
@@ -306,13 +319,13 @@ public class EventLogUtil {
         eventLog.getEventTargetParticipantObjectIds().add(documentUniqueId);
 
         // Set Event status of the operation
-        if (rel == null || rel.getRegistryError() == null || rel.getRegistryError().isEmpty()) {
+        if (registryErrorList == null || registryErrorList.getRegistryError() == null || registryErrorList.getRegistryError().isEmpty()) {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
-            RegistryError re = rel.getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            RegistryError registryError = registryErrorList.getRegistryError().get(0);
+            eventLog.setEM_PatricipantObjectID(registryError.getErrorCode());
+            eventLog.setEM_PatricipantObjectDetail(registryError.getCodeContext().getBytes());
         }
     }
 
@@ -347,9 +360,9 @@ public class EventLogUtil {
      */
     private static String getDocumentEntryPatientId(AdhocQueryRequest request) {
 
-        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
-            if (sl.getName().equals("$XDSDocumentEntryPatientId")) {
-                String patientId = sl.getValueList().getValue().get(0);
+        for (SlotType1 slotType1 : request.getAdhocQuery().getSlot()) {
+            if (slotType1.getName().equals("$XDSDocumentEntryPatientId")) {
+                String patientId = slotType1.getValueList().getValue().get(0);
                 patientId = patientId.substring(1, patientId.length() - 1);
                 return patientId;
             }

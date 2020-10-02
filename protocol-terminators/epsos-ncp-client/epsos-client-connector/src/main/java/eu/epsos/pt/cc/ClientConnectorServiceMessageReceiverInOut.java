@@ -76,7 +76,8 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
             /* Find the axisOperation that has been set by the Dispatch phase. */
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
-            logger.info("[ClientConnector] Axis Operation: '{}:{}:{}' - WSAddressing Action: '{}'", msgContext.getOperationContext().getAxisOperation().getName().getPrefix(),
+            logger.info("[ClientConnector] Axis Operation: '{}:{}:{}' - WSAddressing Action: '{}'",
+                    msgContext.getOperationContext().getAxisOperation().getName().getPrefix(),
                     msgContext.getOperationContext().getAxisOperation().getName().getLocalPart(),
                     msgContext.getOperationContext().getAxisOperation().getName().getNamespaceURI(),
                     msgContext.getOptions().getAction());

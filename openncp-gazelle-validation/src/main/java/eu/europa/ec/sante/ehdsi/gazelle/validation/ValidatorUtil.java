@@ -33,9 +33,11 @@ public class ValidatorUtil {
     public static final String EHDSI_XDS_CS_PUT_REQUEST;
     public static final String EHDSI_XDS_PS_LIST_REQUEST_XCA;
     public static final String EHDSI_XDS_ED_INIT_REQUEST;
+    public static final String EHDSI_XDS_ED_INIT_RESPONSE;
+    public static final String EHDSI_XDS_ED_DISCARD_REQUEST;
+    public static final String EHDSI_XDS_ED_DISCARD_RESPONSE;
     public static final String EHDSI_XDS_PROVIDE_DATA_REQUEST;
     public static final String EHDSI_XDS_CS_PUT_RESPONSE;
-    public static final String EHDSI_XDS_ED_INIT_RESPONSE;
     public static final String EHDSI_XDS_PROVIDE_DATA_RESPONSE;
     public static final String EHDSI_XDS_FETCH_DOC_QUERY_REQUEST;
     public static final String EHDSI_XDS_OS_LIST_RESPONSE_XCA;
@@ -79,9 +81,11 @@ public class ValidatorUtil {
             EHDSI_XDS_CS_PUT_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_REQUEST");
             EHDSI_XDS_PS_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_LIST_REQUEST_XCA");
             EHDSI_XDS_ED_INIT_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_INIT_REQUEST");
+            EHDSI_XDS_ED_INIT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_INIT_RESPONSE");
+            EHDSI_XDS_ED_DISCARD_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_DISCARD_REQUEST");
+            EHDSI_XDS_ED_DISCARD_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_DISCARD_RESPONSE");
             EHDSI_XDS_PROVIDE_DATA_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PROVIDE_DATA_REQUEST");
             EHDSI_XDS_CS_PUT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_RESPONSE");
-            EHDSI_XDS_ED_INIT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ED_INIT_RESPONSE");
             EHDSI_XDS_PROVIDE_DATA_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PROVIDE_DATA_RESPONSE");
             EHDSI_XDS_FETCH_DOC_QUERY_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_REQUEST");
             EHDSI_XDS_OS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_LIST_RESPONSE_XCA");
@@ -122,7 +126,8 @@ public class ValidatorUtil {
 
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
             }
-            if (StringUtils.equals(eventType, "EHDSI-41") || StringUtils.equals(eventType, "EHDSI-51")) {
+            if (StringUtils.equals(eventType, "EHDSI-41") || StringUtils.equals(eventType, "EHDSI-42")
+                    || StringUtils.equals(eventType, "EHDSI-51")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
             }
@@ -154,7 +159,8 @@ public class ValidatorUtil {
 
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }
-            if (StringUtils.equals(eventType, "EHDSI-41") || StringUtils.equals(eventType, "EHDSI-51")) {
+            if (StringUtils.equals(eventType, "EHDSI-41") || StringUtils.equals(eventType, "EHDSI-42")
+                    || StringUtils.equals(eventType, "EHDSI-51")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SC;
             }
@@ -222,10 +228,10 @@ public class ValidatorUtil {
 
             if (message.contains(Constant.CONSENT_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_CS_PUT_REQUEST);
-
+            } else if (message.contains(Constant.EDD_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ED_DISCARD_REQUEST);
             } else if (message.contains(Constant.ED_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ED_INIT_REQUEST);
-
             } else {
                 result.setValidatorName(EHDSI_XDS_PROVIDE_DATA_REQUEST);
             }
@@ -233,14 +239,11 @@ public class ValidatorUtil {
 
         } else if (message.contains(PROVIDE_AND_REGISTER_RESPONSE)) {
 
-            //TODO: To be validated that only one eHDSI Gazelle Validator might be use for response validation
-            // if (message.contains(Constant.CONSENT_CLASSCODE)) {
-            //     result.setValidatorName(EHDSI_XDS_CS_PUT_RESPONSE);
-            // } else if (message.contains(Constant.ED_CLASSCODE)) {
-            //     result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
-            // } else {
-            //     result.setValidatorName(EHDSI_XDS_PROVIDE_DATA_RESPONSE);
-            // }
+            //  if (message.contains(Constant.EDD_CLASSCODE)) {
+            //      result.setValidatorName(EHDSI_XDS_ED_DISCARD_RESPONSE);
+            //  } else if (message.contains(Constant.ED_CLASSCODE)) {
+            //      result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
+            //  }
             result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
             result.setObjectType(ObjectType.XDR_SUBMIT_RESPONSE.toString());
         }

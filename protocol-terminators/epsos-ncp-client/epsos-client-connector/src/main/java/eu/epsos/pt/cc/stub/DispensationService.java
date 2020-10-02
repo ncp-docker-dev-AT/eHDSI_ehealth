@@ -89,19 +89,22 @@ public class DispensationService {
         try {
             Document dispense = XMLUtil.parseContent(document.getBase64Binary());
             NodeList nodeList = dispense.getElementsByTagName("code");
-            LOGGER.info("NodeList size: '{}'", nodeList.getLength());
             Node search = nodeList.item(0);
-            NamedNodeMap attr = search.getAttributes();
-            Node nodeAttr = attr.getNamedItem("code");
+            NamedNodeMap namedNodeMap = search.getAttributes();
+            Node nodeAttr = namedNodeMap.getNamedItem("code");
             nodeAttr.setTextContent(Constants.EDD_CLASSCODE);
-            LOGGER.info("Ok1");
+
+            nodeList = dispense.getElementsByTagName("templateId");
+            search = nodeList.item(0);
+            namedNodeMap = search.getAttributes();
+            nodeAttr = namedNodeMap.getNamedItem("root");
+            nodeAttr.setTextContent("1.3.6.1.4.1.12559.11.10.1.3.1.1.2-DISCARD");
+
             String updated = XMLUtil.documentToString(dispense);
             document.setBase64Binary(updated.getBytes(StandardCharsets.UTF_8));
-            LOGGER.info("Ok2");
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             LOGGER.error("Exception: '{}'", e.getMessage());
         }
-        LOGGER.info("Ok3");
         XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
         return XdrDocumentSource.discard(request, countryCode);
     }

@@ -15,6 +15,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
@@ -51,7 +52,7 @@ public class XDSbRepositoryServiceInvoker {
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode, String docClassCode)
             throws RemoteException {
 
-        logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}", request.getIdAssertion().getID(), countryCode, docClassCode);
+        logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", request.getIdAssertion().getID(), countryCode, docClassCode);
         RegistryResponseType response;
         String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
 
@@ -124,13 +125,16 @@ public class XDSbRepositoryServiceInvoker {
             logger.error("Exception during Remote Validation process: '{}'", ex.getMessage(), ex);
         }
         try {
-            byte[] transformedCda = TMServices.transformDocument(cdaBytes);
-            xdrDocument.setValue(transformedCda);
-
+            if (!StringUtils.equals(docClassCode, Constants.EDD_CLASSCODE)) {
+                byte[] transformedCda = TMServices.transformDocument(cdaBytes);
+                xdrDocument.setValue(transformedCda);
+            } else {
+                xdrDocument.setValue(cdaBytes);
+            }
             /* Validate CDA epSOS Pivot */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
-                        NcpSide.NCP_B, docClassCode, true);
+                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(xdrDocument.getValue())
+                        .getDocumentElement()).toString(), NcpSide.NCP_B, docClassCode, true);
             }
 
         } catch (DocumentTransformationException ex) {
@@ -300,7 +304,7 @@ public class XDSbRepositoryServiceInvoker {
             case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
                         Constants.EDD_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
-                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
+                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_EDD_STR));
                 break;
             case Constants.CONSENT_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
@@ -389,11 +393,16 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.Consent.DISPLAY_NAME));
                 break;
             case Constants.ED_CLASSCODE:
-            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
                         uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.CODING_SCHEME,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.DISPLAY_NAME));
+                break;
+            case Constants.EDD_CLASSCODE:
+                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
+                        uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.NODE_REPRESENTATION,
+                        XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.CODING_SCHEME,
+                        XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.DISPLAY_NAME));
                 break;
             case Constants.HCER_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
