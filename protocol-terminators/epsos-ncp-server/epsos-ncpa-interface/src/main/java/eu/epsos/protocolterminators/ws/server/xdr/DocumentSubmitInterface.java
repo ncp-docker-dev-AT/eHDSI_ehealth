@@ -2,11 +2,11 @@ package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorInterface;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
 import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.EDDocumentMetaData;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 /**
  * Interface for XDR document submit service implementation
@@ -25,7 +25,7 @@ public interface DocumentSubmitInterface extends NationalConnectorInterface {
      *
      * @param dispensationToDiscard - Metadata of the dispensation to be discarded (XML and PDF versions)
      */
-    void cancelDispensation(EPSOSDocument dispensationToDiscard) throws NIException, InsufficientRightsException;
+    void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) throws NIException, InsufficientRightsException;
 
     /**
      * Stores a patient consent in the national infrastructure
