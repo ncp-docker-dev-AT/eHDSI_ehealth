@@ -1,6 +1,7 @@
 package com.gnomon.epsos.model;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 
@@ -9,10 +10,27 @@ import java.io.Serializable;
 public class ConfirmationBean implements Serializable {
 
     private static final long serialVersionUID = 172996144250283038L;
+    
+    
+    
     private String confirm;
     private String purposeOfUse;
     private String pinCode;
     private String prescriptionId;
+    
+    
+    
+    @ManagedProperty(value = "#{myBean}")
+    private MyBean myBean;
+    /**
+     * A method setting the MyBean property.
+     *
+     * @param myBean the bean to set.
+     */
+    public void setMyBean(MyBean myBean) {
+        this.myBean = myBean;
+    }
+
     public String getPinCode() {
 		return pinCode;
 	}
@@ -43,5 +61,10 @@ public class ConfirmationBean implements Serializable {
 
     public void setPurposeOfUse(String purposeOfUse) {
         this.purposeOfUse = purposeOfUse;
+    }
+    
+    public String viewPrescriptions() {
+        myBean.setPurposeOfUseForEP(this.getPurposeOfUse());
+        return "viewPrescriptions.xhtml?faces-redirect=true&amp;javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal";
     }
 }
