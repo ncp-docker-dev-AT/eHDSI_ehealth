@@ -149,6 +149,11 @@
                                 <xsl:call-template name="show-eHDSIIllnessandDisorder">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
+                                <xsl:if test="not($problemCondition/@nullFlavor)">
+                                    <xsl:text> (</xsl:text>
+                                    <xsl:value-of select="$problemCondition/@code"/>
+                                    <xsl:text>)</xsl:text>
+                                </xsl:if>
                             </td>
                             <td>
                                 <!-- Onset Date -->

@@ -520,7 +520,7 @@ public class PacRepBean implements Serializable {
             this.purposeOfUse = purposeOfUse;
             LOGGER.info("TRCA: Creating trca for hcpAssertion: '{}' for patient '{}'. Purpose of use is: '{}'",
                     hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
-            trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, hcpAssertion, patientId);
+            trcAssertion = EpsosHelperService.createPatientConfirmationPlain(hcpAssertion, patientId, purposeOfUse);
             LOGGER.info("TRCA: Created '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
                     trcAssertion.getID(), hcpAssertion.getID(), purposeOfUse, patientId.getRoot(), patientId.getExtension(), purposeOfUse);
             LOGGER.info("TRCA: '{}'", trcAssertion);

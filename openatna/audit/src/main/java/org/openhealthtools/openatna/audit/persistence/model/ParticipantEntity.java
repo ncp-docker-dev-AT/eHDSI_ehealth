@@ -1,6 +1,5 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
-import org.hibernate.annotations.GenericGenerator;
 import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
 
 import javax.persistence.*;
@@ -8,10 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The userId, userName, and alternativeUserId are used to determine equality
- *
- * @author Andrew Harrison
- * @version $Revision:$
+ * The userId, userName, and alternativeUserId are used to determine equality.
  */
 @Entity
 @Table(name = "participants")
@@ -41,8 +37,6 @@ public class ParticipantEntity extends PersistentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    //@GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }

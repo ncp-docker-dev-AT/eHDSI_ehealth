@@ -56,9 +56,9 @@ public class EpsosRestService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpsosRestService.class);
     private static final Utils utils = new Utils();
     private static final String PURPOSE_OF_USE_TREATMENT = "TREATMENT";
+    private static final JAXBContext jaxbContext;
     @Context
     private static HttpServletRequest servletRequest;
-    private static final JAXBContext jaxbContext;
 
     static {
         try {
@@ -260,7 +260,6 @@ public class EpsosRestService {
         LOGGER.info("Get attributes for language: '{}'", country);
         String ret = "";
         String path = request.getSession().getServletContext().getRealPath("/") + "/WEB-INF/";
-        LOGGER.info("#################: '{}'", path);
         List<SearchMask> countryIdentifiers = EpsosHelperService.getCountryIdsFromCS(country, path);
         List<Identifier> identifiers = EpsosHelperService.getCountryIdentifiers(country, language, path, null);
 
@@ -355,20 +354,14 @@ public class EpsosRestService {
         patientId.setRoot(root);
         String purposeOfUse = PURPOSE_OF_USE_TREATMENT;
         LOGGER.info("TRCA: Creating TRCA for hcpAssertion: '{}' for patient '{}'. Purpose of use is: '{}'", ((Assertion) ass).getID(), patientId.getRoot(), purposeOfUse);
-        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
+        Assertion trcAssertion = EpsosHelperService.createPatientConfirmationPlain((Assertion) ass, patientId, purposeOfUse);
         LOGGER.info("TRCA: Created '{}' for: '{}' for patient '{}_{}'. Purpose of use is: '{}'",
-                ((Assertion) trcAssertion).getID(), ((Assertion) ass).getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
-        List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs(
-                (Assertion) ass,
-                (Assertion) trcAssertion,
-                root,
-                extension,
-                country);
+                trcAssertion.getID(), ((Assertion) ass).getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
+        List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs((Assertion) ass, trcAssertion, root, extension, country);
         LOGGER.info("PS Docs found: '{}'", patientDocuments.size());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class,
-                new PatientDocumentAdapter()).create();
+        Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class, new PatientDocumentAdapter()).create();
         ret = gson.toJson(patientDocuments);
         return Response.ok().entity(ret).build();
     }
@@ -390,7 +383,7 @@ public class EpsosRestService {
         patientId.setRoot(root);
         String purposeOfUse = PURPOSE_OF_USE_TREATMENT;
         LOGGER.info("TRCA: Creating TRCA for hcpAssertion: '{}' for patient '{}'. Purpose of use is: '{}'", ((Assertion) ass).getID(), patientId.getRoot(), purposeOfUse);
-        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(purposeOfUse, (Assertion) ass, patientId);
+        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain((Assertion) ass, patientId, purposeOfUse);
         LOGGER.info("TRCA: Created '{}' for: '{}' for patient '{}_{}'. Purpose of use is: '{}'",
                 ((Assertion) trcAssertion).getID(), ((Assertion) ass).getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
         List<PatientDocument> patientDocuments = EpsosHelperService.getPSDocs((Assertion) ass, (Assertion) trcAssertion,
@@ -424,22 +417,21 @@ public class EpsosRestService {
             Patient pat = new Patient();
             pat.setRoot(patientId.getRoot());
             pat.setExtension(patientId.getExtension());
-            Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(PURPOSE_OF_USE_TREATMENT, (Assertion) ass, patientId);
+            Assertion trcAssertion = EpsosHelperService.createPatientConfirmationPlain((Assertion) ass, patientId, PURPOSE_OF_USE_TREATMENT);
             List<PatientDocument> patientDocuments = new ArrayList<>();
 
             if (doctype.equalsIgnoreCase("ps")) {
-                patientDocuments = EpsosHelperService.getPSDocs((Assertion) ass, (Assertion) trcAssertion, root, extension, country);
+                patientDocuments = EpsosHelperService.getPSDocs((Assertion) ass, trcAssertion, root, extension, country);
             }
             if (doctype.equalsIgnoreCase("ep")) {
-                patientDocuments = EpsosHelperService.getEPDocs((Assertion) ass, (Assertion) trcAssertion, root, extension, country);
+                patientDocuments = EpsosHelperService.getEPDocs((Assertion) ass, trcAssertion, root, extension, country);
             }
             DocumentExt dext = new DocumentExt();
             dext.setDocuments(patientDocuments);
             dext.setPatient(pat);
 
             GsonBuilder gsonBuilder = new GsonBuilder();
-            Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class,
-                    new PatientDocumentAdapter()).create();
+            Gson gson = gsonBuilder.registerTypeAdapter(PatientDocument.class, new PatientDocumentAdapter()).create();
             ret = gson.toJson(dext);
             LOGGER.info(ret);
         } else {
@@ -491,7 +483,7 @@ public class EpsosRestService {
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(document.getExtension());
         patientId.setRoot(document.getRoot());
-        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(PURPOSE_OF_USE_TREATMENT, (Assertion) ass, patientId);
+        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain((Assertion) ass, patientId, PURPOSE_OF_USE_TREATMENT);
         String cda = EpsosHelperService.getDocument((Assertion) ass, (Assertion) trcAssertion, pd.getCountry(),
                 document.getRepositoryid(), document.getHcid(), document.getUuid(), doctype, language);
         if (Validator.isNotNull(cda)) {
@@ -523,7 +515,7 @@ public class EpsosRestService {
         PatientId patientId = PatientId.Factory.newInstance();
         patientId.setExtension(document.getExtension());
         patientId.setRoot(document.getRoot());
-        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain(PURPOSE_OF_USE_TREATMENT, (Assertion) ass, patientId);
+        Object trcAssertion = EpsosHelperService.createPatientConfirmationPlain((Assertion) ass, patientId, PURPOSE_OF_USE_TREATMENT);
         String cda = EpsosHelperService.getDocument((Assertion) ass, (Assertion) trcAssertion, pd.getCountry(),
                 document.getRepositoryid(), document.getHcid(), document.getUuid(), doctype, language);
         if (transform) {

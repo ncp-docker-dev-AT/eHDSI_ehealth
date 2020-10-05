@@ -6,7 +6,7 @@
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>5.0.0</version>
+        <version>5.1.0</version>
     </parent>
 
     <artifactId>openncp-protocol-terminators</artifactId>
@@ -269,7 +269,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.6</version>
+                <version>${commons-codec.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>

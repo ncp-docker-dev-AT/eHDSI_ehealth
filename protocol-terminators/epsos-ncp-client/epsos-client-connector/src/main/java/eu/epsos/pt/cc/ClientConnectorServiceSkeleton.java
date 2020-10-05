@@ -295,7 +295,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 case Constants.HCER_CLASSCODE:
                     response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
-                case "DISCARD-" + Constants.ED_CLASSCODE:
+                case Constants.EDD_CLASSCODE:
                     response = DispensationService.discard(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
                 default:

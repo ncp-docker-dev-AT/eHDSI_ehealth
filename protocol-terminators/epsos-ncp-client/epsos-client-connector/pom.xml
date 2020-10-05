@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-client</artifactId>
-        <version>5.0.0</version>
+        <version>5.1.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.65</version>
+            <version>${bcprov.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lowagie</groupId>
@@ -299,7 +299,7 @@
                         WEB-INF/lib/woodstox-core-asl-4.0.8.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
                         WEB-INF/lib/xalan-2.7.1.jar,
-                        WEB-INF/lib/xercesImpl-2.10.0.jar
+                        WEB-INF/lib/xercesImpl-${xerces.version}.jar
                     </packagingExcludes>
                 </configuration>
             </plugin>

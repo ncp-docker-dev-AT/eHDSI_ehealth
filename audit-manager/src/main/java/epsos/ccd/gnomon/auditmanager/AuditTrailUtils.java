@@ -6,6 +6,7 @@ import eu.epsos.util.audit.AuditLogSerializer;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditConstant;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.RFC3881.*;
 import net.RFC3881.AuditMessage.ActiveParticipant;
 import org.apache.commons.lang.StringUtils;
@@ -14,7 +15,6 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -724,10 +724,12 @@ public enum AuditTrailUtils {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("57016-8", AuditConstant.CODE_SYSTEM_LOINC, "Privacy Policy Acknowledgement Document"));
         }
-        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())
-                || StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
+        }
+        if(StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+            eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
 
@@ -1266,7 +1268,7 @@ public enum AuditTrailUtils {
      */
     private void writeTestAudits(AuditMessage auditmessage, String auditmsg) {
 
-        String wta = Constants.WRITE_TEST_AUDITS;
+        String wta = ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS");
         LOGGER.debug("Writing test audits: '{}'", wta);
         if (StringUtils.equals(wta, "true")) {
 

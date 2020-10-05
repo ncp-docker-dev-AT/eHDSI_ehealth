@@ -1658,7 +1658,6 @@ public class EpsosHelperService {
             LOGGER.error("getCountriesNamesFromCS: " + ex.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
-
     }
 
     public static String getCountriesLabelsFromCS(String language) {
@@ -1700,27 +1699,27 @@ public class EpsosHelperService {
 
     public static List<SearchMask> getCountryIdsFromCS(String country, String portalPath) {
 
-        String path;
         List<SearchMask> searchMaskList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
-        path = getSearchMaskPath() + "forms" + File.separator + filename;
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
         LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
 
         try {
             File file = new File(path);
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
             NodeList nodeLst = doc.getElementsByTagNameNS("*", "id");
             for (int s = 0; s < nodeLst.getLength(); s++) {
                 Element link = (Element) nodeLst.item(s);
-                SearchMask sm = new SearchMask();
-                sm.setDomain(link.getAttribute("domain"));
-                sm.setLabel(link.getAttribute("label"));
-                sm.setFriendlyName(link.getAttribute("friendlyName"));
-                searchMaskList.add(sm);
+                SearchMask searchMask = new SearchMask();
+                searchMask.setDomain(link.getAttribute("domain"));
+                searchMask.setLabel(link.getAttribute("label"));
+                searchMask.setFriendlyName(link.getAttribute("contextualDescription"));
+                searchMask.setRequired(Boolean.parseBoolean(link.getAttribute("mandatory")));
+                searchMaskList.add(searchMask);
             }
         } catch (Exception e) {
             LOGGER.error("Error getting country ids '{}'", e.getMessage(), e);
@@ -1732,23 +1731,20 @@ public class EpsosHelperService {
 
         List<Identifier> identifiers = new ArrayList<>();
 
-        List<SearchMask> vec = EpsosHelperService.getCountryIdsFromCS(country, path);
-        for (SearchMask aVec : vec) {
+        List<SearchMask> searchMaskList = EpsosHelperService.getCountryIdsFromCS(country, path);
+        for (SearchMask searchMask : searchMaskList) {
             Identifier id = new Identifier();
-            id.setKey(EpsosHelperService.getPortalTranslation(aVec.getLabel(), language) + "*");
-            id.setDomain(aVec.getDomain());
+            id.setKey(EpsosHelperService.getPortalTranslation(searchMask.getLabel(), language) + "*");
+            id.setDomain(searchMask.getDomain());
             if (id.getKey().equals("") || id.getKey().equals("*")) {
-                id.setKey(aVec.getLabel() + "*");
+                id.setKey(searchMask.getLabel() + "*");
             }
-
-            id.setFriendlyName(aVec.getFriendlyName());
+            id.setRequired(searchMask.isRequired());
+            id.setFriendlyName(searchMask.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
-                String idvalue = (String) user.getExpandoBridge().getAttribute(id.getDomain());
-                LOGGER.info("Identifiers: '{}_{}'", id.getKey(), idvalue);
-                id.setUserValue(idvalue);
+                id.setUserValue((String) user.getExpandoBridge().getAttribute(id.getDomain()));
             }
-
             identifiers.add(id);
         }
         return identifiers;
@@ -1760,20 +1756,19 @@ public class EpsosHelperService {
         List<Demographics> demographicsList = EpsosHelperService.getCountryDemographicsFromCS(country, path);
         for (Demographics demo : demographicsList) {
             Demographics id = new Demographics();
-            if (demo.getMandatory()) {
+            if (demo.isMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language) + "*");
             } else {
                 id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language));
             }
             id.setLength(demo.getLength());
             id.setKey(demo.getKey());
-            id.setMandatory(demo.getMandatory());
+            id.setMandatory(demo.isMandatory());
             id.setType(demo.getType());
             id.setFriendlyName(demo.getFriendlyName());
 
             if (Validator.isNotNull(user)) {
-                String idvalue = (String) user.getExpandoBridge().getAttribute(id.getKey());
-                id.setUserValue(idvalue);
+                id.setUserValue((String) user.getExpandoBridge().getAttribute(id.getKey()));
             }
             demographics.add(id);
         }
@@ -1787,12 +1782,53 @@ public class EpsosHelperService {
         return getCountryIdsFromCS(country, externalContext.getRealPath("/"));
     }
 
+    /**
+     * @param country
+     * @return
+     */
+    public static List<DocumentCriteria> getDocumentIdentifiersFromSearchMask(String country) {
+
+        List<DocumentCriteria> documentCriteriaList = new ArrayList<>();
+        String filename = "InternationalSearch_" + country + ".xml";
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
+        LOGGER.debug("Path for InternationalSearchMask is: '{}'", path);
+
+        try {
+            File file = new File(path);
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(file);
+            document.getDocumentElement().normalize();
+            NodeList nodeList = document.getElementsByTagNameNS("*", "documentSearch");
+            LOGGER.info("NodeList: '{}'", nodeList != null ? nodeList.getLength() : "NodeList documentSearch is empty");
+            for (int s = 0; s < nodeList.getLength(); s++) {
+                Node link = nodeList.item(s);
+                NodeList child = link.getChildNodes();
+                for (int i = 0; i < child.getLength(); i++) {
+                    if (child.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        Element element = (Element) child.item(i);
+                        DocumentCriteria criteria = new DocumentCriteria();
+                        criteria.setKey(element.getLocalName());
+                        criteria.setLabel(element.getAttribute("label"));
+                        criteria.setFriendlyName(element.getAttribute("contextualDescription"));
+                        documentCriteriaList.add(criteria);
+                    }
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage());
+            return Collections.emptyList();
+        }
+        return documentCriteriaList;
+    }
+
     public static String getSearchMaskPath() {
 
         return Constants.EPSOS_PROPS_PATH;
     }
 
-    public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
+    public static List<Demographics> getCountryDemographicsFromCS_old(String country, String portalPath) {
 
         List<Demographics> demographicsList = new ArrayList<>();
         String filename = "InternationalSearch_" + country + ".xml";
@@ -1847,25 +1883,117 @@ public class EpsosHelperService {
                 dem.setType("calendar");
                 demographicsList.add(dem);
             }
-            nodeLst = doc.getElementsByTagNameNS("*", "documentId");
-            for (int s = 0; s < nodeLst.getLength(); s++) {
-                Element link = (Element) nodeLst.item(s);
-                Demographics dem = new Demographics();
-                dem.setLabel(link.getAttribute("label"));
-                dem.setKey(link.getAttribute("label"));
-                dem.setType("text");
-                demographicsList.add(dem);
+//            nodeLst = doc.getElementsByTagNameNS("*", "documentId");
+//            for (int s = 0; s < nodeLst.getLength(); s++) {
+//                Element link = (Element) nodeLst.item(s);
+//                Demographics dem = new Demographics();
+//                dem.setLabel(link.getAttribute("label"));
+//                dem.setKey(link.getAttribute("label"));
+//                dem.setType("text");
+//                demographicsList.add(dem);
+//            }
+//
+//            nodeLst = doc.getElementsByTagNameNS("*", "dispensationPinCode");
+//            for (int s = 0; s < nodeLst.getLength(); s++) {
+//                Element link = (Element) nodeLst.item(s);
+//                Demographics dem = new Demographics();
+//                dem.setLabel(link.getAttribute("label"));
+//                dem.setKey(link.getAttribute("label"));
+//                dem.setType("text");
+//                demographicsList.add(dem);
+//            }
+        } catch (Exception e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
+        }
+        LOGGER.info("Demographics size: '{}'", demographicsList.size());
+        return demographicsList;
+    }
+
+    public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
+
+        List<Demographics> demographicsList = new ArrayList<>();
+        String filename = "InternationalSearch_" + country + ".xml";
+
+        String path = getSearchMaskPath() + "forms" + File.separator + filename;
+        try {
+            File file = new File(path);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(file);
+            doc.getDocumentElement().normalize();
+
+            NodeList nodeLstPatientSearch = doc.getElementsByTagNameNS("*", "patientSearch");
+
+            for (int j = 0; j < nodeLstPatientSearch.getLength(); j++) {
+                Element linkPatient = (Element) nodeLstPatientSearch.item(j);
+
+                // textFields
+                NodeList nodeLst = linkPatient.getElementsByTagNameNS("*", "textField");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    //dem.setLength(Integer.parseInt(link.getAttribute("min")));
+                    dem.setFormat(link.getAttribute("format"));
+                    dem.setFriendlyName(link.getAttribute("contextualDescription"));
+
+                    // search for mandatory items
+                    NodeList nodeLst2 = linkPatient.getElementsByTagNameNS("*", "field");
+                    for (int i = 0; i < nodeLst2.getLength(); i++) {
+                        Element link2 = (Element) nodeLst2.item(i);
+                        if (link2.getAttribute("label").equals(dem.getLabel())) {
+                            dem.setMandatory(true);
+                            break;
+                        }
+                    }
+                    demographicsList.add(dem);
+                }
+                // sex
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "sex");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+                // birth date
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "birthDate");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("calendar");
+                    demographicsList.add(dem);
+                }
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "prescriptionId");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "dispensationPinCode");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+
             }
 
-            nodeLst = doc.getElementsByTagNameNS("*", "pinCode");
-            for (int s = 0; s < nodeLst.getLength(); s++) {
-                Element link = (Element) nodeLst.item(s);
-                Demographics dem = new Demographics();
-                dem.setLabel(link.getAttribute("label"));
-                dem.setKey(link.getAttribute("label"));
-                dem.setType("text");
-                demographicsList.add(dem);
-            }
+
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -1886,65 +2014,84 @@ public class EpsosHelperService {
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static String getPortalTranslationFromServlet(HttpServletRequest req, String key, String language) {
+    public static String getPortalTranslationFromServlet(HttpServletRequest httpServletRequest, String key, String language) {
 
         return LiferayUtils.getPortalTranslation(key, language);
     }
 
-    public static void printAssertion(Assertion ass) throws MarshallingException {
+    public static void printAssertion(Assertion assertion) throws MarshallingException {
 
-        AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element;
-        element = marshaller.marshall(ass);
-        Document document = element.getOwnerDocument();
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            String asstring = Utils.getDocumentAsXml(document, false);
-
-            LOGGER_CLINICAL.info("##################### ASSERTION Start");
-            LOGGER_CLINICAL.info(asstring);
-            LOGGER_CLINICAL.info("##################### ASSERTION End");
+            AssertionMarshaller marshaller = new AssertionMarshaller();
+            Element element;
+            element = marshaller.marshall(assertion);
+            Document document = element.getOwnerDocument();
+            LOGGER_CLINICAL.info("Assertion:\n'{}'", Utils.getDocumentAsXml(document, false));
         }
     }
 
-    public static Assertion createPatientConfirmationPlain(String purpose, Assertion idAs, PatientId patient) throws Exception {
+    /**
+     * Creates TRC Assertions required to proceed with documents list, retrieve and submit operations.
+     *
+     * @param purposeOfUse - Clinician purpose of use access request.
+     * @param assertionHCP - Clinician assertion.
+     * @param patient      - Patient information receiving treatment.
+     * @return Signed TRC Assertions.
+     * @throws Exception - Exception returned by TRC-STS component.
+     */
+    public static Assertion createPatientConfirmationPlain(Assertion assertionHCP, PatientId patient, String purposeOfUse) throws Exception {
 
-        Assertion trc;
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Try to create TRCA for patient: '{}'", patient.getExtension());
-        }
-        String pat = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("TRCA Patient ID: '{}'", pat);
-        }
-        LOGGER.info("Assertion ID: '{}'", idAs.getID());
-        LOGGER.info("SECMAN URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-        TRCAssertionRequest trcAssertionRequest = new TRCAssertionRequest.Builder(idAs, pat).purposeOfUse(purpose).pinCode("1234").prescriptionId("ABCDE").build();
-        LOGGER.info("TRCAssertionRequest: '{}", trcAssertionRequest);
-        trc = trcAssertionRequest.request();
+        return createPatientConfirmationPlain(assertionHCP, patient, purposeOfUse, StringUtils.EMPTY, StringUtils.EMPTY);
+    }
 
+    /**
+     * Creates TRC Assertions required to proceed with documents list, retrieve and submit operations.
+     *
+     * @param assertionHCP        - Clinician assertion.
+     * @param patient             - Patient information receiving treatment.
+     * @param purposeOfUse        - Clinician purpose of use access request.
+     * @param prescriptionId      - Identifier of the prescription.
+     * @param dispensationPinCode - Pin Code to unlock documents.
+     * @return Signed TRC Assertions.
+     * @throws Exception - Exception returned by TRC-STS component.
+     */
+    public static Assertion createPatientConfirmationPlain(Assertion assertionHCP, PatientId patient, String purposeOfUse,
+                                                           String prescriptionId, String dispensationPinCode) throws Exception {
+
+        LOGGER.info("HCP Assertion ID: '{}'", assertionHCP.getID());
+        String patientId = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.info("Creates TRC Assertion with parameters -> Patient ID: '{}' - Prescription Id: '{}' - DispensationPinCode: '{}'",
+                    patientId, prescriptionId, dispensationPinCode);
+        }
+        LOGGER.info("TRC-STS URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+        TRCAssertionRequest.Builder builder = new TRCAssertionRequest.Builder(assertionHCP, patientId)
+                .purposeOfUse(purposeOfUse);
+        if (StringUtils.isNotBlank(prescriptionId)) {
+            builder.prescriptionId(prescriptionId);
+        }
+        if (StringUtils.isNotBlank(dispensationPinCode)) {
+            builder.dispensationPinCode(dispensationPinCode);
+        }
+        Assertion assertionTRC = builder.build().request();
         AssertionMarshaller marshaller = new AssertionMarshaller();
-        Element element = marshaller.marshall(trc);
+        Element element = marshaller.marshall(assertionTRC);
         Document document = element.getOwnerDocument();
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            String trca = Utils.getDocumentAsXml(document, false);
-
-            LOGGER_CLINICAL.info("#### TRCA Start");
-            LOGGER_CLINICAL.info(trca);
-            LOGGER_CLINICAL.info("#### TRCA End");
+            LOGGER_CLINICAL.info("TRC Assertion:\n'{}'", Utils.getDocumentAsXml(document, false));
         }
-        LOGGER.debug("TRCA CREATED: '{}'", trc.getID());
-        LOGGER.debug("TRCA WILL BE STORED TO SESSION: '{}'", trc.getID());
-        LiferayUtils.storeToSession("trcAssertion", trc);
-        return trc;
+        LOGGER.debug("TRC Assertion created and stored into session: '{}'", assertionTRC.getID());
+        LiferayUtils.storeToSession("trcAssertion", assertionTRC);
+        return assertionTRC;
     }
 
     public static String extractPdfPartOfDocument(String cda) {
 
         String result = cda;
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document dom = db.parse(new ByteArrayInputStream(cda.getBytes()));
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            Document dom = documentBuilder.parse(new ByteArrayInputStream(cda.getBytes()));
 
             XPath xpath = XPathFactory.newInstance().newXPath();
             xpath.setNamespaceContext(new CDANameSpaceContext());
@@ -1953,7 +2100,7 @@ public class EpsosHelperService {
             if (pdfNode != null) {
                 String base64EncodedPdfString = pdfNode.getTextContent().trim();
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                    LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                    LOGGER_CLINICAL.info("base64EncodedPdfString: '{}'", base64EncodedPdfString);
                 }
                 result = base64EncodedPdfString;
                 result = "data:application/pdf;base64," + result;
@@ -1963,12 +2110,11 @@ public class EpsosHelperService {
                 if (pdfNode != null) {
                     String base64EncodedPdfString = pdfNode.getTextContent().trim();
                     if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                        LOGGER_CLINICAL.info("##### base64EncodedPdfString: '{}'", base64EncodedPdfString);
+                        LOGGER_CLINICAL.info("base64EncodedPdfString: '{}'", base64EncodedPdfString);
                     }
                     result = base64EncodedPdfString;
                     result = "data:application/pdf;base64," + result;
                 }
-
             }
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -2213,7 +2359,7 @@ public class EpsosHelperService {
                 language = "en_GB";
             }
             String language2 = userLanguage;
-            LOGGER.debug("LANGUAGE=" + language + "-" + userLanguage);
+            LOGGER.debug("LANGUAGE='{}-{}'", language, userLanguage);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("IS_IGNORE_PAGINATION", false);
             String birthDate = patient.getBirthDate();

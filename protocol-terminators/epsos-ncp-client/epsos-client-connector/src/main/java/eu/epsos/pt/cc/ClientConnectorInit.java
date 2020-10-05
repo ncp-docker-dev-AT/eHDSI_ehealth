@@ -19,15 +19,16 @@ import javax.servlet.http.HttpServlet;
  */
 public class ClientConnectorInit extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnectorInit.class);
+    private static final long serialVersionUID = -7364719618036709512L;
+    private final Logger logger = LoggerFactory.getLogger(ClientConnectorInit.class);
 
     @Override
     public void init() throws ServletException {
 
-        LOGGER.info("Initiating Client Connector");
+        logger.info("Initiating Client Connector");
         super.init();
         String serverMode = System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE);
-        LOGGER.info("Server Mode: '{}'", StringUtils.isNotBlank(serverMode) ? serverMode : "N/A");
+        logger.info("Server Mode: '{}'", StringUtils.isNotBlank(serverMode) ? serverMode : "N/A");
 
         System.setProperty("javax.net.ssl.keyStore", Constants.SC_KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.keyStorePassword", Constants.SC_KEYSTORE_PASSWORD);

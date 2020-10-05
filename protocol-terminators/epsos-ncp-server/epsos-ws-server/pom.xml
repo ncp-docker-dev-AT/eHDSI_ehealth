@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-server</artifactId>
-        <version>5.0.0</version>
+        <version>5.1.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -240,7 +240,7 @@
                         WEB-INF/lib/neethi-3.0.2.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
                         WEB-INF/lib/xalan-2.7.1.jar,
-                        WEB-INF/lib/xercesImpl-2.10.0.jar,
+                        WEB-INF/lib/xercesImpl-${xerces.version}.jar,
                         WEB-INF/lib/xmlbeans-2.6.0.jar
                     </packagingExcludes>
                 </configuration>

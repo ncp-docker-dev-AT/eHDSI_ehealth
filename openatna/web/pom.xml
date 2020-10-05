@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.0.0</version>
+        <version>5.1.0</version>
     </parent>
 
     <artifactId>openatna-web</artifactId>
@@ -50,14 +50,14 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.1.2</version>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>javax.servlet.jsp.jstl</artifactId>
+            <version>1.2.5</version>
         </dependency>
         <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <version>1.1.2</version>
+            <groupId>org.apache.taglibs</groupId>
+            <artifactId>taglibs-standard-impl</artifactId>
+            <version>1.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -171,7 +171,7 @@
                                 </resource>
                             </webResources>
                             <packagingExcludes>
-                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                                WEB-INF/lib/xercesImpl-${xerces.version}.jar
                             </packagingExcludes>
                         </configuration>
                     </plugin>
@@ -196,7 +196,7 @@
                             </webResources>
                             <includeEmptyDirectories>false</includeEmptyDirectories>
                             <packagingExcludes>
-                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                                WEB-INF/lib/xercesImpl-${xerces.version}.jar
                             </packagingExcludes>
                         </configuration>
                     </plugin>
@@ -220,7 +220,7 @@
                                 </resource>
                             </webResources>
                             <packagingExcludes>
-                                WEB-INF/lib/xercesImpl-2.10.0.jar
+                                WEB-INF/lib/xercesImpl-${xerces.version}.jar
                             </packagingExcludes>
                         </configuration>
                     </plugin>

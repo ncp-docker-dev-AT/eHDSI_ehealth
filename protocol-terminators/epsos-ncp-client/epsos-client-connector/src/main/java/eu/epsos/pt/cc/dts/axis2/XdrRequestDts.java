@@ -23,8 +23,8 @@ public class XdrRequestDts {
         if (document == null) {
             return null;
         }
-
         XdrRequest result = new XdrRequest();
+        //  TODO: Review if the GenericDocumentCode is required at this level.
         result.setCda(new String(document.getBase64Binary(), StandardCharsets.UTF_8));
         result.setCdaId(document.getUuid());
         result.setSubmissionSetId(document.getSubmissionSetId());

@@ -32,6 +32,8 @@ import javax.net.ssl.SSLContext;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStoreException;
@@ -126,12 +128,12 @@ public class DynamicDiscoveryService {
                     if (!extensionTypes.isEmpty()) {
 
                         Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
-                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "patientSearch").item(0));
+                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "searchFields").item(0));
                         String outPath = APPLICATION_BASE_DIR + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("International Search Mask Path: '{}", outPath);
                         }
-                        StreamResult result = new StreamResult(outPath);
+                        StreamResult result = new StreamResult(new File(outPath));
                         XMLUtil.transformDocument(source, result);
                     }
                 }

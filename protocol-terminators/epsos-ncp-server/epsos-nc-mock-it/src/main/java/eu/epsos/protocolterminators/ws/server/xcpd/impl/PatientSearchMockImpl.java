@@ -1,9 +1,11 @@
 package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
+import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 import tr.com.srdc.epsos.data.model.PatientId;

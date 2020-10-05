@@ -6,6 +6,7 @@ import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureEx
 import eu.epsos.protocolterminators.ws.server.exception.XDSErrorCode;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
+import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import fi.kela.se.epsos.data.model.ConsentDocumentMetaData;
@@ -78,9 +79,11 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      * @param dispensationToDiscard Id of the dispensation to be discarded
      */
     @Override
-    public void cancelDispensation(EPSOSDocument dispensationToDiscard) {
-        //  logger.info("eDispensation to be discarded: '{}'", dispensationToDiscard.getXMLDocumentMetaData().getId());
+    public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) {
+
         logger.info("eDispensation to be discarded: '{}' for Patient: '{}'", dispensationToDiscard.getClassCode(), dispensationToDiscard.getPatientId());
+        logger.info("[National Connector A] Discard Dispense ID: '{}' for ePrescription ID: '{}' operation executed...\n'{}'",
+                discardDispenseDetails.getDiscardId(), discardDispenseDetails.getDispenseId(), discardDispenseDetails.toString());
     }
 
     /**
@@ -115,10 +118,10 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
 
     private void throwDocumentProcessingException(String message, String code) throws DocumentProcessingException {
 
-        DocumentProcessingException dpe = new DocumentProcessingException();
-        dpe.setMessage(message);
-        dpe.setCode(code);
-        throw dpe;
+        DocumentProcessingException documentProcessingException = new DocumentProcessingException();
+        documentProcessingException.setMessage(message);
+        documentProcessingException.setCode(code);
+        throw documentProcessingException;
     }
 
     @Override
