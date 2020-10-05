@@ -1717,7 +1717,7 @@ public class EpsosHelperService {
                 SearchMask searchMask = new SearchMask();
                 searchMask.setDomain(link.getAttribute("domain"));
                 searchMask.setLabel(link.getAttribute("label"));
-                searchMask.setFriendlyName(link.getAttribute("friendlyName"));
+                searchMask.setFriendlyName(link.getAttribute("contextualDescription"));
                 searchMask.setRequired(Boolean.parseBoolean(link.getAttribute("mandatory")));
                 searchMaskList.add(searchMask);
             }
@@ -1756,14 +1756,14 @@ public class EpsosHelperService {
         List<Demographics> demographicsList = EpsosHelperService.getCountryDemographicsFromCS(country, path);
         for (Demographics demo : demographicsList) {
             Demographics id = new Demographics();
-            if (demo.getMandatory()) {
+            if (demo.isMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language) + "*");
             } else {
                 id.setLabel(EpsosHelperService.getPortalTranslation(demo.getLabel(), language));
             }
             id.setLength(demo.getLength());
             id.setKey(demo.getKey());
-            id.setMandatory(demo.getMandatory());
+            id.setMandatory(demo.isMandatory());
             id.setType(demo.getType());
             id.setFriendlyName(demo.getFriendlyName());
 
@@ -1809,10 +1809,9 @@ public class EpsosHelperService {
                     if (child.item(i).getNodeType() == Node.ELEMENT_NODE) {
                         Element element = (Element) child.item(i);
                         DocumentCriteria criteria = new DocumentCriteria();
-                        LOGGER.info("Document Search: '{}'", element.getLocalName());
                         criteria.setKey(element.getLocalName());
                         criteria.setLabel(element.getAttribute("label"));
-                        //criteria.setFriendlyName(element.getAttribute("friendlyName"));
+                        criteria.setFriendlyName(element.getAttribute("contextualDescription"));
                         documentCriteriaList.add(criteria);
                     }
                 }
@@ -1894,7 +1893,7 @@ public class EpsosHelperService {
 //                demographicsList.add(dem);
 //            }
 //
-//            nodeLst = doc.getElementsByTagNameNS("*", "pinCode");
+//            nodeLst = doc.getElementsByTagNameNS("*", "dispensationPinCode");
 //            for (int s = 0; s < nodeLst.getLength(); s++) {
 //                Element link = (Element) nodeLst.item(s);
 //                Demographics dem = new Demographics();
@@ -1909,6 +1908,7 @@ public class EpsosHelperService {
         LOGGER.info("Demographics size: '{}'", demographicsList.size());
         return demographicsList;
     }
+
     public static List<Demographics> getCountryDemographicsFromCS(String country, String portalPath) {
 
         List<Demographics> demographicsList = new ArrayList<>();
@@ -1922,77 +1922,78 @@ public class EpsosHelperService {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(file);
             doc.getDocumentElement().normalize();
-            
+
             NodeList nodeLstPatientSearch = doc.getElementsByTagNameNS("*", "patientSearch");
-            
+
             for (int j = 0; j < nodeLstPatientSearch.getLength(); j++) {
-            	 Element linkPatient = (Element) nodeLstPatientSearch.item(j);
-            	 
-            	// textFields
-                 NodeList nodeLst = linkPatient.getElementsByTagNameNS("*", "textField");
-                 for (int s = 0; s < nodeLst.getLength(); s++) {
-                     Element link = (Element) nodeLst.item(s);
-                     Demographics dem = new Demographics();
-                     dem.setLabel(link.getAttribute("label"));
-                     dem.setKey(link.getAttribute("label"));
-                     dem.setType("text");
-                     dem.setLength(Integer.parseInt(link.getAttribute("min")));
-                     dem.setFriendlyName(link.getAttribute("friendlyName"));
+                Element linkPatient = (Element) nodeLstPatientSearch.item(j);
 
-                     // search for mandatory items
-                     NodeList nodeLst2 = linkPatient.getElementsByTagNameNS("*", "field");
-                     for (int i = 0; i < nodeLst2.getLength(); i++) {
-                         Element link2 = (Element) nodeLst2.item(i);
-                         if (link2.getAttribute("label").equals(dem.getLabel())) {
-                             dem.setMandatory(true);
-                             break;
-                         }
-                     }
-                     demographicsList.add(dem);
-                 }
-                 // sex
-                 nodeLst = linkPatient.getElementsByTagNameNS("*", "sex");
-                 for (int s = 0; s < nodeLst.getLength(); s++) {
-                     Element link = (Element) nodeLst.item(s);
-                     Demographics dem = new Demographics();
-                     dem.setLabel(link.getAttribute("label"));
-                     dem.setKey(link.getAttribute("label"));
-                     dem.setType("text");
-                     demographicsList.add(dem);
-                 }
-                 // birth date
-                 nodeLst = linkPatient.getElementsByTagNameNS("*", "birthDate");
-                 for (int s = 0; s < nodeLst.getLength(); s++) {
-                     Element link = (Element) nodeLst.item(s);
-                     Demographics dem = new Demographics();
-                     dem.setLabel(link.getAttribute("label"));
-                     dem.setKey(link.getAttribute("label"));
-                     dem.setType("calendar");
-                     demographicsList.add(dem);
-                 }
-                 nodeLst = linkPatient.getElementsByTagNameNS("*", "documentId");
-                 for (int s = 0; s < nodeLst.getLength(); s++) {
-                     Element link = (Element) nodeLst.item(s);
-                     Demographics dem = new Demographics();
-                     dem.setLabel(link.getAttribute("label"));
-                     dem.setKey(link.getAttribute("label"));
-                     dem.setType("text");
-                     demographicsList.add(dem);
-                 }
+                // textFields
+                NodeList nodeLst = linkPatient.getElementsByTagNameNS("*", "textField");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    //dem.setLength(Integer.parseInt(link.getAttribute("min")));
+                    dem.setFormat(link.getAttribute("format"));
+                    dem.setFriendlyName(link.getAttribute("contextualDescription"));
 
-                 nodeLst = linkPatient.getElementsByTagNameNS("*", "pinCode");
-                 for (int s = 0; s < nodeLst.getLength(); s++) {
-                     Element link = (Element) nodeLst.item(s);
-                     Demographics dem = new Demographics();
-                     dem.setLabel(link.getAttribute("label"));
-                     dem.setKey(link.getAttribute("label"));
-                     dem.setType("text");
-                     demographicsList.add(dem);
-                 }
-            	
+                    // search for mandatory items
+                    NodeList nodeLst2 = linkPatient.getElementsByTagNameNS("*", "field");
+                    for (int i = 0; i < nodeLst2.getLength(); i++) {
+                        Element link2 = (Element) nodeLst2.item(i);
+                        if (link2.getAttribute("label").equals(dem.getLabel())) {
+                            dem.setMandatory(true);
+                            break;
+                        }
+                    }
+                    demographicsList.add(dem);
+                }
+                // sex
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "sex");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+                // birth date
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "birthDate");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("calendar");
+                    demographicsList.add(dem);
+                }
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "prescriptionId");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+
+                nodeLst = linkPatient.getElementsByTagNameNS("*", "dispensationPinCode");
+                for (int s = 0; s < nodeLst.getLength(); s++) {
+                    Element link = (Element) nodeLst.item(s);
+                    Demographics dem = new Demographics();
+                    dem.setLabel(link.getAttribute("label"));
+                    dem.setKey(link.getAttribute("label"));
+                    dem.setType("text");
+                    demographicsList.add(dem);
+                }
+
             }
-            
-            
+
+
         } catch (Exception e) {
             LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
@@ -2046,22 +2047,22 @@ public class EpsosHelperService {
     /**
      * Creates TRC Assertions required to proceed with documents list, retrieve and submit operations.
      *
-     * @param assertionHCP   - Clinician assertion.
-     * @param patient        - Patient information receiving treatment.
-     * @param purposeOfUse   - Clinician purpose of use access request.
-     * @param prescriptionId - Identifier of the prescription.
-     * @param pinCode        - Pin Code to unlock documents.
+     * @param assertionHCP        - Clinician assertion.
+     * @param patient             - Patient information receiving treatment.
+     * @param purposeOfUse        - Clinician purpose of use access request.
+     * @param prescriptionId      - Identifier of the prescription.
+     * @param dispensationPinCode - Pin Code to unlock documents.
      * @return Signed TRC Assertions.
      * @throws Exception - Exception returned by TRC-STS component.
      */
     public static Assertion createPatientConfirmationPlain(Assertion assertionHCP, PatientId patient, String purposeOfUse,
-                                                           String prescriptionId, String pinCode) throws Exception {
+                                                           String prescriptionId, String dispensationPinCode) throws Exception {
 
         LOGGER.info("HCP Assertion ID: '{}'", assertionHCP.getID());
         String patientId = patient.getExtension() + "^^^&" + patient.getRoot() + "&ISO";
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("Creates TRC Assertion with parameters -> Patient ID: '{}' - Prescription Id: '{}' - PinCode: '{}'",
-                    patientId, prescriptionId, pinCode);
+            LOGGER_CLINICAL.info("Creates TRC Assertion with parameters -> Patient ID: '{}' - Prescription Id: '{}' - DispensationPinCode: '{}'",
+                    patientId, prescriptionId, dispensationPinCode);
         }
         LOGGER.info("TRC-STS URL: '{}'", ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
         TRCAssertionRequest.Builder builder = new TRCAssertionRequest.Builder(assertionHCP, patientId)
@@ -2069,8 +2070,8 @@ public class EpsosHelperService {
         if (StringUtils.isNotBlank(prescriptionId)) {
             builder.prescriptionId(prescriptionId);
         }
-        if (StringUtils.isNotBlank(pinCode)) {
-            builder.pinCode(pinCode);
+        if (StringUtils.isNotBlank(dispensationPinCode)) {
+            builder.dispensationPinCode(dispensationPinCode);
         }
         Assertion assertionTRC = builder.build().request();
         AssertionMarshaller marshaller = new AssertionMarshaller();

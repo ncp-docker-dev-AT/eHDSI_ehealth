@@ -67,14 +67,14 @@ public class NcpBean implements Serializable {
         List<Demographics> demographicsList = EpsosHelperService.getCountryDemographicsFromCS(this.selectedCountry);
         for (Demographics aVec : demographicsList) {
             Demographics id = new Demographics();
-            if (aVec.getMandatory()) {
+            if (aVec.isMandatory()) {
                 id.setLabel(EpsosHelperService.getPortalTranslation(aVec.getLabel(), LiferayUtils.getPortalLanguage()) + "*");
             } else {
                 id.setLabel(EpsosHelperService.getPortalTranslation(aVec.getLabel(), LiferayUtils.getPortalLanguage()));
             }
             id.setLength(aVec.getLength());
             id.setKey(aVec.getKey());
-            id.setMandatory(aVec.getMandatory());
+            id.setMandatory(aVec.isMandatory());
             id.setType(aVec.getType());
             demographics.add(id);
         }
