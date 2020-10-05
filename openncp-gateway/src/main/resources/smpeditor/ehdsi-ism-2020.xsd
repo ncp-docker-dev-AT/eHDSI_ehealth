@@ -30,6 +30,8 @@
                     <xs:attribute name="domain" type="xs:string" use="required"/>
                     <xs:attribute name="label" fixed="label.ism.ePrescriptionId" use="required"/>
                     <xs:attribute name="format" type="xs:string" use="required"/>
+                    <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
+                    <xs:attribute name="originalContextualDescription" type="xs:string"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
@@ -38,6 +40,8 @@
                     <xs:attribute name="domain" type="xs:string" use="required"/>
                     <xs:attribute name="label" fixed="label.ism.dispensationPINCode" use="required"/>
                     <xs:attribute name="format" type="xs:string" use="required"/>
+                    <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
+                    <xs:attribute name="originalContextualDescription" type="xs:string"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
