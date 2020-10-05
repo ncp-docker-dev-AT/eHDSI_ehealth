@@ -128,7 +128,7 @@ public class DynamicDiscoveryService {
                     if (!extensionTypes.isEmpty()) {
 
                         Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
-                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "patientSearch").item(0));
+                        DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "searchFields").item(0));
                         String outPath = APPLICATION_BASE_DIR + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("International Search Mask Path: '{}", outPath);

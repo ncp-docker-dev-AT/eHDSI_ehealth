@@ -25,19 +25,23 @@
     <!-- eHDSI Search Mask for clinical document access -->
     <xs:complexType name="documentSearch">
         <xs:sequence>
-            <xs:element name="documentId" minOccurs="0">
+            <xs:element name="prescriptionId" minOccurs="0">
                 <xs:complexType>
                     <xs:attribute name="domain" type="xs:string" use="required"/>
-                    <xs:attribute name="label" fixed="ePrescriptionId" use="required"/>
+                    <xs:attribute name="label" fixed="label.ism.ePrescriptionId" use="required"/>
                     <xs:attribute name="format" type="xs:string" use="required"/>
+                    <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
+                    <xs:attribute name="originalContextualDescription" type="xs:string"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="pinCode" minOccurs="0">
+            <xs:element name="dispensationPINCode" minOccurs="0">
                 <xs:complexType>
                     <xs:attribute name="domain" type="xs:string" use="required"/>
-                    <xs:attribute name="label" fixed="dispensationPINCode" use="required"/>
+                    <xs:attribute name="label" fixed="label.ism.dispensationPINCode" use="required"/>
                     <xs:attribute name="format" type="xs:string" use="required"/>
+                    <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
+                    <xs:attribute name="originalContextualDescription" type="xs:string"/>
                     <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
                 </xs:complexType>
             </xs:element>
@@ -86,25 +90,25 @@
         <xs:attribute name="domain" type="xs:string" use="required"/>
         <xs:attribute name="label" type="labelIdentifier" use="required"/>
         <xs:attribute name="format" type="xs:string" use="required"/>
-        <xs:attribute name="contextualDescription" type="xs:string"/>
+        <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectBirthTime -->
     <xs:complexType name="birthDate">
-        <xs:attribute name="label" fixed="birthDate" use="required"/>
+        <xs:attribute name="label" fixed="label.ism.birthDate" use="required"/>
         <xs:attribute name="format" type="xs:string"/>
-        <xs:attribute name="contextualDescription" type="xs:string"/>
+        <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
 
     <!-- Patient element - LivingSubjectGender -->
     <xs:complexType name="administrativeGender">
-        <xs:attribute name="label" fixed="sex" use="required"/>
+        <xs:attribute name="label" fixed="label.ism.sex" use="required"/>
         <xs:attribute name="format" type="xs:string" use="required"/>
-        <xs:attribute name="contextualDescription" type="xs:string"/>
+        <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
@@ -113,7 +117,7 @@
     <xs:complexType name="textField">
         <xs:attribute name="label" type="labelGenericTrait" use="required"/>
         <xs:attribute name="format" type="xs:string" use="required"/>
-        <xs:attribute name="contextualDescription" type="xs:string"/>
+        <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
@@ -123,7 +127,7 @@
         <xs:sequence>
             <xs:element name="mediaContent" type="xs:base64Binary"/>
         </xs:sequence>
-        <xs:attribute name="label" fixed="media" use="required"/>
+        <xs:attribute name="label" fixed="label.ism.media" use="required"/>
         <xs:attribute name="mediaName" type="xs:string"/>
         <xs:attribute name="fileExtension" type="xs:string"/>
         <xs:attribute name="description" type="xs:string"/>
@@ -164,43 +168,43 @@
 
     <xs:simpleType name="labelIdentifier">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="healthCardNumber"/>
-            <xs:enumeration value="nationalIdentityCardNumber"/>
-            <xs:enumeration value="nationalPersonIdentifier"/>
-            <xs:enumeration value="nationalSocialSecurityNumber"/>
-            <xs:enumeration value="passportNumber"/>
-            <xs:enumeration value="regionalPatientIdentifier"/>
-            <xs:enumeration value="regionIdentifier"/>
+            <xs:enumeration value="label.ism.healthCardNumber"/>
+            <xs:enumeration value="label.ism.nationalIdentityCardNumber"/>
+            <xs:enumeration value="label.ism.nationalPersonIdentifier"/>
+            <xs:enumeration value="label.ism.nationalSocialSecurityNumber"/>
+            <xs:enumeration value="label.ism.passportNumber"/>
+            <xs:enumeration value="label.ism.regionalPatientIdentifier"/>
+            <xs:enumeration value="label.ism.regionIdentifier"/>
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="labelGenericTrait">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="addressCity"/>
-            <xs:enumeration value="addressCountry"/>
-            <xs:enumeration value="familyName"/>
-            <xs:enumeration value="firstName"/>
+            <xs:enumeration value="label.ism.addressCity"/>
+            <xs:enumeration value="label.ism.addressCountry"/>
+            <xs:enumeration value="label.ism.familyName"/>
+            <xs:enumeration value="label.ism.firstName"/>
         </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="labelList">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="addressCity"/>
-            <xs:enumeration value="addressCountry"/>
-            <xs:enumeration value="birthDate"/>
-            <xs:enumeration value="dispensationPINCode"/>
-            <xs:enumeration value="ePrescriptionId"/>
-            <xs:enumeration value="familyName"/>
-            <xs:enumeration value="firstName"/>
-            <xs:enumeration value="healthCardNumber"/>
-            <xs:enumeration value="media"/>
-            <xs:enumeration value="nationalIdentityCardNumber"/>
-            <xs:enumeration value="nationalPersonIdentifier"/>
-            <xs:enumeration value="nationalSocialSecurityNumber"/>
-            <xs:enumeration value="passportNumber"/>
-            <xs:enumeration value="regionalPatientIdentifier"/>
-            <xs:enumeration value="regionIdentifier"/>
-            <xs:enumeration value="sex"/>
+            <xs:enumeration value="label.ism.addressCity"/>
+            <xs:enumeration value="label.ism.addressCountry"/>
+            <xs:enumeration value="label.ism.birthDate"/>
+            <xs:enumeration value="label.ism.dispensationPINCode"/>
+            <xs:enumeration value="label.ism.ePrescriptionId"/>
+            <xs:enumeration value="label.ism.familyName"/>
+            <xs:enumeration value="label.ism.firstName"/>
+            <xs:enumeration value="label.ism.healthCardNumber"/>
+            <xs:enumeration value="label.ism.media"/>
+            <xs:enumeration value="label.ism.nationalIdentityCardNumber"/>
+            <xs:enumeration value="label.ism.nationalPersonIdentifier"/>
+            <xs:enumeration value="label.ism.nationalSocialSecurityNumber"/>
+            <xs:enumeration value="label.ism.passportNumber"/>
+            <xs:enumeration value="label.ism.regionalPatientIdentifier"/>
+            <xs:enumeration value="label.ism.regionIdentifier"/>
+            <xs:enumeration value="label.ism.sex"/>
         </xs:restriction>
     </xs:simpleType>
 

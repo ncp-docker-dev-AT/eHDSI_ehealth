@@ -83,7 +83,7 @@ public class MyBean implements Serializable {
     private Date consentStartDate;
     private Date consentEndDate;
     private String consentOpt;
-    private String pinCode;
+    private String dispensationPinCode;
     private String prescriptionId;
     private String purposeOfUse;
     private String purposeOfUseForPS;
@@ -250,7 +250,7 @@ public class MyBean implements Serializable {
             errorUserAssertion = (String) userAssertion;
         }
         logger.info("Search Criteria --> Demographics list: '{}', Identifiers list: '{}', PIN Code '{}', Prescription ID: '{}', Purpose of Use: '{}'",
-                demographics.size(), identifiers.size(), pinCode, prescriptionId, purposeOfUse);
+                demographics.size(), identifiers.size(), dispensationPinCode, prescriptionId, purposeOfUse);
         searchPatients(hcpAssertion, identifiers, demographics, selectedCountry);
     }
 
@@ -551,7 +551,7 @@ public class MyBean implements Serializable {
         createTRCAssertion(docType, purposeOfUse, StringUtils.EMPTY, StringUtils.EMPTY);
     }
 
-    private void createTRCAssertion(String docType, String purposeOfUse, String prescriptionId, String pinCode) {
+    private void createTRCAssertion(String docType, String purposeOfUse, String prescriptionId, String dispensationPinCode) {
 
         logger.info("[Portal] Creating TRCAssertion for '{}' request and Purpose of Use: '{}'", docType, purposeOfUse);
         if (StringUtils.equals(docType, "ps")) {
@@ -573,7 +573,7 @@ public class MyBean implements Serializable {
                         hcpAssertion.getID(), patientId.getRoot(), purposeOfUse);
             }
             if (getSignedTRC() == null) {
-                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(hcpAssertion, patientId, purposeOfUse, prescriptionId, pinCode);
+                trcAssertion = EpsosHelperService.createPatientConfirmationPlain(hcpAssertion, patientId, purposeOfUse, prescriptionId, dispensationPinCode);
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     loggerClinical.info("TRCA: Created: '{}' for: '{}' for patient: '{}_{}'. Purpose of use is: '{}'",
                             trcAssertion.getID(), hcpAssertion.getID(), patientId.getRoot(), patientId.getExtension(), purposeOfUse);
@@ -981,13 +981,13 @@ public class MyBean implements Serializable {
         return "genericPatientConfirmation";
     }
 
-    public String getPinCode() {
-        return pinCode;
+    public String getDispensationPinCode() {
+        return dispensationPinCode;
     }
 
-    public void setPinCode(String pinCode) {
-        logger.info("[Portal] Set PIN Code for ePrescription: '{}'", pinCode);
-        this.pinCode = pinCode;
+    public void setDispensationPinCode(String dispensationPinCode) {
+        logger.info("[Portal] Set PIN Code for ePrescription: '{}'", dispensationPinCode);
+        this.dispensationPinCode = dispensationPinCode;
     }
 
     public String getPrescriptionId() {
@@ -1004,8 +1004,8 @@ public class MyBean implements Serializable {
     }
 
     public void setPurposeOfUseForEP(String purposeOfUse) {
-        logger.info("MyBean: '{}', PurposeOfUse: '{}', PinCode: '{}', PrescriptionId: '{}'", this.toString(), purposeOfUse, pinCode, prescriptionId);
-        createTRCAssertion("ep", purposeOfUse, prescriptionId, pinCode);
+        logger.info("MyBean: '{}', PurposeOfUse: '{}', Dispensation PinCode: '{}', PrescriptionId: '{}'", this.toString(), purposeOfUse, dispensationPinCode, prescriptionId);
+        createTRCAssertion("ep", purposeOfUse, prescriptionId, dispensationPinCode);
     }
 
     public boolean getEnableMRO() {
@@ -1190,7 +1190,7 @@ public class MyBean implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("pinCode", pinCode)
+                .append("dispensationPinCode", dispensationPinCode)
                 .append("prescriptionId", prescriptionId)
                 .append("purposeOfUse", purposeOfUse)
                 .append("purposeOfUseForPS", purposeOfUseForPS)
