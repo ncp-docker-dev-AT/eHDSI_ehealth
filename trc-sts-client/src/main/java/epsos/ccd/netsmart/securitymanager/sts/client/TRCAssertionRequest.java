@@ -73,7 +73,7 @@ public class TRCAssertionRequest {
     private final String purposeOfUse;
     private final String prescriptionId;
     private final String patientId;
-    private final String pinCode;
+    private final String dispensationPinCode;
     private final SOAPMessage rstMsg;
     private final String messageId;
     private final DocumentBuilder builder;
@@ -89,7 +89,7 @@ public class TRCAssertionRequest {
 
         this.idAssert = builder.idAssert;
         this.patientId = builder.patientId;
-        this.pinCode = builder.pinCode;
+        this.dispensationPinCode = builder.dispensationPinCode;
         this.prescriptionId = builder.prescriptionId;
         this.purposeOfUse = builder.purposeOfUse;
         this.location = builder.location;
@@ -202,10 +202,10 @@ public class TRCAssertionRequest {
             SOAPElement patientIdElem = trcParamsElem.addChildElement(patientIdName);
             patientIdElem.addTextNode(patientId);
 
-            if (StringUtils.isNotBlank(pinCode)) {
-                Name pinCodeName = fac.createName("PinCode", "trc", TRC_NS);
-                SOAPElement pinCodeElement = trcParamsElem.addChildElement(pinCodeName);
-                pinCodeElement.addTextNode(pinCode);
+            if (StringUtils.isNotBlank(dispensationPinCode)) {
+                Name dispensationPinCodeName = fac.createName("DispensationPinCode", "trc", TRC_NS);
+                SOAPElement dispensationPinCodeElement = trcParamsElem.addChildElement(dispensationPinCodeName);
+                dispensationPinCodeElement.addTextNode(dispensationPinCode);
             }
             if (StringUtils.isNotBlank(prescriptionId)) {
                 Name prescriptionIdName = fac.createName("PrescriptionId", "trc", TRC_NS);
@@ -339,7 +339,7 @@ public class TRCAssertionRequest {
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
         private String prescriptionId;
-        private String pinCode;
+        private String dispensationPinCode;
         private URL location = null;
 
         /**
@@ -366,9 +366,9 @@ public class TRCAssertionRequest {
             return this;
         }
 
-        public Builder pinCode(String pinCode) {
+        public Builder dispensationPinCode(String dispensationPinCode) {
 
-            this.pinCode = pinCode;
+            this.dispensationPinCode = dispensationPinCode;
             return this;
         }
 

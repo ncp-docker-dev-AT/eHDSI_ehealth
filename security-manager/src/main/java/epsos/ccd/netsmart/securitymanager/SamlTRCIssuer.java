@@ -207,7 +207,7 @@ public class SamlTRCIssuer {
      * @param attrValuePair        SAML {@link Attribute} that will be added to the assertion
      * @return the SAML TRC Assertion
      */
-    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse, String pinCode, String prescriptionId,
+    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse, String dispensationPinCode, String prescriptionId,
                                    List<Attribute> attrValuePair) throws SMgrException {
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
@@ -360,15 +360,15 @@ public class SamlTRCIssuer {
         }
         attrStmt.getAttributes().add(attrPoU);
 
-        if (StringUtils.isNotBlank(pinCode)) {
-            Attribute attributePinCode = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
-            attributePinCode.setFriendlyName("Pin Code");
-            attributePinCode.setName("urn:ehdsi:names:document:document-id:pinCode");
-            attributePinCode.setNameFormat(Attribute.URI_REFERENCE);
+        if (StringUtils.isNotBlank(dispensationPinCode)) {
+            Attribute attributeDispensationPinCode = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+            attributeDispensationPinCode.setFriendlyName("Dispensation Pin Code");
+            attributeDispensationPinCode.setName("urn:ehdsi:names:document:document-id:dispensationPinCode");
+            attributeDispensationPinCode.setNameFormat(Attribute.URI_REFERENCE);
             XSString attrValPinCode = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-            attrValPinCode.setValue(pinCode);
-            attributePinCode.getAttributeValues().add(attrValPinCode);
-            attrStmt.getAttributes().add(attributePinCode);
+            attrValPinCode.setValue(dispensationPinCode);
+            attributeDispensationPinCode.getAttributeValues().add(attrValPinCode);
+            attrStmt.getAttributes().add(attributeDispensationPinCode);
         }
         if (StringUtils.isNotBlank(prescriptionId)) {
             Attribute attributeDocumentId = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);

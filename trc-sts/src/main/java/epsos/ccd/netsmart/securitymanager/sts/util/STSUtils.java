@@ -50,18 +50,18 @@ public class STSUtils {
      * @param body
      * @return
      */
-    public static String getPinCode(SOAPElement body) {
+    public static String getDispensationPinCode(SOAPElement body) {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
 
         SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "PinCode").item(0) == null) {
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "DispensationPinCode").item(0) == null) {
             return StringUtils.EMPTY;
         }
 
-        return trcDetails.getElementsByTagNameNS(TRC_NS, "PinCode").item(0).getTextContent();
+        return trcDetails.getElementsByTagNameNS(TRC_NS, "DispensationPinCode").item(0).getTextContent();
     }
 
     /**
