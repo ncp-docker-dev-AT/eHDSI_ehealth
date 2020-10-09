@@ -28,29 +28,29 @@
     <ui:include src="patient.xhtml"/>
     <ui:include src="confirmation.xhtml"/>
 </h:form>
-<c:if test="#{not empty myBean.documentCriteria}">
-    <h:form id="confirmationForm">
-        <p:panel header="Documents search criteria" id="documentsPanelid">
-            <h4><strong>Please provide the identifiers to access CDA</strong></h4>
-            <h:outputLabel value="Dispensation PIN Code"/>
-            <p:inputText value="#{confirmationBean.dispensationPinCode}"/>
-            <h:outputLabel value="Prescription ID"/>
-            <p:inputText value="#{confirmationBean.prescriptionId}"/>
-        </p:panel>
-        <h:inputHidden id="trca" value="#{myBean.signedTRC}"/>
-        <p:panel id="confirmationPanel">
-            <p:commandButton id="submitButton" value="#{msg['trca.confirm']}" ajax="false"
-                             action="#{confirmationBean.viewPrescriptions}">
-                <f:setPropertyActionListener value="#{confirmationBean.dispensationPinCode}" target="#{myBean.dispensationPinCode}"/>
-                <f:setPropertyActionListener value="#{confirmationBean.prescriptionId}"
-                                             target="#{myBean.prescriptionId}"/>
-                <f:setPropertyActionListener value="#{confirmationBean.confirm}" target="#{myBean.specificConsent}"/>
-                <p:resetInput target="confirmationPanel"/>
-            </p:commandButton>
-            <p:commandButton id="cancelButton" value="#{msg['trca.cancel']}" ajax="false"
-                             action="/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"/>
-        </p:panel>
-    </h:form>
-</c:if>
+
+<h:form id="confirmationForm">
+    <p:panel header="Documents search criteria" id="documentsPanelid" rendered="#{not empty myBean.documentCriteria}">
+        <h4><strong>Please provide the identifiers to access CDA</strong></h4>
+        <h:outputLabel value="Dispensation PIN Code"/>
+        <p:inputText value="#{confirmationBean.dispensationPinCode}"/>
+        <h:outputLabel value="Prescription ID"/>
+        <p:inputText value="#{confirmationBean.prescriptionId}"/>
+    </p:panel>
+    <h:inputHidden id="trca" value="#{myBean.signedTRC}"/>
+    <p:panel id="confirmationPanel">
+        <p:commandButton id="submitButton" value="#{msg['trca.confirm']}" ajax="false"
+                         action="#{confirmationBean.viewPrescriptions}">
+            <f:setPropertyActionListener value="#{confirmationBean.dispensationPinCode}"
+                                         target="#{myBean.dispensationPinCode}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.prescriptionId}"
+                                         target="#{myBean.prescriptionId}"/>
+            <f:setPropertyActionListener value="#{confirmationBean.confirm}" target="#{myBean.specificConsent}"/>
+            <p:resetInput target="confirmationPanel"/>
+        </p:commandButton>
+        <p:commandButton id="cancelButton" value="#{msg['trca.cancel']}" ajax="false"
+                         action="/view1.xhtml?javax.portlet.faces.PortletMode=view&amp;javax.portlet.faces.WindowState=normal"/>
+    </p:panel>
+</h:form>
 </body>
 </html>
