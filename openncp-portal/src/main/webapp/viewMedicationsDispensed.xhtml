@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="en-GB" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:ui="http://java.sun.com/jsf/facelets">
 <f:view locale="#{facesContext.externalContext.requestLocale}"/>
 <h:head>
     <title>Medications Dispensed List</title>
@@ -42,17 +42,25 @@
             </tr>
         </table>
     </p:panel>
-    <p:dataTable var="medications" value="#{medicationsDispensed.medicationDispensedList}">
-        <p:column headerText="Name">
-            <h:outputText value="#{medications.document}"/>
-        </p:column>
-        <p:column headerText="Version">
-            <h:outputLink
-                    value="/epsosportal/discardDispenseServlet?documentId=#{medications.document}&amp;repositoryid=#{medications.document}&amp;hcid=#{medications.document}"
-                    target="_blank">
-                <p:graphicImage value="/images/pdf_icon.png" style="text-align:center;width:30px;height:30px;"/>Test
-            </h:outputLink>
-        </p:column>
-    </p:dataTable>
+    <h:form> 
+	    <p:messages id="messages" showDetail="true" showSummary="true" closable="true" autoUpdate="true" />
+	    <p:dataTable var="medication" value="#{medicationsDispensed.medicationDispensedList}">
+	        <p:column headerText="Name">
+	            <h:outputText value="#{medication.document}"/>
+	        </p:column>
+	         <p:column headerText="Dispensed Id">
+	        	<h:outputText value="#{medication.dispensedId}" />
+	         </p:column>
+	         
+	         <p:column headerText="Effective Time">
+	        	<h:outputText value="#{medication.effectiveTime}" >
+	   				<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" />
+				</h:outputText>
+			</p:column>
+	        <p:column headerText="Version">
+	        	<p:commandButton value="Discard dispense" action="#{medicationDiscardBean.discardDispense(medication.document)}" />
+	        </p:column>
+	    </p:dataTable>
+    </h:form>
 </h:body>
 </html>

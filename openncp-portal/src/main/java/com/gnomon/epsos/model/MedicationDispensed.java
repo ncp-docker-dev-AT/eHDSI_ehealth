@@ -1,42 +1,45 @@
 package com.gnomon.epsos.model;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
 import java.io.Serializable;
+import java.util.Date;
 
-@ManagedBean
-@RequestScoped
 public class MedicationDispensed implements Serializable {
 
-    private static final long serialVersionUID = 8235682380235702521L;
-    private String dispensedId;
-    private String patientId;
-    private String document;
+	private static final long serialVersionUID = 8235682380235702521L;
+	private String dispensedId;
+	private String patientId;
+	private String document;
+	private Date effectiveTime;
 
-    public MedicationDispensed() {
-    }
+	public String getDispensedId() {
+		return dispensedId;
+	}
 
-    public String getDispensedId() {
-        return dispensedId;
-    }
+	public void setDispensedId(String dispensedId) {
+		this.dispensedId = dispensedId;
+	}
 
-    public void setDispensedId(String dispensedId) {
-        this.dispensedId = dispensedId;
-    }
+	public String getPatientId() {
+		return patientId;
+	}
 
-    public String getPatientId() {
-        return patientId;
-    }
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
 
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
+	public String getDocument() {
+		return document;
+	}
 
-    public String getDocument() {
-        return document;
-    }
+	public void setDocument(String document) {
+		this.document = document;
+	}
 
-    public void setDocument(String document) {
-        this.document = document;
-    }
+	public Date getEffectiveTime() {
+		return effectiveTime;
+	}
+
+	public void setEffectiveTime(Date effectiveTime) {
+		this.effectiveTime = effectiveTime;
+	}
 }
