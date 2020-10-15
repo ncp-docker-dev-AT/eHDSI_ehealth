@@ -71,8 +71,9 @@ public class MedicationBean implements Serializable {
 				Element link = (Element) nodeLst.item(0);
 				String root = link.getAttribute("root");
 				String extension = link.getAttribute("extension");
-				String dispenseId = new StringBuilder().append("Root = ").append(root == null ? "" : root).//
-						append("; ").append("Extension = ").append(extension == null ? "" : extension).toString();
+				String andRoot = root == null ? "" : "^";
+				String dispenseId = new StringBuilder().append(root == null ? "" : root).//
+						append(extension == null ? "" : andRoot+extension).toString();
 				medicationDispensed.setDispensedId(dispenseId);
 			}
 
