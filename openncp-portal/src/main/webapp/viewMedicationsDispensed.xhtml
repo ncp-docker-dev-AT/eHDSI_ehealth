@@ -48,16 +48,15 @@
 	        <p:column headerText="Name">
 	            <h:outputText value="#{medication.document}"/>
 	        </p:column>
-	         <p:column headerText="Dispensed Id">
+	         <p:column headerText="Dispense Id">
 	        	<h:outputText value="#{medication.dispensedId}" />
 	         </p:column>
-	         
-	         <p:column headerText="Effective Time">
+	         <p:column headerText="Effective Time" style="text-align:right;">
 	        	<h:outputText value="#{medication.effectiveTime}" >
 	   				<f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" />
 				</h:outputText>
 			</p:column>
-	        <p:column headerText="Version">
+	        <p:column headerText="Version" style="text-align:center;">
 	        	<p:commandButton value="Discard dispense" action="#{medicationDiscardBean.discardDispense(medication.document)}" />
 	        </p:column>
 	    </p:dataTable>

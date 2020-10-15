@@ -4,8 +4,13 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 import javax.xml.parsers.DocumentBuilder;
@@ -26,18 +31,6 @@ public class MedicationBean implements Serializable {
 	private static final long serialVersionUID = -3893661360983844773L;
 	private List<MedicationDispensed> medicationDispensedList = new ArrayList<>();
 
-	public MedicationBean() {
-/*
-		List<String> medications = loadMedications();
-		for (String fileName : medications) {
-			MedicationDispensed medicationDispensed = new MedicationDispensed();
-			medicationDispensed.setDocument(fileName);
-			medicationDispensedList.add(medicationDispensed);
-		}
-		*/
-		loadMedications();
-	}
-
 	public List<MedicationDispensed> getMedicationDispensedList() {
 		return medicationDispensedList;
 	}
@@ -46,55 +39,57 @@ public class MedicationBean implements Serializable {
 		this.medicationDispensedList = medicationDispensedList;
 	}
 
-	private /*List<String>*/ void loadMedications() {
+	@PostConstruct
+	private void loadMedications() {
 
 		String directoryName = Constants.EPSOS_PROPS_PATH + "integration/" + Constants.HOME_COMM_ID + "/medication";
 		File folder = new File(directoryName);
 		File[] listOfFiles = folder.listFiles();
 
-//		List<String> medicationList = new ArrayList<>();
-		if (listOfFiles != null) {
-			for (File file : listOfFiles) {
-				if (file.isFile() && file.getName().endsWith(".xml")) {
-//					medicationList.add(file.getName());
-					medicationDispensedList.add(loadMedicationDispensed( file));
-				}
-			}
-		}
-//		return medicationList;
+		medicationDispensedList = Optional.ofNullable(listOfFiles).map(Arrays::asList).orElse(Collections.emptyList())
+				.stream().filter(f -> f.isFile() && f.getName().endsWith(".xml")).map(this::loadMedicationDispensed)
+				.collect(Collectors.toList());
+		;
+
 	}
 
 	private MedicationDispensed loadMedicationDispensed(File file) {
 		MedicationDispensed medicationDispensed = new MedicationDispensed();
 
 		try {
+			medicationDispensed.setDocument(file.getName());
+
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 			documentBuilderFactory.setNamespaceAware(true);
 			DocumentBuilder db = documentBuilderFactory.newDocumentBuilder();
 			Document doc = db.parse(file);
 			doc.getDocumentElement().normalize();
 			NodeList nodeLst = doc.getElementsByTagNameNS("*", "id");
-			if (nodeLst.getLength() > 0) {
+			if (nodeLst != null //
+					&& nodeLst.getLength() > 0 //
+					&& nodeLst.item(0) != null ) {
 				Element link = (Element) nodeLst.item(0);
-				medicationDispensed.setDispensedId(link.getAttribute("extension"));
-				medicationDispensed.setDocument(file.getName());
+				String root = link.getAttribute("root");
+				String extension = link.getAttribute("extension");
+				String dispenseId = new StringBuilder().append("Root = ").append(root == null ? "" : root).//
+						append("; ").append("Extension = ").append(extension == null ? "" : extension).toString();
+				medicationDispensed.setDispensedId(dispenseId);
 			}
 
 			nodeLst = doc.getElementsByTagNameNS("*", "effectiveTime");
-			if (nodeLst.getLength() > 0) {
+			if (nodeLst != null //
+					&& nodeLst.getLength() > 0 //
+					&& nodeLst.item(0) != null //
+					&& ((Element) nodeLst.item(0)).getAttribute("value") != null) {
 				Element link = (Element) nodeLst.item(0);
-
 				String time = link.getAttribute("value");
-				if (time != null) {
-					if (time.length() >= 14) {
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-						medicationDispensed.setEffectiveTime(sdf.parse(time.substring(0, 14)));
-					} else if (time.length() >= 8) {
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-						medicationDispensed.setEffectiveTime(sdf.parse(time.substring(0, 8)));
-					}
+				if (time.length() >= 14) {
+					medicationDispensed.setEffectiveTime(new SimpleDateFormat("yyyyMMddHHmmss")//
+							.parse(time.substring(0, 14)));
+				} else if (time.length() >= 8) {
+					medicationDispensed.setEffectiveTime(new SimpleDateFormat("yyyyMMdd")//
+							.parse(time.substring(0, 8)));
 				}
-
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error getting country ids '{}'", e.getMessage(), e);

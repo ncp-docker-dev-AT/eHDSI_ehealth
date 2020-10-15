@@ -7,7 +7,6 @@ public class MedicationDispensed implements Serializable {
 
 	private static final long serialVersionUID = 8235682380235702521L;
 	private String dispensedId;
-	private String patientId;
 	private String document;
 	private Date effectiveTime;
 
@@ -17,14 +16,6 @@ public class MedicationDispensed implements Serializable {
 
 	public void setDispensedId(String dispensedId) {
 		this.dispensedId = dispensedId;
-	}
-
-	public String getPatientId() {
-		return patientId;
-	}
-
-	public void setPatientId(String patientId) {
-		this.patientId = patientId;
 	}
 
 	public String getDocument() {
