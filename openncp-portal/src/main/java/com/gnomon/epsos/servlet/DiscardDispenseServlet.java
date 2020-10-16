@@ -28,6 +28,12 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.TimeZone;
 
+/**
+ * @deprecated  Use MedicationDiscardBean JSF class instead
+ * @author Marius
+ *
+ */
+@Deprecated
 public class DiscardDispenseServlet extends HttpServlet {
 
     private static final long serialVersionUID = 7738274887962003848L;
