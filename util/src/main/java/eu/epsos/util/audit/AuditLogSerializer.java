@@ -33,7 +33,7 @@ public interface AuditLogSerializer {
         }
         
         public String getTrashDir() {
-            return "audit-trash/";
+            return getDir() + "audit-trash/";
         }
 
         public String getFilePrefix() {
