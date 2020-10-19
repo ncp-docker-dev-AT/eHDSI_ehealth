@@ -31,6 +31,10 @@ public interface AuditLogSerializer {
         public String getDir() {
             return "audit-backup/";
         }
+        
+        public String getTrashDir() {
+            return "audit-trash/";
+        }
 
         public String getFilePrefix() {
             return filePrefix + "-AuditLogBackup-";
@@ -55,4 +59,6 @@ public interface AuditLogSerializer {
             return sdf.format(new Date());
         }
     }
+
+	void moveFile(File file);
 }
