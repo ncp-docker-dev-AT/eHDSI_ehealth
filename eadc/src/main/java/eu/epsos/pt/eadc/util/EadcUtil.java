@@ -8,6 +8,7 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.helper.TransactionHelper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +16,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -27,14 +23,13 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 /**
- * The purpose of this class is to help the eADC invocation process, by
- * providing utility methods to invoke the service.
- *
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
+ * The purpose of this class is to help the eADC invocation process, by providing utility methods to invoke the service.
  */
 public class EadcUtil {
 
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Logger LOGGER = LoggerFactory.getLogger(EadcUtil.class);
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
     private static String defaultDsPath = null;
 
     /**
@@ -44,8 +39,7 @@ public class EadcUtil {
      *
      * @param reqMsgContext the Servlet request message context
      * @param rspMsgContext the Servlet response message context
-     * @param cdaDocument   the optional CDA document, leave as null if not
-     *                      necessary
+     * @param cdaDocument   the optional CDA document, leave as null if not necessary
      * @param transInfo     the Transaction Info object
      * @throws Exception
      */
@@ -59,7 +53,6 @@ public class EadcUtil {
         Transaction transaction;
         Document transactionDocument;
 
-        LOGGER.info("[EADC] Transaction Processing Started...");
         reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         respEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -77,15 +70,15 @@ public class EadcUtil {
         } else {
             transactionDocument = TransactionHelper.convertTransaction(transaction);
         }
-        printTransaction(transaction);
-        LOGGER.info("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isInfoEnabled()) {
+            LOGGER_CLINICAL.info("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
+        }
         EadcEntry eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transactionDocument, reqEnv, respEnv);
         EadcReceiverImpl eadcReceiver = new EadcReceiverImpl();
         eadcReceiver.process(eadcEntry);
 
         watch.stop();
-        LOGGER.debug("[EADC] method invokeEADC executed in: '{}ms'", watch.getTime());
-        LOGGER.info("[EADC] Transaction Processing Finished...");
+        LOGGER.info("[EADC] Transaction Processing executed in: '{}ms'", watch.getTime());
     }
 
     /**
@@ -115,7 +108,7 @@ public class EadcUtil {
     /**
      * Helper method to return the system epSOS Properties Path
      *
-     * @return the full epSOS Props Path currently on the system.
+     * @return the full OpenNCP Props Path currently used by the system.
      */
     public static String getApplicationRootPath() {
 
@@ -129,24 +122,6 @@ public class EadcUtil {
             }
         }
         return path;
-    }
-
-    private static void printTransaction(Transaction transaction) {
-
-        try {
-            StringWriter stringWriter = new StringWriter();
-            JAXBContext jaxbContext = JAXBContext.newInstance(Transaction.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            QName qName = new QName("com:spirit:SpiritProxy", "transaction");
-            JAXBElement<Transaction> root = new JAXBElement<>(qName, Transaction.class, transaction);
-            jaxbMarshaller.marshal(root, stringWriter);
-            String xmlContent = stringWriter.toString();
-            LOGGER.info("Transaction:\n'{}'", xmlContent);
-
-        } catch (JAXBException e) {
-            LOGGER.error("JAXBException: '{}'", e.getMessage(), e);
-        }
     }
 
     public static String xmlToString(Node node) {
@@ -164,7 +139,7 @@ public class EadcUtil {
         } catch (TransformerException e) {
             LOGGER.error("TransformerException: '{}'", e.getMessage());
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**

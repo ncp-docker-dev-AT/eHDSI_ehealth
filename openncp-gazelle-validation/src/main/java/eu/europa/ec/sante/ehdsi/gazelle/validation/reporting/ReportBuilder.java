@@ -57,7 +57,6 @@ public class ReportBuilder {
      * @param validationObject the validated object.
      * @param validationResult the validation result.
      * @return A boolean flag, indicating if the reporting process succeed or not.
-     * @pa
      */
     public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {

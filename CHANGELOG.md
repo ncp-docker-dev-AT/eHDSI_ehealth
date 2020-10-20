@@ -3,6 +3,53 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.1.0] - 05-10-2020
+The OpenNCP 5.1.0 release is the CEF eHDSI Wave 4 Preparatory Test Event version.
+<br/>This version is fully supporting Change Proposals 33, 35, 36 and 42.
+<br/>Dispensation workflow extension - discard operation (CP-036).
+<br/>Improvement of the International Search Mask (CP-042).
+<br/>CDA Display Tool supporting the Wave 4 - CDA Implementation Guidelines.
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/YgATE
+
+### Sub-task
+- [EHNCP-1942] - IP address returned by TRC-STS not coherent for Portugal.
+- [EHNCP-1955] - Implementation of Dispense Discard KPI.
+- [EHNCP-1957] - OpenNCP default infrastructure evolution and upgrade.
+- [EHNCP-1961] - Hibernate 5.4.18 vulnerabilities.
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-1967] - Releasing OpenNCP 5.1.0 (Wave 4 Preparatory version).
+- [EHNCP-1969] - Alignment of the Gazelle validators to Wave 4.
+- [EHNCP-1991] - Implement optional documents criteria parameters for CP-042 in Portals.
+
+### Bug
+- [EHNCP-1668] - PrettyPrinter uses a licensed Saxon feature.
+- [EHNCP-1939] - ATNA persistence layer returns an exception with userId too long.
+- [EHNCP-1952] - Transformation configuration not correct for PS - generalizedMedicineClass.
+- [EHNCP-1958] - Serialization of ISM forms might not work on Windows OS.
+
+### Story
+- [EHNCP-1892] - Implement CP-036 in OpenNCP.
+- [EHNCP-1895] - Implement CP-035 in OpenNCP.
+- [EHNCP-1896] - Implement CP-042 in Interoperability Specifications.
+- [EHNCP-1912] - Implement CP-033 in OpenNCP.
+
+### Improvement
+- [EHNCP-1510] - Specify the International Search Mask.
+- [EHNCP-1962] - Empty parenthesis are shown for the Current problems section entry in the case of a nullFlavor.
+- [EHNCP-1963] - Support indication of dosage period length for medication summary section.
+- [EHNCP-1964] - Display descriptions from ICD-10 to the Problem column of the History of Past Illnesses section.
+
+### Support
+- [EHNCP-1511] - Substitution flag not sent to Country A when substitution is performed.
+
+### Issue
+- [EHNCP-1755] - LivingSubjectBirthPlaceAddress identity trait is not supported.
+- [EHNCP-1970] - Java 8 and OpenSAML framework upgrade are creating an ACCESS_EXTERNAL_SCHEMA property.
+- [EHNCP-1975] - TRC-STS: Evidence Emitter dependency is not needed.
+- [EHNCP-1976] - eADC - XML Transformer issue NullPointerException.
+- [EHNCP-1977] - Requests are logged in PROD.
+- [EHNCP-1978] - ITI-38 audit message too long for OpenATNA's messageContent column.
+
 ## [5.0.0] - 07-07-2020
 The OpenNCP 5.0.0 release is the CEF eHDSI Wave 4 Initial Release.
 <br/>This version is the first release supporting the Change Proposals 36 and 42.

@@ -724,10 +724,12 @@ public enum AuditTrailUtils {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("57016-8", AuditConstant.CODE_SYSTEM_LOINC, "Privacy Policy Acknowledgement Document"));
         }
-        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())
-                || StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
+        }
+        if(StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+            eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
 

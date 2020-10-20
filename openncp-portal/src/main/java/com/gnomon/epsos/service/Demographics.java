@@ -14,17 +14,10 @@ public class Demographics implements Serializable {
     private String type;
     private Date userDateValue;
     private String friendlyName;
+    private String format;
 
     public Demographics() {
         super();
-    }
-
-    public String getFriendlyName() {
-        return friendlyName;
-    }
-
-    public void setFriendlyName(String name) {
-        this.friendlyName = name;
     }
 
     public String getLabel() {
@@ -43,7 +36,7 @@ public class Demographics implements Serializable {
         this.length = length;
     }
 
-    public boolean getMandatory() {
+    public boolean isMandatory() {
         return mandatory;
     }
 
@@ -81,5 +74,21 @@ public class Demographics implements Serializable {
 
     public void setUserDateValue(Date userDateValue) {
         this.userDateValue = userDateValue;
+    }
+
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }

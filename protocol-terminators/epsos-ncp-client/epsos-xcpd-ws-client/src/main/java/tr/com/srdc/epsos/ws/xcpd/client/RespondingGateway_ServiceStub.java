@@ -88,13 +88,13 @@ public class RespondingGateway_ServiceStub extends Stub {
 
     protected AxisOperation[] _operations;
     // HashMap to keep the fault mapping
-    private HashMap faultExceptionNameMap = new HashMap();
-    private HashMap faultExceptionClassNameMap = new HashMap();
-    private HashMap faultMessageMap = new HashMap();
+    private final HashMap faultExceptionNameMap = new HashMap();
+    private final HashMap faultExceptionClassNameMap = new HashMap();
+    private final HashMap faultMessageMap = new HashMap();
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-    private QName[] opNameArray = null;
+    private final QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -411,7 +411,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             // eventLog
             EventLog eventLog = createAndSendEventLog(pRPA_IN201305UV02, (org.hl7.v3.PRPAIN201306UV02) object, messageContext,
                     _returnEnv, env, idAssertion, this._getServiceClient().getOptions().getTo().getAddress());
-            LOGGER.info("****** EventLog: '{}'", eventLog.getEventType());
 
             try {
                 LOGGER.info("SOAP MESSAGE IS: '{}'", XMLUtils.toDOM(_returnEnv));
@@ -588,11 +587,11 @@ public class RespondingGateway_ServiceStub extends Stub {
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.
