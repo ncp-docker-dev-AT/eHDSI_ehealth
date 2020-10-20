@@ -244,29 +244,6 @@ public class Query implements Serializable {
         return this;
     }
 
-    public void afterSeTotNull() {
-        Set<ConditionalStatement> existing = map.get(Target.EVENT_TIME);
-        if (existing == null) {
-            return;
-        }
-
-        //Iterator<ConditionalStatement> itr = existing.iterator();
-        //while(itr.hasNext()) {
-            //if(itr.next().getConditional().compareTo(Conditional.AFTER) == 0) {
-            //    itr.remove();
-            //}
-        //}
-
-        existing.removeIf((ConditionalStatement st) -> st.getConditional().compareTo(Conditional.AFTER) == 0);
-        if(existing.size() == 0) {
-         map.remove(Target.EVENT_TIME);
-        } else {
-            map.put(Target.EVENT_TIME, existing);
-        }
-
-    }
-
-
     public Query like(Object value, Target target, boolean caseSensitive) {
         Conditional c = caseSensitive ? Conditional.CASE_INSENSITIVE_LIKE : Conditional.LIKE;
         addConditional(c, value, target);
