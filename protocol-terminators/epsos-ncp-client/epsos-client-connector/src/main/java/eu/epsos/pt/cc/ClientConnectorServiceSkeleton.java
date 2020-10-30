@@ -142,7 +142,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 		Function<? super PatientId[], String> mapper = arr -> Stream.of(arr).map(Object::toString)
 				.collect(Collectors.joining("\n", "\n", "\n"));//
 		Optional.ofNullable(pDemographic.getPatientIdArray()).filter(arr -> arr.length > 0).map(mapper)
-				.ifPresent(s -> stringBuilder.append("PatientIdArray: ").append(s));
+				.ifPresent(s -> stringBuilder.append("PatientId array: ").append(s));
 		Optional.ofNullable(pDemographic.getGivenName()).filter(StringUtils::isNotBlank)
 				.ifPresent(s -> stringBuilder.append("GivenName: ").append(s));//
 		Optional.ofNullable(pDemographic.getBirthDate()).ifPresent(d -> stringBuilder.append("BirthDate: ").append(d));//
@@ -155,7 +155,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 		Optional.ofNullable(request).filter(r -> r.getIdList() != null && !r.getIdList().isEmpty()) //
 				.map(r -> r.getIdList().stream() //
 						.map(patientId -> patientId.getExtension()) //
-						.collect(Collectors.joining("-", "[", "]"))) //
+						.collect(Collectors.joining(", ", "[ ", " ]"))) //
 				.ifPresent(s -> stringBuilder.append("Request Id Extension:").append(s));
 		Optional.ofNullable(request.getGivenName()).filter(StringUtils::isNotBlank)
 				.ifPresent(s -> stringBuilder.append("GivenName: ").append(s));//
