@@ -95,7 +95,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -1816,7 +1815,7 @@ public class EpsosHelperService {
                     }
                 }
             }
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (SAXException | IOException e) {
             LOGGER.error("Exception: '{}'", e.getMessage());
             return Collections.emptyList();
         }
@@ -2613,7 +2612,7 @@ public class EpsosHelperService {
             builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
             doc = builder.parse(is);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
+        } catch (SAXException | IOException ex) {
             LOGGER.error(ExceptionUtils.getStackTrace(ex));
         }
 
@@ -2882,7 +2881,7 @@ public class EpsosHelperService {
 
     public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographics) {
 
-        PatientDemographics pd = PatientDemographics.Factory.newInstance();
+        PatientDemographics patientDemographics = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
 
         for (int i = 0; i < identifiers.size(); i++) {
@@ -2896,35 +2895,37 @@ public class EpsosHelperService {
         }
 
         for (Demographics dem : demographics) {
+
+            LOGGER.info("Key: '{}'", dem.getKey());
             switch (dem.getKey()) {
-                case "patient.data.surname":
-                    pd.setFamilyName(dem.getUserValue());
+                case "label.ism.familyName":
+                    patientDemographics.setFamilyName(dem.getUserValue());
                     break;
-                case "patient.data.givenname":
-                    pd.setGivenName(dem.getUserValue());
+                case "label.ism.firstName":
+                    patientDemographics.setGivenName(dem.getUserValue());
                     break;
-                case "patient.data.birth.date":
+                case "label.ism.birthDate":
                     if (dem.getUserDateValue() != null) {
                         try {
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(dem.getUserDateValue());
-                            pd.setBirthDate(cal);
+                            patientDemographics.setBirthDate(cal);
                         } catch (Exception ex) {
                             LOGGER.error("Invalid Date Format for date '{}'", dem.getUserValue(), ex);
                         }
                     }
                     break;
                 case "patient.data.street.address":
-                    pd.setStreetAddress(dem.getUserValue());
+                    patientDemographics.setStreetAddress(dem.getUserValue());
                     break;
                 case "patient.data.code":
-                    pd.setPostalCode(dem.getUserValue());
+                    patientDemographics.setPostalCode(dem.getUserValue());
                     break;
                 case "patient.data.city":
-                    pd.setCity(dem.getUserValue());
+                    patientDemographics.setCity(dem.getUserValue());
                     break;
-                case "patient.data.sex":
-                    pd.setAdministrativeGender(dem.getUserValue());
+                case "label.ism.sex":
+                    patientDemographics.setAdministrativeGender(dem.getUserValue());
                     break;
                 default:
                     LOGGER.warn("Identity Trait '{}' doesn't match to any Key", dem.getKey());
@@ -2933,8 +2934,8 @@ public class EpsosHelperService {
             LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
         }
 
-        pd.setPatientIdArray(idArray);
-        return pd;
+        patientDemographics.setPatientIdArray(idArray);
+        return patientDemographics;
     }
 
     public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {
