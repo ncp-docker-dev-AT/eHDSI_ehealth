@@ -148,10 +148,10 @@
             <xs:enumeration value="HR"/>
             <xs:enumeration value="IT"/>
             <xs:enumeration value="CY"/>
-            <xs:enumeration value="LT"/>
             <xs:enumeration value="LV"/>
+            <xs:enumeration value="LT"/>
             <xs:enumeration value="LU"/>
-            <xs:enumeration value="HR"/>
+            <xs:enumeration value="HU"/>
             <xs:enumeration value="MT"/>
             <xs:enumeration value="NL"/>
             <xs:enumeration value="AT"/>
