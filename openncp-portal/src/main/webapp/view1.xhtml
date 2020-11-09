@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 TransitionalEN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
-      xmlns:portlet="http://java.sun.com/portlet_2_0" xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:portlet="http://java.sun.com/portlet_2_0" xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
 
 <h:head/>
 <body>
@@ -29,7 +30,7 @@
         <c:forEach items="#{myBean.identifiers}" var="identifier" varStatus="idLoop">
             <h:outputLabel value="#{identifier.key}"/>
             <p:inputText
-                    id="#{not empty identifier.friendlyName ? identifier.friendlyName : ''.concat('uservalue-').concat(idLoop.index)}"
+                    id="#{not empty identifier.friendlyName ? fn:replace(identifier.friendlyName, ' ', '') : ''.concat('uservalue-').concat(idLoop.index)}"
                     value="#{identifier.userValue}" required="#{identifier.required ? 'true': 'false'}"/>
         </c:forEach>
         <c:forEach items="#{myBean.demographics}" var="demographic" varStatus="demographicsLoop">
@@ -37,12 +38,12 @@
             <c:choose>
                 <c:when test="#{demographic.type=='text'}">
                     <p:inputText
-                            id="#{not empty demographic.friendlyName ? demographic.friendlyName : ''.concat('userValue2-').concat(demographicsLoop.index)}"
+                            id="#{not empty demographic.friendlyName ? fn:replace(demographic.friendlyName, ' ', '') : ''.concat('userValue2-').concat(demographicsLoop.index)}"
                             value="#{demographic.userValue}" required="#{demographic.mandatory}"/>
                 </c:when>
                 <c:when test="#{demographic.type=='calendar'}">
                     <p:calendar
-                            id="#{not empty demographic.friendlyName ? demographic.friendlyName : ''.concat('userDateValue2-').concat(demographicsLoop.index)}"
+                            id="#{not empty demographic.friendlyName ? fn:replace(demographic.friendlyName, ' ', '') : ''.concat('userDateValue2-').concat(demographicsLoop.index)}"
                             value="#{demographic.userDateValue}" yearRange="c-100:c+0" pattern="yyyy/MM/dd"
                             navigator="true">
                         <f:convertDateTime pattern="yyyy/MM/dd"/>
