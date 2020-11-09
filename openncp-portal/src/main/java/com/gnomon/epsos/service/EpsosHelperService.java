@@ -2880,7 +2880,7 @@ public class EpsosHelperService {
         return patient;
     }
 
-    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographics) {
+    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographicsList) {
 
         PatientDemographics patientDemographics = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
@@ -2895,44 +2895,47 @@ public class EpsosHelperService {
             }
         }
 
-        for (Demographics dem : demographics) {
+        for (Demographics demographics : demographicsList) {
 
-            LOGGER.info("Key: '{}'", dem.getKey());
-            switch (dem.getKey()) {
+            LOGGER.info("Key: '{}'", demographics.getKey());
+            switch (demographics.getKey()) {
                 case "label.ism.familyName":
-                    patientDemographics.setFamilyName(dem.getUserValue());
+                    patientDemographics.setFamilyName(demographics.getUserValue());
                     break;
                 case "label.ism.firstName":
-                    patientDemographics.setGivenName(dem.getUserValue());
+                    patientDemographics.setGivenName(demographics.getUserValue());
                     break;
                 case "label.ism.birthDate":
-                    if (dem.getUserDateValue() != null) {
+                    if (demographics.getUserDateValue() != null) {
                         try {
                             Calendar cal = Calendar.getInstance();
-                            cal.setTime(dem.getUserDateValue());
+                            cal.setTime(demographics.getUserDateValue());
                             patientDemographics.setBirthDate(cal);
                         } catch (Exception ex) {
-                            LOGGER.error("Invalid Date Format for date '{}'", dem.getUserValue(), ex);
+                            LOGGER.error("Invalid Date Format for date '{}'", demographics.getUserValue(), ex);
                         }
                     }
                     break;
-                case "patient.data.street.address":
-                    patientDemographics.setStreetAddress(dem.getUserValue());
+                case "label.ism.addressStreetLine":
+                    patientDemographics.setStreetAddress(demographics.getUserValue());
                     break;
-                case "patient.data.code":
-                    patientDemographics.setPostalCode(dem.getUserValue());
+                case "label.ism.addressPostalCode":
+                    patientDemographics.setPostalCode(demographics.getUserValue());
                     break;
-                case "patient.data.city":
-                    patientDemographics.setCity(dem.getUserValue());
+                case "label.ism.addressCity":
+                    patientDemographics.setCity(demographics.getUserValue());
+                    break;
+                case "label.ism.addressCountry":
+                    patientDemographics.setCountry(demographics.getUserValue());
                     break;
                 case "label.ism.sex":
-                    patientDemographics.setAdministrativeGender(dem.getUserValue());
+                    patientDemographics.setAdministrativeGender(demographics.getUserValue());
                     break;
                 default:
-                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", dem.getKey());
+                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", demographics.getKey());
                     break;
             }
-            LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
+            LOGGER.info("{}: '{}'", demographics.getKey(), demographics.getUserValue());
         }
 
         patientDemographics.setPatientIdArray(idArray);
