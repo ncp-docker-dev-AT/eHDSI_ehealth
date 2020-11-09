@@ -95,6 +95,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -1815,7 +1816,7 @@ public class EpsosHelperService {
                     }
                 }
             }
-        } catch (SAXException | IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.error("Exception: '{}'", e.getMessage());
             return Collections.emptyList();
         }
@@ -2612,8 +2613,8 @@ public class EpsosHelperService {
             builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
             doc = builder.parse(is);
-        } catch (SAXException | IOException ex) {
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         return doc;
