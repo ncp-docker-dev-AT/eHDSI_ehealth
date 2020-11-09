@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package tr.com.srdc.epsos.data.model;
 
 /**
- *
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
 public class PatientId {
@@ -22,7 +17,6 @@ public class PatientId {
     }
 
     /**
-     *
      * @param root
      * @param extension
      * @return root + "^^^&" + extension + "&ISO"
@@ -47,12 +41,12 @@ public class PatientId {
         this.extension = extension;
     }
 
-    public String getfullId() {
+    public String getFullId() {
         return createFullId(root, extension);
     }
 
     @Override
     public String toString() {
-        return getfullId();
+        return getFullId();
     }
 }
