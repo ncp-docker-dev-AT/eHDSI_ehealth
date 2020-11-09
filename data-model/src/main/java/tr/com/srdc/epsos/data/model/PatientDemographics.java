@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
  */
 public class PatientDemographics {
 
-    private static Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
-    private static Pattern telephonePattern = Pattern.compile("^\\+?(\\(.+\\))?[0-9 ?\\-?]+[0-9]$");
+    private static final Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern telephonePattern = Pattern.compile("^\\+?(\\(.+\\))?[0-9 ?\\-?]+[0-9]$");
     private String familyName;
     private String givenName;
     private Date birthDate;
@@ -321,34 +321,34 @@ public class PatientDemographics {
     }
 
     public enum Gender {
+
         FEMALE("F"),
         MALE("M"),
         UNDIFFERENTIATED("UN");
 
-        private String mnemonic;
+        private final String value;
 
-        Gender(String mnemonic) {
-            this.mnemonic = mnemonic;
+        Gender(String value) {
+            this.value = value;
         }
 
         public static Gender parseGender(String genderString) throws ParseException {
-            for (Gender g : Gender.values()) {
-                if (g.name().equalsIgnoreCase(genderString) || g.mnemonic.equalsIgnoreCase(genderString)) {
-                    return g;
+
+            for (Gender gender : Gender.values()) {
+                if (gender.name().equalsIgnoreCase(genderString) || gender.value.equalsIgnoreCase(genderString)) {
+                    return gender;
                 }
             }
-
             throw new ParseException("Unable to parse gender string ('" + genderString + "') to a valid gender.", -1);
         }
 
-        public String getMnemonic() {
-            return mnemonic;
+        public String getValue() {
+            return value;
         }
 
         @Override
         public String toString() {
-            return mnemonic;
+            return value;
         }
-
     }
 }

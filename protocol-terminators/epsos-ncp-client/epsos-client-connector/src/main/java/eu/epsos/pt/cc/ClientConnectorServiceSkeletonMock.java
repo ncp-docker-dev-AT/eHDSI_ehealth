@@ -32,7 +32,7 @@ public class ClientConnectorServiceSkeletonMock implements ClientConnectorServic
         PatientDemographics patientDemographics = PatientDemographics.Factory.newInstance();
         patientDemographics.setGivenName(givenName);
         patientDemographics.setFamilyName(familyName);
-        patientDemographics.setAdministrativeGender(gender.getMnemonic());
+        patientDemographics.setAdministrativeGender(gender.getValue());
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Integer.valueOf(patient.substring(0, 4)), Integer.valueOf(patient.substring(4, 6)), Integer.valueOf(patient.substring(6, 8)));
