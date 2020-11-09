@@ -15,8 +15,8 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -597,7 +597,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     sb.append("<id>").append(patientId.getRoot()).append("</id>");
                     sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
                     sb.append("</identifier>");
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                    if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                         loggerClinical.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
                         loggerClinical.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
                     }
@@ -605,8 +605,19 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 }
                 sb.append("</patient>");
                 logger.debug("patientIdList.size: '{}'", patientIdList.size());
-
-
+//    Identifier of the patient (mandatory)
+//    Region identifier (when the provided patient identifier is regional)
+//    Family name of the patient
+//    Firstname of the patient
+//    Gender
+//    Date of birth (year, month and day)
+//    Address (city, postal code, street address line, country)
+                List<PRPAMT201306UV02LivingSubjectAdministrativeGender> administrativeGenders = inputQBP.getParameterList().getLivingSubjectAdministrativeGender();
+                logger.info("PRPAMT201306UV02LivingSubjectAdministrativeGender: '{}'", administrativeGenders.get(0).getValue().get(0).getCode());
+                List<PRPAMT201306UV02LivingSubjectBirthTime> subjectBirthTimes = inputQBP.getParameterList().getLivingSubjectBirthTime();
+                logger.info("PRPAMT201306UV02LivingSubjectBirthTime: '{}'", subjectBirthTimes.get(0).getValue().get(0).getValue());
+                inputQBP.getParameterList().getLivingSubjectName().get(0).getValue();
+                inputQBP.getParameterList().getPatientAddress();
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
                 try {
                     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -669,12 +680,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     }
                     logger.info("The client country code to be used by the PDP: '{}'", countryCode);
 
-                    // Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
                     /*
-                     * TODO: Uncomment when PDP works. You may also need to pass
-                     * the whole PatientID (both the root and extension) to PDP,
-                     * if required by PDP procedures.
-                     *
+                     *  Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
+                     *  TODO: Uncomment when PDP works. You may also need to pass the whole PatientID
+                     *  (both the root and extension) to PDP, if required by PDP procedures.
                      */
                     for (int i = 0; i < pdList.size(); i++) {
                         if (!SAML2Validator.isConsentGiven(pdList.get(i).getIdList().get(0).getExtension(), countryCode)) {
@@ -690,7 +699,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         fillOutputMessage(outputMessage, null, null, "OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, "(4703) Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
+                        fillOutputMessage(outputMessage, "(4703) Either the security policy of country A or a privacy " +
+                                "policy of the patient (that was given in country A) does not allow the requested operation " +
+                                "to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
                     }
                 }
