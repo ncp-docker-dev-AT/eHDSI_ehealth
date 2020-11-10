@@ -83,8 +83,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Bean(name = "filterMultipartResolver")
     public CommonsMultipartResolver filterMultipartResolver() {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setDefaultEncoding("utf-8");
+        resolver.setDefaultEncoding(StandardCharsets.UTF_8.name());
         resolver.setMaxUploadSize(100000000);
+        resolver.setMaxInMemorySize(100000000);
         return resolver;
     }
 }

@@ -11,12 +11,11 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -581,38 +580,55 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             logger.info("Receiver Home Community ID.. '{}'", receiverHomeCommID);
             logger.info("Constants.HOME_COMM_ID...... '{}'", Constants.HOME_COMM_ID);
 
-            List<PRPAMT201306UV02LivingSubjectId> idList = inputQBP.getParameterList().getLivingSubjectId();
-            // TODO: enable demographic searches
+            List<PRPAMT201306UV02LivingSubjectId> livingSubjectIds = inputQBP.getParameterList().getLivingSubjectId();
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
                 fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
-            } else if (!idList.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
+            } else if (!livingSubjectIds.isEmpty()) {
+                StringBuilder stringBuilderNRO = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
-                sb.append("<patient>");
-                for (int idIndex = 0; idIndex < idList.size(); idIndex++) {
+                stringBuilderNRO.append("<patient>");
+                for (PRPAMT201306UV02LivingSubjectId livingSubjectId : livingSubjectIds) {
                     PatientId patientId = new PatientId();
-                    patientId.setRoot(idList.get(idIndex).getValue().get(0).getRoot());
-                    patientId.setExtension(idList.get(idIndex).getValue().get(0).getExtension());
-                    sb.append("<identifier>");
-                    sb.append("<id>").append(patientId.getRoot()).append("</id>");
-                    sb.append("<extension>").append(patientId.getExtension()).append("</extension>");
-                    sb.append("</identifier>");
-                    if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-                        loggerClinical.info("Using ID Namespace (root)...... '{}':'{}'", idIndex, patientId.getRoot());
-                        loggerClinical.info("Using Patient ID (extension)... '{}':'{}'", idIndex, patientId.getExtension());
-                    }
+                    patientId.setRoot(livingSubjectId.getValue().get(0).getRoot());
+                    patientId.setExtension(livingSubjectId.getValue().get(0).getExtension());
+                    stringBuilderNRO.append("<livingSubjectId>");
+                    stringBuilderNRO.append("<id>").append(patientId.getRoot()).append("</id>");
+                    stringBuilderNRO.append("<extension>").append(patientId.getExtension()).append("</extension>");
+                    stringBuilderNRO.append("</livingSubjectId>");
                     patientIdList.add(patientId);
                 }
-                sb.append("</patient>");
-                logger.debug("patientIdList.size: '{}'", patientIdList.size());
+                List<PRPAMT201306UV02LivingSubjectAdministrativeGender> administrativeGenders = inputQBP.getParameterList().getLivingSubjectAdministrativeGender();
+                if (!CollectionUtils.isEmpty(administrativeGenders)) {
+                    logger.info("PRPAMT201306UV02LivingSubjectAdministrativeGender: '{}'", administrativeGenders.get(0).getValue().get(0).getCode());
+                    stringBuilderNRO.append("<livingSubjectAdministrativeGender>").append(administrativeGenders.get(0).getValue().get(0).getCode()).append("</livingSubjectAdministrativeGender>");
+                }
 
+                List<PRPAMT201306UV02LivingSubjectBirthTime> subjectBirthTimes = inputQBP.getParameterList().getLivingSubjectBirthTime();
+                if (!CollectionUtils.isEmpty(subjectBirthTimes)) {
+                    logger.info("PRPAMT201306UV02LivingSubjectBirthTime: '{}'", subjectBirthTimes.get(0).getValue().get(0).getValue());
+                    stringBuilderNRO.append("<livingSubjectBirthTime>").append(subjectBirthTimes.get(0).getValue().get(0).getValue()).append("</livingSubjectBirthTime>");
+                }
+
+                List<PRPAMT201306UV02LivingSubjectName> livingSubjectNames = inputQBP.getParameterList().getLivingSubjectName();
+                if (!CollectionUtils.isEmpty(livingSubjectNames)) {
+                    // TODO: Implementation to be finalized.
+                    logger.info("Patient Names must be added to the NRO message");
+                }
+
+                List<PRPAMT201306UV02PatientAddress> patientAddresses = inputQBP.getParameterList().getPatientAddress();
+                if (!CollectionUtils.isEmpty(patientAddresses)) {
+                    // TODO: Implementation to be finalized.
+                    logger.info("Patient Addresses must be added to the NRO message");
+                }
+                stringBuilderNRO.append("</patient>");
+                logger.info("Patient Identifier:\n'{}'", stringBuilderNRO.toString());
 
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
                 try {
                     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                     factory.setNamespaceAware(true);
                     DocumentBuilder builder = factory.newDocumentBuilder();
-                    Document doc = builder.parse(new InputSource(new StringReader(sb.toString())));
+                    Document doc = builder.parse(new InputSource(new StringReader(stringBuilderNRO.toString())));
                     EvidenceUtils.createEvidenceREMNRO(doc, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
                             Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                             Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
@@ -624,7 +640,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 }
 
                 // call to NI
-                List<PatientDemographics> pdList = patientSearchService.getPatientDemographics(patientIdList);
+                List<PatientDemographics> demographicsList = patientSearchService.getPatientDemographics(patientIdList);
 
                 // Joao: the NRR is being generated based on the request data, not on the response. This NRR is optional as per the CP, so it's left commented
 //                try {
@@ -644,7 +660,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                } catch (Exception e) {
 //                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
-                if (pdList.isEmpty()) {
+                if (demographicsList.isEmpty()) {
                     // Preparing answer not available error
                     fillOutputMessage(outputMessage, "No patient found.", ERROR_ANSWER_NOT_AVAILABLE, "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
@@ -655,10 +671,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
                     if (cIndex > 0) {
                         countryCode = DN.substring(cIndex + 2, cIndex + 4);
-                    } // Mustafa: This part is added for handling consents when the call is not https
-                    // In this case, we check the country code of the signature certificate that
-                    // ships within the HCP assertion
+                    }
                     // TODO: Might be necessary to remove later, although it does no harm in reality!
+                    // This part is added for handling consents when the call is not HTTPS.
+                    // In this case, we check the country code of the signature certificate that ships within the HCP assertion
                     else {
                         logger.info("Could not get client country code from the service consumer certificate. " +
                                 "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
@@ -669,28 +685,28 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     }
                     logger.info("The client country code to be used by the PDP: '{}'", countryCode);
 
-                    // Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
                     /*
-                     * TODO: Uncomment when PDP works. You may also need to pass
-                     * the whole PatientID (both the root and extension) to PDP,
-                     * if required by PDP procedures.
-                     *
+                     *  Then, it is the Policy Decision Point (PDP) that decides according to the consents of the patients
+                     *  TODO: Uncomment when PDP works. You may also need to pass the whole PatientID
+                     *  (both the root and extension) to PDP, if required by PDP procedures.
                      */
-                    for (int i = 0; i < pdList.size(); i++) {
-                        if (!SAML2Validator.isConsentGiven(pdList.get(i).getIdList().get(0).getExtension(), countryCode)) {
+                    for (int i = 0; i < demographicsList.size(); i++) {
+                        if (!SAML2Validator.isConsentGiven(demographicsList.get(i).getIdList().get(0).getExtension(), countryCode)) {
                             // This patient data cannot be sent to Country B
-                            pdList.remove(i);
+                            demographicsList.remove(i);
                             i--;
                         } else {
-                            outputMessage.getControlActProcess().getSubject().add(getSubjectByPatientDemographic(pdList.get(i)));
+                            outputMessage.getControlActProcess().getSubject().add(getSubjectByPatientDemographic(demographicsList.get(i)));
                         }
                     }
-                    if (!pdList.isEmpty()) {
+                    if (!demographicsList.isEmpty()) {
                         // There are patient data to be sent, OK
                         fillOutputMessage(outputMessage, null, null, "OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, "(4703) Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
+                        fillOutputMessage(outputMessage, "(4703) Either the security policy of country A or a privacy " +
+                                "policy of the patient (that was given in country A) does not allow the requested operation " +
+                                "to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
                     }
                 }

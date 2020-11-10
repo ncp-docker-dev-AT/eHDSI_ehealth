@@ -933,10 +933,10 @@ public class RespondingGateway_ServiceStub extends Stub {
                     param,
                     marshaller,
                     XCAConstants.SOAP_HEADERS.NAMESPACE_URI,
-                    XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST);
+                    XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST);
             OMNamespace namespace = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.NAMESPACE_URI,
                     null);
-            return factory.createOMElement(source, XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST, namespace);
+            return factory.createOMElement(source, XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST, namespace);
         } catch (JAXBException bex) {
             throw AxisFault.makeFault(bex);
         }
@@ -958,10 +958,10 @@ public class RespondingGateway_ServiceStub extends Stub {
             OMFactory factory = OMAbstractFactory.getOMFactory();
             RespondingGateway_ServiceStub.JaxbRIDataSource source = new RespondingGateway_ServiceStub.JaxbRIDataSource(
                     RetrieveDocumentSetResponseType.class, param, marshaller, XCAConstants.SOAP_HEADERS.NAMESPACE_URI,
-                    XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE);
+                    XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE);
             OMNamespace namespace = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.NAMESPACE_URI, null);
 
-            return factory.createOMElement(source, XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE, namespace);
+            return factory.createOMElement(source, XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE, namespace);
 
         } catch (JAXBException bex) {
             throw AxisFault.makeFault(bex);

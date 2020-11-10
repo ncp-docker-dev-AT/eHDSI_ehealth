@@ -2613,8 +2613,8 @@ public class EpsosHelperService {
             builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
             doc = builder.parse(is);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            LOGGER.error(ExceptionUtils.getStackTrace(ex));
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         }
 
         return doc;
@@ -2880,9 +2880,9 @@ public class EpsosHelperService {
         return patient;
     }
 
-    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographics) {
+    public static PatientDemographics createPatientDemographicsForQuery(List<Identifier> identifiers, List<Demographics> demographicsList) {
 
-        PatientDemographics pd = PatientDemographics.Factory.newInstance();
+        PatientDemographics patientDemographics = PatientDemographics.Factory.newInstance();
         PatientId[] idArray = new PatientId[identifiers.size()];
 
         for (int i = 0; i < identifiers.size(); i++) {
@@ -2895,46 +2895,51 @@ public class EpsosHelperService {
             }
         }
 
-        for (Demographics dem : demographics) {
-            switch (dem.getKey()) {
-                case "patient.data.surname":
-                    pd.setFamilyName(dem.getUserValue());
+        for (Demographics demographics : demographicsList) {
+
+            LOGGER.info("Key: '{}'", demographics.getKey());
+            switch (demographics.getKey()) {
+                case "label.ism.familyName":
+                    patientDemographics.setFamilyName(demographics.getUserValue());
                     break;
-                case "patient.data.givenname":
-                    pd.setGivenName(dem.getUserValue());
+                case "label.ism.firstName":
+                    patientDemographics.setGivenName(demographics.getUserValue());
                     break;
-                case "patient.data.birth.date":
-                    if (dem.getUserDateValue() != null) {
+                case "label.ism.birthDate":
+                    if (demographics.getUserDateValue() != null) {
                         try {
                             Calendar cal = Calendar.getInstance();
-                            cal.setTime(dem.getUserDateValue());
-                            pd.setBirthDate(cal);
+                            cal.setTime(demographics.getUserDateValue());
+                            patientDemographics.setBirthDate(cal);
                         } catch (Exception ex) {
-                            LOGGER.error("Invalid Date Format for date '{}'", dem.getUserValue(), ex);
+                            LOGGER.error("Invalid Date Format for date '{}'", demographics.getUserValue(), ex);
                         }
                     }
                     break;
-                case "patient.data.street.address":
-                    pd.setStreetAddress(dem.getUserValue());
+                case "label.ism.addressStreetLine":
+                    patientDemographics.setStreetAddress(demographics.getUserValue());
                     break;
-                case "patient.data.code":
-                    pd.setPostalCode(dem.getUserValue());
+                case "label.ism.addressPostalCode":
+                    patientDemographics.setPostalCode(demographics.getUserValue());
                     break;
-                case "patient.data.city":
-                    pd.setCity(dem.getUserValue());
+                case "label.ism.addressCity":
+                    patientDemographics.setCity(demographics.getUserValue());
                     break;
-                case "patient.data.sex":
-                    pd.setAdministrativeGender(dem.getUserValue());
+                case "label.ism.addressCountry":
+                    patientDemographics.setCountry(demographics.getUserValue());
+                    break;
+                case "label.ism.sex":
+                    patientDemographics.setAdministrativeGender(demographics.getUserValue());
                     break;
                 default:
-                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", dem.getKey());
+                    LOGGER.warn("Identity Trait '{}' doesn't match to any Key", demographics.getKey());
                     break;
             }
-            LOGGER.info("{}: '{}'", dem.getKey(), dem.getUserValue());
+            LOGGER.info("{}: '{}'", demographics.getKey(), demographics.getUserValue());
         }
 
-        pd.setPatientIdArray(idArray);
-        return pd;
+        patientDemographics.setPatientIdArray(idArray);
+        return patientDemographics;
     }
 
     public static String toString(Node node, boolean omitXmlDeclaration, boolean prettyPrint) {
