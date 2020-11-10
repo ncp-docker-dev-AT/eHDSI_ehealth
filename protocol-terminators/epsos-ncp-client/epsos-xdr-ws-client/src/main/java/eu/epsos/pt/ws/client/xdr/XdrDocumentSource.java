@@ -1,6 +1,6 @@
 package eu.epsos.pt.ws.client.xdr;
 
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
@@ -38,7 +38,7 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse discard(final XdrRequest request, final String countryCode) throws XdrException {
+    public static XdrResponse discard(final XdrRequest request, final String countryCode) throws XDRException {
 
         return provideAndRegisterDocSet(request, countryCode, Constants.EDD_CLASSCODE);
     }
@@ -49,7 +49,7 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse initialize(final XdrRequest request, final String countryCode) throws XdrException {
+    public static XdrResponse initialize(final XdrRequest request, final String countryCode) throws XDRException {
 
         return provideAndRegisterDocSet(request, countryCode, Constants.ED_CLASSCODE);
     }
@@ -60,7 +60,7 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode, String docClassCode) throws XdrException {
+    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode, String docClassCode) throws XDRException {
 
         RegistryResponseType response;
 
@@ -71,7 +71,7 @@ public final class XdrDocumentSource {
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException e) {
-            throw new XdrException(e);
+            throw new XDRException(e);
         }
         return XdrResponseDts.newInstance(response);
     }
@@ -81,7 +81,7 @@ public final class XdrDocumentSource {
      *
      * @param registryErrorList the Registry Error List to be processed.
      */
-    private static void processRegistryErrors(final RegistryErrorList registryErrorList) throws XdrException {
+    private static void processRegistryErrors(final RegistryErrorList registryErrorList) throws XDRException {
 
         if (registryErrorList == null) {
             return;
@@ -111,9 +111,9 @@ public final class XdrDocumentSource {
             }
             if (hasError) {
                 if (errorCode != null && errorCode.trim().length() > 0) {
-                    throw new XdrException(errorCode);
+                    throw new XDRException(errorCode);
                 } else {
-                    throw new XdrException(codeContext);
+                    throw new XDRException(codeContext);
                 }
             }
         }

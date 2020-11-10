@@ -17,7 +17,7 @@ public enum ObjectType {
     XDR_SUBMIT_REQUEST("XDR-SUBMIT-REQUEST"),
     XDR_SUBMIT_RESPONSE("XDR-SUBMIT-RESPONSE");
 
-    private String name;
+    private final String name;
 
     ObjectType(String s) {
         name = s;

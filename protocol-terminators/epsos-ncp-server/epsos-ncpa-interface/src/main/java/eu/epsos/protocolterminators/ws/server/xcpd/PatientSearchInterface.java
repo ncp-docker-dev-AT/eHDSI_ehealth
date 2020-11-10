@@ -2,10 +2,10 @@ package eu.epsos.protocolterminators.ws.server.xcpd;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorInterface;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 import org.opensaml.core.xml.io.MarshallingException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 import java.util.List;
 
@@ -18,17 +18,17 @@ import java.util.List;
 public interface PatientSearchInterface extends NationalConnectorInterface {
 
     /**
-     * Translates a National citizen number in an epSOS id.
+     * Translates a National citizen number in an eHDSI id.
      *
      * @param citizenNumber a valid citizen identifier
-     * @return the citizen epSOS identifier
+     * @return the citizen eHDSI identifier
      */
     String getPatientId(String citizenNumber) throws NIException, InsufficientRightsException;
 
     /**
      * Searches the NI for all the patients that relates to the given <code>idList</code>.
      *
-     * @param idList A set of patient's epSOS identifiers
+     * @param idList A set of patient's eHDSI identifiers
      * @return A set of patient demographics
      */
     List<PatientDemographics> getPatientDemographics(List<PatientId> idList) throws NIException, InsufficientRightsException, MarshallingException;
