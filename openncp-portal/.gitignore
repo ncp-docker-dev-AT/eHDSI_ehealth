@@ -1,8 +1,0 @@
-/target
-/.settings
-/.classpath
-/src/main/resources/rebel.xml
-~/.m2
-~/nb-configuration.xml
-
-/bin/
