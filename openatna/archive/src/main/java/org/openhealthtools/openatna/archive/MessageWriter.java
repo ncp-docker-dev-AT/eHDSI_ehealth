@@ -1,30 +1,9 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * <p>
- * Contributors:
- * Cardiff University - intial API and implementation
- */
-
 package org.openhealthtools.openatna.archive;
 
 import org.openhealthtools.openatna.audit.persistence.model.*;
 import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.util.Base64;
 import org.openhealthtools.openatna.audit.persistence.util.DataConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -33,16 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
-
 public class MessageWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorWriter.class);
-
-    private EntityWriter entityWriter = new EntityWriter();
+    private final EntityWriter entityWriter = new EntityWriter();
 
     public void begin(XMLStreamWriter writer) throws XMLStreamException {
 
@@ -50,32 +22,32 @@ public class MessageWriter {
         writer.writeStartElement(DataConstants.MESSAGES);
     }
 
-    public void writeMessages(List<? extends MessageEntity> msgs, XMLStreamWriter writer) throws XMLStreamException {
+    public void writeMessages(List<? extends MessageEntity> messageList, XMLStreamWriter writer) throws XMLStreamException {
 
-        for (MessageEntity msg : msgs) {
+        for (MessageEntity message : messageList) {
             writer.writeStartElement(DataConstants.MESSAGE);
-            if (msg.getSourceAddress() != null) {
-                writer.writeAttribute(DataConstants.SOURCE_IP, msg.getSourceAddress());
+            if (message.getSourceAddress() != null) {
+                writer.writeAttribute(DataConstants.SOURCE_IP, message.getSourceAddress());
             }
-            if (msg.getEventActionCode() != null) {
-                writer.writeAttribute(DataConstants.EVT_ACTION, msg.getEventActionCode());
+            if (message.getEventActionCode() != null) {
+                writer.writeAttribute(DataConstants.EVT_ACTION, message.getEventActionCode());
             }
-            if (msg.getEventOutcome() != null) {
-                writer.writeAttribute(DataConstants.EVT_OUTCOME, Integer.toString(msg.getEventOutcome()));
+            if (message.getEventOutcome() != null) {
+                writer.writeAttribute(DataConstants.EVT_OUTCOME, Integer.toString(message.getEventOutcome()));
             }
-            if (msg.getEventDateTime() != null) {
-                writer.writeAttribute(DataConstants.EVT_TIME, Archiver.formatDate(msg.getEventDateTime()));
+            if (message.getEventDateTime() != null) {
+                writer.writeAttribute(DataConstants.EVT_TIME, Archiver.formatDate(message.getEventDateTime()));
             }
-            if (msg.getEventId() != null) {
-                entityWriter.writeCode(msg.getEventId(), writer, DataConstants.EVT_ID);
+            if (message.getEventId() != null) {
+                entityWriter.writeCode(message.getEventId(), writer, DataConstants.EVT_ID);
             }
-            if (!msg.getEventTypeCodes().isEmpty()) {
-                List<? extends CodeEntity> l = new ArrayList<>(msg.getEventTypeCodes());
+            if (!message.getEventTypeCodes().isEmpty()) {
+                List<? extends CodeEntity> l = new ArrayList<>(message.getEventTypeCodes());
                 for (CodeEntity codeEntity : l) {
                     entityWriter.writeCode(codeEntity, writer, DataConstants.EVT_TYPE);
                 }
             }
-            Set<MessageSourceEntity> sources = msg.getMessageSources();
+            Set<MessageSourceEntity> sources = message.getMessageSources();
             writer.writeStartElement(DataConstants.MESSAGE_SOURCES);
             for (MessageSourceEntity source : sources) {
                 writer.writeStartElement(DataConstants.MESSAGE_SOURCE);
@@ -83,11 +55,11 @@ public class MessageWriter {
                 writer.writeEndElement();
             }
             writer.writeEndElement();
-            Set<MessageParticipantEntity> parts = msg.getMessageParticipants();
+            Set<MessageParticipantEntity> parts = message.getMessageParticipants();
             writer.writeStartElement(DataConstants.MESSAGE_PARTICIPANTS);
             for (MessageParticipantEntity part : parts) {
                 writer.writeStartElement(DataConstants.MESSAGE_PARTICIPANT);
-                if (part.isUserIsRequestor()) {
+                if (Boolean.TRUE.equals(part.isUserIsRequestor())) {
                     writer.writeAttribute(DataConstants.USER_IS_REQUESTOR, Boolean.toString(part.isUserIsRequestor()));
                 }
                 NetworkAccessPointEntity nap = part.getNetworkAccessPoint();
@@ -101,7 +73,7 @@ public class MessageWriter {
             writer.writeEndElement();
 
             writer.writeStartElement(DataConstants.MESSAGE_OBJECTS);
-            Set<MessageObjectEntity> objs = msg.getMessageObjects();
+            Set<MessageObjectEntity> objs = message.getMessageObjects();
             for (MessageObjectEntity obj : objs) {
                 writer.writeStartElement(DataConstants.MESSAGE_OBJECT);
                 Short cyc = obj.getObjectDataLifeCycle();
@@ -134,7 +106,6 @@ public class MessageWriter {
         }
     }
 
-
     public void finish(XMLStreamWriter writer) throws IOException {
 
         try {
@@ -143,7 +114,6 @@ public class MessageWriter {
             writer.flush();
             writer.close();
         } catch (XMLStreamException e) {
-            LOGGER.error("XMLStreamException: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
     }

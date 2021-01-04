@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -13,16 +14,12 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
 public class ArchiveHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveHandler.class);
     private static final String JAR_SEP = "/";
 
-    private static ArrayList<String> ignores = new ArrayList<>();
+    private static final ArrayList<String> ignores = new ArrayList<>();
 
     static {
         ignores.add(".DS_Store");
@@ -40,17 +37,12 @@ public class ArchiveHandler {
 
     public static File archive(String jarName, List<File> files, File destDir, boolean recursive) throws IOException {
 
-        if (!destDir.exists()) {
-
-            if (!destDir.mkdirs()) {
-                LOGGER.error("Cannot create directory: '{}'", destDir.getAbsolutePath());
-            }
+        if (!destDir.exists() && !destDir.mkdirs()) {
+            LOGGER.error("Cannot create directory: '{}'", destDir.getAbsolutePath());
         }
         File jar = new File(destDir, jarName);
-        if (jar.exists()) {
-            if (!jar.delete()) {
-                LOGGER.error("Cannot delete JAR file: '{}'", jar.getAbsolutePath());
-            }
+        if (jar.exists() && !jar.delete()) {
+            LOGGER.error("Cannot delete JAR file: '{}'", jar.getAbsolutePath());
         }
         File parent = destDir.getParentFile();
         if (parent == null) {
@@ -67,7 +59,6 @@ public class ArchiveHandler {
         jos.close();
         return jar;
     }
-
 
     private static void writeEntry(File f, JarOutputStream jos, File build, List<String> entries, boolean recursive) throws IOException {
 
@@ -110,8 +101,8 @@ public class ArchiveHandler {
 
         out.putNextEntry(new ZipEntry("META-INF/"));
         out.putNextEntry(new ZipEntry("META-INF/MANIFEST.MF"));
-        out.write("Manifest-Version: 1.0\n".getBytes("UTF-8"));
-        out.write(("Built-Date: " + Archiver.formatDate(new Date()) + "\n").getBytes("UTF-8"));
+        out.write("Manifest-Version: 1.0\n".getBytes(StandardCharsets.UTF_8));
+        out.write(("Built-Date: " + Archiver.formatDate(new Date()) + "\n").getBytes(StandardCharsets.UTF_8));
         out.closeEntry();
     }
 
@@ -119,12 +110,12 @@ public class ArchiveHandler {
 
         String root = build.getCanonicalPath();
         String entry = file.getCanonicalPath();
-        String jarPath = entry.substring(root.length(), entry.length()).replace(File.separator, JAR_SEP);
+        String jarPath = entry.substring(root.length()).replace(File.separator, JAR_SEP);
         if (file.isDirectory() && !(jarPath.endsWith(JAR_SEP))) {
             jarPath += JAR_SEP;
         }
         if (jarPath.startsWith(JAR_SEP)) {
-            jarPath = jarPath.substring(1, jarPath.length());
+            jarPath = jarPath.substring(1);
         }
 
         return jarPath;
@@ -206,10 +197,8 @@ public class ArchiveHandler {
                 }
             }
         }
-        if (incParent) {
-            if (!parent.delete()) {
-                LOGGER.error("Cannot delete directory: '{}'", parent.getAbsolutePath());
-            }
+        if (incParent && !parent.delete()) {
+            LOGGER.error("Cannot delete directory: '{}'", parent.getAbsolutePath());
         }
     }
 
@@ -299,7 +288,7 @@ public class ArchiveHandler {
         if (!dir.mkdirs()) {
             LOGGER.error("Cannot create directory: '{}'-'{}'", destDir, path);
         }
-        String name = jarEntry.substring(jarEntry.lastIndexOf(JAR_SEP) + 1, jarEntry.length());
+        String name = jarEntry.substring(jarEntry.lastIndexOf(JAR_SEP) + 1);
         if (name.length() == 0) {
             return dir;
         }

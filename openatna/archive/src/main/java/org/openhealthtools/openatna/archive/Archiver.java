@@ -85,10 +85,11 @@ public class Archiver {
     }
 
     public void archive() throws Exception {
+
         String name = nameFormat.format(new Date());
         setDefaultArchiveName(name);
         File dir = setDefaultArchiveDirectoy(archiveName);
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         if (archiveMessages) {
             files.add(archiveMessages(dir));
         }
@@ -142,6 +143,7 @@ public class Archiver {
      * @throws Exception
      */
     private File archiveEntities(File directory) throws Exception {
+
         File ret = new File(directory, ENTITIES);
         try (FileOutputStream fout = new FileOutputStream(ret)) {
             XMLStreamWriter w = XMLOutputFactory.newInstance().createXMLStreamWriter(fout);
@@ -158,6 +160,7 @@ public class Archiver {
     }
 
     private void archiveSources(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
+
         SourceDao dao = AtnaFactory.sourceDao();
         int offset = 0;
         List<? extends SourceEntity> msgs = dao.getAll(offset, max);
@@ -174,6 +177,7 @@ public class Archiver {
     }
 
     private void archiveParticipants(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
+
         ParticipantDao dao = AtnaFactory.participantDao();
         int offset = 0;
         List<? extends ParticipantEntity> msgs = dao.getAll(offset, max);
@@ -190,6 +194,7 @@ public class Archiver {
     }
 
     private void archiveObjects(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
+
         ObjectDao dao = AtnaFactory.objectDao();
         int offset = 0;
         List<? extends ObjectEntity> msgs = dao.getAll(offset, max);
@@ -206,6 +211,7 @@ public class Archiver {
     }
 
     private void archiveCodes(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
+
         CodeDao dao = AtnaFactory.codeDao();
         int offset = 0;
         List<? extends CodeEntity> msgs = dao.getAll(offset, max);
@@ -222,6 +228,7 @@ public class Archiver {
     }
 
     private void archiveNaps(EntityWriter writer, XMLStreamWriter w, int max) throws Exception {
+
         NetworkAccessPointDao dao = AtnaFactory.networkAccessPointDao();
         int offset = 0;
         List<? extends NetworkAccessPointEntity> msgs = dao.getAll(offset, max);
@@ -234,7 +241,7 @@ public class Archiver {
             offset += msgs.size();
         }
         writer.finishType(w);
-        LOGGER.info("written " + offset + " network access points");
+        LOGGER.info("Written '{}' network access points", offset);
     }
 
     private File archiveErrors(File directory) throws Exception {
@@ -261,6 +268,7 @@ public class Archiver {
     }
 
     private File setDefaultArchiveDirectoy(String name) {
+
         if (name.indexOf(EXT) > -1) {
             name = name.substring(0, name.indexOf(EXT));
         }
@@ -273,6 +281,7 @@ public class Archiver {
     }
 
     private void setDefaultArchiveName(String name) {
+
         if (archiveName == null) {
             archiveName = (name);
         }
