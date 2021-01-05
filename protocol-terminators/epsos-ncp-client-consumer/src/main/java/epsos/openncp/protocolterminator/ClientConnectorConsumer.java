@@ -180,7 +180,6 @@ public class ClientConnectorConsumer {
         ClientConnectorServiceStub clientConnectorStub = initializeServiceStub();
 
         try {
-
             addAssertions(clientConnectorStub, idAssertion, trcAssertion);
             RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
             RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
@@ -193,8 +192,8 @@ public class ClientConnectorConsumer {
             retrieveDocumentRequest.setTargetLanguage(targetLanguage);
 
             RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
-
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
+
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }

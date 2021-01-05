@@ -2,7 +2,7 @@ package eu.epsos.pt.cc.stub;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -50,7 +50,7 @@ public class ConsentService {
      * @throws ParseException
      */
     public static XdrResponse put(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                  final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
+                                  final Assertion hcpAssertion, final Assertion trcAssertion) throws XDRException, ParseException {
         XdrRequest request;
         request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
         request.setDocumentCode(eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(document.getClassCode()));

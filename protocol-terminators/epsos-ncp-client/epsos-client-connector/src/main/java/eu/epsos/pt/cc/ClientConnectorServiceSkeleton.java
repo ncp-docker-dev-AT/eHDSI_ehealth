@@ -3,7 +3,7 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.*;
 import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
@@ -251,7 +251,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     @Override
     public SubmitDocumentResponseDocument submitDocument(final SubmitDocumentDocument1 submitDocument,
                                                          Assertion hcpAssertion, Assertion trcAssertion)
-            throws XdrException, ParseException {
+            throws XDRException, ParseException {
 
         final String methodName = "submitDocument";
         LoggingSlf4j.start(logger, methodName);

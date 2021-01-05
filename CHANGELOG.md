@@ -3,6 +3,33 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.1.1] - 10-10-2020
+The OpenNCP 5.1.1 release is the CEF eHDSI Wave 4 Preparatory Test Event HotFix version.
+<br/>This version is fully supporting all the Patient Identification Traits.
+<br/>OpenNCP Gateway has been fixed (support Media type, Hungary country code and Patient Address)
+<br/>OpenNCP Portal improvement (Medication Discard feature and ISM Search Mask).
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/H4NtEg
+
+### Sub-task
+- [EHNCP-1623] - Schema validation error for eD message when explicit unit is used for supply unit quantity in eP message.
+- [EHNCP-2034] - Portals should support all the available identity traits.
+- [EHNCP-2035] - Releasing OpenNCP 5.1.1 (Wave 4 Hotfix version).
+- [EHNCP-2036] - TSAM Sync should support PostgreSQL database.
+
+### Bug
+- [EHNCP-1997] - Search masks with Media Content cannot be uploaded to SMP server.
+- [EHNCP-2001] - In ehdsi-ism-2020.xsd the countryCode enumeration list does not contain a "HU" country code.
+
+### Improvement
+- [EHNCP-1998] - OpenNCP Portal Medications Dispensed List.
+
+### Initiative
+- [EHNCP-1996] - OpenNCP Portal - Patient confirmation doesn't work without Document Search criteria.
+
+### Issue
+- [EHNCP-1903] - Problem with Service Provider Element in ATNA Audits.
+- [EHNCP-2015] - Incorrect parsing of Search Mask attribute "contextualDescription".
+
 ## [5.1.0] - 05-10-2020
 The OpenNCP 5.1.0 release is the CEF eHDSI Wave 4 Preparatory Test Event version.
 <br/>This version is fully supporting Change Proposals 33, 35, 36 and 42.

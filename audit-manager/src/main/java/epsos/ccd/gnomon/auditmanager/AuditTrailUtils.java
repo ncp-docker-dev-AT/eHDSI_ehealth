@@ -825,6 +825,7 @@ public enum AuditTrailUtils {
         InetAddressValidator validator = InetAddressValidator.getInstance();
         if (StringUtils.isBlank(userId)) {
             LOGGER.warn("No Service, as this is Service Consumer");
+            throw new IllegalArgumentException("Both ServiceConsumer User ID and ServiceProvider User ID must exist!");
         } else {
             ActiveParticipant activeParticipant = new ActiveParticipant();
             activeParticipant.setNetworkAccessPointID(ipAddress);
