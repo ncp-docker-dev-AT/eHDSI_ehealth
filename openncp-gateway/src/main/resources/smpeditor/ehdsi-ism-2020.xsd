@@ -98,7 +98,7 @@
     <!-- Patient element - LivingSubjectBirthTime -->
     <xs:complexType name="birthDate">
         <xs:attribute name="label" fixed="label.ism.birthDate" use="required"/>
-        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string" use="required"/>
         <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
@@ -148,10 +148,10 @@
             <xs:enumeration value="HR"/>
             <xs:enumeration value="IT"/>
             <xs:enumeration value="CY"/>
-            <xs:enumeration value="LT"/>
             <xs:enumeration value="LV"/>
+            <xs:enumeration value="LT"/>
             <xs:enumeration value="LU"/>
-            <xs:enumeration value="HR"/>
+            <xs:enumeration value="HU"/>
             <xs:enumeration value="MT"/>
             <xs:enumeration value="NL"/>
             <xs:enumeration value="AT"/>
@@ -180,6 +180,8 @@
 
     <xs:simpleType name="labelGenericTrait">
         <xs:restriction base="xs:string">
+            <xs:enumeration value="label.ism.addressStreetLine"/>
+            <xs:enumeration value="label.ism.addressPostalCode"/>
             <xs:enumeration value="label.ism.addressCity"/>
             <xs:enumeration value="label.ism.addressCountry"/>
             <xs:enumeration value="label.ism.familyName"/>
@@ -189,6 +191,8 @@
 
     <xs:simpleType name="labelList">
         <xs:restriction base="xs:string">
+            <xs:enumeration value="label.ism.addressStreetLine"/>
+            <xs:enumeration value="label.ism.addressPostalCode"/>
             <xs:enumeration value="label.ism.addressCity"/>
             <xs:enumeration value="label.ism.addressCountry"/>
             <xs:enumeration value="label.ism.birthDate"/>

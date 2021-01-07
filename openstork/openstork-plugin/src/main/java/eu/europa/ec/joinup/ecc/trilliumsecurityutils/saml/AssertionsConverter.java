@@ -513,8 +513,8 @@ public class AssertionsConverter {
         }
 
         // MANDATORY: Patient ID (For eHealth Exchange)
-        if (patientId != null && patientId.getfullId() != null && !patientId.getfullId().isEmpty()) {
-            assertionBuilder.patientId(patientId.getfullId());
+        if (patientId != null && patientId.getFullId() != null && !patientId.getFullId().isEmpty()) {
+            assertionBuilder.patientId(patientId.getFullId());
 
         } else {
             LOGGER.error("One or more required attributes were not found (Patient Id).");

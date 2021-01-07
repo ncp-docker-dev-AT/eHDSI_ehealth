@@ -14,10 +14,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
 public class ErrorReader {
 
     public void begin(XMLEventReader reader) throws XMLStreamException {
@@ -38,7 +34,6 @@ public class ErrorReader {
         }
         return ret;
     }
-
 
     public ErrorEntity readError(XMLEventReader reader) throws XMLStreamException {
 
@@ -62,14 +57,19 @@ public class ErrorReader {
             XMLEvent code = reader.peek();
             if (code.isStartElement()) {
                 StartElement el = code.asStartElement();
-                if (el.getName().getLocalPart().equals(DataConstants.ERROR_MESSAGE)) {
-                    se.setErrorMessage(reader.getElementText());
-                } else if (el.getName().getLocalPart().equals(DataConstants.ERROR_STACKTRACE)) {
-                    se.setStackTrace(Base64.decode(reader.getElementText()));
-                } else if (el.getName().getLocalPart().equals(DataConstants.ERROR_PAYLOAD)) {
-                    se.setPayload(Base64.decode(reader.getElementText()));
-                } else {
-                    reader.nextEvent();
+                switch (el.getName().getLocalPart()) {
+                    case DataConstants.ERROR_MESSAGE:
+                        se.setErrorMessage(reader.getElementText());
+                        break;
+                    case DataConstants.ERROR_STACKTRACE:
+                        se.setStackTrace(Base64.decode(reader.getElementText()));
+                        break;
+                    case DataConstants.ERROR_PAYLOAD:
+                        se.setPayload(Base64.decode(reader.getElementText()));
+                        break;
+                    default:
+                        reader.nextEvent();
+                        break;
                 }
             } else if (code.isEndElement()) {
                 EndElement el = code.asEndElement();

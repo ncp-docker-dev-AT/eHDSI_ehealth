@@ -3,7 +3,7 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import org.opensaml.saml.saml2.core.Assertion;
 
 import java.text.ParseException;
@@ -71,7 +71,7 @@ public interface ClientConnectorServiceSkeletonInterface {
      * @see SubmitDocumentResponseDocument
      * @see SubmitDocumentDocument1
      */
-    SubmitDocumentResponseDocument submitDocument(SubmitDocumentDocument1 submitDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XdrException, ParseException;
+    SubmitDocumentResponseDocument submitDocument(SubmitDocumentDocument1 submitDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XDRException, ParseException;
 
     /*
      * Auxiliar
