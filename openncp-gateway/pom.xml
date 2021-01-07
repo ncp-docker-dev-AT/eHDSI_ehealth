@@ -235,9 +235,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-<!--                    <packagingExcludes>-->
-<!--                        WEB-INF/lib/xercesImpl-${xerces.version}.jar-->
-<!--                    </packagingExcludes>-->
                 </configuration>
             </plugin>
             <plugin>
