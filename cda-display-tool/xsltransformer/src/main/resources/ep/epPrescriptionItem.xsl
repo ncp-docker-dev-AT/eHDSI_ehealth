@@ -504,19 +504,6 @@
                                         <xsl:call-template name="substitution-code"/>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th>
-                                        <!-- Units per intake -->
-                                        <xsl:call-template name="show-eHDSIDisplayLabel">
-                                            <xsl:with-param name="code" select="'78'"/>
-                                        </xsl:call-template>
-                                    </th>
-                                    <td>
-                                        <xsl:call-template name="show-IVL_PQ">
-                                            <xsl:with-param name="node" select="n1:doseQuantity"/>
-                                        </xsl:call-template>
-                                    </td>
-                                </tr>
                             </table>
                         </fieldset>
                     </td>
