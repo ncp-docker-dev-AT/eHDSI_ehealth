@@ -17,12 +17,12 @@ public class AdhocQueryRequestCreator {
     }
 
     /**
-     * @param id
-     * @param homeCommunityId
+     * @param extension
+     * @param root
      * @param docClassCode
      * @return
      */
-    public static AdhocQueryRequest createAdhocQueryRequest(String id, String homeCommunityId, GenericDocumentCode docClassCode) {
+    public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root, GenericDocumentCode docClassCode) {
 
         AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
 
@@ -40,7 +40,7 @@ public class AdhocQueryRequestCreator {
         SlotType1 patientId = new SlotType1();
         patientId.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_PATIENTID_SLOT_NAME);
         ValueListType v1 = new ValueListType();
-        v1.getValue().add("'" + id + "^^^&" + homeCommunityId + "&" + "ISO'");
+        v1.getValue().add("'" + extension + "^^^&" + root + "&" + "ISO'");
         patientId.setValueList(v1);
         adhocQueryRequest.getAdhocQuery().getSlot().add(patientId);
 

@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is an Data Transformation Service. This provide functions to transform data into a Document object.
+ * This is an Data Transformation Service providing functions to transform data into a Document object.
  *
  * @author Marcelo Fonseca - <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -36,16 +36,10 @@ public class DocumentDts {
      */
     public static EpsosDocument1 newInstance(XDSDocument document) {
 
-        /*
-         * PRE-CONDITIONS
-         */
         if (document == null) {
             return null;
         }
 
-        /*
-         * BODY
-         */
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
         result.setUuid(document.getDocumentUniqueId());
         result.setDescription(document.getDescription());
@@ -85,16 +79,10 @@ public class DocumentDts {
      */
     public static EpsosDocument1[] newInstance(List<XDSDocumentAssociation> documentAssociation) {
 
-        /*
-         * PRE-CONDITIONS
-         */
         if (documentAssociation == null || documentAssociation.isEmpty()) {
             return new EpsosDocument1[0];
         }
 
-        /*
-         * BODY
-         */
         List<EpsosDocument1> resultList = new ArrayList<>();
 
         for (XDSDocumentAssociation doc : documentAssociation) {
@@ -128,22 +116,17 @@ public class DocumentDts {
      */
     public static EpsosDocument1 newInstance(DocumentResponse documentResponse) {
 
-        /*
-         * PRE-CONDITIONS
-         */
         if (documentResponse == null) {
             return null;
         }
-        /*
-         * BODY
-         */
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
+        result.setHcid(documentResponse.getHomeCommunityId());
         result.setUuid(documentResponse.getDocumentUniqueId());
         result.setMimeType(documentResponse.getMimeType());
+        result.setRepositoryId(documentResponse.getRepositoryUniqueId());
         result.setBase64Binary(documentResponse.getDocument());
 
         return result;
-
     }
 
     /**

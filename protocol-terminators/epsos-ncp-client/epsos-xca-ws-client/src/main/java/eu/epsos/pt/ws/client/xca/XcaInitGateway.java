@@ -19,7 +19,6 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -71,26 +70,24 @@ public class XcaInitGateway {
         try {
 
             /* queryRequest */
-            AdhocQueryRequest queryRequest;
-            queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
+            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
 
             /* Stub */
-            RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub();
+            RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();
             DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
-            stub.setAddr(epr);
-            stub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
-            EventLogClientUtil.createDummyMustUnderstandHandler(stub);
-            stub.setCountryCode(countryCode);
+            respondingGatewayStub.setAddr(epr);
+            respondingGatewayStub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
+            EventLogClientUtil.createDummyMustUnderstandHandler(respondingGatewayStub);
+            respondingGatewayStub.setCountryCode(countryCode);
 
             /* queryResponse */
-            AdhocQueryResponse queryResponse = stub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());   // Request
+            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
                 result = AdhocQueryResponseConverter.convertAdhocQueryResponse(queryResponse);
             }
-
         } catch (RemoteException | RuntimeException ex) {
             throw new RuntimeException(ex);
         }
@@ -150,10 +147,6 @@ public class XcaInitGateway {
                 RegistryErrorList registryErrorList = queryResponse.getRegistryResponse().getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
-
-        } catch (AxisFault ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-            throw new RuntimeException(ex);
         } catch (RemoteException ex) {
             throw new RuntimeException(ex);
         }
@@ -200,7 +193,7 @@ public class XcaInitGateway {
      * Processes registry errors from the {@link AdhocQueryResponse} message, by reporting them to the logging system.
      *
      * @param registryErrorList the list of errors from the {@link AdhocQueryResponse} message.
-     * @throws Exception thrown when an error has a severity of type "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".
+     * @throws XCAException thrown when an error has a severity of type "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".
      */
     private static void processRegistryErrors(RegistryErrorList registryErrorList) throws XCAException {
         // A.R. ++ Error processing. For retrieve. Is it needed?
@@ -254,6 +247,15 @@ public class XcaInitGateway {
     private static boolean checkTransformationErrors(String errorCode) {
 
         List<String> errorCodes = new ArrayList<>();
+        errorCodes.add("2500");
+        errorCodes.add("2501");
+        errorCodes.add("2502");
+        errorCodes.add("2503");
+        errorCodes.add("2504");
+        errorCodes.add("2505");
+        errorCodes.add("2506");
+        errorCodes.add("2507");
+        errorCodes.add("2508");
         errorCodes.add("4500");
         errorCodes.add("4501");
         errorCodes.add("4502");
@@ -267,15 +269,6 @@ public class XcaInitGateway {
         errorCodes.add("4510");
         errorCodes.add("4511");
         errorCodes.add("4512");
-        errorCodes.add("2500");
-        errorCodes.add("2501");
-        errorCodes.add("2502");
-        errorCodes.add("2503");
-        errorCodes.add("2504");
-        errorCodes.add("2505");
-        errorCodes.add("2506");
-        errorCodes.add("2507");
-        errorCodes.add("2508");
 
         return errorCodes.contains(errorCode);
     }

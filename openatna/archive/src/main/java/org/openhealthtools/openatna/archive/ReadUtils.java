@@ -7,12 +7,10 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.*;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- */
 public class ReadUtils {
 
+    private ReadUtils() {
+    }
 
     public static XMLEvent dig(XMLEventReader reader, String... tags) throws XMLStreamException {
 

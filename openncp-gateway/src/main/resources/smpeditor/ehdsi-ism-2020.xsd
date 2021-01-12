@@ -98,7 +98,7 @@
     <!-- Patient element - LivingSubjectBirthTime -->
     <xs:complexType name="birthDate">
         <xs:attribute name="label" fixed="label.ism.birthDate" use="required"/>
-        <xs:attribute name="format" type="xs:string"/>
+        <xs:attribute name="format" type="xs:string" use="required"/>
         <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>

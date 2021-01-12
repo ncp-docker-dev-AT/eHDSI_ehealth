@@ -17,28 +17,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Andrew Harrison
- * @version 1.0.0
- * @date Jan 27, 2010: 5:56:09 PM
- */
-
 public class MessageReader {
 
-    private EntityReader entityReader = new EntityReader();
+    private final EntityReader entityReader = new EntityReader();
 
     public void begin(XMLEventReader reader) throws XMLStreamException {
 
         ReadUtils.dig(reader, DataConstants.MESSAGES);
     }
 
-
     public List<MessageEntity> readMessages(int max, XMLEventReader reader) throws XMLStreamException {
 
         if (max <= 0) {
             max = Integer.MAX_VALUE;
         }
-        List<MessageEntity> ret = new ArrayList<MessageEntity>();
+        List<MessageEntity> ret = new ArrayList<>();
         boolean is = ReadUtils.peek(reader, DataConstants.MESSAGE);
         while (is && ret.size() < max) {
             ret.add(readMessage(reader));
@@ -75,31 +68,40 @@ public class MessageReader {
             XMLEvent code = reader.peek();
             if (code.isStartElement()) {
                 StartElement el = code.asStartElement();
-                if (el.getName().getLocalPart().equals(DataConstants.EVT_ID)) {
-                    code = reader.nextTag();
-                    attrs = ReadUtils.getAttributes(code);
-                    se.setEventId(entityReader.readCode(attrs, EventIdCodeEntity.class));
-                } else if (el.getName().getLocalPart().equals(DataConstants.EVT_TYPE)) {
-                    code = reader.nextTag();
-                    attrs = ReadUtils.getAttributes(code);
-                    se.addEventTypeCode(entityReader.readCode(attrs, EventTypeCodeEntity.class));
-                } else if (el.getName().getLocalPart().equals(DataConstants.MESSAGE_SOURCES)) {
-                    List<MessageSourceEntity> sources = readSources(0, reader);
-                    for (MessageSourceEntity source : sources) {
-                        se.addMessageSource(source);
+                switch (el.getName().getLocalPart()) {
+                    case DataConstants.EVT_ID:
+                        code = reader.nextTag();
+                        attrs = ReadUtils.getAttributes(code);
+                        se.setEventId(entityReader.readCode(attrs, EventIdCodeEntity.class));
+                        break;
+                    case DataConstants.EVT_TYPE:
+                        code = reader.nextTag();
+                        attrs = ReadUtils.getAttributes(code);
+                        se.addEventTypeCode(entityReader.readCode(attrs, EventTypeCodeEntity.class));
+                        break;
+                    case DataConstants.MESSAGE_SOURCES:
+                        List<MessageSourceEntity> sources = readSources(0, reader);
+                        for (MessageSourceEntity source : sources) {
+                            se.addMessageSource(source);
+                        }
+                        break;
+                    case DataConstants.MESSAGE_PARTICIPANTS: {
+                        List<MessageParticipantEntity> pes = readParticipants(0, reader);
+                        for (MessageParticipantEntity pe : pes) {
+                            se.addMessageParticipant(pe);
+                        }
+                        break;
                     }
-                } else if (el.getName().getLocalPart().equals(DataConstants.MESSAGE_PARTICIPANTS)) {
-                    List<MessageParticipantEntity> pes = readParticipants(0, reader);
-                    for (MessageParticipantEntity pe : pes) {
-                        se.addMessageParticipant(pe);
+                    case DataConstants.MESSAGE_OBJECTS: {
+                        List<MessageObjectEntity> pes = readObjects(0, reader);
+                        for (MessageObjectEntity pe : pes) {
+                            se.addMessageObject(pe);
+                        }
+                        break;
                     }
-                } else if (el.getName().getLocalPart().equals(DataConstants.MESSAGE_OBJECTS)) {
-                    List<MessageObjectEntity> pes = readObjects(0, reader);
-                    for (MessageObjectEntity pe : pes) {
-                        se.addMessageObject(pe);
-                    }
-                } else {
-                    reader.nextEvent();
+                    default:
+                        reader.nextEvent();
+                        break;
                 }
             } else if (code.isEndElement()) {
                 EndElement el = code.asEndElement();
@@ -124,7 +126,7 @@ public class MessageReader {
             max = Integer.MAX_VALUE;
         }
         ReadUtils.dig(reader, DataConstants.MESSAGE_SOURCES);
-        List<MessageSourceEntity> ret = new ArrayList<MessageSourceEntity>();
+        List<MessageSourceEntity> ret = new ArrayList<>();
         XMLEvent evt = ReadUtils.dig(reader, DataConstants.MESSAGE_SOURCE);
         while (evt != null && ret.size() < max) {
             MessageSourceEntity mse = new MessageSourceEntity(entityReader.readSource(reader));
@@ -141,7 +143,7 @@ public class MessageReader {
             max = Integer.MAX_VALUE;
         }
         ReadUtils.dig(reader, DataConstants.MESSAGE_PARTICIPANTS);
-        List<MessageParticipantEntity> ret = new ArrayList<MessageParticipantEntity>();
+        List<MessageParticipantEntity> ret = new ArrayList<>();
         XMLEvent evt = ReadUtils.dig(reader, DataConstants.MESSAGE_PARTICIPANT);
         while (evt != null && ret.size() < max) {
             MessageParticipantEntity mpe = new MessageParticipantEntity();
