@@ -70,8 +70,7 @@ public class XcaInitGateway {
         try {
 
             /* queryRequest */
-            AdhocQueryRequest queryRequest;
-            queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
+            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
 
             /* Stub */
             RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();

@@ -3,6 +3,7 @@ package tr.com.srdc.epsos.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -30,7 +31,7 @@ public class OidUtil {
     private static HashMap<String, String> oid2CountryCodeMap;
 
     static {
-        readCountryOid2CodeMappingFile();
+        loadHomeCommunityConfigurationFile();
     }
 
     private OidUtil() {
@@ -47,7 +48,7 @@ public class OidUtil {
     /**
      * Converts a country code into a HomeCommunityId
      *
-     * @param countryCode 2-letter ISO code of the country, such as tr, pt, at.
+     * @param countryCode 2-letter ISO code of the country, such as pt, at.
      * @return foreign HomeCommunityId
      */
     public static String getHomeCommunityId(String countryCode) {
@@ -62,14 +63,12 @@ public class OidUtil {
 
     public static boolean isValidHomeCommunityId(String homeCommunityId) {
 
-        //  return oid2CountryCodeMap.containsKey(homeCommunityId);
         return OID_PATTERN.matcher(homeCommunityId).matches();
     }
 
     /**
      * @param countryOid
-     * @return 2-letter ISO code of the country, but in uppercase, such as TR,
-     * PT, AT.
+     * @return 2-letter ISO code of the country, but in uppercase, such as PT, AT.
      */
     public static String getCountryCodeUpperCase(String countryOid) {
 
@@ -78,42 +77,32 @@ public class OidUtil {
     }
 
     /**
-     *
+     * Loading the $OPENNCP_ROOT/pn-oid.xml configuration file containing the Member State Home Community ID.
      */
-    private static void readCountryOid2CodeMappingFile() {
+    private static void loadHomeCommunityConfigurationFile() {
 
-        DocumentBuilder dBuilder;
-        Document doc;
-
-        oid2CountryCodeMap = new HashMap<>();
-        String mapFilePath = Constants.EPSOS_PROPS_PATH + PN_OID_FILE_NAME;
-
-        File mapFile = new File(mapFilePath);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         try {
-            dBuilder = dbFactory.newDocumentBuilder();
-            doc = dBuilder.parse(mapFile);
-            doc.getDocumentElement().normalize();
-            Node mappings = doc.getDocumentElement();
-
-            NodeList nodeList = mappings.getChildNodes();
-
+            String mapFilePath = Constants.EPSOS_PROPS_PATH + PN_OID_FILE_NAME;
+            oid2CountryCodeMap = new HashMap<>();
+            File mapFile = new File(mapFilePath);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
+            Document document = documentBuilder.parse(mapFile);
+            document.getDocumentElement().normalize();
+            Element root = document.getDocumentElement();
+            NodeList nodeList = root.getElementsByTagName("mapping");
             for (int i = 0; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Node mapping = nodeList.item(i);
 
+                if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
+
+                    Node mapping = nodeList.item(i);
                     String countryOid = mapping.getAttributes().getNamedItem("domainId").getNodeValue().trim();
                     String countryCode = mapping.getAttributes().getNamedItem("country").getNodeValue().trim();
-
                     oid2CountryCodeMap.put(countryOid, countryCode);
                 }
             }
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("ParserConfigurationException: '{}'", e.getMessage(), e);
-        } catch (SAXException e) {
-            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
-        } catch (IOException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+        } catch (ParserConfigurationException | IOException | SAXException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
     }
 
