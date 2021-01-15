@@ -14,10 +14,6 @@
 
     <name>OpenNCP TSAM Exporter</name>
 
-    <properties>
-        <spring.version>5.2.6.RELEASE</spring.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
