@@ -10,6 +10,8 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 
+import java.util.List;
+
 /**
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
@@ -19,6 +21,32 @@ public class PatientService {
     private PatientService() {
     }
 
+    /**
+     * @param patientId
+     * @param countryCode
+     * @param documentCode
+     * @param idAssertion
+     * @param trcAssertion
+     * @return
+     * @throws XCAException
+     */
+    public static QueryResponse findOriginalClinicalDocument(final PatientId patientId, final String countryCode,
+                                                             final List<GenericDocumentCode> documentCodes, final Assertion idAssertion,
+                                                             final Assertion trcAssertion) throws XCAException {
+
+        return XcaInitGateway.crossGatewayQuery(patientId, countryCode, documentCodes.get(0), idAssertion, trcAssertion,
+                RegisteredService.PATIENT_SERVICE.getServiceName());
+    }
+
+    /**
+     * @param pid
+     * @param countryCode
+     * @param documentCode
+     * @param idAssertion
+     * @param trcAssertion
+     * @return
+     * @throws XCAException
+     */
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
 
@@ -26,6 +54,16 @@ public class PatientService {
                 RegisteredService.PATIENT_SERVICE.getServiceName());
     }
 
+    /**
+     * @param document
+     * @param homeCommunityId
+     * @param countryCode
+     * @param targetLanguage
+     * @param hcpAssertion
+     * @param trcAssertion
+     * @return
+     * @throws XCAException
+     */
     public static RetrieveDocumentSetResponseType.DocumentResponse retrieve(final XDSDocument document,
                                                                             final String homeCommunityId,
                                                                             final String countryCode,

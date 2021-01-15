@@ -7,6 +7,7 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.Insufficie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
+import org.apache.commons.collections.CollectionUtils;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
@@ -27,13 +28,15 @@ public class SAML2Validator {
 
     private static final ServiceLoader<PolicyAssertionManager> serviceLoader = ServiceLoader.load(PolicyAssertionManager.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Validator.class);
+
+    private static final String URN_NAMESPACE_WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+
     private static PolicyAssertionManager policyManager;
 
     static {
         try {
-            LOGGER.info("Loading National implementation of PolicyManagerInterface...");
             policyManager = serviceLoader.iterator().next();
-            LOGGER.info("Successfully loaded PolicyManager");
+            LOGGER.info("National PolicyManager implementation successfully loaded");
         } catch (Exception e) {
             LOGGER.error("Failed to load implementation of PolicyManagerInterface: " + e.getMessage(), e);
         }
@@ -56,7 +59,7 @@ public class SAML2Validator {
 
         String sigCountryCode = null;
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(URN_NAMESPACE_WSSE, "Security");
         Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
@@ -113,7 +116,7 @@ public class SAML2Validator {
 
         try {
             // Since the XCA Simulator sends this value wrong, we are trying it as follows for now
-            NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = soapHeader.getElementsByTagNameNS(URN_NAMESPACE_WSSE, "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
@@ -187,7 +190,7 @@ public class SAML2Validator {
         String sigCountryCode;
 
         try {
-            NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = soapHeader.getElementsByTagNameNS(URN_NAMESPACE_WSSE, "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
@@ -285,29 +288,32 @@ public class SAML2Validator {
      */
     public static List<Assertion> getAssertions(Element soapHeader) {
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        LOGGER.info("[Security] Retrieving SAML from SOAP Header");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(URN_NAMESPACE_WSSE, "Security");
 
         Element security = (Element) securityList.item(0);
         NodeList assertionList = security.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion");
         List<Assertion> result = new ArrayList<>();
 
         for (int i = 0; i < assertionList.getLength(); i++) {
-            Element ass = (Element) assertionList.item(i);
+            Element assertionElement = (Element) assertionList.item(i);
 
-            if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
-                ass.setAttribute("ID", "_" + ass.getAttribute("ID").substring("urn:uuid:".length()));
+            if (assertionElement.getAttribute("ID").startsWith("urn:uuid:")) {
+                assertionElement.setAttribute("ID", "_" + assertionElement.getAttribute("ID").substring("urn:uuid:".length()));
             }
 
             try {
                 // Validate Assertion according to SAML XSD
                 SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
-                result.add((Assertion) SAML.fromElement(ass));
+                // Validate Assertion according to SAML XSD
+                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(assertionElement));
+                result.add((Assertion) SAML.fromElement(assertionElement));
 
             } catch (UnmarshallingException | IOException | SAXException ex) {
                 LOGGER.error(null, ex);
             }
         }
+        LOGGER.info("[Security] Asserstions list size: '{}'", !CollectionUtils.isEmpty(result) ? result.size() : "EMPTY LIST");
         return result;
     }
 
@@ -365,7 +371,7 @@ public class SAML2Validator {
         try {
             sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
         } catch (SMgrException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
+            LOGGER.error("SMgrException: '{}'", e.getMessage(), e);
             throw e;
         }
 
@@ -415,7 +421,7 @@ public class SAML2Validator {
     }
 
     /**
-     * @param sh
+     * @param soapHeader
      * @return
      * @throws MissingFieldException
      * @throws XSDValidationException
@@ -425,7 +431,7 @@ public class SAML2Validator {
 
         String sigCountryCode = null;
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(URN_NAMESPACE_WSSE, "Security");
         Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
@@ -455,7 +461,6 @@ public class SAML2Validator {
             }
 
             sigCountryCode = new SignatureManager().verifySAMLAssertion(hcpAssertion);
-
 
         } catch (IOException | UnmarshallingException e) {
             LOGGER.error("{}: '{}'", e.getMessage(), e);

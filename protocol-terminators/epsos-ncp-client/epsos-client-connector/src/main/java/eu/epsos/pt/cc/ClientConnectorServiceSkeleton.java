@@ -81,7 +81,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      * Performs international search for documents. Filtering by patient and document code.
      * This method is an adapter for the usage of a XCA client.
      *
-     * @param queryDocuments axis wrapper for element: <code>queryDocuments</code>. This encapsulates, destination
+     * @param queryDocuments Axis wrapper for element: <code>queryDocuments</code>. This encapsulates, destination
      *                       Country Code, patient's identification and documents class code.
      * @return a QueryDocumentsResponseDocument containing the query response(s).
      */
@@ -92,25 +92,22 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         final String methodName = "queryDocuments";
         LoggingSlf4j.start(logger, methodName);
 
-        QueryDocumentsResponse result = QueryDocumentsResponse.Factory.newInstance();
-
-        /* retrieve data from parameters */
-        QueryDocuments queryDocuments1 = queryDocuments.getQueryDocuments();
-        QueryDocumentRequest queryDocumentRequest = queryDocuments1.getArg0();
+        // Retrieve data from parameters.
+        QueryDocumentRequest queryDocumentRequest = queryDocuments.getQueryDocuments().getArg0();
         String countryCode = queryDocumentRequest.getCountryCode();
 
+        PatientId requestPatientId = queryDocumentRequest.getPatientId();
+        tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(requestPatientId);
+        tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts
+                .newInstance(queryDocumentRequest.getClassCode());
 
-        PatientId tmp = queryDocumentRequest.getPatientId();
-        tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
-
-        GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
-        tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
-
-        if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
+        // If the DocumentCode is not from LOINC then the type of document is not supported by OpenNCP.
+        if (!StringUtils.equals(documentCode.getSchema(), IheConstants.ClASSCODE_SCHEME)) {
             throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
         }
+        QueryDocumentsResponse result = QueryDocumentsResponse.Factory.newInstance();
 
-        /* perform the call */
+        //  Access to OpenNCP services based on the type of document requested.
         try {
             QueryResponse response;
 
@@ -120,6 +117,9 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     break;
                 case Constants.EP_CLASSCODE:
                     response = OrderService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
+                    break;
+                case Constants.DISCHARGE_CLASSCODE:
+                    response = null;
                     break;
                 case Constants.MRO_CLASSCODE:
                     response = MroService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
@@ -132,17 +132,17 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 result.setReturnArray(DocumentDts.newInstance(response.getDocumentAssociations()));
             }
 
-        } catch (RuntimeException ex) {
+        } catch (RuntimeException e) {
             LoggingSlf4j.error(logger, methodName);
-            throw ex;
+            throw e;
         }
 
         // create return wrapper
-        QueryDocumentsResponseDocument wapper = QueryDocumentsResponseDocument.Factory.newInstance();
-        wapper.setQueryDocumentsResponse(result);
+        QueryDocumentsResponseDocument wrapper = QueryDocumentsResponseDocument.Factory.newInstance();
+        wrapper.setQueryDocumentsResponse(result);
 
         LoggingSlf4j.end(logger, methodName);
-        return wapper;
+        return wrapper;
     }
 
     /**

@@ -33,9 +33,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * XCA Initiating Gateway
@@ -70,7 +68,7 @@ public class XcaInitGateway {
         try {
 
             /* queryRequest */
-            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
+            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), Collections.singletonList(documentCode));
 
             /* Stub */
             RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();
