@@ -67,8 +67,8 @@ public class EvidenceEmitterHandlerUtils {
         map.put(XCAConstants.ADHOC_QUERY_RESPONSE, IHEEventType.PATIENT_SERVICE_LIST.getCode());
 
         // ITI-39: same for PS or eP Retrieve
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
 
         // ITI-41: same for Dispensation Initialize/Discard
         map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode());
@@ -98,8 +98,8 @@ public class EvidenceEmitterHandlerUtils {
         map.put(XCPDConstants.PATIENT_DISCOVERY_RESPONSE, "XCPD_RES");
         map.put(XCAConstants.ADHOC_QUERY_REQUEST, "XCA_LIST_REQ");
         map.put(XCAConstants.ADHOC_QUERY_RESPONSE, "XCA_LIST_RES");
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_REQUEST, "XCA_RETRIEVE_REQ");
-        map.put(XCAConstants.RETRIEVE_DOCUMENTSET_RESPONSE, "XCA_RETRIEVE_RES");
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST, "XCA_RETRIEVE_REQ");
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE, "XCA_RETRIEVE_RES");
         map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, "XDR_SUBMIT_REQ");
         map.put(XDRConstants.DOC_RCP_PRVDANDRGSTDOCSETB_STR, "XDR_SUBMIT_REQ");
         map.put(XDRConstants.REGISTRY_RESPONSE_STR, "XDR_SUBMIT_RES");

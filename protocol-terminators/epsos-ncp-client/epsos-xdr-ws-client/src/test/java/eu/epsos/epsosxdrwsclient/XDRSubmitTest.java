@@ -1,12 +1,12 @@
 package eu.epsos.epsosxdrwsclient;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.ResourceLoader;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class XDRSubmitTest {
         LOGGER.info("+++++++++++++++++++++++ FINISHED! +++++++++++++++++++++++");
     }
 
-    public void doSubmit() throws XdrException, ParseException {
+    public void doSubmit() throws XDRException, ParseException {
 
         // build assertions
         Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
@@ -61,7 +61,7 @@ public class XDRSubmitTest {
         PatientId patientId = new PatientId();
         patientId.setRoot(HOME_COMMUNITY_ID);
         patientId.setExtension(PATIENT_ID);
-        List<PatientId> patientIds = new ArrayList<PatientId>();
+        List<PatientId> patientIds = new ArrayList<>();
         patientIds.add(patientId);
 
         // build patient demographics

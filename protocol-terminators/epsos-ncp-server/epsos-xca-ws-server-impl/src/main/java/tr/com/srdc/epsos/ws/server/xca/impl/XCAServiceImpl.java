@@ -42,6 +42,7 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
@@ -64,12 +65,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private final Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private ITransformationService transformationService;
-    private OMFactory factory;
-    private oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
-    private oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
-    private oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
-    private DocumentSearchInterface documentSearchService;
+    private final ITransformationService transformationService;
+    private final OMFactory omFactory;
+    private final oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
+    private final oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
+    private final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
+    private final DocumentSearchInterface documentSearchService;
 
     /**
      * Public Constructor for IHE XCA Profile implementation, the default constructor will handle the loading of
@@ -93,7 +94,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         ofRim = new oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory();
         ofRs = new oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory();
 
-        factory = OMAbstractFactory.getOMFactory();
+        omFactory = OMAbstractFactory.getOMFactory();
 
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
@@ -470,7 +471,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
         // Status
-        eot.setMimeType("text/xml");
+        eot.setMimeType(MediaType.TEXT_XML_VALUE);
 
         // Name
         eot.setName(ofRim.createInternationalStringType());
@@ -562,7 +563,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
         // Status
-        eot.setMimeType("text/xml");
+        eot.setMimeType(MediaType.TEXT_XML_VALUE);
 
         // Name
         eot.setName(ofRim.createInternationalStringType());
@@ -718,13 +719,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String value, boolean isWarning) {
 
-        OMElement re = factory.createOMElement("RegistryError", ons);
-        re.addAttribute(factory.createOMAttribute("codeContext", null, codeContext));
-        re.addAttribute(factory.createOMAttribute("errorCode", null, errorCode));
+        OMElement re = omFactory.createOMElement("RegistryError", ons);
+        re.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
+        re.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
         String aux = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error");
-        re.addAttribute(factory.createOMAttribute("severity", null, aux));
+        re.addAttribute(omFactory.createOMAttribute("severity", null, aux));
         // EHNCP-1131
-        re.addAttribute(factory.createOMAttribute("location", null, getLocation()));
+        re.addAttribute(omFactory.createOMAttribute("location", null, getLocation()));
         re.setText(value);
 
         return re;
@@ -1041,7 +1042,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
 
             OMNamespace ns = registryResponseElement.getNamespace();
-            OMNamespace ons = factory.createOMNamespace(ns.getNamespaceURI(), "a");
+            OMNamespace ons = omFactory.createOMNamespace(ns.getNamespaceURI(), "a");
 
             for (int i = 0; i < tmResponse.getErrors().size(); i++) {
                 ITMTSAMEror error = tmResponse.getErrors().get(i);
@@ -1080,11 +1081,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private void retrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
                                             EventLog eventLog, OMElement omElement) throws Exception {
 
-        OMNamespace ns = factory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
-        OMElement registryResponse = factory.createOMElement("RegistryResponse", ns);
-        OMElement registryErrorList = factory.createOMElement("RegistryErrorList", ns);
+        OMNamespace ns = omFactory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
+        OMElement registryResponse = omFactory.createOMElement("RegistryResponse", ns);
+        OMElement registryErrorList = omFactory.createOMElement("RegistryErrorList", ns);
         OMNamespace ns2 = omElement.getNamespace();
-        OMElement documentResponse = factory.createOMElement("DocumentResponse", ns2);
+        OMElement documentResponse = omFactory.createOMElement("DocumentResponse", ns2);
 
         boolean documentReturned = false;
         boolean failure = false;
@@ -1240,23 +1241,23 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
 
             logger.info("XCA Retrieve Request is valid.");
-            OMElement homeCommunityId = factory.createOMElement("HomeCommunityId", ns2);
+            OMElement homeCommunityId = omFactory.createOMElement("HomeCommunityId", ns2);
             homeCommunityId.setText(request.getDocumentRequest().get(0).getHomeCommunityId());
             documentResponse.addChild(homeCommunityId);
 
-            OMElement repositoryUniqueId = factory.createOMElement("RepositoryUniqueId", ns2);
+            OMElement repositoryUniqueId = omFactory.createOMElement("RepositoryUniqueId", ns2);
             repositoryUniqueId.setText(request.getDocumentRequest().get(0).getRepositoryUniqueId());
             documentResponse.addChild(repositoryUniqueId);
 
-            OMElement documentUniqueId = factory.createOMElement("DocumentUniqueId", ns2);
+            OMElement documentUniqueId = omFactory.createOMElement("DocumentUniqueId", ns2);
             documentUniqueId.setText(documentId);
             documentResponse.addChild(documentUniqueId);
 
-            OMElement mimeType = factory.createOMElement("mimeType", ns2);
-            mimeType.setText("text/xml");
+            OMElement mimeType = omFactory.createOMElement("mimeType", ns2);
+            mimeType.setText(MediaType.TEXT_XML_VALUE);
             documentResponse.addChild(mimeType);
 
-            OMElement document = factory.createOMElement("Document", factory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
+            OMElement document = omFactory.createOMElement("Document", omFactory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
             logger.info("XCA Retrieve Response has been created.");
             try {
                 Document doc = epsosDoc.getDocument();
@@ -1309,7 +1310,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 "text/xml;charset=UTF-8");
                     }
                     DataHandler dataHandler = new DataHandler(dataSource);
-                    OMText textData = factory.createOMText(dataHandler, true);
+                    OMText textData = omFactory.createOMText(dataHandler, true);
                     textData.setOptimize(true);
                     document.addChild(textData);
 
@@ -1327,22 +1328,22 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // If the registryErrorList is empty or contains only Warning, the status of the request is SUCCESS
         if (!registryErrorList.getChildElements().hasNext()) {
             logger.info("XCA Retrieve Document - Transformation Status: '{}'\nDefault Case", AdhocQueryResponseStatus.SUCCESS);
-            registryResponse.addAttribute(factory.createOMAttribute("status", null,
+            registryResponse.addAttribute(omFactory.createOMAttribute("status", null,
                     AdhocQueryResponseStatus.SUCCESS));
         } else {
             if (checkIfOnlyWarnings(registryErrorList)) {
                 logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning", AdhocQueryResponseStatus.SUCCESS);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                registryResponse.addAttribute(omFactory.createOMAttribute("status", null,
                         AdhocQueryResponseStatus.SUCCESS));
             } else if (failure) {
                 // If there is a failure during the request process, the status is FAILURE
                 logger.info("XCA Retrieve Document - Transformation Status: '{}'\nCheck Warning Failure: '{}'", AdhocQueryResponseStatus.FAILURE, failure);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                registryResponse.addAttribute(omFactory.createOMAttribute("status", null,
                         AdhocQueryResponseStatus.FAILURE));
             } else {
                 //  Otherwise the status is PARTIAL SUCCESS
                 logger.info("XCA Retrieve Document - Transformation Status: '{}'\nOtherwise...", AdhocQueryResponseStatus.PARTIAL_SUCCESS);
-                registryResponse.addAttribute(factory.createOMAttribute("status", null,
+                registryResponse.addAttribute(omFactory.createOMAttribute("status", null,
                         AdhocQueryResponseStatus.PARTIAL_SUCCESS));
             }
         }

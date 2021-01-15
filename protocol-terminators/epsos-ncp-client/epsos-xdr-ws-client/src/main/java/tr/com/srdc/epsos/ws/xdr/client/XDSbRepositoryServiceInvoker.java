@@ -15,6 +15,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
@@ -51,7 +52,7 @@ public class XDSbRepositoryServiceInvoker {
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode, String docClassCode)
             throws RemoteException {
 
-        logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}", request.getIdAssertion().getID(), countryCode, docClassCode);
+        logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", request.getIdAssertion().getID(), countryCode, docClassCode);
         RegistryResponseType response;
         String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
 
@@ -60,15 +61,11 @@ public class XDSbRepositoryServiceInvoker {
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
 
         switch (docClassCode) {
-            case "DISCARD-" + Constants.ED_CLASSCODE:
-                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
-                break;
             case Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE);
                 break;
             case Constants.CONSENT_CLASSCODE:
-                endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
-                break;
             case Constants.HCER_CLASSCODE:
                 endpointReference = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE);
                 break;
@@ -128,13 +125,16 @@ public class XDSbRepositoryServiceInvoker {
             logger.error("Exception during Remote Validation process: '{}'", ex.getMessage(), ex);
         }
         try {
-            byte[] transformedCda = TMServices.transformDocument(cdaBytes);
-            xdrDocument.setValue(transformedCda);
-
+            if (!StringUtils.equals(docClassCode, Constants.EDD_CLASSCODE)) {
+                byte[] transformedCda = TMServices.transformDocument(cdaBytes);
+                xdrDocument.setValue(transformedCda);
+            } else {
+                xdrDocument.setValue(cdaBytes);
+            }
             /* Validate CDA epSOS Pivot */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(transformedCda).getDocumentElement()).toString(),
-                        NcpSide.NCP_B, docClassCode, true);
+                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(xdrDocument.getValue())
+                        .getDocumentElement()).toString(), NcpSide.NCP_B, docClassCode, true);
             }
 
         } catch (DocumentTransformationException ex) {
@@ -196,12 +196,12 @@ public class XDSbRepositoryServiceInvoker {
     private ClassificationType makeClassification0(String classificationScheme, String classifiedObject, String nodeRepresentation) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-        ClassificationType cl = ofRim.createClassificationType();
-        cl.setId(uuid);
-        cl.setNodeRepresentation(nodeRepresentation);
-        cl.setClassificationScheme(classificationScheme);
-        cl.setClassifiedObject(classifiedObject);
-        return cl;
+        ClassificationType rimClassification = ofRim.createClassificationType();
+        rimClassification.setId(uuid);
+        rimClassification.setNodeRepresentation(nodeRepresentation);
+        rimClassification.setClassificationScheme(classificationScheme);
+        rimClassification.setClassifiedObject(classifiedObject);
+        return rimClassification;
     }
 
     /**
@@ -301,10 +301,10 @@ public class XDSbRepositoryServiceInvoker {
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
                         Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_ED_STR));
                 break;
-            case "DISCARD-" + Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
-                        "DISCARD-" + Constants.ED_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
-                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_CONS_STR));
+                        Constants.EDD_CLASSCODE, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_VALUE,
+                        XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_EDD_STR));
                 break;
             case Constants.CONSENT_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME, uuid,
@@ -333,7 +333,7 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.CODING_SCHEME,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.Dispensation.EpsosPivotCoded.DISPLAY_NAME));
                 break;
-            case "DISCARD-" + Constants.ED_CLASSCODE:
+            case Constants.EDD_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.FormatCode.FORMAT_CODE_SCHEME, uuid,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.FormatCode.DispensationDiscard.PivotCoded.CODING_SCHEME,
@@ -393,11 +393,16 @@ public class XDSbRepositoryServiceInvoker {
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.Consent.DISPLAY_NAME));
                 break;
             case Constants.ED_CLASSCODE:
-            case "DISCARD-" + Constants.ED_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
                         uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.NODE_REPRESENTATION,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.CODING_SCHEME,
                         XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensation.DISPLAY_NAME));
+                break;
+            case Constants.EDD_CLASSCODE:
+                result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,
+                        uuid, XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.NODE_REPRESENTATION,
+                        XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.CODING_SCHEME,
+                        XDRConstants.EXTRINSIC_OBJECT.TypeCode.EDispensationDiscard.DISPLAY_NAME));
                 break;
             case Constants.HCER_CLASSCODE:
                 result.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.TypeCode.TYPE_CODE_SCHEME,

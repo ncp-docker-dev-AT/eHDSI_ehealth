@@ -25,11 +25,13 @@ import java.util.Map.Entry;
 
 @Controller
 public class MessageController {
+	private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
-    private final Logger logger = LoggerFactory.getLogger(MessageController.class);
+    private static final String PARSE_EXCEPTION_MESSAGE = "ParseException: '{}', {}";
+    private static final String HOUR_23 = "23";
+    private static final String MINUTE_59 = "59";
 
     private final AuditLoggerPluginManager auditLoggerPluginManager;
-
     private final MessageDao messageDao;
 
     @Autowired
@@ -65,7 +67,7 @@ public class MessageController {
                     }
 
                 } catch (NumberFormatException e) {
-                    logger.debug("error for start offset value=" + start, e);
+                    logger.debug("error for start offset value = {}; exception {} ", start, e);
                 }
             }
             modelMap.addAttribute("offset", offset);
@@ -137,7 +139,7 @@ public class MessageController {
 
     private Query createQuery(QueryBean bean) {
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+       
         Query query = new Query();
 
         if (StringUtils.isNotBlank(bean.getEventIdCode())) {
@@ -178,33 +180,9 @@ public class MessageController {
                 query.addConditional(Query.Conditional.EQUALS, ts, Query.Target.EVENT_TIME);
             }
         }
-        Date startDate = null;
-        if (StringUtils.isNotBlank(bean.getStartDate())) {
-            String date = bean.getStartDate();
-            try {
-                startDate = format.parse(date + " " + bean.getStartHour() + ":" + bean.getStartMin());
-                query.after(startDate);
-            } catch (ParseException e) {
-                logger.error("ParseException: '{}'", e.getMessage(), e);
-            }
-
-        }
-        if (StringUtils.isNotBlank(bean.getEndDate())) {
-            String date = bean.getEndDate();
-            try {
-                Date dt = format.parse(date + " " + bean.getEndHour() + ":" + bean.getEndMin());
-                if (startDate != null) {
-                    if (dt.after(startDate)) {
-                        query.before(dt);
-                    }
-                } else {
-                    query.before(dt);
-                }
-            } catch (ParseException e) {
-                logger.error("ParseException: '{}'", e.getMessage(), e);
-            }
-
-        }
+        
+        this.processDateFields(bean, query);
+        
         if (StringUtils.isNotBlank(bean.getEventTypeCode())) {
             query.addConditional(Query.Conditional.EQUALS, bean.getEventTypeCode(), Query.Target.EVENT_TYPE_CODE);
         }
@@ -217,4 +195,88 @@ public class MessageController {
 
         return query;
     }
+
+	/**
+     * if both dates are filled, verify if end date is after start date. <br\>
+     * if so,  <br\>
+     * 		then filter between dates <br\>
+     * if not, then put the hour of end date to midnight.  <br\>
+     * if end date after start date  <br\>
+     * 		then filter between dates <br\>
+     * if still end date not after start date then set the query to filter after start date. <br\>
+     *  <br\>
+     * otherwise: <br\>
+     *		 if start date filled: query after start date <br\>
+     *  <br\>
+     *		 if end date filled : query before end date <br\>
+     *  <br\>
+     * 
+     * @param bean
+     * @param query
+     */
+	private void processDateFields(QueryBean bean, Query query) {
+		 
+		boolean isStartDateFilled = StringUtils.isNotBlank(bean.getStartDate());
+		boolean isEndDateFilled = StringUtils.isNotBlank(bean.getEndDate());
+		// is preferable to instantiate each time
+		SimpleDateFormat dateFormat = (isStartDateFilled || isEndDateFilled) ? new SimpleDateFormat("yyyy-MM-dd HH:mm") : null;
+		if (isStartDateFilled && isEndDateFilled) {
+			processBothDateFilled(bean, query, dateFormat);
+		} else if (isStartDateFilled) { // only start date
+			Date startDate = parseStartDate(bean, dateFormat);
+			if (startDate != null)
+				query.after(startDate);
+		} else if (isEndDateFilled) { // only end date
+			Date endDate = parseEndDate(bean, dateFormat);
+			if (endDate != null)
+				query.before(endDate);
+		}
+	}
+
+	private void processBothDateFilled(QueryBean bean, Query query, SimpleDateFormat dateFormat) {
+		// verify if both date fields are filled
+		Date startDate = parseStartDate(bean, dateFormat);
+		Date endDate = parseEndDate(bean, dateFormat);
+		if (startDate != null && endDate != null) {
+			if (endDate.after(startDate)) {
+				query.between(startDate, endDate);
+			} else {
+				try {
+					endDate = dateFormat.parse(bean.getEndDate() + " " + HOUR_23 + ":" + MINUTE_59);
+				} catch (ParseException e) {
+					logger.error(PARSE_EXCEPTION_MESSAGE, e.getMessage(), e);
+				}
+				if (endDate != null && endDate.after(startDate)) {
+					query.between(startDate, endDate);
+				} else { // still strange situation
+					query.after(startDate);
+				}
+			}
+			//strange situations might happen 
+		}else if(startDate != null) {
+			query.after(startDate);
+		}else  if(endDate != null) {
+			query.before(endDate);
+		}
+	}
+
+	private Date parseEndDate(QueryBean bean, SimpleDateFormat dateFormat) {
+		Date endDate = null;
+		try {
+			endDate = dateFormat.parse(bean.getEndDate() + " " + bean.getEndHour() + ":" + bean.getEndMin());
+		} catch (ParseException e) {
+			logger.error(PARSE_EXCEPTION_MESSAGE, e.getMessage(), e);
+		}
+		return endDate;
+	}
+
+	private Date parseStartDate(QueryBean bean, SimpleDateFormat dateFormat) {
+		Date startDate = null;
+		try {
+			startDate = dateFormat.parse(bean.getStartDate() + " " + bean.getStartHour() + ":" + bean.getStartMin());
+		} catch (ParseException e) {
+			logger.error(PARSE_EXCEPTION_MESSAGE, e.getMessage(), e);
+		}
+		return startDate;
+	}
 }

@@ -134,19 +134,27 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:when test="$low and $high">
+                <!--TODO add label to eHDSIDisplayLabel value set -->
+                <xsl:text>from </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
-                </xsl:call-template> -
+                </xsl:call-template>
+                <!--TODO add label to eHDSIDisplayLabel value set -->
+                <xsl:text> until </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$low">
+                <!--TODO add label to eHDSIDisplayLabel value set -->
+                <xsl:text>from </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$high">
+                <!--TODO add label to eHDSIDisplayLabel value set -->
+                <xsl:text>until </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
                 </xsl:call-template>
@@ -246,21 +254,21 @@
                       select="$medOffset/n1:low"/>
         <xsl:if test="$medOffsetLow">
             <xsl:value-of select="$medOffsetLow/@value"/>
-            &#160;
+            <xsl:text> </xsl:text>
             <xsl:value-of select="$medOffsetLow/@unit"/>
-            &#160;
+            <xsl:text> </xsl:text>
         </xsl:if>
         <xsl:call-template name="show-eHDSITimingEvent">
             <xsl:with-param name="node" select="$medEvent"/>
         </xsl:call-template>
         <xsl:if test="$medOffsetWidth">
-            <xsl:text>&#160; </xsl:text>
+            <xsl:text> </xsl:text>
             <xsl:call-template name="show-eHDSIDisplayLabel">
                 <xsl:with-param name="code" select="'31'"/>
             </xsl:call-template>
-            <xsl:text> &#160;</xsl:text>
+            <xsl:text> </xsl:text>
             <xsl:value-of select="$medOffsetWidth/@value"/>
-            &#160;
+            <xsl:text> </xsl:text>
             <xsl:call-template name="show-eHDSIUnit">
                 <xsl:with-param name="code" select="$medOffsetWidth/@unit"/>
             </xsl:call-template>

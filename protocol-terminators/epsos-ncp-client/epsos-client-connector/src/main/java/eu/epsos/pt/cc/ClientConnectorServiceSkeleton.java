@@ -3,12 +3,10 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.*;
 import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -36,7 +34,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     private static final String UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION = "Unsupported Class Code scheme: ";
     private static final String UNSUPPORTED_CLASS_CODE_EXCEPTION = "Unsupported Class Code: ";
     private final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceSkeleton.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     /**
      * Performs international search for a patient, filtering by a set of demographics.
@@ -57,38 +54,25 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         QueryPatientResponseDocument result = QueryPatientResponseDocument.Factory.newInstance();
 
         try {
-            /* create request */
+            /* Creating request */
             List<tr.com.srdc.epsos.data.model.PatientDemographics> xcpdResp;
+            QueryPatientRequest queryPatientRequest = queryPatient.getQueryPatient().getArg0();
+            PatientDemographics pDemographic = queryPatientRequest.getPatientDemographics();
+            tr.com.srdc.epsos.data.model.PatientDemographics request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
+            String countryCode = queryPatientRequest.getCountryCode();
 
-            tr.com.srdc.epsos.data.model.PatientDemographics request;
-            QueryPatientRequest arg0 = queryPatient.getQueryPatient().getArg0();
-            PatientDemographics pDemographic = arg0.getPatientDemographics();
-            request = eu.epsos.pt.cc.dts.PatientDemographicsDts.newInstance(pDemographic);
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-                loggerClinical.info("Patient Demographics: '{}', '{}', '{}'",
-                        ((pDemographic.getPatientIdArray() == null) ? "N/A" : pDemographic.getPatientIdArray()[0]),
-                        pDemographic.getBirthDate(), pDemographic.getGivenName());
-                loggerClinical.info("Patient Demographics Request: '{}', '{}', '{}'", request.getId(), request.getGivenName(),
-                        request.getBirthDate());
-            }
-            String countryCode = arg0.getCountryCode();
-
-            // call XCPD Client
+            // Calling XCPD Client
             xcpdResp = IdentificationService.findIdentityByTraits(request, assertion, countryCode);
 
-            /* result */
-            QueryPatientResponse response;
-            List<PatientDemographics> aux;
-            aux = eu.epsos.pt.cc.dts.axis2.PatientDemographicsDts.newInstance(xcpdResp);
-            response = QueryPatientResponseDts.newInstance(aux);
-
+            //  Response
+            List<PatientDemographics> aux = eu.epsos.pt.cc.dts.axis2.PatientDemographicsDts.newInstance(xcpdResp);
+            QueryPatientResponse response = QueryPatientResponseDts.newInstance(aux);
             result.setQueryPatientResponse(response);
 
         } catch (ClientConnectorException ex) {
             LoggingSlf4j.error(logger, methodName);
             throw ex;
         }
-
         LoggingSlf4j.end(logger, methodName);
         return result;
     }
@@ -181,7 +165,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         final String methodName = "retrieveDocument";
         LoggingSlf4j.start(logger, methodName);
 
-
         RetrieveDocumentResponse result;
         /*
          * Body
@@ -251,7 +234,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
     @Override
     public SubmitDocumentResponseDocument submitDocument(final SubmitDocumentDocument1 submitDocument,
                                                          Assertion hcpAssertion, Assertion trcAssertion)
-            throws XdrException, ParseException {
+            throws XDRException, ParseException {
 
         final String methodName = "submitDocument";
         LoggingSlf4j.start(logger, methodName);
@@ -264,10 +247,10 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
             /*  create Xdr request */
             SubmitDocument1 submitDocument1 = submitDocument.getSubmitDocument();
-            SubmitDocumentRequest arg0 = submitDocument1.getArg0();
-            String countryCode = arg0.getCountryCode();
-            EpsosDocument1 document = arg0.getDocument();
-            PatientDemographics patient = arg0.getPatientDemographics();
+            SubmitDocumentRequest submitDocumentRequest = submitDocument1.getArg0();
+            String countryCode = submitDocumentRequest.getCountryCode();
+            EpsosDocument1 document = submitDocumentRequest.getDocument();
+            PatientDemographics patient = submitDocumentRequest.getPatientDemographics();
             String classCodeNode;
             GenericDocumentCode classCode = document.getClassCode();
             if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
@@ -295,7 +278,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 case Constants.HCER_CLASSCODE:
                     response = HcerService.submit(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
-                case "DISCARD-" + Constants.ED_CLASSCODE:
+                case Constants.EDD_CLASSCODE:
                     response = DispensationService.discard(document, patient, countryCode, hcpAssertion, trcAssertion);
                     break;
                 default:
@@ -326,10 +309,10 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
 
         SayHelloResponseDocument result = SayHelloResponseDocument.Factory.newInstance();
 
-        SayHelloResponse resp = SayHelloResponse.Factory.newInstance();
-        resp.setReturn("Hello " + sayHello.getSayHello().getArg0());
+        SayHelloResponse sayHelloResponse = SayHelloResponse.Factory.newInstance();
+        sayHelloResponse.setReturn("Hello " + sayHello.getSayHello().getArg0());
 
-        result.setSayHelloResponse(resp);
+        result.setSayHelloResponse(sayHelloResponse);
 
         LoggingSlf4j.end(logger, methodName);
         return result;

@@ -2,21 +2,28 @@ package eu.epsos.pt.cc.stub;
 
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
-import eu.europa.ec.sante.ehdsi.gazelle.validation.util.Constant;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.data.model.XdrResponse;
+import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
-/**
- * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
- */
 public class DispensationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispensationService.class);
@@ -25,15 +32,13 @@ public class DispensationService {
     }
 
     /**
-     * Notify the patient’s country of affiliation on a successful dispensation
-     * of an ePrescription.
+     * Notify the patient’s country of affiliation on a successful dispensation of an ePrescription.
      * <p>
-     * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service
-     * provider share a common identifier for the patient <dd>The patient has
-     * given consent to the use of epSOS <dd>The service consumer has previously
-     * retrieved the list of the patient’s available ePrescriptions <dd>All
-     * available ePrescriptions for the identified patient are accessible for
-     * NCP-A and the provided eDispensation data relates to these ePrescriptions
+     * <br/> <dl> <dt><b>Preconditions: </b> <dd>Service consumer and service provider share a common identifier for
+     * the patient <dd>The patient has given consent to the use of epSOS <dd>The service consumer has previously
+     * retrieved the list of the patient’s available ePrescriptions
+     * <dd>All available ePrescriptions for the identified patient are accessible for NCP-A and the provided eDispensation
+     * data relates to these ePrescriptions
      * <dd>A treatment relationship exists between the patient and the
      * requesting HCP and the attesting assertion can be verified by the service
      * provider <dd>The HCP is authorised to dispense medication for the patient
@@ -57,7 +62,8 @@ public class DispensationService {
      * @throws ParseException
      */
     public static XdrResponse initialize(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                         final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
+                                         final Assertion hcpAssertion, final Assertion trcAssertion) throws XDRException, ParseException {
+
         LOGGER.info("[CC] Dispense Service: Initialize");
         XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
         return XdrDocumentSource.initialize(request, countryCode);
@@ -77,10 +83,29 @@ public class DispensationService {
      * <dd>eDispensations are not rolled back automatically by the country of affiliation </dl>
      */
     public static XdrResponse discard(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                      final Assertion hcpAssertion, final Assertion trcAssertion) throws XdrException, ParseException {
+                                      final Assertion hcpAssertion, final Assertion trcAssertion) throws XDRException, ParseException {
+
         LOGGER.info("[CC] Dispense Service: DISCARD");
-        XdrRequest request;
-        request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
-        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, "DISCARD-" + Constant.ED_CLASSCODE);
+        try {
+            Document dispense = XMLUtil.parseContent(document.getBase64Binary());
+            NodeList nodeList = dispense.getElementsByTagName("code");
+            Node search = nodeList.item(0);
+            NamedNodeMap namedNodeMap = search.getAttributes();
+            Node nodeAttr = namedNodeMap.getNamedItem("code");
+            nodeAttr.setTextContent(Constants.EDD_CLASSCODE);
+
+            nodeList = dispense.getElementsByTagName("templateId");
+            search = nodeList.item(0);
+            namedNodeMap = search.getAttributes();
+            nodeAttr = namedNodeMap.getNamedItem("root");
+            nodeAttr.setTextContent("1.3.6.1.4.1.12559.11.10.1.3.1.1.2-DISCARD");
+
+            String updated = XMLUtil.documentToString(dispense);
+            document.setBase64Binary(updated.getBytes(StandardCharsets.UTF_8));
+        } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
+            LOGGER.error("Exception: '{}'", e.getMessage());
+        }
+        XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
+        return XdrDocumentSource.discard(request, countryCode);
     }
 }

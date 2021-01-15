@@ -75,7 +75,7 @@ public class RespondingGateway_RequestReceiver {
                                     if (pRPA_IN201306UV02.getControlActProcess().getSubject().get(s).getRegistrationEvent().getSubject1().getPatient().getPatientPerson().getValue().getBirthTime() != null) {
                                         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
                                         Date birthDate;
-                                        String sBirthdate = null;
+                                        String sBirthdate;
 
                                         try {
                                             sBirthdate = pRPA_IN201306UV02.getControlActProcess().getSubject().get(s).getRegistrationEvent().getSubject1().getPatient().getPatientPerson().getValue().getBirthTime().getValue().substring(0, 8);

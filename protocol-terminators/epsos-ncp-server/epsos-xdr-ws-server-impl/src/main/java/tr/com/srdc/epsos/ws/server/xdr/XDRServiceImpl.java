@@ -19,21 +19,20 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.Insufficie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.Document;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +43,29 @@ import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 
 public class XDRServiceImpl implements XDRServiceInterface {
 
+    private static final DatatypeFactory DATATYPE_FACTORY;
     private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(XDRServiceImpl.class);
     private final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private final DocumentSubmitInterface documentSubmitService;
@@ -79,14 +91,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private RegistryError createErrorMessage(String errorCode, String codeContext, String value, String location, boolean isWarning) {
 
-        RegistryError re = ofRs.createRegistryError();
-        re.setErrorCode(errorCode);
-        re.setLocation(location);
-        re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
-        re.setCodeContext(codeContext);
-        re.setValue(value);
-        return re;
-
+        RegistryError registryError = ofRs.createRegistryError();
+        registryError.setErrorCode(errorCode);
+        registryError.setLocation(location);
+        registryError.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
+        registryError.setCodeContext(codeContext);
+        registryError.setValue(value);
+        return registryError;
     }
 
     private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
@@ -94,10 +105,63 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return createErrorMessage(errorCode, codeContext, value, getLocation(), isWarning);
     }
 
+    /**
+     * Returning HOME COMMUNITY ID instead of RegisteredService.CONSENT_SERVICE.
+     *
+     * @return Home Community ID URN encoded.
+     */
     protected String getLocation() {
 
-        //  Returning HOME COMMUNITY ID instead of RegisteredService.CONSENT_SERVICE
         return "urn:oid:" + Constants.HOME_COMM_ID;
+    }
+
+    private void prepareEventLogForDiscardMedication(EventLog eventLog, String discardId, ProvideAndRegisterDocumentSetRequestType request,
+                                                     RegistryResponseType response, Element soapHeader) {
+
+        eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
+        eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
+        eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
+        eventLog.getEventTargetParticipantObjectIds().add(discardId);
+        if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
+
+            for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
+                if (!(request.getSubmitObjectsRequest().getRegistryObjectList()
+                        .getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
+                    continue;
+                }
+                ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
+                        .getIdentifiable().get(i).getValue();
+                String documentId = "";
+                for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
+                    if (StringUtils.equals(eit.getIdentificationScheme(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
+                        documentId = eit.getValue();
+                    }
+                }
+                eventLog.getEventTargetParticipantObjectIds().add(documentId);
+                break;
+            }
+        }
+
+        if (response.getRegistryErrorList() != null) {
+            eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
+        } else {
+            eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
+        }
+        String userIdAlias = Helper.getAssertionsSPProvidedId(soapHeader);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
+                + "<" + Helper.getUserID(soapHeader) + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
+        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
+        eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
+        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
+
+        if (response.getRegistryErrorList() != null) {
+            RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
+            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
+            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+        }
     }
 
     /**
@@ -111,11 +175,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
         eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
-        }
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
+
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
 
             for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
@@ -156,7 +217,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
-        logger.debug("Event log prepared");
     }
 
     /**
@@ -173,11 +233,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
         eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
         eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
-        }
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
 
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
 
@@ -210,11 +266,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 + "<" + Helper.getUserID(soapHeader) + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
-
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-
         eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
-
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
@@ -222,8 +275,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
             eventLog.setEM_PatricipantObjectID(re.getErrorCode());
             eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
         }
-
-        logger.debug("Event log prepared");
     }
 
     private String getDocumentEntryPatientId(ProvideAndRegisterDocumentSetRequestType request) {
@@ -238,8 +289,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
             ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
                     .getIdentifiable().get(i).getValue();
-            // Traverse all Classification blocks in the ExtrinsicObject
-            // selected
+            // Traverse all Classification blocks in the ExtrinsicObject selected
             for (int j = 0; j < eot.getSlot().size(); j++) {
                 // Search for the slot with the name "sourcePatientId"
                 if (StringUtils.equals(eot.getSlot().get(j).getName(), "sourcePatientId")) {
@@ -258,21 +308,24 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return patientId.substring(0, patientId.indexOf("^^^"));
     }
 
+    /**
+     * @param request    - XDR submit request.
+     * @param soapHeader - SOAP Header from XDR message.
+     * @param eventLog   - Discard Medication event log.
+     * @return XDR Discard Medication object.
+     * @throws Exception - Generic Exception in case of error, should be finalized using specific Exception.
+     */
     public RegistryResponseType discardMedicationDispensed(ProvideAndRegisterDocumentSetRequestType request,
                                                            SOAPHeader soapHeader, EventLog eventLog) throws Exception {
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
-        Element shElement;
-        try {
-            shElement = XMLUtils.toDOM(soapHeader);
-        } catch (Exception e) {
-            logger.error("Cannot retrieve SoapHeader from incoming request");
-            throw e;
-        }
-        documentSubmitService.setSOAPHeader(shElement);
 
+        Element soapHeaderElement = XMLUtils.toDOM(soapHeader);
+        documentSubmitService.setSOAPHeader(soapHeaderElement);
+        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
         RegistryResponseType response = new RegistryResponseType();
         String patientId = getPatientId(request);
         String documentId = "";
+        String discardId = "";
+        String discardDate = "";
         logger.info("Received an eDispensation document for patient: '{}'", patientId);
         try {
             org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
@@ -288,22 +341,58 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                         IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
-                        Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
+                        Objects.requireNonNull(Helper.getTRCAssertion(soapHeaderElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
                 logger.error(ExceptionUtils.getStackTrace(e));
             }
-            // Call to National Connector
-            documentSubmitService.cancelDispensation(epsosDocument);
+
+            List<JAXBElement<? extends IdentifiableType>> registryObjectList = request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable();
+            if (registryObjectList != null) {
+                for (JAXBElement<? extends IdentifiableType> identifiable : registryObjectList) {
+
+                    if (identifiable.getValue() instanceof ExtrinsicObjectType) {
+                        List<SlotType1> slotType1List = identifiable.getValue().getSlot();
+                        for (SlotType1 slotType1 : slotType1List) {
+                            if (StringUtils.equals(slotType1.getName(), "creationTime")) {
+                                discardDate = slotType1.getValueList().getValue().get(0);
+                            }
+                        }
+                    } else if (identifiable.getValue() instanceof RegistryPackageType) {
+                        RegistryPackageType registryPackageType = (RegistryPackageType) identifiable.getValue();
+                        for (ExternalIdentifierType externalIdentifier : registryPackageType.getExternalIdentifier()) {
+                            if (StringUtils.equals(externalIdentifier.getIdentificationScheme(), "urn:uuid:96fdda7c-d067-4183-912e-bf5ee74998a8")) {
+                                discardId = externalIdentifier.getValue();
+                            }
+                        }
+                    }
+                }
+            }
+            //  Call to National Connector
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_FORMAT);
+            DiscardDispenseDetails discardDetails = new DiscardDispenseDetails();
+            discardDetails.setDispenseId(documentId);
+            discardDetails.setDiscardId(discardId);
+            discardDetails.setDiscardDate(simpleDateFormat.parse(discardDate));
+            discardDetails.setPatientId(patientId);
+            discardDetails.setHealthCareProvider(Helper.getAlternateUserID(soapHeaderElement));
+            discardDetails.setHealthCareProviderId(Helper.getAssertionsSPProvidedId(soapHeaderElement));
+            discardDetails.setHealthCareProviderFacility(Helper.getPointOfCareUserId(soapHeaderElement));
+            discardDetails.setHealthCareProviderOrganization(Helper.getOrganizationId(soapHeaderElement));
+            discardDetails.setHealthCareProviderOrganization(Helper.getOrganization(soapHeaderElement));
+            documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
+
         } catch (NationalInfrastructureException e) {
             logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
+        prepareEventLogForDiscardMedication(eventLog, discardId, request, response, soapHeaderElement);
+
         return response;
     }
 
@@ -403,7 +492,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8), NcpSide.NCP_A,
                                 obtainClassCode(request), false);
                     }
-
                 } catch (DocumentTransformationException ex) {
                     logger.error(ex.getLocalizedMessage(), ex);
                 }
@@ -493,6 +581,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
                 logger.info("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
                 if (StringUtils.equals(classification.getClassificationScheme(), "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
+
+                    // TODO: check the right LOINC code, currently coded as in example 3.4.2 ver. 2.2 p. 82
                     if (StringUtils.equals(classification.getNodeRepresentation(), "urn:epSOS:ep:dis:2010")) {
                         //  urn:epSOS:ep:dis:2010
                         logger.info("Dispense Medication");
@@ -504,21 +594,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         return discardMedicationDispensed(request, soapHeader, eventLog);
                     }
                 }
-//                if (classification.getNodeRepresentation().compareTo(Constants.ED_CLASSCODE) == 0) {
-//                    // If classified as eDispensation, process as eDispensation
-//                    logger.info("Processing an eDispensation message");
-//                    return saveDispensation(request, soapHeader, eventLog);
-//                }
-//                // TODO: check the right LOINC code, currently coded as in example 3.4.2 ver. 2.2 p. 82
-//                else if (classification.getNodeRepresentation().compareTo(Constants.CONSENT_CLASSCODE) == 0) {
-//                    //  Use case not supported in eHDSI
-//                    logger.info("Processing a consent");
-//                    return saveConsent(request, soapHeader, eventLog);
-//                } else if (classification.getNodeRepresentation().equals(Constants.HCER_CLASSCODE)) {
-//                    //  Use case not supported in eHDSI
-//                    logger.info("Processing HCER document");
-//                    return saveHCER(request, soapHeader, eventLog);
-//                }
             }
             break;
         }

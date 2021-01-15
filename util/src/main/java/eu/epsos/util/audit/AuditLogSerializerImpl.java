@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,18 +79,19 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
     }
 
     private File getPath() {
-
         return new File(System.getenv("EPSOS_PROPS_PATH") + type.getDir());
+    }
+    
+    private String getTrashPath() {
+        return System.getenv("EPSOS_PROPS_PATH") + type.getTrashDir();
     }
 
     private boolean isAuditLogBackupWriterFile(File file) {
-
         String fileName = file.getName();
         return fileName.startsWith(type.getFilePrefix()) && fileName.endsWith(type.getFileSuffix());
     }
 
     private boolean isPathValid(File path) {
-
         if (!path.exists()) {
             logger.error("Source path ('{}') does not exist!", path);
             return false;
@@ -98,4 +102,18 @@ public class AuditLogSerializerImpl implements AuditLogSerializer {
 
         return true;
     }
+
+	@Override
+	public void moveFile(File file) {
+		String trashPath = getTrashPath();
+		try {
+			File destinationFolder = new File(trashPath);
+			if (!destinationFolder.exists()) {
+				destinationFolder.mkdirs();
+			}
+			Files.move(file.toPath(), Paths.get(trashPath, file.getName()), StandardCopyOption.REPLACE_EXISTING);
+		} catch (Exception e) {
+			logger.error("Unable to move file {}, {}", trashPath + file.getName(), e.getMessage());
+		}
+	}
 }

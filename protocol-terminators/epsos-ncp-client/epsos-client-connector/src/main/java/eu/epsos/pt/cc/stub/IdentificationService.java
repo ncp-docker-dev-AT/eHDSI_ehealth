@@ -50,9 +50,9 @@ public final class IdentificationService {
      */
     public static List<PatientDemographics> findIdentityByTraits(final PatientDemographics patient,
                                                                  final Assertion hcpAssertion,
-                                                                 final String countrCode)
+                                                                 final String countryCode)
             throws NoPatientIdDiscoveredException {
 
-        return XcpdInitGateway.patientDiscovery(patient, hcpAssertion, countrCode);
+        return XcpdInitGateway.patientDiscovery(patient, hcpAssertion, countryCode);
     }
 }

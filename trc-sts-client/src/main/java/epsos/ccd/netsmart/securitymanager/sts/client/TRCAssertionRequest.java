@@ -35,8 +35,6 @@ import java.util.UUID;
 /**
  * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
  * It uses the Builder Design Pattern to create the request, in order to create a immutable final object.
- *
- * @author Jerry Dimitriou jerouris at netsmart.gr
  */
 public class TRCAssertionRequest {
 
@@ -75,7 +73,7 @@ public class TRCAssertionRequest {
     private final String purposeOfUse;
     private final String prescriptionId;
     private final String patientId;
-    private final String pinCode;
+    private final String dispensationPinCode;
     private final SOAPMessage rstMsg;
     private final String messageId;
     private final DocumentBuilder builder;
@@ -91,11 +89,10 @@ public class TRCAssertionRequest {
 
         this.idAssert = builder.idAssert;
         this.patientId = builder.patientId;
-        this.pinCode = builder.pinCode;
+        this.dispensationPinCode = builder.dispensationPinCode;
         this.prescriptionId = builder.prescriptionId;
         this.purposeOfUse = builder.purposeOfUse;
         this.location = builder.location;
-
         this.messageId = createMessageId();
 
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -205,9 +202,16 @@ public class TRCAssertionRequest {
             SOAPElement patientIdElem = trcParamsElem.addChildElement(patientIdName);
             patientIdElem.addTextNode(patientId);
 
-            Name pinCodeName = fac.createName("PinCode", "trc", TRC_NS);
-            SOAPElement pinCodeElement = trcParamsElem.addChildElement(pinCodeName);
-            pinCodeElement.addTextNode(pinCode);
+            if (StringUtils.isNotBlank(dispensationPinCode)) {
+                Name dispensationPinCodeName = fac.createName("DispensationPinCode", "trc", TRC_NS);
+                SOAPElement dispensationPinCodeElement = trcParamsElem.addChildElement(dispensationPinCodeName);
+                dispensationPinCodeElement.addTextNode(dispensationPinCode);
+            }
+            if (StringUtils.isNotBlank(prescriptionId)) {
+                Name prescriptionIdName = fac.createName("PrescriptionId", "trc", TRC_NS);
+                SOAPElement prescriptionIdElement = trcParamsElem.addChildElement(prescriptionIdName);
+                prescriptionIdElement.addTextNode(prescriptionId);
+            }
 
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
@@ -242,7 +246,7 @@ public class TRCAssertionRequest {
 
             String value = System.getProperty("javax.net.ssl.key.alias");
 
-            //Write and send the SOAP message
+            //  Write and send the SOAP message
             LOGGER.info("Sending SOAP request - Default Key Alias: '{}'", StringUtils.isNotBlank(value) ? value : "N/A");
             rstMsg.writeTo(httpConnection.getOutputStream());
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
@@ -250,14 +254,15 @@ public class TRCAssertionRequest {
 
             LOGGER.info("Receiving SOAP response");
             if (response.getSOAPBody().hasFault()) {
+
                 SOAPFault newFault = response.getSOAPBody().getFault();
                 String code = newFault.getFaultCode();
                 String string = newFault.getFaultString();
-
                 throw new SOAPException("Code:" + code + ", Error String:" + string);
-
             }
-            return extractTRCAssertionFromRSTC(response);
+            Assertion assertionTRCA = extractTRCAssertionFromRSTC(response);
+            LOGGER.info("TRC Assertion: '{}'", assertionTRCA != null ? assertionTRCA.getID() : "TRC Assertion is NULL");
+            return assertionTRCA;
 
         } catch (SOAPException ex) {
             throw new Exception("SOAP Exception: " + ex.getMessage());
@@ -269,6 +274,7 @@ public class TRCAssertionRequest {
     private Assertion extractTRCAssertionFromRSTC(SOAPMessage response) throws Exception {
 
         try {
+            LOGGER.info("[TRC-STS Client] Extract TRC from RSTC");
             SOAPBody body = response.getSOAPBody();
             if (body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").getLength() != 1) {
                 throw new Exception("TRC Assertion is missing from the RSTRC body");
@@ -333,7 +339,7 @@ public class TRCAssertionRequest {
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
         private String prescriptionId;
-        private String pinCode;
+        private String dispensationPinCode;
         private URL location = null;
 
         /**
@@ -360,9 +366,9 @@ public class TRCAssertionRequest {
             return this;
         }
 
-        public Builder pinCode(String pinCode) {
+        public Builder dispensationPinCode(String dispensationPinCode) {
 
-            this.pinCode = pinCode;
+            this.dispensationPinCode = dispensationPinCode;
             return this;
         }
 

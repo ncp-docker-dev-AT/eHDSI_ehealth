@@ -36,6 +36,8 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     private static final String TELEPHONE = "telephone";
     private final Logger logger = LoggerFactory.getLogger(PatientSearchMockImpl.class);
 
+    PatientDemographics patientDemographics;
+
     @Override
     public String getPatientId(String citizenNumber) {
 
@@ -45,6 +47,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     @Override
     public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
 
+        logger.info("[National Infrastructure Mock] Get Patient Demographics: '{}'", getPatientDemographics().toString());
         List<PatientDemographics> result = new ArrayList<>(1);
 
         // Identifying mocked Patient File.
@@ -99,7 +102,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
-            logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getfullId());
+            logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getFullId());
 
         } catch (Exception e) {
             logger.error("[National Infrastructure Mock] Patient Not Found Exception: '{}'", e.getMessage(), e);
@@ -109,11 +112,16 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
         return result;
     }
 
+    public PatientDemographics getPatientDemographics() {
+        return patientDemographics;
+    }
+
     @Override
     public void setPatientDemographics(PatientDemographics patientDemographics) {
 
         if (logger.isDebugEnabled()) {
             logger.debug(patientDemographics.toString());
         }
+        this.patientDemographics = patientDemographics;
     }
 }
