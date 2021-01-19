@@ -91,7 +91,7 @@
         <!-- Dependency Versions -->
         <axiom-api.version>1.2.21</axiom-api.version>
         <axis2.version>1.7.9</axis2.version>
-        <bcprov.version>1.65</bcprov.version>
+        <bcprov.version>1.68</bcprov.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-codec.version>1.15</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -109,7 +109,7 @@
         <herasaf-xacml.version>1.0.4.RELEASE</herasaf-xacml.version>
         <hibernate.version>5.4.27.Final</hibernate.version>
         <httpclient.version>4.5.12</httpclient.version>
-        <jasperreports.version>6.12.2</jasperreports.version>
+        <jasperreports.version>6.16.0</jasperreports.version>
         <javamelody.version>1.83.0</javamelody.version>
         <javassist.version>3.12.0.GA</javassist.version>
         <jaxb-api.version>2.2.6</jaxb-api.version>
@@ -138,7 +138,7 @@
         <xmlbeans.version>2.6.0</xmlbeans.version>
         <xmlsec.version>2.1.5</xmlsec.version>
         <xml-apis.version>1.4.01</xml-apis.version>
-        <xstream.version>1.4.12</xstream.version>
+        <xstream.version>1.4.15</xstream.version>
     </properties>
 
     <dependencyManagement>
