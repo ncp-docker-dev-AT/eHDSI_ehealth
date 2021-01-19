@@ -14,7 +14,6 @@
     <name>OpenNCP Gazelle Validation</name>
 
     <properties>
-        <httpclient.version>4.5.12</httpclient.version>
         <jaxb2-plugin.version>2.3.1</jaxb2-plugin.version>
         <spring-ws.version>3.0.9.RELEASE</spring-ws.version>
     </properties>

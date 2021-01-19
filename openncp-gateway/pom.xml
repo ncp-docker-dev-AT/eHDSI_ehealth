@@ -45,10 +45,20 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.dynamic-discovery</groupId>
-            <artifactId>dynamic-discovery-client</artifactId>
-            <version>${dynamic-discovery-client.version}</version>
-        </dependency>
+			<groupId>eu.europa.ec.dynamic-discovery</groupId>
+			<artifactId>dynamic-discovery-client</artifactId>
+			<version>${dynamic-discovery-client.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 <!--        <dependency>-->
 <!--            <groupId>dnsjava</groupId>-->
 <!--            <artifactId>dnsjava</artifactId>-->
@@ -199,6 +209,10 @@
                 <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+            		<artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
