@@ -1170,6 +1170,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         .add(Criteria.DocumentId, documentId)
                         .add(Criteria.PatientId, patientId)
                         .add(Criteria.RepositoryId, repositoryId));
+                //  TODO: EHNCP-2055 Inconsistency in handling patient id
+                //  logger.info("[WS-Server] National Document:\n'{}'", epsosDoc.toString());
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
                 registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
