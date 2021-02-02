@@ -70,6 +70,12 @@
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-saml-api</artifactId>
             <version>${opensaml.version}</version>
+            	<exclusions>
+            		<exclusion>
+						<groupId>org.apache.httpcomponents</groupId>
+						<artifactId>httpclient</artifactId>
+					</exclusion>
+				</exclusions>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>

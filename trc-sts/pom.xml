@@ -59,6 +59,16 @@
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-security-manager</artifactId>
             <version>${project.version}</version>
+            	<exclusions>
+                	<exclusion>
+                    	<groupId>log4j</groupId>
+                    	<artifactId>log4j</artifactId>
+                	</exclusion>
+                	<exclusion>
+                    	<groupId>org.apache.httpcomponents</groupId>
+            			<artifactId>httpclient</artifactId>
+                	</exclusion>
+        		</exclusions>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -100,7 +110,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>24.1.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
@@ -129,6 +139,10 @@
                 <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+            		<artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

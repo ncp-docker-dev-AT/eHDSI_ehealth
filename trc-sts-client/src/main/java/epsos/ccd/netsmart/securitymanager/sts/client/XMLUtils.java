@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 
 /**
- * @author Jerry Dimitriou <jerouris at netsmart.gr>
+ * @author Jerry Dimitriou jerouris at netsmart.gr
  */
 public class XMLUtils {
 

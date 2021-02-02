@@ -42,3 +42,13 @@ keytool -import -alias gazelle.ehdsi.eu -file gazelle.ehdsi.eu.crt -keystore JAV
 Tips for creating new versions
 ------------------------------
 From the root directory just run the following command mvn versions:set -DnewVersion=<new version>
+
+
+Dependency check
+----------------
+mvn dependency-check:aggregate -DskipTests -U -T2C
+or
+mvn clean verify -DskipTests -T2C
+or
+mvn clean dependency-check:aggregate -DskipTests -U -T2C
+then see the file from target/dependency-check-report.html

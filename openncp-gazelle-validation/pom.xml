@@ -14,7 +14,6 @@
     <name>OpenNCP Gazelle Validation</name>
 
     <properties>
-        <httpclient.version>4.5.12</httpclient.version>
         <jaxb2-plugin.version>2.3.1</jaxb2-plugin.version>
         <spring-ws.version>3.0.9.RELEASE</spring-ws.version>
     </properties>
@@ -89,12 +88,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 
