@@ -1,3 +1,4 @@
 spring:
   datasource:
-    url: jdbc:oracle:thin:@//${tsam-sync.datasource.host}:${tsam-sync.datasource.port}/${tsam-sync.datasource.database}
+    driver-class-name: ${tsam-sync.datasource.driver}
+    url: jdbc:oracle:thin:@(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP) (HOST = td3-scan.systest.receptpartner.se)(PORT = 1521)) (ADDRESS = (PROTOCOL = TCP) (HOST = td4-scan.systest.receptpartner.se) (PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = PDBEPCBTEST1_PRIMARY)))
