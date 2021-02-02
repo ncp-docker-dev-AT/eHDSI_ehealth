@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 
@@ -131,16 +132,16 @@ public class DiscardDispenseDetails {
 
     @Override
     public String toString() {
-        return "DiscardDispenseDetails{" +
-                "discardId='" + discardId + '\'' +
-                ", dispenseId='" + dispenseId + '\'' +
-                ", discardDate=" + discardDate +
-                ", patientId='" + patientId + '\'' +
-                ", healthCareProviderId='" + healthCareProviderId + '\'' +
-                ", healthCareProvider='" + healthCareProvider + '\'' +
-                ", healthCareProviderFacility='" + healthCareProviderFacility + '\'' +
-                ", healthCareProviderOrganizationId='" + healthCareProviderOrganizationId + '\'' +
-                ", healthCareProviderOrganization='" + healthCareProviderOrganization + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("discardId", discardId)
+                .append("dispenseId", dispenseId)
+                .append("discardDate", discardDate)
+                .append("patientId", patientId)
+                .append("healthCareProviderId", healthCareProviderId)
+                .append("healthCareProvider", healthCareProvider)
+                .append("healthCareProviderFacility", healthCareProviderFacility)
+                .append("healthCareProviderOrganizationId", healthCareProviderOrganizationId)
+                .append("healthCareProviderOrganization", healthCareProviderOrganization)
+                .toString();
     }
 }

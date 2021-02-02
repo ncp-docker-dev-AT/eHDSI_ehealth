@@ -379,6 +379,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
             discardDetails.setHealthCareProviderFacility(Helper.getPointOfCareUserId(soapHeaderElement));
             discardDetails.setHealthCareProviderOrganization(Helper.getOrganizationId(soapHeaderElement));
             discardDetails.setHealthCareProviderOrganization(Helper.getOrganization(soapHeaderElement));
+            //  TODO: EHNCP-2055 Inconsistency in handling patient id
+            //  logger.info("[WS-Server] Discard Information:\n'{}", discardDetails.toString());
             documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
 
         } catch (NationalInfrastructureException e) {
