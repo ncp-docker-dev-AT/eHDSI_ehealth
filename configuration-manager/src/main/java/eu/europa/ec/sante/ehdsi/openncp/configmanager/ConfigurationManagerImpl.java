@@ -77,10 +77,17 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         Property property = new Property(key, value);
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        session.saveOrUpdate(property);
-        transaction.commit();
-
         properties.put(key, value);
+
+        try {
+            session.saveOrUpdate(property);
+            transaction.commit();
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 
     /**
@@ -149,8 +156,16 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         if (value == null) {
             Session session = sessionFactory.getCurrentSession();
             Transaction transaction = session.beginTransaction();
-            Property property = session.get(Property.class, key);
-            transaction.commit();
+            Property property;
+            try {
+                property = session.get(Property.class, key);
+                transaction.commit();
+            } catch (RuntimeException e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                throw e;
+            }
 
             if (property == null) {
                 return Optional.empty();
