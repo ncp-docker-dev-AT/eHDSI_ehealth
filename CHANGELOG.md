@@ -3,6 +3,23 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.1.3] - 08-02-2020
+The OpenNCP 5.1.3 release is the CEF eHDSI Wave 4 Formal Test Event Security HotFix version.
+<br/>Vulnerabilities contained into the project dependencies have been removed
+<br/>OpenNCP Configuration Manager transaction handling improvement.
+<br/>OpenNCP NCP-A mock has been improved according Wave 4 specifications.
+
+### Sub-task
+- [EHNCP-1782] - Oracle Database 12c support (bugFix).
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-2058] - Releasing OpenNCP 5.1.3 (Wave 4 Formal Test Event Security HotFix).
+
+### Bug
+- [EHNCP-2054] - Adapt CDA mock documents and logic to generate valid CDA L1 documents.
+
+### Improvement
+- [EHNCP-2057] - Configuration Manager - Save or Update operation using transaction rollback.
+
 ## [5.1.2] - 11-01-2020
 The OpenNCP 5.1.2 release is the CEF eHDSI Wave 4 Formal Test Event HotFix version.
 <br/>eHDSI Testing Portals inherited from the epSOS Pilot have been removed from the Reference Implementation.
@@ -10,40 +27,40 @@ The OpenNCP 5.1.2 release is the CEF eHDSI Wave 4 Formal Test Event HotFix versi
 <br/>Minor BugFix and improvements into the Reference Implementation.
 
 ### Sub-task
-- [EHNCP-1969] - Alignment of the Gazelle validators to Wave 4
-- [EHNCP-2050] - Releasing OpenNCP 5.1.2 (Wave 4 Formal Test Event)
+- [EHNCP-1969] - Alignment of the Gazelle validators to Wave 4.
+- [EHNCP-2050] - Releasing OpenNCP 5.1.2 (Wave 4 Formal Test Event).
 
 ### Bug
-- [EHNCP-2000] - ATNA FailedLogsHandlerImpl doesn't work properly for Sweden without Xerces.jar
-- [EHNCP-2031] - EADC Database Creation : Missing Column
-- [EHNCP-2048] - [CDA Display Tool] Units per intake duplicated in Prescription Details view
+- [EHNCP-2000] - ATNA FailedLogsHandlerImpl doesn't work properly for Sweden without Xerces.jar.
+- [EHNCP-2031] - EADC Database Creation : Missing Column.
+- [EHNCP-2048] - [CDA Display Tool] Units per intake duplicated in Prescription Details view.
 
 ### Issue
-- [EHNCP-1983] - OpenATNA-Web Viewer filter has bug with date ranges
-- [EHNCP-2003] - Incoherent and confusing logging statement
-- [EHNCP-2044] - ISM XSD missing required attribute in birthDate format
-- [EHNCP-2045] - XCA WSDL exposes SOAP 1.1 binding
+- [EHNCP-1983] - OpenATNA-Web Viewer filter has bug with date ranges.
+- [EHNCP-2003] - Incoherent and confusing logging statement.
+- [EHNCP-2044] - ISM XSD missing required attribute in birthDate format.
+- [EHNCP-2045] - XCA WSDL exposes SOAP 1.1 binding.
 
 ### Improvement
-- [EHNCP-1993] - FailedLogsHandler process is not working properly when an unexpected file format backuped is loaded
-- [EHNCP-2002] - CountryConfigManager can't find patient search ID label
-- [EHNCP-2049] - Improve the way the duration of treatment is represented
+- [EHNCP-1993] - FailedLogsHandler process is not working properly when an unexpected file format backuped is loaded.
+- [EHNCP-2002] - CountryConfigManager can't find patient search ID label.
+- [EHNCP-2049] - Improve the way the duration of treatment is represented.
 
 ### Decision to remove eHDSI Testing Portals from Pilot phase
-- [EHNCP-2040] - Remove eHDSI Portals from the Reference Implementation core
-- [EHNCP-1101] - Migration from Liferay 6.2-GA6 to 7.0.2-GA3 Community Edition
-- [EHNCP-820] - Update Java Wicket version
-- [EHNCP-212] - Set the AllowScriptAccess
-- [EHNCP-214] - Verify that parameter values are in their expected ranges and types
-- [EHNCP-216] - Circular dependency between XHTML page and Java method
-- [EHNCP-178] - Block body parameters
+- [EHNCP-2040] - Remove eHDSI Portals from the Reference Implementation core.
+- [EHNCP-1101] - Migration from Liferay 6.2-GA6 to 7.0.2-GA3 Community Edition.
+- [EHNCP-820] - Update Java Wicket version.
+- [EHNCP-212] - Set the AllowScriptAccess.
+- [EHNCP-214] - Verify that parameter values are in their expected ranges and types.
+- [EHNCP-216] - Circular dependency between XHTML page and Java method.
+- [EHNCP-178] - Block body parameters.
 
 ### Support
-- [EHNCP-1364] - Gazelle CDA validator finds eD errors in data coming from eP
-- [EHNCP-1904] - Wrong PatientID Root in XCA OrderService Response for EP
-- [EHNCP-1992] - TSAM - Memory leak
-- [EHNCP-2016] - NC PatientSearchImpl support only id attributes from ISM, so demographics can't be processed by NC
-- [EHNCP-2052] - Portugal cannot retrieve Estonian HomeCommunity ID from configuration
+- [EHNCP-1364] - Gazelle CDA validator finds eD errors in data coming from eP.
+- [EHNCP-1904] - Wrong PatientID Root in XCA OrderService Response for EP.
+- [EHNCP-1992] - TSAM - Memory leak.
+- [EHNCP-2016] - NC PatientSearchImpl support only id attributes from ISM, so demographics can't be processed by NC.
+- [EHNCP-2052] - Portugal cannot retrieve Estonian HomeCommunity ID from configuration.
 
 ## [5.1.1] - 10-10-2020
 The OpenNCP 5.1.1 release is the CEF eHDSI Wave 4 Preparatory Test Event HotFix version.

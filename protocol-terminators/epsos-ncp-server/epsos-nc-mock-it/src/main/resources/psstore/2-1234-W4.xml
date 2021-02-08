@@ -1772,7 +1772,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <text><reference value="#obs-26"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20191122"/>
-                            <value xsi:type="CV" code="278147001" displayName="Blood group O Rh(D) positive" codeSystem="2.16.840.1.113883.6.96" />
+                            <value xsi:type="CE" code="278147001" displayName="Blood group O Rh(D) positive" codeSystem="2.16.840.1.113883.6.96" />
                         </observation>
                     </entry>
                 </section>

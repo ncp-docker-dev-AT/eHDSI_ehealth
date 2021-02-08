@@ -19,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan("eu.europa.ec.sante.ehdsi.openncp.gateway.domain")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 

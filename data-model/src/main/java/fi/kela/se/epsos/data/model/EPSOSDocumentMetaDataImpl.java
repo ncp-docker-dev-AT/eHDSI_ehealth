@@ -1,17 +1,19 @@
 package fi.kela.se.epsos.data.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.Date;
 
 public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
-    private String id;
-    private String patientId;
-    private int documentFormat;
-    private Date effectiveDate;
-    private String classCode;
-    private String repositoryId;
-    private String title;
-    private String author;
+    private final String id;
+    private final String patientId;
+    private final int documentFormat;
+    private final Date effectiveDate;
+    private final String classCode;
+    private final String repositoryId;
+    private final String title;
+    private final String author;
 
     public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
                                      String classCode, String repositoryId, String title, String author) {
@@ -72,8 +74,15 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
     @Override
     public String toString() {
-        return "EPSOSDocumentMetaDataImpl [id=" + id + ", patientId=" + patientId + ", documentFormat=" + documentFormat
-                + ", effectiveDate=" + effectiveDate + ", classCode=" + classCode + ", repositoryId=" + repositoryId
-                + ", title=" + title + ", author=" + author + "]";
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("patientId", patientId)
+                .append("documentFormat", documentFormat)
+                .append("effectiveDate", effectiveDate)
+                .append("classCode", classCode)
+                .append("repositoryId", repositoryId)
+                .append("title", title)
+                .append("author", author)
+                .toString();
     }
 }
