@@ -119,5 +119,10 @@
             <artifactId>postgresql</artifactId>
             <version>${postgresql-connector.version}</version>
         </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb-api.version}</version>
+        </dependency>
     </dependencies>
 </project>
