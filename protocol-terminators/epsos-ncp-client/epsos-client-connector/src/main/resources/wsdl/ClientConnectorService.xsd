@@ -24,6 +24,8 @@
 
     <xs:element name="submitDocumentResponse" type="tns:submitDocumentResponse"/>
 
+	<xs:element name="GeneralFault" type="tns:GeneralFault"/>
+
     <xs:complexType name="queryPatient">
         <xs:sequence>
             <xs:element name="arg0" type="tns:queryPatientRequest" minOccurs="0"/>
@@ -201,4 +203,11 @@
             <xs:element name="return" type="tns:epsosDocument" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+    
+	<xs:complexType name="GeneralFault">
+		<xs:sequence>
+			<xs:element name="faultMessage" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+    
 </xs:schema>

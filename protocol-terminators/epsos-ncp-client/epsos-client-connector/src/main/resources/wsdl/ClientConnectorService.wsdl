@@ -44,26 +44,35 @@
     <wsdl:message name="submitDocumentResponse">
         <wsdl:part name="parameters" element="tns:submitDocumentResponse" />
     </wsdl:message>
+    <wsdl:message name="GeneralFaultMessage">
+        <wsdl:part element="tns:GeneralFault" name="fault"/>
+    </wsdl:message>
+    
     <wsdl:portType name="ClientConnectorServicePortType">
         <wsdl:operation name="sayHello">
             <wsdl:input message="tns:sayHello" wsaw:Action="urn:ehdsi:sayHello"/>
             <wsdl:output message="tns:sayHelloResponse" wsaw:Action="urn:ehdsi:sayHelloResponse"/>
+            <wsdl:fault message="tns:GeneralFaultMessage" name="GeneralException"/>
         </wsdl:operation>
         <wsdl:operation name="queryPatient">
             <wsdl:input message="tns:queryPatient" wsaw:Action="urn:ehdsi:queryPatient"/>
             <wsdl:output message="tns:queryPatientResponse" wsaw:Action="urn:ehdsi:queryPatientResponse"/>
+            <wsdl:fault message="tns:GeneralFaultMessage" name="GeneralException"/>
         </wsdl:operation>
         <wsdl:operation name="queryDocuments">
             <wsdl:input message="tns:queryDocuments" wsaw:Action="urn:ehdsi:queryDocuments"/>
             <wsdl:output message="tns:queryDocumentsResponse" wsaw:Action="urn:ehdsi:queryDocumentsResponse"/>
+            <wsdl:fault message="tns:GeneralFaultMessage" name="GeneralException"/>
         </wsdl:operation>
         <wsdl:operation name="retrieveDocument">
             <wsdl:input message="tns:retrieveDocument" wsaw:Action="urn:ehdsi:retrieveDocument"/>
             <wsdl:output message="tns:retrieveDocumentResponse" wsaw:Action="urn:ehdsi:retrieveDocumentResponse"/>
+            <wsdl:fault message="tns:GeneralFaultMessage" name="GeneralException"/>
         </wsdl:operation>
         <wsdl:operation name="submitDocument">
             <wsdl:input message="tns:submitDocument" wsaw:Action="urn:ehdsi:submitDocument"/>
             <wsdl:output message="tns:submitDocumentResponse" wsaw:Action="urn:ehdsi:submitDocumentResponse"/>
+            <wsdl:fault message="tns:GeneralFaultMessage" name="GeneralException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="ClientConnectorServicePortBinding" type="tns:ClientConnectorServicePortType">
@@ -76,6 +85,9 @@
             <wsdl:output>
                 <soap12:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="GeneralException">
+                <soap12:fault name="GeneralException" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="queryPatient">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
@@ -86,6 +98,9 @@
             <wsdl:output>
                 <soap12:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="GeneralException">
+                <soap12:fault name="GeneralException" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="queryDocuments">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
@@ -96,6 +111,9 @@
             <wsdl:output>
                 <soap12:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="GeneralException">
+                <soap12:fault name="GeneralException" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="retrieveDocument">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
@@ -106,6 +124,9 @@
             <wsdl:output>
                 <soap12:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="GeneralException">
+                <soap12:fault name="GeneralException" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="submitDocument">
             <wsp:PolicyReference URI="#HttpsWithSAML2AssertionPolicy" />
@@ -116,6 +137,9 @@
             <wsdl:output>
                 <soap12:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="GeneralException">
+                <soap12:fault name="GeneralException" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="ClientConnectorService">
