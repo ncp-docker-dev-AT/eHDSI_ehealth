@@ -47,7 +47,6 @@
     <wsdl:message name="GeneralFaultMessage">
         <wsdl:part element="tns:GeneralFault" name="fault"/>
     </wsdl:message>
-    
     <wsdl:portType name="ClientConnectorServicePortType">
         <wsdl:operation name="sayHello">
             <wsdl:input message="tns:sayHello" wsaw:Action="urn:ehdsi:sayHello"/>
