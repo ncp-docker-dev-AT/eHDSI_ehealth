@@ -34,6 +34,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -51,6 +52,10 @@ public class XcaInitGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
+    
+	private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
+			"2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
+			"4512");
     /**
      * Private constructor to disable class instantiation.
      */
@@ -245,31 +250,6 @@ public class XcaInitGateway {
      * @return True | false according the Error Codes List.
      */
     private static boolean checkTransformationErrors(String errorCode) {
-
-        List<String> errorCodes = new ArrayList<>();
-        errorCodes.add("2500");
-        errorCodes.add("2501");
-        errorCodes.add("2502");
-        errorCodes.add("2503");
-        errorCodes.add("2504");
-        errorCodes.add("2505");
-        errorCodes.add("2506");
-        errorCodes.add("2507");
-        errorCodes.add("2508");
-        errorCodes.add("4500");
-        errorCodes.add("4501");
-        errorCodes.add("4502");
-        errorCodes.add("4503");
-        errorCodes.add("4504");
-        errorCodes.add("4505");
-        errorCodes.add("4506");
-        errorCodes.add("4507");
-        errorCodes.add("4508");
-        errorCodes.add("4509");
-        errorCodes.add("4510");
-        errorCodes.add("4511");
-        errorCodes.add("4512");
-
-        return errorCodes.contains(errorCode);
+        return ERROR_CODES.contains(errorCode);
     }
 }

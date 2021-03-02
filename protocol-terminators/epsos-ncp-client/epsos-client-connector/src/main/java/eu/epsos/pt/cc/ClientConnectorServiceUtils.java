@@ -21,6 +21,7 @@ public class ClientConnectorServiceUtils {
 	        return (AxisFault) e;
 	    }
 		String errorCode = DEFAULT_ERROR_CODE;
+		String faultMessage = "";
 	   	Throwable t = e;
 		if (e instanceof InvocationTargetException) {
 	        t = ((InvocationTargetException) e).getTargetException();
@@ -28,11 +29,12 @@ public class ClientConnectorServiceUtils {
 	        t = ((UndeclaredThrowableException) e).getCause();
 	    }else if(t instanceof NoPatientIdDiscoveredException) {
 			errorCode = NoPatientIdDiscovered;
+			faultMessage = "There is no patient discovered having the ID specified!";
 		}
 		
 		GeneralFault generalFault = GeneralFault.Factory.newInstance();
 				
-		generalFault.setFaultMessage(errorCode);
+		generalFault.setFaultMessage(faultMessage);
 		
 		GeneralFaultDocument generalFaultDocument = GeneralFaultDocument.Factory.newInstance();
 		generalFaultDocument.setGeneralFault(generalFault);
