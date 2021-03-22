@@ -393,6 +393,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
+        
+        if (registryErrorList.getRegistryError().isEmpty()) {
+        	response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        } else {
+        	response.setRegistryErrorList(registryErrorList);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
+        }
         prepareEventLogForDiscardMedication(eventLog, discardId, request, response, soapHeaderElement);
 
         return response;
