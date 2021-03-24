@@ -25,4 +25,11 @@ public interface EPSOSDocumentMetaData {
     String getTitle();
 
     String getAuthor();
+    
+    ConfidentialityMetadata getConfidentiality();
+    
+    interface ConfidentialityMetadata {
+        String getConfidentialityCode();
+        String getConfidentialityDisplay();
+    }
 }
