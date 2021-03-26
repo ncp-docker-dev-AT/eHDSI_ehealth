@@ -6,7 +6,7 @@
     <code code="57833-6" codeSystem="2.16.840.1.113883.6.1" displayName="Prescription for medication"/>
     <title>ePrescription (eHDSI/Finland)</title>
     <effectiveTime value="20191122143500+0200" />
-    <confidentialityCode code="N" displayName="normal" codeSystem="2.16.840.1.113883.5.25"/>
+    <confidentialityCode code="C" displayName="Confidential" codeSystem="2.16.840.1.113883.5.25"/>
     <languageCode code="fi-FI" />
     <setId root="1.2.246.10.11535721.93.2009.15721892033029812" />
     <recordTarget contextControlCode="OP" typeCode="RCT">

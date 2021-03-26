@@ -19,9 +19,10 @@ Although being real choices for the different diseases and conditions, the selec
     <!-- title used for display purposes -->
     <title>Patient Summary</title>
     <effectiveTime value="20191122143500+0200" />
-    <confidentialityCode code="N" displayName="normal" codeSystem="2.16.840.1.113883.5.25"/>
+    <confidentialityCode code="C" displayName="Confidential" codeSystem="2.16.840.1.113883.5.25"/>
     <!-- document language code -->
-    <languageCode code="en-GB"/>
+    <!-- <languageCode code="en-GB"/> -->
+    <languageCode code="fi-FI"/>
     <!-- setID (optional): remains unchanged among all the existing transformations -->
     <setId root="2.999" extension="111"/>
     <!-- recordTarget: Patient Information -->
