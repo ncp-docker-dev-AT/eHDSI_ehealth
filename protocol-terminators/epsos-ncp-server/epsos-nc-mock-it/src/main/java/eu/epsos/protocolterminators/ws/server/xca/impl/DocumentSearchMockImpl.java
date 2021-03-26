@@ -264,7 +264,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 		}
 		return StringUtils.trim(code);
 	}
-	
+
+	private String getClinicalDocumentLanguage(Document doc) {
+		List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
+		String code = "";
+		for (Node node : nodeList) {
+			if (node.getAttributes().getNamedItem("code") != null) {
+				code = node.getAttributes().getNamedItem("code").getTextContent();
+				logger.debug("confidentiality code: '{}'", code);
+			}
+		}
+		return StringUtils.trim(code);
+	}
     @Override
     public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) {
 

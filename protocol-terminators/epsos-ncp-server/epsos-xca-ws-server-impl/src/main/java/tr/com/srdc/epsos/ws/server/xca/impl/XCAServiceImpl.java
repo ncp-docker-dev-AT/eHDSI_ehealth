@@ -932,7 +932,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 							String confidentialityDisplay = docXml.getConfidentiality() == null
 									|| docXml.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
 											: docXml.getConfidentiality().getConfidentialityDisplay();
-							 xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY, docXml.getEffectiveTime(), docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentialityCode, confidentialityDisplay);
+							xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY,
+									docXml.getEffectiveTime(), docXml.getRepositoryId(), request, eotXML, false,
+									docXml.getId(), confidentialityCode, confidentialityDisplay);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
                         }
                         String pdfUUID = "";

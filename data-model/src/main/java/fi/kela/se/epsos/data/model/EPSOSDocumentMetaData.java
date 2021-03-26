@@ -26,6 +26,8 @@ public interface EPSOSDocumentMetaData {
 
     String getAuthor();
     
+    String getLanguage();
+    
     ConfidentialityMetadata getConfidentiality();
     
     interface ConfidentialityMetadata {
