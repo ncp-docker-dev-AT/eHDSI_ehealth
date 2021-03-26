@@ -288,7 +288,9 @@ public class XDSbRepositoryServiceInvoker {
 
         // rim:Slot
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME, DateUtil.getCurrentTimeUTC()));
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, getLanguageCode(document)));
+
+        String languageCode = document != null? getLanguageCode(document): null ;
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, languageCode));
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.SOURCE_PATIENT_ID, patientId.toString()));
 
         /*
