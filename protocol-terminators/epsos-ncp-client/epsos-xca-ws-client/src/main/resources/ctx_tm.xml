@@ -84,7 +84,7 @@
             <value>${EPSOS_PROPS_PATH}${tm.mda.value_set_repository_path}</value>
         </property>
         <property name="ncpSide">
-            <value>NCP_A</value>
+            <value>NCP_B</value>
         </property>
     </bean>
 
