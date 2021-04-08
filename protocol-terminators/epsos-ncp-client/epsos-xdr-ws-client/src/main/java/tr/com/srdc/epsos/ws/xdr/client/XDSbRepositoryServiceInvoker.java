@@ -14,9 +14,7 @@ import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xerces.dom.DeferredElementNSImpl;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
@@ -24,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
@@ -32,18 +29,20 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author erdem
  */
 public class XDSbRepositoryServiceInvoker {
 
+    //TODO: this class implementation needs to be reviewed deeply
     private static final ObjectFactory ofRim = new ObjectFactory();
     private final Logger logger = LoggerFactory.getLogger(XDSbRepositoryServiceInvoker.class);
 
@@ -62,7 +61,6 @@ public class XDSbRepositoryServiceInvoker {
         logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", request.getIdAssertion().getID(), countryCode, docClassCode);
         RegistryResponseType response;
         String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-
 
         String endpointReference = null;
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
@@ -89,6 +87,15 @@ public class XDSbRepositoryServiceInvoker {
         // Dummy handler for any mustUnderstand header within server response
         EventLogClientUtil.createDummyMustUnderstandHandler(axisClient);
 
+        //  Retrieving XDR document from request
+        Document document = null;
+        try {
+            document = XMLUtil.parseContent(request.getCda());
+        } catch (Exception e) {
+            logger.warn("Could not parse dispense", e);
+        }
+        String languageCode = document != null ? getLanguageCode(document) : XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_DEFAULT_VALUE;
+
         // ProvideAndRegisterDocumentSetRequestType
         ihe.iti.xds_b._2007.ObjectFactory ofXds = new ihe.iti.xds_b._2007.ObjectFactory();
         oasis.names.tc.ebxml_regrep.xsd.lcm._3.ObjectFactory ofLcm = new oasis.names.tc.ebxml_regrep.xsd.lcm._3.ObjectFactory();
@@ -99,7 +106,7 @@ public class XDSbRepositoryServiceInvoker {
 
         //  XDS Document
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-        ExtrinsicObjectType extrinsicObject = makeExtrinsicObject(request, uuid, docClassCode);
+        ExtrinsicObjectType extrinsicObject = makeExtrinsicObject(request, uuid, docClassCode, languageCode);
         registerDocumentSetRequest.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable()
                 .add(ofRim.createExtrinsicObject(extrinsicObject));
 
@@ -119,19 +126,12 @@ public class XDSbRepositoryServiceInvoker {
         ProvideAndRegisterDocumentSetRequestType.Document xdrDocument = new ProvideAndRegisterDocumentSetRequestType.Document();
         xdrDocument.setId(uuid);
 
-        byte[] cdaBytes = null;
+        byte[] cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
         try {
-            cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
-
             /* Validate CDA epSOS Friendly */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
-                        NcpSide.NCP_B, docClassCode, false);
+                OpenNCPValidation.validateCdaDocument(request.getCda(), NcpSide.NCP_B, docClassCode, false);
             }
-        } catch (Exception ex) {
-            logger.error("Exception during Remote Validation process: '{}'", ex.getMessage(), ex);
-        }
-        try {
             if (!StringUtils.equals(docClassCode, Constants.EDD_CLASSCODE)) {
                 byte[] transformedCda = TMServices.transformDocument(cdaBytes);
                 xdrDocument.setValue(transformedCda);
@@ -140,10 +140,8 @@ public class XDSbRepositoryServiceInvoker {
             }
             /* Validate CDA epSOS Pivot */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(xdrDocument.getValue())
-                        .getDocumentElement()).toString(), NcpSide.NCP_B, docClassCode, true);
+                OpenNCPValidation.validateCdaDocument(new String(xdrDocument.getValue(), StandardCharsets.UTF_8), NcpSide.NCP_B, docClassCode, true);
             }
-
         } catch (DocumentTransformationException ex) {
             logger.error(ex.getLocalizedMessage(), ex);
             xdrDocument.setValue(cdaBytes);
@@ -251,8 +249,8 @@ public class XDSbRepositoryServiceInvoker {
      * @param docClassCode
      * @return
      */
-    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode) {
-        return makeExtrinsicObject(request, uuid, docClassCode, Boolean.FALSE);
+    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, String language) {
+        return makeExtrinsicObject(request, uuid, docClassCode, language, Boolean.FALSE);
     }
 
     /**
@@ -262,18 +260,11 @@ public class XDSbRepositoryServiceInvoker {
      * @param isPDF
      * @return
      */
-    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, Boolean isPDF) {
+    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, String language, Boolean isPDF) {
 
         if (Boolean.TRUE.equals(isPDF)) {
             // TODO A.R. isPDF unfinished...
             logger.warn("PDF document will be processed, but this is not fully supported by current implementation");
-        }
-
-        Document document = null;
-        try {
-            document = XMLUtil.parseContent(request.getCda());
-        } catch (Exception e) {
-            logger.warn("Could not parse dispense", e);
         }
 
         ExtrinsicObjectType result = ofRim.createExtrinsicObjectType();
@@ -288,9 +279,7 @@ public class XDSbRepositoryServiceInvoker {
 
         // rim:Slot
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME, DateUtil.getCurrentTimeUTC()));
-
-        String languageCode = document != null? getLanguageCode(document): null ;
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, languageCode));
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, language));
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.SOURCE_PATIENT_ID, patientId.toString()));
 
         /*
@@ -310,7 +299,6 @@ public class XDSbRepositoryServiceInvoker {
                 XDRConstants.EXTRINSIC_OBJECT.CONFIDENTIALITY_CODE_STR));
 
         // eHDSI Class Code
-        logger.info("makeExtrinsicObject: '{}'", docClassCode);
         switch (docClassCode) {
             case Constants.ED_CLASSCODE:
                 //  urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a
@@ -689,15 +677,20 @@ public class XDSbRepositoryServiceInvoker {
         }
     }
 
-    private String getLanguageCode(Document document) {
-
-        List<Node> nodeList = XMLUtil.getNodeList(document, "ClinicalDocument/languageCode");
-        String languageCode = "";
+    /**
+     * Util method retrieving the language code from a CDA document.
+     *
+     * @param document - CDA document as DOM object.
+     * @return ISO language code of the document.
+     */
+    private String getLanguageCode(Document doc) {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
+        String languageCode = XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_DEFAULT_VALUE;
         for (Node node : nodeList) {
-            languageCode = ((DeferredElementNSImpl) node).getAttribute("code");
+            if (node.getNodeType() == Node.ELEMENT_NODE && node.getAttributes().getNamedItem("code") != null) {
+                languageCode = node.getAttributes().getNamedItem("code").getTextContent();
+            }
         }
-
         return StringUtils.trim(languageCode);
     }
-
 }

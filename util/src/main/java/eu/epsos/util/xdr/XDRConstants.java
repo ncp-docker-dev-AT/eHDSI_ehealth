@@ -64,7 +64,7 @@ public class XDRConstants {
         public static final String CREATION_TIME = "creationTime";
         /* Language Code */
         public static final String LANGUAGE_CODE_STR = "languageCode";
-        public static final String LANGUAGE_CODE_VALUE = "en";
+        public static final String LANGUAGE_CODE_DEFAULT_VALUE = "en-GB";
         /* Source Patient */
         public static final String SOURCE_PATIENT_ID = "sourcePatientId";
         /* HealthCareFacility Code */
