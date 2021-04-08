@@ -169,14 +169,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         /*
          * Body
          */
-        RetrieveDocument1 retrieveDocument1 = retrieveDocument.getRetrieveDocument();
-        RetrieveDocumentRequest arg0 = retrieveDocument1.getArg0();
-        String countryCode = arg0.getCountryCode();
-        DocumentId xdsDocument = arg0.getDocumentId();
-        String homeCommunityId = arg0.getHomeCommunityId();
-        String targetLanguage = arg0.getTargetLanguage();
+        RetrieveDocumentRequest retrieveDocumentRequest = retrieveDocument.getRetrieveDocument().getArg0();
+        String countryCode = retrieveDocumentRequest.getCountryCode();
+        DocumentId xdsDocument = retrieveDocumentRequest.getDocumentId();
+        String homeCommunityId = retrieveDocumentRequest.getHomeCommunityId();
+        String targetLanguage = retrieveDocumentRequest.getTargetLanguage();
 
-        GenericDocumentCode tmpCode = arg0.getClassCode();
+        GenericDocumentCode tmpCode = retrieveDocumentRequest.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
         if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
