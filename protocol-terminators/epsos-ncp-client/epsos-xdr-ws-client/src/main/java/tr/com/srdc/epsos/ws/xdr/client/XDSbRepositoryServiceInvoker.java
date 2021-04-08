@@ -16,17 +16,24 @@ import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xerces.dom.DeferredElementNSImpl;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
+import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
@@ -261,6 +268,14 @@ public class XDSbRepositoryServiceInvoker {
             // TODO A.R. isPDF unfinished...
             logger.warn("PDF document will be processed, but this is not fully supported by current implementation");
         }
+
+        Document document = null;
+        try {
+            document = XMLUtil.parseContent(request.getCda());
+        } catch (Exception e) {
+            logger.warn("Could not parse dispense", e);
+        }
+
         ExtrinsicObjectType result = ofRim.createExtrinsicObjectType();
         PatientDemographics patient = request.getPatient();
         PatientId patientId = patient.getIdList().get(0);
@@ -272,9 +287,10 @@ public class XDSbRepositoryServiceInvoker {
         result.setStatus(IheConstants.REGREP_STATUSTYPE_APPROVED);
 
         // rim:Slot
-        String now = DateUtil.getDateByDateFormat(XDRConstants.EXTRINSIC_OBJECT.DATE_FORMAT, new Date());
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME, now));
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_VALUE));
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME, DateUtil.getCurrentTimeUTC()));
+
+        String languageCode = document != null? getLanguageCode(document): null ;
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, languageCode));
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.SOURCE_PATIENT_ID, patientId.toString()));
 
         /*
@@ -672,4 +688,16 @@ public class XDSbRepositoryServiceInvoker {
                 return "Class Code does not have a matching submission set designation!";
         }
     }
+
+    private String getLanguageCode(Document document) {
+
+        List<Node> nodeList = XMLUtil.getNodeList(document, "ClinicalDocument/languageCode");
+        String languageCode = "";
+        for (Node node : nodeList) {
+            languageCode = ((DeferredElementNSImpl) node).getAttribute("code");
+        }
+
+        return StringUtils.trim(languageCode);
+    }
+
 }
