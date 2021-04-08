@@ -239,7 +239,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             String requestLogMsg;
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope));
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (LOGGER_CLINICAL.isDebugEnabled() 
+                		&& !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE,
                             System.getProperty("line.separator"), logRequestMsg);
                 }
@@ -358,7 +359,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             //  Log SOAP response message.
             String responseLogMsg;
             try {
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (LOGGER_CLINICAL.isDebugEnabled() 
+                		&& !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
                     LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE,
                             System.getProperty("line.separator"), logResponseMsg);

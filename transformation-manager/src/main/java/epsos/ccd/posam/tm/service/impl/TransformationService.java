@@ -67,7 +67,8 @@ public class TransformationService implements ITransformationService, TMConstant
         StopWatch watch = new StopWatch();
         watch.start();
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+        if (Boolean.FALSE // disable logging. already logged inside  process() method
+        		&& OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             try {
                 loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
             } catch (Exception e) {
@@ -907,8 +908,8 @@ public class TransformationService implements ITransformationService, TMConstant
                 oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isInfoEnabled()) {
-            loggerClinical.info("Document OID: '{}'", oid);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Document OID: '{}'", oid);
         }
         return oid;
     }

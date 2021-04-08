@@ -46,7 +46,6 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
     private final Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
-    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private final ObjectFactory objectFactory;
     private final PatientSearchInterface patientSearchService;
 

@@ -31,7 +31,7 @@ public class FieldValueValidators {
         if (assertion.getIssuer().getValue() == null) {
             throw (new InvalidFieldException("Issuer should be filled."));
         } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("Issuer	: " + assertion.getIssuer().getValue());
+            LOGGER_CLINICAL.debug("Issuer	: " + assertion.getIssuer().getValue());
         }
     }
 
@@ -39,7 +39,7 @@ public class FieldValueValidators {
         if (assertion.getSubject().getNameID().getValue() == null) {
             throw (new InvalidFieldException("NameID should be filled."));
         } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
+            LOGGER_CLINICAL.debug("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
         }
     }
 

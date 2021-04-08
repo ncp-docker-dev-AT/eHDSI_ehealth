@@ -247,7 +247,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             /* Log soap request */
             String logRequestBody;
             try {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
                     loggerClinical.debug(XCPDConstants.LOG.OUTGOING_XCPD_MESSAGE + System.getProperty("line.separator") + logRequestMsg);
                 }
@@ -351,7 +351,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             /* Log soap response */
             String logResponseBody;
             try {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
                     loggerClinical.debug(XCPDConstants.LOG.INCOMING_XCPD_MESSAGE + System.getProperty("line.separator") + logResponseMsg);
                 }

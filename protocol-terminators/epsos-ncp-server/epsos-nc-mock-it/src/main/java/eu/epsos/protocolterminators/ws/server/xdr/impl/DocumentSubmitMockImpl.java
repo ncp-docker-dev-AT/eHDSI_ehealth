@@ -46,13 +46,12 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
         String dispensation;
         try {
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
-            loggerClinical.info("eDispense:\n'{}'", dispensation);
         } catch (TransformerException e) {
             logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
             throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("eDispensation document content: '{}'", dispensation);
+            loggerClinical.debug("eDispensation document content: '{}'", dispensation);
         }
 
         if (dispensation == null || dispensation.isEmpty()) {
@@ -112,7 +111,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             throwDocumentProcessingException("Cannot parse consent!", "4106");
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("Patient consent content: '{}'", consent);
+            loggerClinical.debug("Patient consent content: '{}'", consent);
         }
     }
 
@@ -135,7 +134,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             throwDocumentProcessingException("Cannot parse HCER!", "4106");
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("HCER document content: '{}'", consent);
+            loggerClinical.debug("HCER document content: '{}'", consent);
         }
     }
 }

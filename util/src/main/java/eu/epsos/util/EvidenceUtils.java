@@ -94,18 +94,12 @@ public class EvidenceUtils {
             TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException {
 
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
-                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
-                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
-                    submissionTime, status, title);
-        }
-        MessageType messageType;
+    	MessageType messageType;
         String messageIdentifier;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
-            logMessage(incomingMsg);
+            // disable logging. already logged 
+            // logMessage(incomingMsg);
             messageType = messageInspector.getMessageType();
             messageIdentifier = messageInspector.getMessageUUID();
         } catch (Exception e) {
@@ -289,12 +283,6 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
                                             String title) throws Exception {
 
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
-                            "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
-                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType, submissionTime, status, title);
-        }
         MessageType messageType;
         String msguuid;
         try {
@@ -308,8 +296,8 @@ public class EvidenceUtils {
             msguuid = UUID.randomUUID().toString();
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
-            LOGGER_CLINICAL.info("Evidences for MessageType: '{}'", messageType.getClass());
+            LOGGER_CLINICAL.debug("MSGUUID: '{}'", msguuid);
+            LOGGER_CLINICAL.debug("Evidences for MessageType: '{}'", messageType.getClass());
         }
         createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
@@ -349,8 +337,8 @@ public class EvidenceUtils {
                     submissionTime, status, title, msguuid);
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
-            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
+            LOGGER_CLINICAL.debug("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
+            LOGGER_CLINICAL.debug("MSGUUID: '{}'", msguuid);
         }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
@@ -452,9 +440,9 @@ public class EvidenceUtils {
             } else {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title, "NRO") + ".xml";
             }
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
-                LOGGER_CLINICAL.info("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
-                LOGGER_CLINICAL.info("NRO:\n'{}'", oblString);
+            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+                LOGGER_CLINICAL.debug("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
+                LOGGER_CLINICAL.debug("NRO:\n'{}'", oblString);
             }
             FileUtil.constructNewFile(title, oblString.getBytes());
         }

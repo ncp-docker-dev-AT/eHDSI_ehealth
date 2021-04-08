@@ -88,8 +88,8 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
 
         logger.debug("Processing a Transaction Object as Document");
         String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
-            loggerClinical.info("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
         }
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
     }

@@ -1016,14 +1016,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_PatricipantObjectDetail() != null) {
             String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-                loggerClinical.info("Participant Requester: '{}'", requester);
+            if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                loggerClinical.debug("Participant Requester: '{}'", requester);
             }
         }
         if (eventLog.getResM_PatricipantObjectDetail() != null) {
             String responder = new String(eventLog.getResM_PatricipantObjectDetail());
-            if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-                loggerClinical.info("Participant Responder: '{}'", responder);
+            if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                loggerClinical.debug("Participant Responder: '{}'", responder);
             }
         }
 
