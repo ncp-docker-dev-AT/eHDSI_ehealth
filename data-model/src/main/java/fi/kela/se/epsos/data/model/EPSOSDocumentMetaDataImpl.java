@@ -1,8 +1,8 @@
 package fi.kela.se.epsos.data.model;
 
-import java.util.Date;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Date;
 
 public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
@@ -15,39 +15,39 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     private final String title;
     private final String author;
     private final ConfidentialityMetadata confidentiality;
-	private final String language;
+    private final String language;
 
-	@Deprecated
-	public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-			String classCode, String repositoryId, String title, String author) {
+    @Deprecated
+    public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
+                                     String classCode, String repositoryId, String title, String author) {
 
-		this.id = id;
-		this.patientId = patientId;
-		this.documentFormat = documentFormat;
-		this.effectiveDate = effectiveDate;
-		this.classCode = classCode;
-		this.repositoryId = repositoryId;
-		this.title = title;
-		this.author = author;
-		this.confidentiality = new SimpleConfidentialityMetadata("N", "Normal");
-		this.language=null;
-	}
+        this.id = id;
+        this.patientId = patientId;
+        this.documentFormat = documentFormat;
+        this.effectiveDate = effectiveDate;
+        this.classCode = classCode;
+        this.repositoryId = repositoryId;
+        this.title = title;
+        this.author = author;
+        this.confidentiality = new SimpleConfidentialityMetadata("N", "Normal");
+        this.language = null;
+    }
 
-	public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-			String classCode, String repositoryId, String title, String author,
-			ConfidentialityMetadata confidentiality, String language) {
+    public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
+                                     String classCode, String repositoryId, String title, String author,
+                                     ConfidentialityMetadata confidentiality, String language) {
 
-		this.id = id;
-		this.patientId = patientId;
-		this.documentFormat = documentFormat;
-		this.effectiveDate = effectiveDate;
-		this.classCode = classCode;
-		this.repositoryId = repositoryId;
-		this.title = title;
-		this.author = author;
-		this.confidentiality = confidentiality;
-		this.language=language;
-	}
+        this.id = id;
+        this.patientId = patientId;
+        this.documentFormat = documentFormat;
+        this.effectiveDate = effectiveDate;
+        this.classCode = classCode;
+        this.repositoryId = repositoryId;
+        this.title = title;
+        this.author = author;
+        this.confidentiality = confidentiality;
+        this.language = language;
+    }
 
     public EPSOSDocumentMetaDataImpl(EPSOSDocumentMetaData metaData) {
 
@@ -94,17 +94,17 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     public String getAuthor() {
         return author;
     }
-    
-	@Override
-	public ConfidentialityMetadata getConfidentiality() {
-		return confidentiality;
-	}
-	
-	@Override
-	public String getLanguage() {
-		// TODO Auto-generated method stub
-		return language;
-	}
+
+    @Override
+    public ConfidentialityMetadata getConfidentiality() {
+        return confidentiality;
+    }
+
+    @Override
+    public String getLanguage() {
+        return language;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -123,26 +123,23 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
     public static class SimpleConfidentialityMetadata implements ConfidentialityMetadata {
 
-        private String confidentialityCode;
+        private final String confidentialityCode;
 
-        private String confidentialityDisplay;
+        private final String confidentialityDisplay;
 
         public SimpleConfidentialityMetadata(String confidentialityCode, String confidentialityDisplay) {
             this.confidentialityCode = confidentialityCode;
             this.confidentialityDisplay = confidentialityDisplay;
         }
 
+        @Override
+        public String getConfidentialityCode() {
+            return confidentialityCode;
+        }
 
-		@Override
-		public String getConfidentialityCode() {
-			return confidentialityCode;
-		}
-
-		@Override
-		public String getConfidentialityDisplay() {
-			return confidentialityDisplay;
-		}
+        @Override
+        public String getConfidentialityDisplay() {
+            return confidentialityDisplay;
+        }
     }
-
-	
 }

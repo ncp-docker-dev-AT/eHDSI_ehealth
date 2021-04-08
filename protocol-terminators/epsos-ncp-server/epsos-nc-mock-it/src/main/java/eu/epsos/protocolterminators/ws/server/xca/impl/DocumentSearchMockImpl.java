@@ -130,9 +130,9 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 logger.debug("Parsing PS patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
-                
+
                 PSDocumentMetaData psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc), 
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
                         this.getClinicalDocumentConfidentialityCode(pdfDoc), this.getClinicalDocumentConfidentialityDisplay(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
@@ -242,41 +242,42 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return StringUtils.trim(author);
     }
 
-	private String getClinicalDocumentConfidentialityDisplay(Document doc) {
-		List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
-		String display = "";
-		for (Node node : nodeList) {
-			if (node.getAttributes().getNamedItem("displayName") != null) {
-				display = node.getAttributes().getNamedItem("displayName").getTextContent();
-				logger.debug("confidentiality displayName: '{}'", display);
-			}
-		}
-		return StringUtils.trim(display);
-	}
-	
-	private String getClinicalDocumentConfidentialityCode(Document doc) {
-		List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
-		String code = "";
-		for (Node node : nodeList) {
-			if (node.getAttributes().getNamedItem("code") != null) {
-				code = node.getAttributes().getNamedItem("code").getTextContent();
-				logger.debug("confidentiality code: '{}'", code);
-			}
-		}
-		return StringUtils.trim(code);
-	}
+    private String getClinicalDocumentConfidentialityDisplay(Document doc) {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
+        String display = "";
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("displayName") != null) {
+                display = node.getAttributes().getNamedItem("displayName").getTextContent();
+                logger.debug("confidentiality displayName: '{}'", display);
+            }
+        }
+        return StringUtils.trim(display);
+    }
 
-	private String getClinicalDocumentLanguage(Document doc) {
-		List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
-		String code = "";
-		for (Node node : nodeList) {
-			if (node.getAttributes().getNamedItem("code") != null) {
-				code = node.getAttributes().getNamedItem("code").getTextContent();
-				logger.debug("confidentiality code: '{}'", code);
-			}
-		}
-		return StringUtils.trim(code);
-	}
+    private String getClinicalDocumentConfidentialityCode(Document doc) {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
+        String code = "";
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("code") != null) {
+                code = node.getAttributes().getNamedItem("code").getTextContent();
+                logger.debug("confidentiality code: '{}'", code);
+            }
+        }
+        return StringUtils.trim(code);
+    }
+
+    private String getClinicalDocumentLanguage(Document doc) {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
+        String code = "";
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("code") != null) {
+                code = node.getAttributes().getNamedItem("code").getTextContent();
+                logger.debug("confidentiality code: '{}'", code);
+            }
+        }
+        return StringUtils.trim(code);
+    }
+
     @Override
     public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) {
 
