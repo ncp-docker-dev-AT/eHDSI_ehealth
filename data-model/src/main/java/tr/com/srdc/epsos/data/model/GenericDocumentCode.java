@@ -1,5 +1,7 @@
 package tr.com.srdc.epsos.data.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 /**
  * This class represents a Generic Document Code, which holds a code Value and a code Schema.
  *
@@ -37,5 +39,13 @@ public class GenericDocumentCode {
      */
     public void setSchema(String schema) {
         this.schema = schema;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("value", value)
+                .append("schema", schema)
+                .toString();
     }
 }
