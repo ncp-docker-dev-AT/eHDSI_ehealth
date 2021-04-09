@@ -110,10 +110,6 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         String processedDocumentCodeSystem;
         String processedDocumentCodeAndCodeSystemCombination;
 
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
-            loggerClinical.debug("XML Document:\n'{}'", EadcUtil.convertXMLDocumentToString(transaction));
-        }
-
         NodeList clinicalDocumentNodeList = transaction.getElementsByTagNameNS(CDA_NAMESPACE, "ClinicalDocument");
         int numberOfCdaDocuments = clinicalDocumentNodeList.getLength();
         // Test, if the currently processed comes without a CDA-document

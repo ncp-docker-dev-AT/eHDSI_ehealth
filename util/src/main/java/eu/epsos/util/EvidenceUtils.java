@@ -98,8 +98,6 @@ public class EvidenceUtils {
         String messageIdentifier;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
-            // disable logging. already logged 
-            // logMessage(incomingMsg);
             messageType = messageInspector.getMessageType();
             messageIdentifier = messageInspector.getMessageUUID();
         } catch (Exception e) {
@@ -158,10 +156,6 @@ public class EvidenceUtils {
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
         }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
-            LOGGER_CLINICAL.info("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingMsg));
-            LOGGER_CLINICAL.info("MSGUUID: '{}'", msguuid);
-        }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
             statusmsg = "success";
@@ -180,7 +174,6 @@ public class EvidenceUtils {
 
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
-            logMessage(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -253,7 +246,6 @@ public class EvidenceUtils {
                 title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title, "NRR") + ".xml";
             }
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
-                LOGGER_CLINICAL.info("MSGUUID: '{}'  NRR TITLE: '{}'", msguuid, title);
                 LOGGER_CLINICAL.info("NRR:\n'{}'", oblString);
             }
             FileUtil.constructNewFile(title, oblString.getBytes());
@@ -283,21 +275,14 @@ public class EvidenceUtils {
                                             String recipientCertAlias, String eventType, DateTime submissionTime, String status,
                                             String title) throws Exception {
 
-        MessageType messageType;
         String msguuid;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingSoap);
             logMessage(incomingSoap);
-            messageType = messageInspector.getMessageType();
             msguuid = messageInspector.getMessageUUID();
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            messageType = new UnknownMessageType(incomingSoap);
             msguuid = UUID.randomUUID().toString();
-        }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("MSGUUID: '{}'", msguuid);
-            LOGGER_CLINICAL.debug("Evidences for MessageType: '{}'", messageType.getClass());
         }
         createEvidenceREMNRO(incomingSoap, issuerKeyStorePath, issuerKeyPassword,
                 issuerCertAlias, senderKeyStorePath, senderKeyPassword,
@@ -335,10 +320,6 @@ public class EvidenceUtils {
                     XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
                     senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
                     submissionTime, status, title, msguuid);
-        }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("DOCUMENT:\n'{}'", XMLUtil.documentToString(incomingSoap));
-            LOGGER_CLINICAL.debug("MSGUUID: '{}'", msguuid);
         }
         String statusmsg = "failure";
         if (StringUtils.equals("0", status)) {
@@ -439,10 +420,6 @@ public class EvidenceUtils {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, handler.toString(), "NRO") + ".xml";
             } else {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title, "NRO") + ".xml";
-            }
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-                LOGGER_CLINICAL.debug("MSGUUID: '{}'  NRO TITLE: '{}'", msguuid, title);
-                LOGGER_CLINICAL.debug("NRO:\n'{}'", oblString);
             }
             FileUtil.constructNewFile(title, oblString.getBytes());
         }

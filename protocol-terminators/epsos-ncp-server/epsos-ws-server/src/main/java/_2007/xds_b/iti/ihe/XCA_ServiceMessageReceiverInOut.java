@@ -125,8 +125,6 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
 
                 if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name()) && loggerClinical.isDebugEnabled()) {
-                    loggerClinical.debug("[Audit Debug] Requester: ParticipantId: '{}'\nObjectDetail: '{}'",
-                            getMessageID(msgContext.getEnvelope()), msgContext.getEnvelope().getHeader().toString());
                     loggerClinical.debug("Incoming XCA Request Message:\n{}", XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope())));
                 }
                 if (StringUtils.equals(XCAOperation.SERVICE_CROSS_GATEWAY_QUERY, methodName)) {

@@ -97,12 +97,8 @@ public class Utilities {
     }
 
     public static void serialize(Element request) throws TransformerException {
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Stream:\n'{}'", outputStream.toString());
-        }
     }
 
     /**
