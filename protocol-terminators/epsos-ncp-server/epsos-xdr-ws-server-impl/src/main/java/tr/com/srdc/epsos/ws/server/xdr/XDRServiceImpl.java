@@ -376,11 +376,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
             discardDetails.setPatientId(patientId);
             discardDetails.setHealthCareProvider(Helper.getAlternateUserID(soapHeaderElement));
             discardDetails.setHealthCareProviderId(Helper.getAssertionsSPProvidedId(soapHeaderElement));
-            discardDetails.setHealthCareProviderFacility(Helper.getPointOfCareUserId(soapHeaderElement));
-            discardDetails.setHealthCareProviderOrganization(Helper.getOrganizationId(soapHeaderElement));
+            discardDetails.setHealthCareProviderFacility(Helper.getXSPALocality(soapHeaderElement));
             discardDetails.setHealthCareProviderOrganization(Helper.getOrganization(soapHeaderElement));
+            discardDetails.setHealthCareProviderOrganizationId(Helper.getOrganizationId(soapHeaderElement));
             //  TODO: EHNCP-2055 Inconsistency in handling patient id
-            //  logger.info("[WS-Server] Discard Information:\n'{}", discardDetails.toString());
             documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
 
         } catch (NationalInfrastructureException e) {
@@ -392,6 +391,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+        }
+
+        if (registryErrorList.getRegistryError().isEmpty()) {
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        } else {
+            response.setRegistryErrorList(registryErrorList);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
         }
         prepareEventLogForDiscardMedication(eventLog, discardId, request, response, soapHeaderElement);
 
