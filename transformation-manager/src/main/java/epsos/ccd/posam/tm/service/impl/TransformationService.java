@@ -67,14 +67,7 @@ public class TransformationService implements ITransformationService, TMConstant
         StopWatch watch = new StopWatch();
         watch.start();
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        if (Boolean.FALSE // disable logging. already logged inside  process() method
-        		&& OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            try {
-                loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
-            } catch (Exception e) {
-                logger.error("XML Transformation Exception: '{}'", e.getMessage(), e);
-            }
-        }
+       
         watch.stop();
         logger.info("Transformation of CDA executed in: '{}ms'", watch.getTotalTimeMillis());
         logger.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");

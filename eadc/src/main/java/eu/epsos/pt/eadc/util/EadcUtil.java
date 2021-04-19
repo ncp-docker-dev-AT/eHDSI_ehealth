@@ -70,8 +70,7 @@ public class EadcUtil {
         } else {
             transactionDocument = TransactionHelper.convertTransaction(transaction);
         }
-        if (Boolean.FALSE // disable logging
-        		&& !StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
         }
         EadcEntry eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transactionDocument, reqEnv, respEnv);
