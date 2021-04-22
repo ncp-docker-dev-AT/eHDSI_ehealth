@@ -285,7 +285,7 @@ public class STSService implements Provider<SOAPMessage> {
 
             SOAPFactory fac = SOAPFactory.newInstance();
             SOAPElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, MESSAGE_ID, "wsa"));
-            messageIdElem.setTextContent("uuid:" + UUID.randomUUID().toString());
+            messageIdElem.setTextContent("uuid:" + UUID.randomUUID());
             SOAPElement securityHeaderElem = header.addHeaderElement(new QName(WS_SEC_NS, "Security", "wsse"));
 
             SOAPElement timeStampElem = fac.createElement("Timestamp", "wsu", WS_SEC_UTIL_NS);
@@ -405,9 +405,9 @@ public class STSService implements Provider<SOAPMessage> {
      */
     private void log(SOAPMessage message) {
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            try(ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 message.writeTo(out);
-                loggerClinical.debug("SOAPMessage:\n{}", out.toString());
+                loggerClinical.debug("SOAPMessage:\n{}", out);
             } catch (IOException | SOAPException e) {
                 loggerClinical.error("Exception: '{}'", e.getMessage(), e);
             }

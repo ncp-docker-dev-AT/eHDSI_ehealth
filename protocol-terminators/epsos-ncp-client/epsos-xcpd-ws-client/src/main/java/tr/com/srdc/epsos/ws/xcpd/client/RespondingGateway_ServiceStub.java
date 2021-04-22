@@ -86,15 +86,15 @@ public class RespondingGateway_ServiceStub extends Stub {
         }
     }
 
-    protected AxisOperation[] _operations;
     // HashMap to keep the fault mapping
     private final HashMap faultExceptionNameMap = new HashMap();
     private final HashMap faultExceptionClassNameMap = new HashMap();
     private final HashMap faultMessageMap = new HashMap();
+    private final QName[] opNameArray = null;
+    protected AxisOperation[] _operations;
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-    private final QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -216,7 +216,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addAttribute(att);
 
             SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             OMNamespace ns = factory.createOMNamespace(XCPDConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");

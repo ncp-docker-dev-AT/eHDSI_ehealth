@@ -82,7 +82,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
 
         logger.info("eDispensation to be discarded: '{}' for Patient: '{}'", dispensationToDiscard.getClassCode(), dispensationToDiscard.getPatientId());
         logger.info("[National Connector A] Discard Dispense ID: '{}' for ePrescription ID: '{}' operation executed...\n'{}'",
-                discardDispenseDetails.getDiscardId(), discardDispenseDetails.getDispenseId(), discardDispenseDetails.toString());
+                discardDispenseDetails.getDiscardId(), discardDispenseDetails.getDispenseId(), discardDispenseDetails);
     }
 
     /**

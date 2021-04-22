@@ -94,7 +94,7 @@ public class EvidenceUtils {
             TransformerException, SyntaxException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
             UnrecoverableKeyException {
 
-    	MessageType messageType;
+        MessageType messageType;
         String messageIdentifier;
         try {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);

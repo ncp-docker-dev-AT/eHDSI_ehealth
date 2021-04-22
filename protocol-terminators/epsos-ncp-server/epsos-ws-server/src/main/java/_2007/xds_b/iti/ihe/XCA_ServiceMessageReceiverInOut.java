@@ -108,7 +108,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         "Operation is not located, if this is doclit style the SOAP-ACTION should specified via the SOAP Action to use the RawXMLProvider");
             }
 
-            String randomUUID = tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID().toString();
+            String randomUUID = tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID();
             String methodName;
 
             if ((op.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(op.getName().getLocalPart())) != null)) {
@@ -413,11 +413,11 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.

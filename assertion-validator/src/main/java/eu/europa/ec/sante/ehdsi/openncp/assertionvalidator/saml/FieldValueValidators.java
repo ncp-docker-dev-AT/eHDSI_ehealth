@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang.StringUtils;
@@ -8,15 +9,14 @@ import org.joda.time.DateTimeZone;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 
 public class FieldValueValidators {
 
     public static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     private static final int CONDITIONS_SECOND_RANGE = 60; // a tolerance on the clock (second)
-    private static final int HCP_MAXIMUM_TIME_SPAN = 4; // maximum timespan for hcp identity assertion (hours)
-    private static final int TRC_MAXIMUM_TIME_SPAN = 2; // maximum timespan for trc assertion (hours)
+    private static final int HCP_MAXIMUM_TIME_SPAN = 4; // maximum time span for hcp identity assertion (hours)
+    private static final int TRC_MAXIMUM_TIME_SPAN = 2; // maximum time span for trc assertion (hours)
 
     private FieldValueValidators() {
     }
@@ -31,7 +31,7 @@ public class FieldValueValidators {
         if (assertion.getIssuer().getValue() == null) {
             throw (new InvalidFieldException("Issuer should be filled."));
         } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Issuer	: " + assertion.getIssuer().getValue());
+            LOGGER_CLINICAL.debug("Issuer: '{}'", assertion.getIssuer().getValue());
         }
     }
 
@@ -39,7 +39,7 @@ public class FieldValueValidators {
         if (assertion.getSubject().getNameID().getValue() == null) {
             throw (new InvalidFieldException("NameID should be filled."));
         } else if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Subject Name ID	: " + assertion.getSubject().getNameID().getValue());
+            LOGGER_CLINICAL.debug("Subject Name ID: '{}'", assertion.getSubject().getNameID().getValue());
         }
     }
 
