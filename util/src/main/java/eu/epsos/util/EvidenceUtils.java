@@ -45,6 +45,7 @@ public class EvidenceUtils {
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final String DATATYPE_STRING = "http://www.w3.org/2001/XMLSchema#string";
     private static final String DATATYPE_DATETIME = "http://www.w3.org/2001/XMLSchema#dateTime";
+    private static final String HIDDEN_PASSWORD = "******";
 
     private EvidenceUtils() {
     }
@@ -55,6 +56,7 @@ public class EvidenceUtils {
      */
     private static boolean checkCorrectnessOfIHEXCA(final MessageType messageType) {
         // TODO: Review the reason why the MessageType is not analyzed and the validity is set to true by default.
+        LOGGER.debug("The message type : '{}' is correct.", messageType);
         return true;
     }
 
@@ -101,7 +103,7 @@ public class EvidenceUtils {
             messageType = messageInspector.getMessageType();
             messageIdentifier = messageInspector.getMessageUUID();
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.warn("[REM-NRR] Message Type Unknown: '{}'", e.getMessage(), e);
             messageType = new UnknownMessageType(incomingMsg);
             messageIdentifier = UUID.randomUUID().toString();
         }
@@ -152,20 +154,21 @@ public class EvidenceUtils {
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRR()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
-                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
-                    submissionTime, status, title, msguuid);
+                    XMLUtil.documentToString(incomingMsg), issuerKeyStorePath, StringUtils.isNotBlank(issuerKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    issuerCertAlias, senderKeyStorePath, StringUtils.isNotBlank(senderKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    senderCertAlias, recipientKeyStorePath, StringUtils.isNotBlank(recipientKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    recipientCertAlias, eventType, submissionTime, status, title, msguuid);
         }
-        String statusmsg = "failure";
+        String messageStatus = "failure";
         if (StringUtils.equals("0", status)) {
-            statusmsg = "success";
+            messageStatus = "success";
         }
 
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
+        UnorderedPolicyRepository policyRepository = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
         ClassLoader loader = EvidenceUtils.class.getClassLoader();
         InputStream inputStream = loader.getResourceAsStream("policy/samplePolicyNRR.xml");
-        polrep.deploy(PolicyMarshaller.unmarshal(inputStream));
+        policyRepository.deploy(PolicyMarshaller.unmarshal(inputStream));
 
         /*
          * Instantiate the message inspector, to see which type of message is
@@ -176,7 +179,7 @@ public class EvidenceUtils {
             MessageInspector messageInspector = new MessageInspector(incomingMsg);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.warn("[REM-NRR] Message Type Unknown: '{}'", e.getMessage(), e);
             messageType = new UnknownMessageType(incomingMsg);
         }
         /*
@@ -187,7 +190,7 @@ public class EvidenceUtils {
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
-        action.setValue(statusmsg);
+        action.setValue(messageStatus);
 
         LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
@@ -240,13 +243,10 @@ public class EvidenceUtils {
             oh.discharge();
             Utilities.serialize(oh.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(oh.getMessage());
-            if (title == null || title.isEmpty()) {
+            if (StringUtils.isBlank(title)) {
                 title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, oh.toString(), "NRR") + ".xml";
             } else {
                 title = getPath() + "nrr" + File.separator + getDocumentTitle(msguuid, title, "NRR") + ".xml";
-            }
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isInfoEnabled()) {
-                LOGGER_CLINICAL.info("NRR:\n'{}'", oblString);
             }
             FileUtil.constructNewFile(title, oblString.getBytes());
         }
@@ -317,18 +317,19 @@ public class EvidenceUtils {
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.debug("[Evidences] createEvidenceREMNRO()\nIncoming message:\n'{}'\n Issuer Info: '{}'-'{}'-'{}', " +
                             "Sender Info: '{}'-'{}'-'{}', Recipient Info: '{}'-'{}'-'{}'\nEvent Info: '{}'-'{}'-'{}'-'{}'-'{}'",
-                    XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, issuerKeyPassword, issuerCertAlias, senderKeyStorePath,
-                    senderKeyPassword, senderCertAlias, recipientKeyStorePath, recipientKeyPassword, recipientCertAlias, eventType,
-                    submissionTime, status, title, msguuid);
+                    XMLUtil.documentToString(incomingSoap), issuerKeyStorePath, StringUtils.isNotBlank(issuerKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    issuerCertAlias, senderKeyStorePath, StringUtils.isNotBlank(senderKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    senderCertAlias, recipientKeyStorePath, StringUtils.isNotBlank(recipientKeyPassword) ? HIDDEN_PASSWORD : "N/A",
+                    recipientCertAlias, eventType, submissionTime, status, title, msguuid);
         }
-        String statusmsg = "failure";
+        String messageStatus = "failure";
         if (StringUtils.equals("0", status)) {
 
-            statusmsg = "success";
+            messageStatus = "success";
         }
 
         PDP simplePDP = SimplePDPFactory.getSimplePDP();
-        UnorderedPolicyRepository polrep = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
+        UnorderedPolicyRepository policyRepository = (UnorderedPolicyRepository) simplePDP.getPolicyRepository();
 
         JAXBMarshallerConfiguration conf = new JAXBMarshallerConfiguration();
         conf.setValidateParsing(false);
@@ -338,7 +339,7 @@ public class EvidenceUtils {
         ClassLoader loader;
         loader = EvidenceUtils.class.getClassLoader();
         InputStream inputStream = loader.getResourceAsStream("policy/samplePolicy.xml");
-        polrep.deploy(PolicyMarshaller.unmarshal(inputStream));
+        policyRepository.deploy(PolicyMarshaller.unmarshal(inputStream));
 
         // Read the message as it arrives at the facade
         MessageType messageType;
@@ -347,12 +348,12 @@ public class EvidenceUtils {
             logMessage(incomingSoap);
             messageType = messageInspector.getMessageType();
         } catch (Exception e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            LOGGER.warn("[REM-NRO] Message Type Unknown: '{}'", e.getMessage(), e);
             messageType = new UnknownMessageType(incomingSoap);
         }
-        if (checkCorrectnessOfIHEXCA(messageType)) {
-            LOGGER.info("The message type : '{}' is correct.", messageType);
-        }
+        //TODO: 2021-04-21  Review the following method and if any validation is expected based on the message type.
+        checkCorrectnessOfIHEXCA(messageType);
+
 
         /*
          * Now create the XACML request
@@ -362,7 +363,7 @@ public class EvidenceUtils {
         action.setDataType(new URI(DATATYPE_STRING));
         action.setIdentifier(new URI("urn:eSENS:outcome"));
         actionList.add(action);
-        action.setValue(statusmsg);
+        action.setValue(messageStatus);
 
         LinkedList<XACMLAttributes> environmentList = new LinkedList<>();
         XACMLAttributes environment = new XACMLAttributes();
@@ -379,7 +380,6 @@ public class EvidenceUtils {
 
         /*
          * Call the XACML engine.
-         *
          * The policy has been deployed in the setupBeforeClass.
          */
         EnforcePolicy enforcePolicy = new EnforcePolicy(simplePDP);
@@ -416,7 +416,7 @@ public class EvidenceUtils {
             handler.discharge();
             Utilities.serialize(handler.getMessage().getDocumentElement());
             String oblString = XMLUtil.documentToString(handler.getMessage());
-            if (title == null || title.isEmpty()) {
+            if (StringUtils.isBlank(title)) {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, handler.toString(), "NRO") + ".xml";
             } else {
                 title = getPath() + "nro" + File.separator + getDocumentTitle(msguuid, title, "NRO") + ".xml";
@@ -459,10 +459,10 @@ public class EvidenceUtils {
      */
     public static Document readMessage(String file) throws ParserConfigurationException, SAXException, IOException {
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(new File(file));
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        return documentBuilder.parse(new File(file));
     }
 
     /**
@@ -478,7 +478,7 @@ public class EvidenceUtils {
     private static X509Certificate getCertificate(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
 
-        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
+        LOGGER.debug("X509Certificate getCertificate('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? HIDDEN_PASSWORD : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());
@@ -499,7 +499,7 @@ public class EvidenceUtils {
     private static PrivateKey getSigningKey(String keyStorePath, String keyPassword, String certAlias)
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
 
-        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? "******" : "N/A", certAlias);
+        LOGGER.debug("PrivateKey getSigningKey('{}', '{}', '{}')", keyStorePath, StringUtils.isNotBlank(keyPassword) ? HIDDEN_PASSWORD : "N/A", certAlias);
         KeyStore ks = KeyStore.getInstance("JKS");
         InputStream keyStream = new FileInputStream(new File(keyStorePath));
         ks.load(keyStream, keyPassword == null ? null : keyPassword.toCharArray());
