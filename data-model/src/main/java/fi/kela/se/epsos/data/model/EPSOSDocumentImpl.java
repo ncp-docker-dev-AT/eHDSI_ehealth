@@ -38,25 +38,25 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
 
     private String getDocumentId() {
 
-        String oid = "";
+        String uid = "";
         if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
             if (id.getAttributes().getNamedItem("root") != null) {
-                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
+                uid = uid + id.getAttributes().getNamedItem("root").getTextContent();
             }
             if (id.getAttributes().getNamedItem("extension") != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
+                uid = uid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        logger.info("Document ID: '{}'", oid);
-        return oid;
+        return uid;
     }
 
     @Override
-    public boolean matchesCriteria(SearchCriteria sc) {
+    public boolean matchesCriteria(SearchCriteria searchCriteria) {
 
-        String patientId = sc.getCriteriaValue(Criteria.PatientId);
-        String documentId = sc.getCriteriaValue(Criteria.DocumentId);
+        logger.debug("Processing Search Criteria");
+        String patientId = searchCriteria.getCriteriaValue(Criteria.PatientId);
+        String documentId = searchCriteria.getCriteriaValue(Criteria.DocumentId);
 
         if (patientId != null && !patientId.isEmpty()) {
             return patientId.equals(this.patientId) && documentId != null && documentId.equals(getDocumentId());

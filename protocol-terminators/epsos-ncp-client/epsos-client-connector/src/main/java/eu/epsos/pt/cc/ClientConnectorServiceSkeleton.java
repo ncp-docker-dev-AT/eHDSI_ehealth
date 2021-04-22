@@ -106,7 +106,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
-        if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
+        if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
             throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
         }
 
@@ -178,7 +178,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         GenericDocumentCode tmpCode = retrieveDocumentRequest.getClassCode();
         tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
-        if (!documentCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
+        if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
             throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
         }
 
@@ -187,8 +187,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             XDSDocument request = XdsDocumentDts.newInstance(xdsDocument);
             request.setClassCode(documentCode);
 
-            logger.info("[ClientConnector retrieveDocument()] Document: '{}' homeCommunityId: '{}' targetLanguage: '{}'",
-                    request.getDocumentUniqueId(), homeCommunityId, targetLanguage);
+            logger.info("[ClientConnector retrieveDocument()] homeCommunityId: '{}' targetLanguage: '{}'", homeCommunityId, targetLanguage);
             switch (documentCode.getValue()) {
                 case Constants.PS_CLASSCODE:
                     response = PatientService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
@@ -252,7 +251,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             PatientDemographics patient = submitDocumentRequest.getPatientDemographics();
             String classCodeNode;
             GenericDocumentCode classCode = document.getClassCode();
-            if (!classCode.getSchema().equals(IheConstants.ClASSCODE_SCHEME)) {
+            if (!classCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
                 throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + classCode.getSchema());
             }
             classCodeNode = classCode.getNodeRepresentation();

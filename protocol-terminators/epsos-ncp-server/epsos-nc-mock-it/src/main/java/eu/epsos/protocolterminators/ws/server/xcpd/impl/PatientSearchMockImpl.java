@@ -40,14 +40,18 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
     @Override
     public String getPatientId(String citizenNumber) {
-
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Get Patient ID: '{}'", citizenNumber);
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
 
-        logger.info("[National Infrastructure Mock] Get Patient Demographics: '{}'", getPatientDemographics().toString());
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Get Patient Demographics: '{}'", getPatientDemographics().toString());
+        }
         List<PatientDemographics> result = new ArrayList<>(1);
 
         // Identifying mocked Patient File.
@@ -79,7 +83,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
         // Load Patient properties file.
         Properties properties = new Properties();
         try {
-            logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile.toString());
+            logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile);
             properties.load(new FileInputStream(patientFile.toString()));
 
             PatientDemographics patient = new PatientDemographics();
@@ -119,8 +123,8 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     @Override
     public void setPatientDemographics(PatientDemographics patientDemographics) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(patientDemographics.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Set Patient Demographics: '{}'", patientDemographics.toString());
         }
         this.patientDemographics = patientDemographics;
     }

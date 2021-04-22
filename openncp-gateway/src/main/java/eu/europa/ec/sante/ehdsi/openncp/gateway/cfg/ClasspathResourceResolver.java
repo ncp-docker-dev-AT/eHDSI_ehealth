@@ -15,7 +15,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
     @Override
     public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
 
-        logger.info("--> method resolveResource({}, {}, {}, {}, {})", type, namespaceURI, publicId, systemId, baseURI);
+        logger.debug("--> method resolveResource({}, {}, {}, {}, {})", type, namespaceURI, publicId, systemId, baseURI);
         LSInputImpl input = new LSInputImpl();
 
         InputStream stream = ClasspathResourceResolver.class.getResourceAsStream("/" + systemId);
@@ -23,7 +23,7 @@ public class ClasspathResourceResolver implements LSResourceResolver {
         input.setSystemId(systemId);
         input.setBaseURI(baseURI);
         input.setCharacterStream(new InputStreamReader(stream));
-        
+
         return input;
     }
 }

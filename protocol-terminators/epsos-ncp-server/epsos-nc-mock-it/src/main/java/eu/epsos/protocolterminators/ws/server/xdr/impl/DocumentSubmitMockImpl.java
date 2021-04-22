@@ -43,6 +43,9 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
     @Override
     public void submitDispensation(EPSOSDocument dispensationDocument) throws NIException {
 
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Submit Dispense Document");
+        }
         String dispensation;
         try {
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
@@ -80,8 +83,11 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
     @Override
     public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) {
 
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Submit Discard Dispense Document");
+        }
         logger.info("eDispensation to be discarded: '{}' for Patient: '{}'", dispensationToDiscard.getClassCode(), dispensationToDiscard.getPatientId());
-        logger.info("[National Connector A] Discard Dispense ID: '{}' for ePrescription ID: '{}' operation executed...\n'{}'",
+        logger.info("Discard Dispense ID: '{}' for ePrescription ID: '{}' operation executed...\n'{}'",
                 discardDispenseDetails.getDiscardId(), discardDispenseDetails.getDispenseId(), discardDispenseDetails);
     }
 
@@ -92,6 +98,10 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      */
     @Override
     public void cancelConsent(DocumentAssociation<ConsentDocumentMetaData> consentToDiscard) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Discard Consent Document");
+        }
         logger.info("Consent to be discarded: '{}'", consentToDiscard.getXMLDocumentMetaData().getId());
     }
 
@@ -103,35 +113,33 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
     @Override
     public void submitPatientConsent(EPSOSDocument consentDocument) throws NIException {
 
-        String consent = null;
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Submit Consent Document");
+        }
+        String consent;
         try {
             consent = PrettyPrinter.prettyPrint(consentDocument.getDocument());
         } catch (TransformerException e) {
             logger.error("TransformerException: '{}'", e.getMessage(), e);
-            throwDocumentProcessingException("Cannot parse consent!", "4106");
+            throw new DocumentProcessingException("Cannot parse consent!");
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.debug("Patient consent content: '{}'", consent);
         }
     }
 
-    private void throwDocumentProcessingException(String message, String code) throws DocumentProcessingException {
-
-        DocumentProcessingException documentProcessingException = new DocumentProcessingException();
-        documentProcessingException.setMessage(message);
-        documentProcessingException.setCode(code);
-        throw documentProcessingException;
-    }
-
     @Override
     public void submitHCER(EPSOSDocument hcerDocument) throws DocumentProcessingException {
 
-        String consent = null;
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Submit Health Care Encounter Report");
+        }
+        String consent;
         try {
             consent = PrettyPrinter.prettyPrint(hcerDocument.getDocument());
         } catch (TransformerException e) {
             logger.error("TransformerException: '{}'", e.getMessage(), e);
-            throwDocumentProcessingException("Cannot parse HCER!", "4106");
+            throw new DocumentProcessingException("Cannot parse HCER!");
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.debug("HCER document content: '{}'", consent);

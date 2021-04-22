@@ -10,6 +10,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.EvidenceUtils;
+import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -318,6 +319,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
     public RegistryResponseType discardMedicationDispensed(ProvideAndRegisterDocumentSetRequestType request,
                                                            SOAPHeader soapHeader, EventLog eventLog) throws Exception {
 
+        logger.info("Processing Discard Dispense Medication");
         Element soapHeaderElement = XMLUtils.toDOM(soapHeader);
         documentSubmitService.setSOAPHeader(soapHeaderElement);
         RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
@@ -411,10 +413,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @return
      * @throws Exception
      */
-    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader
-            soapHeader,
+    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader soapHeader,
                                                  EventLog eventLog) throws Exception {
 
+        logger.info("Processing Dispense Medication");
         RegistryResponseType response = new RegistryResponseType();
         String sigCountryCode = null;
 
@@ -587,18 +589,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
             // Traverse all Classification blocks in the ExtrinsicObject selected
             for (ClassificationType classification : extrinsicObject.getClassification()) {
 
-                logger.info("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
-                if (StringUtils.equals(classification.getClassificationScheme(), "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
+                logger.debug("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
+                if (StringUtils.equals(classification.getClassificationScheme(), IheConstants.FORMAT_CODE_SCHEME)) {
 
                     // TODO: check the right LOINC code, currently coded as in example 3.4.2 ver. 2.2 p. 82
                     if (StringUtils.equals(classification.getNodeRepresentation(), "urn:epSOS:ep:dis:2010")) {
                         //  urn:epSOS:ep:dis:2010
-                        logger.info("Dispense Medication");
                         return saveDispensation(request, soapHeader, eventLog);
 
                     } else if (StringUtils.equals(classification.getNodeRepresentation(), "urn:eHDSI:ed:discard:2020")) {
                         //  "urn:eHDSI:ed:discard:2020"
-                        logger.info("Discard Dispense Medication");
                         return discardMedicationDispensed(request, soapHeader, eventLog);
                     }
                 }
@@ -904,17 +904,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private String getDocumentId(org.w3c.dom.Document document) {
 
-        String oid = "";
+        String uid = "";
         if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
             if (id.getAttributes().getNamedItem("root") != null) {
-                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
+                uid = uid + id.getAttributes().getNamedItem("root").getTextContent();
             }
             if (id.getAttributes().getNamedItem("extension") != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
+                uid = uid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        logger.info("Document ID: '{}'", oid);
-        return oid;
+        return uid;
     }
 }

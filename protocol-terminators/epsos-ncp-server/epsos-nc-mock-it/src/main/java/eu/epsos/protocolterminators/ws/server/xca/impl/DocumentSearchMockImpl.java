@@ -236,7 +236,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     }
                 }
                 author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
-                        StringUtils.trim(family.toString()), suffix.toString());
+                        StringUtils.trim(family.toString()), suffix);
             }
         }
         return StringUtils.trim(author);
@@ -282,19 +282,19 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) {
 
         if (logger.isInfoEnabled()) {
-            logger.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
+            logger.info("[National Infrastructure Mock] Get Patient Summary Document List: '{}'", searchCriteria.toString());
         }
         for (DocumentAssociation<PSDocumentMetaData> documentAssociation : psDocumentMetaDatas) {
 
             if (documentAssociation.getXMLDocumentMetaData() != null) {
-                logger.info("Patient ID: '{}'", documentAssociation.getXMLDocumentMetaData().getPatientId());
+                logger.debug("Patient ID: '{}'", documentAssociation.getXMLDocumentMetaData().getPatientId());
             } else {
-                logger.info("Document Association is null");
+                logger.debug("Document Association is null");
             }
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 }
                 return documentAssociation;
             }
@@ -306,7 +306,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) {
 
         if (logger.isInfoEnabled()) {
-            logger.info("getEPDocumentList(SearchCriteria searchCriteria)");
+            logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
         }
         List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
 
@@ -314,8 +314,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 metaDatas.add(documentAssociation);
-                if (logger.isInfoEnabled()) {
-                    logger.info("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 }
             }
         }
@@ -325,14 +325,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     @Override
     public EPSOSDocument getDocument(SearchCriteria searchCriteria) {
 
-        logger.info("[NI] Get Document: '{}', '{}', '{}'", searchCriteria.getCriteriaValue(Criteria.DocumentId),
+        logger.info("[National Infrastructure Mock] Retrieve Document: '{}', '{}', '{}'", searchCriteria.getCriteriaValue(Criteria.DocumentId),
                 searchCriteria.getCriteriaValue(Criteria.PatientId), searchCriteria.getCriteriaValue(Criteria.RepositoryId));
-        for (EPSOSDocument doc : documents) {
-            if (doc.matchesCriteria(searchCriteria)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getDocument(SearchCriteria searchCriteria): '{}'", doc.toString());
+        for (EPSOSDocument epsosDocument : documents) {
+            if (epsosDocument.matchesCriteria(searchCriteria)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("getDocument(SearchCriteria searchCriteria): '{}'", epsosDocument);
                 }
-                return doc;
+                return epsosDocument;
             }
         }
 
@@ -343,16 +343,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     public DocumentAssociation<MroDocumentMetaData> getMroDocumentList(SearchCriteria searchCriteria) {
 
         if (logger.isInfoEnabled()) {
-            logger.info("getMroDocumentList(SearchCriteria searchCriteria): '{}'", searchCriteria.toString());
+            logger.info("[National Infrastructure Mock] Get Medication Related Overview Document List: '{}'", searchCriteria.toString());
         }
-        for (DocumentAssociation<MroDocumentMetaData> da : mroDocumentMetaDatas) {
+        for (DocumentAssociation<MroDocumentMetaData> documentAssociation : mroDocumentMetaDatas) {
 
-            if (da.getXMLDocumentMetaData() != null
-                    && da.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("getMroDocumentList(SearchCriteria searchCriteria): '{}'", da.toString());
+            if (documentAssociation.getXMLDocumentMetaData() != null
+                    && documentAssociation.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("getMroDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 }
-                return da;
+                return documentAssociation;
             }
         }
 
@@ -375,7 +375,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 oid = oid + "^" + id.getAttributes().getNamedItem(CONSTANT_EXTENSION).getTextContent();
             }
         }
-        logger.info("CDA Document ID: '{}'", oid);
+        logger.debug("CDA Document ID: '{}'", oid);
         return oid;
     }
 
@@ -415,7 +415,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     private void wrapPDFinCDA(byte[] pdf, Document doc) {
 
-        logger.info("NameSpace: '{}', Document URI '{}', XML encoding: '{}', BaseURI: '{}'", doc.getNamespaceURI(),
+        logger.debug("NameSpace: '{}', Document URI '{}', XML encoding: '{}', BaseURI: '{}'", doc.getNamespaceURI(),
                 doc.getDocumentURI(), doc.getXmlEncoding(), doc.getBaseURI());
 
         // Remove old component element
@@ -445,7 +445,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         Node rootNode = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "ClinicalDocument").item(0);
 
         rootNode.replaceChild(newComponent, oldComponent);
-        logger.info("PDF document added.");
+        logger.debug("PDF document added.");
     }
 
     /**
