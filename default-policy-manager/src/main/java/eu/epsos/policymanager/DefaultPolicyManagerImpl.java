@@ -180,6 +180,22 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
+     * @param assertion
+     * @param documentClass
+     * @throws MissingFieldException
+     * @throws InvalidFieldException
+     */
+    @Override
+    public void XSPAOrganizationIdValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+
+        String organizationId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION_ID);
+        if (StringUtils.isBlank(organizationId)) {
+            throw new InvalidFieldException("XSPA Organization ID 'urn:oasis:names:tc:xspa:1.0:subject:organization-id' attribute in assertion should be filled.");
+        }
+        logger.debug("HCP Identity Assertion XSPA Organization ID: '{}", organizationId);
+    }
+
+    /**
      * @param assertion - SAML user assertion.
      * @throws InsufficientRightsException - User doesn't have enough privileges.
      */

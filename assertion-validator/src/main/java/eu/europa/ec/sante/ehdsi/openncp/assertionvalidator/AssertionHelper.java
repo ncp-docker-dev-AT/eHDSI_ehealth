@@ -15,7 +15,7 @@ import java.util.List;
 public class AssertionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHelper.class);
-    private static final String ERROR_MESSAGE = "'{0}' - attribute shall contain AttributeValue element.";
+    private static final String ERROR_MESSAGE = "{0} - attribute shall contain AttributeValue element.";
 
     private AssertionHelper() {
     }
@@ -36,12 +36,14 @@ public class AssertionHelper {
                     if (!a.getAttributeValues().isEmpty()) {
                         return a.getAttributeValues().get(0).getDOM().getTextContent();
                     } else {
-                        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+                        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attribute);
+                        throw new MissingFieldException(errorMessage);
                     }
                 }
             }
         }
-        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attribute);
+        throw new MissingFieldException(errorMessage);
     }
 
     /**
@@ -61,7 +63,8 @@ public class AssertionHelper {
                 }
             }
         }
-        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attribute);
+        throw new MissingFieldException(errorMessage);
     }
 
     /**
