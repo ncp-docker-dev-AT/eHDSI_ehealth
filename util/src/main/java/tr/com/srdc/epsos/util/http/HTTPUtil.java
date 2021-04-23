@@ -83,7 +83,7 @@ public class HTTPUtil {
 
     private static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
 
-        HttpsURLConnection con = null;
+        HttpsURLConnection urlConnection = null;
 
         if (!sslValidation) {
 
@@ -91,7 +91,7 @@ public class HTTPUtil {
 
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                    return new X509Certificate[0];
                 }
 
                 @Override
@@ -113,26 +113,26 @@ public class HTTPUtil {
                 keyManagerFactory.init(keyStore, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
 
                 // Install the all-trusting trust manager
-                SSLContext sc;
-                sc = SSLContext.getInstance("TLSv1.2");
-                sc.init(keyManagerFactory.getKeyManagers(), trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                SSLContext sslContext;
+                sslContext = SSLContext.getInstance("TLSv1.2");
+                sslContext.init(keyManagerFactory.getKeyManagers(), trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
                 URL url;
                 url = new URL(host);
-                con = (HttpsURLConnection) url.openConnection();
-                con.setHostnameVerifier((hostname, session) -> true);
-                con.setSSLSocketFactory(sc.getSocketFactory());
-                con.connect();
-                return con.getServerCertificates();
+                urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setHostnameVerifier((hostname, session) -> true);
+                urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                urlConnection.connect();
+                return urlConnection.getServerCertificates();
 
             } catch (IOException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
                     | KeyManagementException | CertificateException e) {
                 LOGGER.error("Error: '{}'", e.getMessage(), e);
             } finally {
 
-                if (con != null) {
-                    con.disconnect();
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
                 }
             }
         }
@@ -163,9 +163,9 @@ public class HTTPUtil {
      */
     public static String getServerCertificate(String endpoint) {
 
-        LOGGER.info("Trying to find certificate from : '{}'", endpoint);
+        LOGGER.debug("Trying to find certificate from : '{}'", endpoint);
         String result = "";
-        HttpsURLConnection con = null;
+        HttpsURLConnection urlConnection = null;
 
         try {
             if (!endpoint.startsWith("https")) {
@@ -175,13 +175,13 @@ public class HTTPUtil {
 
                 URL url;
                 url = new URL(endpoint);
-                con = (HttpsURLConnection) url.openConnection();
+                urlConnection = (HttpsURLConnection) url.openConnection();
                 //TODO: not sustainable solution: EHNCP-1363
-                con.setHostnameVerifier((hostname, session) -> true);
+                urlConnection.setHostnameVerifier((hostname, session) -> true);
                 // End EHNCP-1363
-                con.setSSLSocketFactory(sslsocketfactory);
-                con.connect();
-                Certificate[] certs = con.getServerCertificates();
+                urlConnection.setSSLSocketFactory(sslsocketfactory);
+                urlConnection.connect();
+                Certificate[] certs = urlConnection.getServerCertificates();
 
                 // Get the first certificate
                 if (certs != null && certs.length > 0) {
@@ -194,8 +194,8 @@ public class HTTPUtil {
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         } finally {
-            if (con != null) {
-                con.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
             }
         }
         LOGGER.debug("Server Certificate: '{}'", result);

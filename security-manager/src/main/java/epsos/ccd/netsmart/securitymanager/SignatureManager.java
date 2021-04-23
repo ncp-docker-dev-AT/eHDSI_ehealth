@@ -57,7 +57,7 @@ import java.util.List;
 public class SignatureManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManager.class);
-    private KeyStoreManager keyManager;
+    private final KeyStoreManager keyManager;
     private String signatureAlgorithm;
     private String digestAlgorithm;
 
@@ -101,14 +101,13 @@ public class SignatureManager {
                 profileValidator.validate(sig);
             } catch (SignatureException e) {
                 // Indicates signature did not conform to SAML Signature profile
-                LOGGER.error("ValidationException: '{}'", e.getMessage(), e);
                 throw new SMgrException("SAML Signature Profile Validation: " + e.getMessage());
             }
 
             X509Certificate cert;
             List<X509Certificate> certificates = KeyInfoSupport.getCertificates(sig.getKeyInfo());
             for (X509Certificate certificate : certificates) {
-                LOGGER.info("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
+                LOGGER.debug("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
             }
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
@@ -121,14 +120,12 @@ public class SignatureManager {
             }
 
             BasicX509Credential verificationCredential = new BasicX509Credential(cert);
-            LOGGER.info("[Security] SAML certificate validation");
 
             try {
                 SignatureValidator.validate(sig, verificationCredential);
 
             } catch (SignatureException e) {
                 // Indicates signature was not cryptographically valid, or possibly a processing error
-                LOGGER.error("SignatureException: '{}'", e.getMessage(), e);
                 throw new SMgrException("Signature Validation: " + e.getMessage());
             }
             CertificateValidator cv = new CertificateValidator(keyManager.getTrustStore());
@@ -176,14 +173,13 @@ public class SignatureManager {
             }
 
         } catch (XMLSignatureException | MarshalException ex) {
-            LOGGER.error(null, ex);
             throw new SMgrException("Signature Invalid: " + ex.getMessage(), ex);
         }
 
     }
 
     /**
-     * Signs a Signable SAML Object using the private key with alias <i>keyAlias</i>.
+     * Signs a SAML Object using the private key with alias <i>keyAlias</i>.
      * Uses the OpenSAML2 library.
      *
      * @param as          The Signable SAML Object that is going to be signed. Usually a SAML Assertion
@@ -223,7 +219,6 @@ public class SignatureManager {
         try {
             value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
         } catch (CertificateEncodingException e) {
-            LOGGER.error("CertificateEncodingException: '{}'", e.getMessage(), e);
             throw new SMgrException(e.getMessage(), e);
         }
         x509Certificate.setValue(value);
@@ -236,7 +231,6 @@ public class SignatureManager {
             MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
             marshallerFactory.getMarshaller(as).marshall(as);
         } catch (MarshallingException e) {
-            LOGGER.error("MarshallingException: '{}'", e.getMessage(), e);
             throw new SMgrException(e.getMessage(), e);
         }
         try {
@@ -308,7 +302,6 @@ public class SignatureManager {
 
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchAlgorithmException
                 | InvalidAlgorithmParameterException | MarshalException | XMLSignatureException ex) {
-            LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage(), ex);
         }
     }

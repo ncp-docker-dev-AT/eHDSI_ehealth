@@ -67,13 +67,7 @@ public class TransformationService implements ITransformationService, TMConstant
         StopWatch watch = new StopWatch();
         watch.start();
         TMResponseStructure responseStructure = process(epSOSOriginalData, null, true);
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            try {
-                loggerClinical.debug("PIVOT CDA: \n'{}'", XMLUtil.prettyPrint(responseStructure.getDocument()));
-            } catch (Exception e) {
-                logger.error("XML Transformation Exception: '{}'", e.getMessage(), e);
-            }
-        }
+
         watch.stop();
         logger.info("Transformation of CDA executed in: '{}ms'", watch.getTotalTimeMillis());
         logger.info("Transforming OpenNCP CDA Document toEpsosPivot [END]");
@@ -279,7 +273,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 // create & fill TMResponseStructure
                 responseStructure = new TMResponseStructure(finalDoc, status, errors, warnings);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("TM result:\n{}", responseStructure.toString());
+                    logger.debug("TM result:\n{}", responseStructure);
                 }
             }
         } catch (TMException e) {
@@ -297,7 +291,7 @@ public class TransformationService implements ITransformationService, TMConstant
             status = STATUS_FAILURE;
             errors.add(TMError.ERROR_PROCESSING_ERROR);
             responseStructure = new TMResponseStructure(inputDocument, status, errors, warnings);
-            logger.error("Exception: TM Error Code: '{}'", TMError.ERROR_PROCESSING_ERROR.toString(), e);
+            logger.error("Exception: TM Error Code: '{}'", TMError.ERROR_PROCESSING_ERROR, e);
         }
 
         // Transformation Service - Audit Message Handling
@@ -617,7 +611,7 @@ public class TransformationService implements ITransformationService, TMConstant
 
                         CodedElement ce = new CodedElement(originalElement);
                         if (logger.isDebugEnabled()) {
-                            logger.debug("translation element - skipping: '{}'", ce.toString());
+                            logger.debug("translation element - skipping: '{}'", ce);
                         }
                         continue;
                     }
@@ -808,7 +802,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 return true;
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Processing failure! for Code: '{}'", codedElement.toString());
+                    logger.debug("Processing failure! for Code: '{}'", codedElement);
                 }
                 errors.addAll(tsamResponse.getErrors());
                 warnings.addAll(tsamResponse.getWarnings());
@@ -907,8 +901,8 @@ public class TransformationService implements ITransformationService, TMConstant
                 oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isInfoEnabled()) {
-            loggerClinical.info("Document OID: '{}'", oid);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Document OID: '{}'", oid);
         }
         return oid;
     }

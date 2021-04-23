@@ -1,5 +1,6 @@
 package eu.epsos.dts.xds;
 
+import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
@@ -87,7 +88,7 @@ public final class AdhocQueryResponseConverter {
                     for (int j = 0; j < eo.getValue().getClassification().size(); j++) {
                         str = eo.getValue().getClassification().get(j).getClassificationScheme();
                         //Set isPDF
-                        if (str.equals("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
+                        if (StringUtils.equals(str, IheConstants.FORMAT_CODE_SCHEME)) {
                             if (eo.getValue().getClassification().get(j).getNodeRepresentation().equals("urn:ihe:iti:xds-sd:pdf:2008")) {
                                 document.setPDF(true);
                             } else {
