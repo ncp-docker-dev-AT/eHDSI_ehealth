@@ -9,6 +9,7 @@ This version is planned to be used as the official eHDSI Wave 4 GoLive release f
 <br/>Practitioner SAML token definition has been updated, and the field urn:oasis:names:tc:xspa:1.0:subject:organization-id is now mandatory.
 <br/>Patient identifier root id is not overwritten anymore by the eHNCP Home Community ID during the XCA List operation.
 <br/>XDS metadata improvement (data extracted from CDA instead of static values).
+<br/>OpenNCP Gateway fix related to multiple database support.
 <br/>Minor bug fixing on the Discard Dispense Medication operation.
 <br/>Minor bug fixing into the CDA Display Tool (missing translation).
 
