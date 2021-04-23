@@ -3,7 +3,40 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
-## [5.1.3] - 08-02-2020
+## [5.1.4] - 23-04-2021
+The OpenNCP 5.1.4 release is the CEF eHDSI Wave 4 Operation Ready version based on the Formal Test event feedback.
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 Jul 2021 .
+<br/>Practitioner SAML token definition has been updated, and the field urn:oasis:names:tc:xspa:1.0:subject:organization-id is now mandatory.
+<br/>Patient identifier root id is not overwritten anymore by the eHNCP Home Community ID during the XCA List operation.
+<br/>XDS metadata improvement (data extracted from CDA instead of static values).
+<br/>Minor bug fixing on the Discard Dispense Medication operation.
+<br/>Minor bug fixing into the CDA Display Tool (missing translation).
+
+### Bug
+- [EHNCP-1851] - Patient ID is not the same in XCA List Response and CDA record target.
+- [EHNCP-2077] - [CDA Display Tool] Hardcoded label not retrieved from EpsosRepository value set XML.
+- [EHNCP-2079] - XML audit evidences not generated on the correct folder after CDA transformation.
+- [EHNCP-2080] - OpenNCP Gateway is forcing the use of MySQL hibernate.dialect.
+- [EHNCP-2085] - XDS Metadata shall be aligned with CDA content exchanged.
+- [EHNCP-2086] - XDR Discard operation doesn't return transaction status.
+- [EHNCP-2087] - SAML Organization and Organization-ID are not processed properly during the Discard operation.
+- [EHNCP-2088] - XDS metadata "languageCode" hardcoded in XDR transaction.
+
+### Improvement
+- [EHNCP-217] - Circular dependency between unused XHTML pages.
+
+### Decision
+- [EHNCP-2089] - Organisation-id in SAML assertion vs. disp CDA value representedOrganization.
+
+### Issue
+- [EHNCP-2090] - Clinical logs have multiple occurrences of the same message.
+
+### Test
+- [EHNCP-2094] - Test Cases_01_OpenNCPeH Actor verifies XDS Metadata is aligned with CDA content exchanged.
+- [EHNCP-2095] - Test Cases_02_OpenNCPeH Actor verifies the XDR Discard operation return transaction status
+- [EHNCP-2096] - Test Cases_03_OpenNCPeH Actor XDS metadata "languageCode" hardcoded in XDR transaction.
+
+## [5.1.3] - 08-02-2021
 The OpenNCP 5.1.3 release is the CEF eHDSI Wave 4 Formal Test Event Security HotFix version.
 <br/>Vulnerabilities contained into the project dependencies have been removed
 <br/>OpenNCP Configuration Manager transaction handling improvement.
@@ -20,7 +53,7 @@ The OpenNCP 5.1.3 release is the CEF eHDSI Wave 4 Formal Test Event Security Hot
 ### Improvement
 - [EHNCP-2057] - Configuration Manager - Save or Update operation using transaction rollback.
 
-## [5.1.2] - 11-01-2020
+## [5.1.2] - 11-01-2021
 The OpenNCP 5.1.2 release is the CEF eHDSI Wave 4 Formal Test Event HotFix version.
 <br/>eHDSI Testing Portals inherited from the epSOS Pilot have been removed from the Reference Implementation.
 <br/>CDA DisplayTool improvements and bug fix reported during the Wave 4 Preparatory Test Event.
