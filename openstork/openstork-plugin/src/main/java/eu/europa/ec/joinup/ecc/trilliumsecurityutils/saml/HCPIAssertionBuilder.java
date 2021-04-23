@@ -1,5 +1,6 @@
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -19,7 +20,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.*;

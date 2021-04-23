@@ -1,23 +1,3 @@
-/**
- * Copyright (c) 2009-2011 Misys Open Source Solutions (MOSS) and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * Misys Open Source Solutions - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.net;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,31 +17,30 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 /**
- * A simple class for dealing with certificate management. <p />
+ * A simple class for dealing with certificate management.
  * <p/>
- * This is a single point of entry for the entire suite of ssl
- * key and certificate handling functions.  Basically you should
- * use it as a static class for obtaining KeyManager s and
- * TrustManager s.  KeyManagers hold keys and as such require
- * passwords.  TrustManagers on the other hand only hold certificates
- * and as such do not require passwords.  You should also use it
- * to obtain the KeyStore needed to generate the KeyManager s and
- * TrustManager s.  <p />
  * <p/>
- * Once everything is complete, this should only be used by the
- * ConnectionFactory and should never be called directly. <p />
+ * This is a single point of entry for the entire suite of ssl key and certificate handling functions.
+ * Basically you should use it as a static class for obtaining KeyManager s and TrustManager s.
+ * KeyManagers hold keys and as such require passwords.
+ * TrustManagers on the other hand only hold certificates and as such do not require passwords.
+ * You should also use it to obtain the KeyStore needed to generate the KeyManager s and TrustManager s.
  * <p/>
- * (Actually that means that these should all be protected and
- * not public, but I think that would break the unit tests.) <p />
- *
- * @author Josh Flachsbart
+ * <p/>
+ * Once everything is complete, this should only be used by the ConnectionFactory and should never be called directly.
+ * <p/>
+ * <p/>
+ * (Actually that means that these should all be protected and not public, but I think that would break the unit tests.)
+ * <p/>
  */
 public class ConnectionCertificateHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("org.openhealthtools.openatna.net.ConnectionCertificateHandler");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCertificateHandler.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
 
+    private ConnectionCertificateHandler() {
+    }
 
     /**
      * Creates a key/trust store and loads in the corresponding file.
@@ -142,8 +121,8 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
-                    LOGGER_CLINICAL.info(message.toString());
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
+                    LOGGER_CLINICAL.debug(message.toString());
                 }
             }
         }
@@ -171,8 +150,9 @@ public class ConnectionCertificateHandler {
                 message += "\n  Valid until: " + cert.getNotAfter();
                 message += "\n  Issuer: " + cert.getIssuerDN();
             }
-            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
-                LOGGER_CLINICAL.info(message);
+            if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")
+                    && LOGGER_CLINICAL.isDebugEnabled()) {
+                LOGGER_CLINICAL.debug(message);
             }
         }
     }
@@ -203,33 +183,10 @@ public class ConnectionCertificateHandler {
                         message.append("\n  Issuer: ").append(x509Certificate.getIssuerDN());
                     }
                 }
-                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")) {
-                    LOGGER_CLINICAL.info(message.toString());
+                if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
+                    LOGGER_CLINICAL.debug(message.toString());
                 }
             }
-        }
-    }
-
-    public static void main(String[] args) {
-
-        try {
-            KeyStore ks = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/keystore"), "password");
-            ConnectionCertificateHandler.printKeyCertificates(ks);
-            KeyManager[] kms = ConnectionCertificateHandler.createKeyManagers(ks, "password");
-            LOGGER.info("Printing all key managers:");
-            for (KeyManager km : kms) {
-                LOGGER.info(km.toString());
-            }
-            KeyStore ts = ConnectionCertificateHandler.createKeyStore(new URL("file:certs/truststore"), "password");
-            ConnectionCertificateHandler.printTrustCerts(ts);
-            TrustManager[] tms = ConnectionCertificateHandler.createTrustManagers(ts, null);
-            LOGGER.info("Printing all trust managers:");
-            for (TrustManager tm : tms) {
-                LOGGER.info(tm.toString());
-            }
-
-        } catch (Exception e) {
-            LOGGER.info("Top Level Error: " + e);
         }
     }
 }

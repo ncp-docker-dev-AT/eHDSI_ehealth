@@ -48,7 +48,7 @@ import java.util.Scanner;
 @Service
 public class SMPConverter {
 
-    private static JAXBContext jaxbContext;
+    private static final JAXBContext jaxbContext;
 
     static {
         try {
@@ -142,7 +142,7 @@ public class SMPConverter {
                     String certAlias = environment.getProperty(type + ".certificate.alias");
                     String certificatePass = ConfigurationManagerFactory.getConfigurationManager().getProperty(certPass);
                     String certificateAlias = ConfigurationManagerFactory.getConfigurationManager().getProperty(certAlias);
-                    logger.info("Certificate Info: '{}', '{}', '{}', '{}'", certAlias, certificateAlias, certPass,
+                    logger.debug("Certificate Info: '{}', '{}', '{}', '{}'", certAlias, certificateAlias, certPass,
                             StringUtils.isNotBlank(certificatePass) ? "******" : "N/A");
 
                     // eHDSI OpenNCP has been using only JKS keystore.
@@ -592,7 +592,7 @@ public class SMPConverter {
      */
     private void getXMLFile(ServiceMetadata serviceMetadata) {
 
-        logger.info("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
+        logger.debug("Generate XML SMP file: '{}'", serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue());
 
         // Generates the final SMP XML file
         XMLStreamWriter xsw;
@@ -623,8 +623,7 @@ public class SMPConverter {
             jaxbMarshaller.marshal(serviceMetadata, generatedFileOS);
             jaxbMarshaller.marshal(serviceMetadata, stringWriter);
 
-            logger.info("Service Metadata:\n{}", stringWriter);
-
+            logger.debug("Service Metadata:\n{}", stringWriter);
             generatedFileOS.flush();
 
         } catch (JAXBException | IOException | XMLStreamException e) {

@@ -211,7 +211,7 @@ public class SamlTRCIssuer {
                                    List<Attribute> attrValuePair) throws SMgrException {
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
+            loggerClinical.debug("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                     hcpIdentityAssertion.getID(), patientID, purposeOfUse);
         }
         // Initializing the Map

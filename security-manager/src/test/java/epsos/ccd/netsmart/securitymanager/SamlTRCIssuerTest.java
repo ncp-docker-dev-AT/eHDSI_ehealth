@@ -77,7 +77,7 @@ public class SamlTRCIssuerTest {
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(samlasRoot);
             // Unmarshall using the document root element, an EntitiesDescriptor in this case
             Assertion hcpIdentityAssertion = (Assertion) unmarshaller.unmarshall(samlasRoot);
-            LOGGER.info("Name Id Value:{0}", hcpIdentityAssertion.getSubject().getNameID().getValue());
+            LOGGER.info("Name Id Value:{}", hcpIdentityAssertion.getSubject().getNameID().getValue());
             String patientID = "theID";
             List<Attribute> attrValuePair = null;
             SamlTRCIssuer instance = new SamlTRCIssuer();

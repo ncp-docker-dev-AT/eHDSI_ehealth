@@ -112,9 +112,9 @@
                                                         <xsl:otherwise>
                                                             <tr bgcolor="#E6F2FF">
                                                                 <th>
-                                                                    <!-- Medicinal product -->
-                                                                    <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                                    Medicinal product
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'128'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Active ingredient -->

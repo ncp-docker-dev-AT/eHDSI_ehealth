@@ -356,6 +356,7 @@ public class SAML2Validator {
         policyManager.XSPARoleValidator(assertion, classCode);
         policyManager.HealthcareFacilityValidator(assertion, classCode);
         policyManager.PurposeOfUseValidator(assertion, classCode);
+        policyManager.XSPAOrganizationIdValidator(assertion, classCode);
         policyManager.XSPALocalityValidator(assertion, classCode);
 
         //TODO: [Mustafa, 2012.07.05] The original security manager was extended to return the two-letter country code

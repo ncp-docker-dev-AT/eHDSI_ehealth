@@ -109,7 +109,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                                 "SOAP Action to use the RawXMLProvider");
             }
 
-            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
             String methodName;
             Document eDispenseCda;
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
@@ -149,7 +149,6 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
-                    LOGGER.info("[XDR] ServiceMessageReceiverInOut: '{}'", eventLog.toString());
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 

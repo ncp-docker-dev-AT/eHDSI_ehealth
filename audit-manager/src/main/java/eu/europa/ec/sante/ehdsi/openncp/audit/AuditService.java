@@ -48,8 +48,8 @@ public class AuditService implements MessageHandlerListener {
 
         try {
             if (eventObject instanceof EventLog) {
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isInfoEnabled()) {
-                    loggerClinical.info("Processing EventLog: '{}'", eventObject != null ? eventObject.toString() : "Event Log is null");
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                    loggerClinical.debug("Processing EventLog: '{}'", eventObject != null ? eventObject.toString() : "Event Log is null");
                 }
 
                 EventLog eventLog = (EventLog) eventObject;
