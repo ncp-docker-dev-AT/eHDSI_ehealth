@@ -21,7 +21,8 @@ This version is planned to be used as the official eHDSI Wave 4 GoLive release f
 - [EHNCP-2085] - XDS Metadata shall be aligned with CDA content exchanged.
 - [EHNCP-2086] - XDR Discard operation doesn't return transaction status.
 - [EHNCP-2087] - SAML Organization and Organization-ID are not processed properly during the Discard operation.
-- [EHNCP-2088] - XDS metadata "languageCode" hardcoded in XDR transaction.
+- [EHNCP-2088] - XDS metadata "languageCode" hardcoded in XDR transaction. 
+- [EHNCP-2107] - Common Components - Dynamic Discovery missing dependency at runtime.
 
 ### Improvement
 - [EHNCP-217] - Circular dependency between unused XHTML pages.
