@@ -7,6 +7,7 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.Insufficie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.common.xml.SAMLSchemaBuilder;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -54,6 +56,7 @@ public class SAML2Validator {
     public static String validateXCPDHeader(Element soapHeader) throws MissingFieldException, InsufficientRightsException,
             InvalidFieldException, XSDValidationException, SMgrException {
 
+        LOGGER.debug("[SAML] Validating XCPD Header.");
         String sigCountryCode = null;
 
         NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
@@ -109,6 +112,7 @@ public class SAML2Validator {
     public static String validateXCAHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
+        LOGGER.debug("[SAML] Validating XCA Header.");
         String sigCountryCode;
 
         try {
@@ -184,6 +188,7 @@ public class SAML2Validator {
     public static String validateXDRHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
+        LOGGER.debug("[SAML] Validating XDR Header.");
         String sigCountryCode;
 
         try {
@@ -234,7 +239,6 @@ public class SAML2Validator {
             sigCountryCode = checkHCPAssertion(hcpAssertion, classCode);
             policyManager.XDRPermissionValidator(hcpAssertion, classCode);
             checkTRCAssertion(trcAssertion, classCode);
-
             checkTRCAdviceIdReferenceAgainstHCPId(trcAssertion, hcpAssertion);
         } catch (IOException | UnmarshallingException | SAXException e) {
             LOGGER.error("", e);
@@ -356,7 +360,9 @@ public class SAML2Validator {
         policyManager.XSPARoleValidator(assertion, classCode);
         policyManager.HealthcareFacilityValidator(assertion, classCode);
         policyManager.PurposeOfUseValidator(assertion, classCode);
-        policyManager.XSPAOrganizationIdValidator(assertion, classCode);
+        if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
+            policyManager.XSPAOrganizationIdValidator(assertion, classCode);
+        }
         policyManager.XSPALocalityValidator(assertion, classCode);
 
         //TODO: [Mustafa, 2012.07.05] The original security manager was extended to return the two-letter country code
@@ -366,7 +372,6 @@ public class SAML2Validator {
         try {
             sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
         } catch (SMgrException e) {
-            LOGGER.error("IOException: '{}'", e.getMessage(), e);
             throw e;
         }
 
@@ -416,7 +421,7 @@ public class SAML2Validator {
     }
 
     /**
-     * @param sh
+     * @param soapHeader
      * @return
      * @throws MissingFieldException
      * @throws XSDValidationException

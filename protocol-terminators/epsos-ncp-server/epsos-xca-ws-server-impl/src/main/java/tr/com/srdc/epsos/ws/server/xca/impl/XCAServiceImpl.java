@@ -743,7 +743,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
-    private void AdhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
+    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
                                            EventLog eventLog) throws Exception {
 
         String sigCountryCode = null;
@@ -1509,7 +1509,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         AdhocQueryResponse result = ofQuery.createAdhocQueryResponse();
         try {
-            AdhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
+            adhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
         } catch (UnsupportedOperationException uoe) {
             result = handleUnsupportedOperationException(adhocQueryRequest, uoe);
         }

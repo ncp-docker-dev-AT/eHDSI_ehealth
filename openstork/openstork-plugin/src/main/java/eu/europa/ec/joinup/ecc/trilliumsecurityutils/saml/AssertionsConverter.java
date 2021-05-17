@@ -97,11 +97,11 @@ public class AssertionsConverter {
         auditDataMap = new HashMap<>();
 
         try {
-            //initializing the map
+            // Initializing the map
             auditDataMap.clear();
             XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
-            //Doing an indirect copy so, because when cloning, signatures are lost.
+            // Doing an indirect copy so, because when cloning, signatures are lost.
             SignatureManager sman = new SignatureManager(ksm);
 
             try {
@@ -160,43 +160,43 @@ public class AssertionsConverter {
             auditDataMap.put("humanRequestorNameID", hcpIdentityAssertion.getSubject().getNameID().getValue());
             auditDataMap.put("humanRequestorSubjectID", nameid.getValue());
 
-            //Create and add Subject Confirmation
+            // Create and add Subject Confirmation
             SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
             subjectConf.setMethod(SubjectConfirmation.METHOD_SENDER_VOUCHES);
             trc.getSubject().getSubjectConfirmations().add(subjectConf);
 
-            //Create and add conditions
+            // Create and add conditions
             Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
             conditions.setNotBefore(nowUTC.toDateTime());
             conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
             trc.setConditions(conditions);
 
-            //Create and add Advice
+            //  Create and add Advice
             Advice advice = create(Advice.class, Advice.DEFAULT_ELEMENT_NAME);
             trc.setAdvice(advice);
 
-            //Create and add AssertionIDRef
+            // Create and add AssertionIDRef
             AssertionIDRef aIdRef = create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
             aIdRef.setAssertionID(hcpIdentityAssertion.getID());
             advice.getAssertionIDReferences().add(aIdRef);
 
-            //Add and create the authentication statement
+            // Add and create the authentication statement
             AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
             authStmt.setAuthnInstant(nowUTC.toDateTime());
             trc.getAuthnStatements().add(authStmt);
 
-            //Creata and add AuthnContext
+            // Create and add AuthnContext
             AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
             AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setAuthnContextClassRef(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
-            // Create the Saml Attribute Statement
+            //  Create the Saml Attribute Statement
             AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
             trc.getStatements().add(attrStmt);
 
-            //Creating the Attribute that holds the Patient ID
+            // Creating the Attribute that holds the Patient ID
             Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             attrPID.setFriendlyName("XSPA Subject");
 
@@ -204,14 +204,14 @@ public class AssertionsConverter {
             attrPID.setName("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
             attrPID.setNameFormat(Attribute.URI_REFERENCE);
 
-            //Create and add the Attribute Value
+            // Create and add the Attribute Value
             XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
             XSString attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
             attrValPID.setValue(patientID);
             attrPID.getAttributeValues().add(attrValPID);
             attrStmt.getAttributes().add(attrPID);
 
-            //Creating the Attribute that holds the Purpose of Use
+            // Creating the Attribute that holds the Purpose of Use
             Attribute attrPoU = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             attrPoU.setFriendlyName("XSPA Purpose Of Use");
 
@@ -258,7 +258,6 @@ public class AssertionsConverter {
             sman.signSAMLAssertion(trc);
             return trc;
         } catch (Exception ex) {
-            LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
     }
@@ -299,10 +298,10 @@ public class AssertionsConverter {
         LOGGER.info("is x509 subject?: {}", format.equals(NameID.X509_SUBJECT));
         LOGGER.info("is Unspecified?: {}", format.equals(NameID.UNSPECIFIED));
 
-        NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
-        n.setFormat(format);
-        n.setValue(subject.getNameID().getValue());
-        return n;
+        NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
+        nameID.setFormat(format);
+        nameID.setValue(subject.getNameID().getValue());
+        return nameID;
     }
 
     private static Assertion createEpsosAssertion(String username, String role, String organization, String organizationId,
