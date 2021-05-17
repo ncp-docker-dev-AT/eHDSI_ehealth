@@ -217,7 +217,7 @@ public class SignatureManager {
 
         String value;
         try {
-            value = org.apache.xml.security.utils.Base64.encode(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
+            value = org.apache.commons.codec.binary.Base64.encodeBase64String(((BasicX509Credential) signingCredential).getEntityCertificate().getEncoded());
         } catch (CertificateEncodingException e) {
             throw new SMgrException(e.getMessage(), e);
         }

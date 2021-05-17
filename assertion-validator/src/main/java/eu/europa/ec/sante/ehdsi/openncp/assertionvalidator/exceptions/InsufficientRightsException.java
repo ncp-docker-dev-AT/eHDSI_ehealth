@@ -15,7 +15,7 @@ public class InsufficientRightsException extends Exception {
     }
 
     private String message;
-    private String errorCode;
+    private final String errorCode;
 
     public InsufficientRightsException() {
         errorCode = "4703";

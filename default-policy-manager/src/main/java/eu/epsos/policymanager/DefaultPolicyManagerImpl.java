@@ -382,7 +382,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         switch (documentClass) {
             //  eDispensation document
             case Constants.ED_CLASSCODE:
-                XDRPermissionValidatorDispense(assertion);
+            case Constants.EDD_CLASSCODE:
+                XDRPermissionValidatorSubmitDocument(assertion);
                 break;
             //  HCER is not supported currently in eHDSI project.
             case Constants.HCER_CLASSCODE:
@@ -399,12 +400,12 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
-     * XDR validation of dispensation service.
+     * XDR validation of Submit Document service (Dispense or Discard Medication).
      *
      * @param assertion - SAML user assertion.
      * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
-    private void XDRPermissionValidatorDispense(Assertion assertion) throws InsufficientRightsException {
+    private void XDRPermissionValidatorSubmitDocument(Assertion assertion) throws InsufficientRightsException {
 
         boolean recordMedicationAdministrationRecord = false;
 
@@ -449,7 +450,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorEncounterReport(Assertion assertion) throws InsufficientRightsException {
 
-        XDRPermissionValidatorDispense(assertion);
+        XDRPermissionValidatorSubmitDocument(assertion);
     }
 
     /**

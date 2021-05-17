@@ -16,17 +16,15 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.util.HttpUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.apache.http.ssl.SSLContexts;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.ServiceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +52,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -73,8 +66,8 @@ import java.util.regex.Pattern;
 public class SMPUploadFileController {
 
     private final Logger logger = LoggerFactory.getLogger(SMPUploadFileController.class);
-    private SMPConverter smpconverter;
-    private Environment environment;
+    private final SMPConverter smpconverter;
+    private final Environment environment;
 
     @Autowired
     public SMPUploadFileController(SMPConverter smpconverter, Environment environment) {
@@ -258,36 +251,8 @@ public class SMPUploadFileController {
                 logger.debug("Entity that will be put on the SMP server : '{}'", IOUtils.toString(entityPut.getContent(), StandardCharsets.UTF_8));
             }
 
-            ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-
-            PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
-
             // Trust own CA and all self-signed certs
-            SSLContext sslcontext = null;
-            try {
-                //must be the same as SC_KEYSTORE_PASSWORD
-                sslcontext = SSLContexts.custom()
-                        .loadKeyMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_KEYSTORE)),
-                                configurationManager.getProperty(StandardProperties.NCP_KEYSTORE_PASSWORD).toCharArray(),
-                                configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_PASSWORD).toCharArray(),
-                                privatek)
-                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE)),
-                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray(),
-                                new TrustSelfSignedStrategy())
-                        .build();
-            } catch (NoSuchAlgorithmException ex) {
-                logger.error("NoSuchAlgorithmException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (KeyStoreException ex) {
-                logger.error("KeyStoreException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (CertificateException ex) {
-                logger.error("CertificateException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (IOException ex) {
-                logger.error("IOException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (KeyManagementException ex) {
-                logger.error("KeyManagementException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (UnrecoverableKeyException ex) {
-                logger.error("UnrecoverableKeyException: '{}", SimpleErrorHandler.printExceptionStackTrace(ex));
-            }
+            SSLContext sslcontext = HttpUtil.createSSLContext();
 
             //PUT
             HttpPut httpput = new HttpPut(uri);
@@ -310,6 +275,7 @@ public class SMPUploadFileController {
                     response.getStatusLine().getReasonPhrase());
 
             //Audit vars
+            ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
             String ncp = configurationManager.getProperty("ncp.country");
             String ncpemail = configurationManager.getProperty("ncp.email");
             String country = configurationManager.getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
@@ -430,7 +396,7 @@ public class SMPUploadFileController {
         smpupload.setAllItems(allItems);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Model Attibute: '{}'", model.toString());
+            logger.debug("Model Attibute: '{}'", model);
         }
         return "redirect:/smpeditor/uploadsmpinfo";
 
@@ -513,7 +479,7 @@ public class SMPUploadFileController {
         model.addAttribute("items", smpupload.getAllItems());
 
         if (logger.isDebugEnabled()) {
-            logger.debug("MVC Model: '{}", model.toString());
+            logger.debug("MVC Model: '{}", model);
         }
         return "smpeditor/uploadsmpinfo";
     }

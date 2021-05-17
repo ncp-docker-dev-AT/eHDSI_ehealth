@@ -3,6 +3,23 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.1.5] - 17-05-2021
+The OpenNCP 5.1.5 is the Wave 4 Formal HotFix release including the Formal Test Event improvements ,and a clarification 
+of the Requirements for HCP identification during Medication Dispense Discard use case (eHDSI Business Requirements and eHDSI SAML Profile update).
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 July 2021 as a replacement of version 5.1.4.
+
+Main changes in this release are:<br/>
+<ul>
+<li>Practitioner Organization ID SAML token is now mandatory only for the Medication Discard workflow.</li>
+<li>OpenNCP Gateway -  customization of the certificate used during the SML/SMP authentication.</li>
+</ul>
+
+### Change Request
+- [EHNCP-2120] - eHDSI SAML OrganizationID mandatory for the medication discard operation (linked with [EHNCP-2089] - Organisation-id in SAML assertion vs. disp CDA value representedOrganization).
+
+### Improvement
+- [EHNCP-2119] - OpenNCP Gateway - Certificates independent configuration.
+
 ## [5.1.4] - 23-04-2021
 The OpenNCP 5.1.4 release is the CEF eHDSI Wave 4 Operation Ready version based on the Formal Test event feedback.
 This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 Jul 2021 .
