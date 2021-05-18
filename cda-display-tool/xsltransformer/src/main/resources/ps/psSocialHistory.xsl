@@ -1,19 +1,16 @@
 <?xml version="1.0"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3"
->
-    <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
-                doctype-public="-//W3C//DTD HTML 4.01//EN"/>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3">
 
     <xsl:variable name="socialHistorySectionCode"
                   select="'29762-2'"/>
 
-    <!--social histories -->
+    <!-- eHDSI Social History -->
     <xsl:template name="socialHistory" match="/">
         <xsl:apply-templates select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:code[@code=$socialHistorySectionCode]]"/>
     </xsl:template>
 
     <xsl:template match = "/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:code[@code=$socialHistorySectionCode]]">
-        <div class="wrap-collabsible">
+        <div class="wrap-collapsible">
             <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
             <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
                 <!-- Section title -->
@@ -23,7 +20,7 @@
             </label>
             <div class="collapsible-content-title">
                 <div class="content-inner-title">
-                    <div class="wrap-collabsible">
+                    <div class="wrap-collapsible">
                         <input id="collapsible-social-history-original" class="toggle" type="checkbox"/>
                         <label for="collapsible-social-history-original" class="lbl-toggle">
                             <xsl:value-of select="$originalNarrativeTableTitle"/>
@@ -35,7 +32,7 @@
                         </div>
                     </div>
                     <br/>
-                    <div class="wrap-collabsible">
+                    <div class="wrap-collapsible">
                         <input id="collapsible-social-history-translated" class="toggle" type="checkbox" checked="true"/>
                         <label for="collapsible-social-history-translated" class="lbl-toggle">
                             <xsl:value-of select="$translatedCodedTableTitle"/>
@@ -70,7 +67,7 @@
                                                 </xsl:call-template>
                                             </th>
                                         </tr>
-                                        <xsl:apply-templates select="n1:entry/n1:observation"/>
+                                        <xsl:apply-templates select="n1:entry/n1:observation" mode="socialhistory"/>
                                     </tbody>
                                 </table>
                             </div>
@@ -83,7 +80,7 @@
         <br />
     </xsl:template>
 
-    <xsl:template match="n1:entry/n1:observation">
+    <xsl:template match="n1:entry/n1:observation" mode="socialhistory">
         <tr>
             <td>
                 <!-- Observation Type -->
@@ -102,12 +99,6 @@
                 <xsl:apply-templates select="n1:value"/>
             </td>
         </tr>
-    </xsl:template>
-
-    <xsl:template match="n1:text">
-        <div class="narrative_wrapper">
-            <xsl:apply-templates select="*"/>
-        </div>
     </xsl:template>
 
     <xsl:template match="n1:code">
