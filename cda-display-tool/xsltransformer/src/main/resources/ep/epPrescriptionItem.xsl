@@ -383,8 +383,10 @@
                             <table class="ep_table">
                                 <tr>
                                     <th>
-                                        <!-- TODO add label to eHDSIDisplayLabel value set -->
-                                        Duration of treatment
+                                        <!-- Duration of treatment -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'150'"/>
+                                        </xsl:call-template>
                                     </th>
                                     <td>
                                         <xsl:call-template name="show-IVL_TS">

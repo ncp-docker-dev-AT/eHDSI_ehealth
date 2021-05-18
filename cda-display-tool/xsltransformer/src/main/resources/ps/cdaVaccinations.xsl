@@ -97,9 +97,10 @@
                                                             </th>
                                                             <xsl:if test="$vacAct/n1:entryRelationship/n1:observation[@classCode='OBS'][@moodCode='EVN']/n1:code[@codeSystem='2.16.840.1.113883.6.1'][@code ='30973-2']">
                                                             <th>
-                                                                <!-- Dose number in series header -->
-                                                                <!-- TODO Add label to eHDSIDisplayLabel value set-->
-                                                                Dose number in series
+                                                                <!-- Dose number in series -->
+                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                    <xsl:with-param name="code" select="'152'"/>
+                                                                </xsl:call-template>
                                                             </th>
                                                             </xsl:if>
                                                             <th>

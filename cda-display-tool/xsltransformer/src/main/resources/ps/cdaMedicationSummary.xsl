@@ -153,8 +153,10 @@
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
-                                                                    <!-- TODO add label to eHDSIDisplayLabel value set -->
-                                                                    Duration of treatment
+                                                                    <!-- Duration of treatment -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'150'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                             </tr>
                                                             <xsl:for-each select="n1:entry">
