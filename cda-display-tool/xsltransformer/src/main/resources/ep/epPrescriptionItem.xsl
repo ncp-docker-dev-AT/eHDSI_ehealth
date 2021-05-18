@@ -5,11 +5,40 @@
                 xmlns:epsos="urn:epsos-org:ep:medication"
                 version="1.0">
 
-    <xsl:output method="html"
-                indent="yes"
-                version="4.01"
-                doctype-system="http://www.w3.org/TR/html4/strict.dtd"
-                doctype-public="-//W3C//DTD HTML 4.01//EN"/>
+    <xsl:template match="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:entry/n1:substanceAdministration">
+        <fieldset style="min-height:100px;">
+            <legend>
+                <!-- Pharmaceutical Substance Header -->
+                <b><xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial"/></b></legend>
+            <table>
+                <tr>
+                    <td>
+                        <xsl:call-template name="epPrescriptionItemDetails"/>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </xsl:template>
+
+    <!-- Pharmaceutical Substance Header -->
+    <xsl:template match="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial">
+        &#160;
+        <xsl:value-of select="n1:name"/>
+        <xsl:choose>
+            <xsl:when test="epsos:asSpecializedKind">
+                <xsl:if test="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@codeSystem='2.16.840.1.113883.6.73'">
+                    (<span class="codeSystem">ATC</span>
+                    &#160;
+                    <span class="codeSystem">
+                        <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@code"/>
+                    </span>
+                    &#160;
+                    <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:name"/>)
+                </xsl:if>
+            </xsl:when>
+        </xsl:choose>
+        &#160;
+    </xsl:template>
 
     <xsl:template name="package">
         <xsl:call-template name="show-package">
@@ -655,7 +684,7 @@
                                             </xsl:choose>
                                             <input type="hidden" name="prescriptionID" id="prescriptionID">
                                                 <xsl:attribute name="value">
-                                                    <xsl:value-of select="$prescriptionID"/>
+                                                    <xsl:value-of select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:id/@extension"/>
                                                 </xsl:attribute>
                                             </input>
                                             <input type="hidden">
@@ -898,37 +927,4 @@
         </table>
     </xsl:template>
 
-    <xsl:template name="epPrescriptionItem">
-        <xsl:for-each select="$entryNode">
-            <fieldset style="min-height:100px;">
-                <legend><b><xsl:call-template name="pharmaceuticalSubstanceHeader"/></b></legend>
-                <table>
-                    <tr>
-                        <td>
-                            <xsl:call-template name="epPrescriptionItemDetails"/>
-                        </td>
-                    </tr>
-                </table>
-            </fieldset>
-        </xsl:for-each>
-    </xsl:template>
-
-    <xsl:template name="pharmaceuticalSubstanceHeader">
-        &#160;
-        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
-        <xsl:choose>
-            <xsl:when test="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asSpecializedKind">
-                <xsl:if test="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@codeSystem='2.16.840.1.113883.6.73'">
-                    (<span class="codeSystem">ATC</span>
-                    &#160;
-                    <span class="codeSystem">
-                        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@code"/>
-                    </span>
-                    &#160;
-                    <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:name"/>)
-                </xsl:if>
-            </xsl:when>
-        </xsl:choose>
-        &#160;
-    </xsl:template>
 </xsl:stylesheet>
