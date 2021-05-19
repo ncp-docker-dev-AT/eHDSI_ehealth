@@ -74,6 +74,7 @@
                 <xsl:with-param name="telecom" select="."/>
             </xsl:call-template>
         </xsl:for-each>
+        <br/>
     </xsl:template>
 
     <!-- show-address -->
