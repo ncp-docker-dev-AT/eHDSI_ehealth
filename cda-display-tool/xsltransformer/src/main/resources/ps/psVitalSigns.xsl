@@ -41,8 +41,11 @@
                                 <tr>
                                     <td style="background-color:#ffffcc">
                                         <i class="fas fa-exclamation-triangle" style="color:#085a9f" aria-hidden="true"/>
-                                        <!-- TODO - Has to be replaced with a value from the epSOSDisplayLabel value set -->
-                                        The date of the organizer should match the date of the observations.<br/>
+                                        <!-- The date of the organizer should match the date of the observations -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'151'"/>
+                                        </xsl:call-template>
+                                        <br/>
                                     </td>
                                 </tr>
                             </table>
