@@ -55,149 +55,126 @@
                         <div class="collapsible-content">
                             <div class="content-inner">
                                 <div id="extendedCdaHeader">
-                                    <table>
-                                        <tr>
-                                            <td>
-                                            <table class="header_table" width="100%">
-                                                <colgroup>
-                                                    <col span="1" style="width: 20%;"/>
-                                                    <col span="1" style="width: 30%;"/>
-                                                    <col span="1" style="width: 20%;"/>
-                                                    <col span="1" style="width: 30%;"/>
-                                                </colgroup>
+                                    <table class="header_table" width="100%">
+                                        <colgroup>
+                                            <col span="1" style="width: 10%;"/>
+                                            <col span="1" style="width: 20%;"/>
+                                            <col span="1" style="width: 15%;"/>
+                                            <col span="1" style="width: 20%;"/>
+                                            <col span="1" style="width: 15%;"/>
+                                            <col span="1" style="width: 20%;"/>
+                                        </colgroup>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <th>
-                                                            <!--  Specialty: -->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'69'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <xsl:value-of select="/ClinicalDocument/author/assignedAuthor/code/@displayName"/>
-                                                        <td>
-                                                        </td>
-                                                        <th>
-                                                            <!--  Contact Information: -->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'12'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <td>
-                                                            <xsl:call-template name="telecom">
-                                                                <xsl:with-param name="telecomParam"
-                                                                                select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom"/>
-                                                            </xsl:call-template>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>
-                                                            <!-- Facility ID -->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'28'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <td>
-                                                            <xsl:call-template name="facilityId">
-                                                                <xsl:with-param name="id"
-                                                                                select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
-                                                            </xsl:call-template>
-                                                        </td>
-                                                        <th>
-                                                            <!-- Facility Name:-->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'29'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <td>
-                                                            <xsl:call-template name="facilityName">
-                                                                <xsl:with-param name="name"
-                                                                                select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
-                                                            </xsl:call-template>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>
-                                                            <!-- Country: -->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'13'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <td>
-                                                            <xsl:call-template name="country">
-                                                                <xsl:with-param name="name"
-                                                                                select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
-                                                            </xsl:call-template>
-                                                        </td>
-                                                        <th>
-                                                            <!--  Address: -->
-                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                <xsl:with-param name="code" select="'3'"/>
-                                                            </xsl:call-template>
-                                                        </th>
-                                                        <td>
-                                                            <xsl:call-template name="show-address">
-                                                                <xsl:with-param name="address" select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
-                                                            </xsl:call-template>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            </td>
-                                            <td>
-                                                <fieldset style="min-height:100px;">
-                                                    <legend>Organisation</legend>
-                                                    <table class="header_table" width="100%">
-                                                        <colgroup>
-                                                            <col span="1" style="width: 50%;"/>
-                                                            <col span="1" style="width: 50%;"/>
-                                                        </colgroup>
-                                                        <tbody>
-                                                            <tr>
-                                                                <th>
-                                                                    <!--  Organisation Name: -->
-                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                        <xsl:with-param name="code" select="'47'"/>
-                                                                    </xsl:call-template>
-                                                                </th>
-                                                                <td>
-                                                                    <xsl:call-template name="organization">
-                                                                        <xsl:with-param name="name"
-                                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:desc"/>
-                                                                    </xsl:call-template>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    <!--  Organisation Identifier: -->
-                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                        <xsl:with-param name="code" select="'46'"/>
-                                                                    </xsl:call-template>
-                                                                </th>
-                                                                <td>
-                                                                    <xsl:call-template name="organization">
-                                                                        <xsl:with-param name="name"
-                                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:id"/>
-                                                                    </xsl:call-template>
-                                                                </td>
-                                                            </tr>
-                                                            <th>
-                                                                <!--  Contact Information -->
-                                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                    <xsl:with-param name="code" select="'12'"/>
-                                                                </xsl:call-template>
-                                                            </th>
-                                                            <td>
-                                                                <xsl:call-template name="telecom">
-                                                                    <xsl:with-param name="telecomParam"
-                                                                                    select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:telecom"/>
-                                                                </xsl:call-template>
-                                                            </td>
-                                                        </tbody>
-                                                    </table>
-                                                </fieldset>
-                                            </td>
-                                        </tr>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    <!--  Specialty: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'69'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <xsl:value-of select="/ClinicalDocument/author/assignedAuthor/code/@displayName"/>
+                                                <td>
+                                                </td>
+                                                <th>
+                                                    <!--  Contact Information: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'12'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="telecom">
+                                                        <xsl:with-param name="telecomParam"
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  Organisation Name: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'47'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="organization">
+                                                        <xsl:with-param name="name"
+                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:desc"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <!-- Facility ID -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'28'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="facilityId">
+                                                        <xsl:with-param name="id"
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!-- Facility Name:-->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'29'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="facilityName">
+                                                        <xsl:with-param name="name"
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  Organisation Identifier: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'46'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="organization">
+                                                        <xsl:with-param name="name"
+                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:id"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <!-- Country: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'13'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="country">
+                                                        <xsl:with-param name="name"
+                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr/n1:country"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  Address: -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'3'"/>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="show-address">
+                                                        <xsl:with-param name="address" select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:addr"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                                <th>
+                                                    <!--  TODO Add entry to the eHDSIDisplayLabel value set -->
+                                                    Organisation Contact Information
+                                                </th>
+                                                <td>
+                                                    <xsl:call-template name="telecom">
+                                                        <xsl:with-param name="telecomParam"
+                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:telecom"/>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -289,9 +266,9 @@
 
     <!-- Address -->
     <xsl:template match="n1:assignedAuthor/n1:representedOrganization/n1:addr">
-    <xsl:call-template name="show-address">
-        <xsl:with-param name="address" select="."/>
-    </xsl:call-template>
+        <xsl:call-template name="show-address">
+            <xsl:with-param name="address" select="."/>
+        </xsl:call-template>
     </xsl:template>
 
     <!-- Organization -->
