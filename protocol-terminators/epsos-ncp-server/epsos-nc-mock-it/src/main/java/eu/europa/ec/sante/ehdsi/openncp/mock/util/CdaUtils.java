@@ -18,7 +18,7 @@ import java.util.Iterator;
 public class CdaUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CdaUtils.class);
-    private static NamespaceContext hl7 = new NamespaceContext() {
+    private static final NamespaceContext hl7 = new NamespaceContext() {
         public String getNamespaceURI(String prefix) {
             String uri;
             if (StringUtils.equals(prefix, "hl7")) {
@@ -50,14 +50,14 @@ public class CdaUtils {
      */
     public static PatientDemographics getPatientDemographicsFromXMLDocument(Document doc) {
 
-        PatientDemographics pd = new PatientDemographics();
+        PatientDemographics patientDemographics = new PatientDemographics();
 
         XPathFactory factory = XPathFactory.newInstance();
         XPath xPath = factory.newXPath();
         xPath.setNamespaceContext(hl7);
         try {
             String extension = xPath.evaluate("/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:id/@extension", doc);
-            pd.setId(extension);
+            patientDemographics.setId(extension);
         } catch (XPathExpressionException e) {
             LOGGER.warn("Could not find patient's id in the CDA document: '{}'", e.getMessage(), e);
         }
@@ -69,10 +69,10 @@ public class CdaUtils {
                 if (givenNames.item(i).hasAttributes()) {
                     continue;
                 }
-                if (pd.getGivenName() == null) {
-                    pd.setGivenName(givenNames.item(i).getTextContent());
+                if (patientDemographics.getGivenName() == null) {
+                    patientDemographics.setGivenName(givenNames.item(i).getTextContent());
                 } else {
-                    pd.setGivenName(pd.getGivenName() + " " + givenNames.item(i).getTextContent());
+                    patientDemographics.setGivenName(patientDemographics.getGivenName() + " " + givenNames.item(i).getTextContent());
                 }
             }
         } catch (XPathExpressionException e) {
@@ -82,10 +82,10 @@ public class CdaUtils {
         try {
             NodeList familyNames = (NodeList) xPath.evaluate("/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:name/hl7:family", doc, XPathConstants.NODESET);
             for (int i = 0; i < familyNames.getLength(); i++) {
-                if (pd.getFamilyName() == null) {
-                    pd.setFamilyName(familyNames.item(i).getTextContent());
+                if (patientDemographics.getFamilyName() == null) {
+                    patientDemographics.setFamilyName(familyNames.item(i).getTextContent());
                 } else {
-                    pd.setFamilyName(pd.getFamilyName() + " " + familyNames.item(i).getTextContent());
+                    patientDemographics.setFamilyName(patientDemographics.getFamilyName() + " " + familyNames.item(i).getTextContent());
                 }
             }
         } catch (XPathExpressionException e) {
@@ -95,13 +95,13 @@ public class CdaUtils {
 
         try {
             String administrativeGenderCode = xPath.evaluate("/hl7:ClinicalDocument/hl7:recordTarget/hl7:patientRole/hl7:patient/hl7:administrativeGenderCode/@code", doc);
-            pd.setAdministrativeGender(PatientDemographics.Gender.parseGender(administrativeGenderCode));
+            patientDemographics.setAdministrativeGender(PatientDemographics.Gender.parseGender(administrativeGenderCode));
         } catch (XPathExpressionException e) {
             LOGGER.warn("Could not find patient's administrative gender code in the CDA document: '{}'", e.getMessage(), e);
         } catch (ParseException pe) {
             LOGGER.error("Error parsing patient administrative gender code.");
         }
 
-        return pd;
+        return patientDemographics;
     }
 }

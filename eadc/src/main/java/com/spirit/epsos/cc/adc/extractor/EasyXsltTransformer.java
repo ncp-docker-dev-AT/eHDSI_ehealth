@@ -47,7 +47,7 @@ public class EasyXsltTransformer {
         try {
             this.xsltDocument = xsltDocument;
             this.transformer = EasyXsltTransformer.objTransformerFact.newTransformer(xsltDomSource);
-            logger.info("An XSLT-Transformer object was initialized successfully");
+            logger.debug("An XSLT-Transformer object was initialized successfully");
         } catch (TransformerConfigurationException transformerConfigurationException) {
             logger.error("TransformerConfigurationException: Used XSLT Document:\n'{}'", EadcUtil.convertXMLDocumentToString(xsltDocument));
             throw new Exception("An error occurred, when loading the XSLT-Document", transformerConfigurationException);

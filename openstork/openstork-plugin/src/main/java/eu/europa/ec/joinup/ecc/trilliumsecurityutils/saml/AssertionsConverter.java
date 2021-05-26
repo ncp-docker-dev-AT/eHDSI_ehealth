@@ -8,6 +8,8 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.sts.client.TRCAssertionRequest;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionConstants;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -26,8 +28,6 @@ import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientId;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.namespace.QName;
@@ -53,6 +53,9 @@ public class AssertionsConverter {
         } catch (InitializationException e) {
             LOGGER.error("InitializationException: '{}'", e.getMessage());
         }
+    }
+
+    private AssertionsConverter() {
     }
 
     private static <T> T create(Class<T> cls, QName qname) {
@@ -94,11 +97,11 @@ public class AssertionsConverter {
         auditDataMap = new HashMap<>();
 
         try {
-            //initializing the map
+            // Initializing the map
             auditDataMap.clear();
             XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
-            //Doing an indirect copy so, because when cloning, signatures are lost.
+            // Doing an indirect copy so, because when cloning, signatures are lost.
             SignatureManager sman = new SignatureManager(ksm);
 
             try {
@@ -157,43 +160,43 @@ public class AssertionsConverter {
             auditDataMap.put("humanRequestorNameID", hcpIdentityAssertion.getSubject().getNameID().getValue());
             auditDataMap.put("humanRequestorSubjectID", nameid.getValue());
 
-            //Create and add Subject Confirmation
+            // Create and add Subject Confirmation
             SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
             subjectConf.setMethod(SubjectConfirmation.METHOD_SENDER_VOUCHES);
             trc.getSubject().getSubjectConfirmations().add(subjectConf);
 
-            //Create and add conditions
+            // Create and add conditions
             Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
             conditions.setNotBefore(nowUTC.toDateTime());
             conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
             trc.setConditions(conditions);
 
-            //Create and add Advice
+            //  Create and add Advice
             Advice advice = create(Advice.class, Advice.DEFAULT_ELEMENT_NAME);
             trc.setAdvice(advice);
 
-            //Create and add AssertionIDRef
+            // Create and add AssertionIDRef
             AssertionIDRef aIdRef = create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
             aIdRef.setAssertionID(hcpIdentityAssertion.getID());
             advice.getAssertionIDReferences().add(aIdRef);
 
-            //Add and create the authentication statement
+            // Add and create the authentication statement
             AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
             authStmt.setAuthnInstant(nowUTC.toDateTime());
             trc.getAuthnStatements().add(authStmt);
 
-            //Creata and add AuthnContext
+            // Create and add AuthnContext
             AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
             AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setAuthnContextClassRef(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
-            // Create the Saml Attribute Statement
+            //  Create the Saml Attribute Statement
             AttributeStatement attrStmt = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
             trc.getStatements().add(attrStmt);
 
-            //Creating the Attribute that holds the Patient ID
+            // Creating the Attribute that holds the Patient ID
             Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             attrPID.setFriendlyName("XSPA Subject");
 
@@ -201,14 +204,14 @@ public class AssertionsConverter {
             attrPID.setName("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
             attrPID.setNameFormat(Attribute.URI_REFERENCE);
 
-            //Create and add the Attribute Value
+            // Create and add the Attribute Value
             XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
             XSString attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
             attrValPID.setValue(patientID);
             attrPID.getAttributeValues().add(attrValPID);
             attrStmt.getAttributes().add(attrPID);
 
-            //Creating the Attribute that holds the Purpose of Use
+            // Creating the Attribute that holds the Purpose of Use
             Attribute attrPoU = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             attrPoU.setFriendlyName("XSPA Purpose Of Use");
 
@@ -231,45 +234,44 @@ public class AssertionsConverter {
             String poc = ((XSString) Objects.requireNonNull(findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                     "urn:oasis:names:tc:xspa:1.0:subject:organization")).getAttributeValues().get(0)).getValue();
 
-            LOGGER.info("Point of Care: {0}", poc);
+            LOGGER.info("Point of Care: {}", poc);
             auditDataMap.put("pointOfCare", poc);
 
             String pocId = ((XSURI) Objects.requireNonNull(findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                     "urn:oasis:names:tc:xspa:1.0:subject:organization-id")).getAttributeValues().get(0)).getValue();
 
-            LOGGER.info("Point of Care: {0}", poc);
+            LOGGER.info("Point of Care: {}", poc);
             auditDataMap.put("pointOfCareID", pocId);
 
             String hrRole = ((XSString) Objects.requireNonNull(findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                     "urn:oasis:names:tc:xacml:2.0:subject:role")).getAttributeValues().get(0)).getValue();
 
-            LOGGER.info("HR Role {0}", hrRole);
+            LOGGER.info("HR Role {}", hrRole);
             auditDataMap.put("humanRequestorRole", hrRole);
 
             String facilityType = ((XSString) Objects.requireNonNull(findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                     "urn:epsos:names:wp3.4:subject:healthcare-facility-type")).getAttributeValues().get(0)).getValue();
 
-            LOGGER.info("Facility Type {0}", facilityType);
+            LOGGER.info("Facility Type {}", facilityType);
             auditDataMap.put("facilityType", facilityType);
 
             sman.signSAMLAssertion(trc);
             return trc;
         } catch (Exception ex) {
-            LOGGER.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
     }
 
     protected static Attribute findURIInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        LOGGER.info("Size:{0}", statements.size());
+        LOGGER.info("Size:{}", statements.size());
         for (AttributeStatement stmt : statements) {
 
             for (Attribute attribute : stmt.getAttributes()) {
 
                 if (attribute.getName().equals(attrName)) {
 
-                    LOGGER.info("Attribute Name:{0}", attribute.getName());
+                    LOGGER.info("Attribute Name:{}", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
 
                     attr.setFriendlyName(attribute.getFriendlyName());
@@ -292,14 +294,14 @@ public class AssertionsConverter {
     protected static NameID findProperNameID(Subject subject) {
 
         String format = subject.getNameID().getFormat();
-        LOGGER.info("is email?: {0}", format.equals(NameID.EMAIL));
-        LOGGER.info("is x509 subject?: {0}", format.equals(NameID.X509_SUBJECT));
-        LOGGER.info("is Unspecified?: {0}", format.equals(NameID.UNSPECIFIED));
+        LOGGER.info("is email?: {}", format.equals(NameID.EMAIL));
+        LOGGER.info("is x509 subject?: {}", format.equals(NameID.X509_SUBJECT));
+        LOGGER.info("is Unspecified?: {}", format.equals(NameID.UNSPECIFIED));
 
-        NameID n = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
-        n.setFormat(format);
-        n.setValue(subject.getNameID().getValue());
-        return n;
+        NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
+        nameID.setFormat(format);
+        nameID.setValue(subject.getNameID().getValue());
+        return nameID;
     }
 
     private static Assertion createEpsosAssertion(String username, String role, String organization, String organizationId,
@@ -319,7 +321,7 @@ public class AssertionsConverter {
 
             assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
 
-            String assId = "_" + UUID.randomUUID().toString();
+            String assId = "_" + UUID.randomUUID();
             assertion.setID(assId);
             assertion.setVersion(SAMLVersion.VERSION_20);
             org.joda.time.DateTime now = new org.joda.time.DateTime();
@@ -471,14 +473,14 @@ public class AssertionsConverter {
             LOGGER.info("Optional attribute not found, proceeding with conversion (HCP Specialty).", ex);
         }
 
-        // OPTIONAL: HCP Organization ID and HCP Organization Name
+        // Required: HCP Organization ID and HCP Organization Name
         try {
             orgId = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
             orgName = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, "urn:oasis:names:tc:xspa:1.0:subject:organization");
             assertionBuilder.healthCareProfessionalOrganisation(orgId, orgName);
 
         } catch (MissingFieldException ex) {
-            LOGGER.info("Optional attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.", ex);
+            LOGGER.error("Required attribute not found, proceeding with conversion ( HCP Organization ID and HCP Organization Name.", ex);
         }
 
         // MANDATORY: HealthCare Facility Type
@@ -628,13 +630,13 @@ public class AssertionsConverter {
 
     protected static Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 
-        LOGGER.info("Size:{0}", statements.size());
+        LOGGER.info("Size:{}", statements.size());
 
         for (AttributeStatement stmt : statements) {
             for (Attribute attribute : stmt.getAttributes()) {
                 if (attribute.getName().equals(attrName)) {
 
-                    LOGGER.info("Attribute Name: {0}", attribute.getName());
+                    LOGGER.info("Attribute Name: {}", attribute.getName());
                     Attribute attr = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
                     attr.setFriendlyName(attribute.getFriendlyName());
                     attr.setName(attribute.getNameFormat());

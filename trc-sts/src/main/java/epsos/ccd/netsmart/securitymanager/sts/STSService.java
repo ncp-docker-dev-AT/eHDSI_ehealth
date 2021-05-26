@@ -95,10 +95,7 @@ public class STSService implements Provider<SOAPMessage> {
     @Override
     public SOAPMessage invoke(SOAPMessage source) {
 
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.debug("Incoming SOAP Message request: '{}'", source);
-            log(source);
-        }
+        log(source);
 
         SOAPBody body;
         SOAPHeader header;
@@ -178,10 +175,7 @@ public class STSService implements Provider<SOAPMessage> {
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
-            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-                loggerClinical.debug("Outgoing SOAP Message response: '{}'", response);
-                log(response);
-            }
+            log(response);
             return response;
 
         } catch (SOAPException | WSTrustException | MarshallingException | SMgrException | ParserConfigurationException ex) {
@@ -289,7 +283,7 @@ public class STSService implements Provider<SOAPMessage> {
 
             SOAPFactory fac = SOAPFactory.newInstance();
             SOAPElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, MESSAGE_ID, "wsa"));
-            messageIdElem.setTextContent("uuid:" + UUID.randomUUID().toString());
+            messageIdElem.setTextContent("uuid:" + UUID.randomUUID());
             SOAPElement securityHeaderElem = header.addHeaderElement(new QName(WS_SEC_NS, "Security", "wsse"));
 
             SOAPElement timeStampElem = fac.createElement("Timestamp", "wsu", WS_SEC_UTIL_NS);
@@ -408,12 +402,10 @@ public class STSService implements Provider<SOAPMessage> {
      * @param message - Incoming SOAP message.
      */
     private void log(SOAPMessage message) {
-
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 message.writeTo(out);
-                loggerClinical.info("SOAPMessage:\n{}", out.toString());
+                loggerClinical.debug("SOAPMessage:\n{}", out);
             } catch (IOException | SOAPException e) {
                 loggerClinical.error("Exception: '{}'", e.getMessage(), e);
             }

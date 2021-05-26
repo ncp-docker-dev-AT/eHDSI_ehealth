@@ -218,7 +218,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                     try {
                         String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                        loggerClinical.info("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
+                        loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
 
                     } catch (Exception ex) {
                         logger.error(ex.getLocalizedMessage(), ex);

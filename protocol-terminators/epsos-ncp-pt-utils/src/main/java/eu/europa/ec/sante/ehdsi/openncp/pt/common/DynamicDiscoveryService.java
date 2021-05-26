@@ -164,9 +164,9 @@ public class DynamicDiscoveryService {
         try {
 
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
-            LOGGER.info("****** participantIdentifierValue '{}'.", participantIdentifierValue);
-            LOGGER.info("****** NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierValue));
-            LOGGER.info("****** CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierValue)));
+            LOGGER.debug("****** participantIdentifierValue '{}'.", participantIdentifierValue);
+            LOGGER.debug("****** NAPTR Hash: '{}'", HashUtil.getSHA256HashBase32(participantIdentifierValue));
+            LOGGER.debug("****** CNAME Hash: '{}'", StringUtils.lowerCase("b-" + HashUtil.getMD5Hash(participantIdentifierValue)));
             KeyStore ks = KeyStore.getInstance("JKS");
 
             File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("TRUSTSTORE_PATH"));

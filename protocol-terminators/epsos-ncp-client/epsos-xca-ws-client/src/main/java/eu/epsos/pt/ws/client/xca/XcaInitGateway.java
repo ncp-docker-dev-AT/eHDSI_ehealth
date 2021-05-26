@@ -100,8 +100,8 @@ public class XcaInitGateway {
                                                         final Assertion idAssertion, final Assertion trcAssertion,
                                                         String service) throws XCAException {
 
-        LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}', '{}')", document.getDocumentUniqueId(),
-                homeCommunityId, countryCode, targetLanguage, idAssertion.getID(), trcAssertion.getID(), service);
+        LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}', '{}')", homeCommunityId, countryCode,
+                targetLanguage, idAssertion.getID(), trcAssertion.getID(), service);
         DocumentResponse result = null;
         RetrieveDocumentSetResponseType queryResponse;
         String classCode = null;
@@ -229,7 +229,7 @@ public class XcaInitGateway {
                     //Throw all the remaining errors
                     if (hasError) {
                         if (LOGGER.isErrorEnabled()) {
-                            LOGGER.error("Registry Errors: '{}'", msg.toString());
+                            LOGGER.error("Registry Errors: '{}'", msg);
                         }
                         throw new XCAException(errorCode);
                     }
