@@ -5,8 +5,7 @@
     <!--
         Allow the user of properties from application.properties throughout this configuration file(s)
     -->
-    <bean id="placeholderConfig"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="placeholderConfig" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="locations">
 
             <list>
