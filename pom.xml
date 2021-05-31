@@ -14,12 +14,12 @@
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>European Commission - DG Health and Food Safety</name>
-        <url>http://ec.europa.eu/dgs/health_food-safety</url>
+        <url>https://ec.europa.eu/dgs/health_food-safety</url>
     </organization>
     <licenses>
         <license>
             <name>Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
 
@@ -340,14 +340,9 @@
             <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/ehealth-third-party/</url>
         </repository>
         <repository>
-            <id>maven2-jasperreports.sourceforge.net</id>
-            <name>Jasper Reports Maven2 Repository</name>
-            <url>http://jasperreports.sourceforge.net/maven2/</url>
-        </repository>
-        <repository>
             <id>maven2-repository.jboss.org</id>
             <name>JBoss Maven Repository</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
         <repository>
             <name>Official OpenSaml Repository</name>
