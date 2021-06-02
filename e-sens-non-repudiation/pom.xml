@@ -134,8 +134,17 @@
                     <groupId>org.apache.httpcomponents</groupId>
             		<artifactId>httpclient</artifactId>
                 </exclusion>
+                 <exclusion>
+                    <groupId>org.apache.xmlgraphics</groupId>
+            		<artifactId>batik-css</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+    		<groupId>org.apache.xmlgraphics</groupId>
+   		 	<artifactId>batik-css</artifactId>
+    		<version>${batik-css.version}</version>
+		</dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
