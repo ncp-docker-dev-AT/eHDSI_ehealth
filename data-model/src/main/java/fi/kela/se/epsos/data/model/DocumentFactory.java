@@ -128,9 +128,9 @@ public class DocumentFactory {
      */
     private static PSDocumentMetaData createPSDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
-        EPDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
+        PSDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
         if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
-            confidentiality = new EPDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
+            confidentiality = new PSDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
         }
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
                 Constants.PS_CLASSCODE, repositoryId, title, author, confidentiality, languageCode);
@@ -148,6 +148,27 @@ public class DocumentFactory {
                                                          String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         return createPSDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode);
+    }
+
+    /**
+     * OrCDDocument
+     */
+    private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate,
+                                                       String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+        OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
+        if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
+            confidentiality = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
+        }
+        EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
+                orCDClassCode, repositoryId, title, author, confidentiality, languageCode);
+        return new OrCDDocumentMetaDataImpl(metaData);
+    }
+
+    public static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, String id, String patientId, Date effectiveDate, String repositoryId,
+                                                         String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+
+        return createOrCDDocument(orCDClassCode, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
                 repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode);
     }
 

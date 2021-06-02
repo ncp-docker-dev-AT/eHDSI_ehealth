@@ -104,4 +104,24 @@ public class CdaUtils {
 
         return patientDemographics;
     }
+
+    /**
+     * Returns The classCode from a CDA document
+     *
+     * @param doc CDA document
+     * @return CDA Document classCode
+     */
+    public static String getClassCodeFromXMLDocument(Document doc) {
+
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xPath = factory.newXPath();
+        xPath.setNamespaceContext(hl7);
+        String classCode = StringUtils.EMPTY;
+        try {
+            classCode = xPath.evaluate("/hl7:ClinicalDocument/hl7:code/@code", doc);
+        } catch (XPathExpressionException e) {
+            LOGGER.warn("Could not find classCode in the CDA document: '{}'", e.getMessage(), e);
+        }
+        return classCode;
+    }
 }

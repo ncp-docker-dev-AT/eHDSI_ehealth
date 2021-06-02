@@ -2,20 +2,15 @@ package eu.epsos.protocolterminators.ws.server.xca;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorInterface;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import fi.kela.se.epsos.data.model.DocumentAssociation;
-import fi.kela.se.epsos.data.model.EPDocumentMetaData;
-import fi.kela.se.epsos.data.model.EPSOSDocument;
-import fi.kela.se.epsos.data.model.MroDocumentMetaData;
-import fi.kela.se.epsos.data.model.PSDocumentMetaData;
-import fi.kela.se.epsos.data.model.SearchCriteria;
+import fi.kela.se.epsos.data.model.*;
 
 import java.util.List;
 
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 
 /**
- * Combined interface for Patient Summary and ePrescription XCA Service implementation.
- * Implementations of the interface in the countries supporting only eP or only PS should throw UnsupportedOperationException on the missing methods.
+ * Combined interface for Patient Summary, ePrescription and OrCD XCA Service implementation.
+ * Implementations of the interface in the countries supporting only eP, only PS or only OrCD should throw UnsupportedOperationException on the missing methods.
  */
 public interface DocumentSearchInterface extends NationalConnectorInterface {
 
@@ -43,6 +38,14 @@ public interface DocumentSearchInterface extends NationalConnectorInterface {
      * @return List<DocumentAssociation < EPDocumentMetaData>>
      */
     List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
+
+    /**
+     * This method returns one/several OrCDDocumentMetaData in XML format) that matches the searchCriteria.
+     *
+     * @param searchCriteria (see SearchCriteria interface for more info)
+     * @return List<OrCDDocumentMetaData>
+     */
+    List<OrCDDocumentMetaData> getOrCDLaboratoryDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
 
     /**
      * This method returns one EPSOSDocument which includes document metaData
