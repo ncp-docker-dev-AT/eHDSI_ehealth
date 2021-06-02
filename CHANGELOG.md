@@ -3,8 +3,34 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.1.6] - 03-06-2021
+The OpenNCP 5.1.6 is the Wave 4 Formal Second HotFix release including the Formal Test Event improvements, a bug fix of
+the Medication Dispense Discard use case (eHDSI Business Requirements and eHDSI SAML Profile update), and some minor 
+improvements and bug fix based on the stakeholders feedback on version 5.1.5.
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 July 2021 strongly recommended as a replacement of version 5.1.5.
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Reference Implementation build - Maven HTTP repositories discarded.</li>
+<li>XDR messages - date format compliant with IHE DTM definition.</li>
+<li>Minor updates of JAR dependencies marked as vulnerable.</li>
+</ul>
+
+### Sub-Task
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-2132] - Releasing OpenNCP 5.1.6 (Wave 4 Operation Ready 2nd HotFix).
+
+### Bug
+- [EHNCP-2129] - XDR request invalid due to time format.
+- [EHNCP-2128] - DocumentFactory uses wrong implementation class in PS and MRO.
+- [EHNCP-2135] - ClientConnectorService WSDL doesn't enforce the use of CountryCode.
+
+### Improvement
+- [EHNCP-2133] - Remove trivial Java dependencies and implementations deprecated.
+- [EHNCP-2134] - Support Maven build with version 3.8.1 (none http repository not supported).
+
 ## [5.1.5] - 17-05-2021
-The OpenNCP 5.1.5 is the Wave 4 Formal HotFix release including the Formal Test Event improvements ,and a clarification 
+The OpenNCP 5.1.5 is the Wave 4 Formal HotFix release including the Formal Test Event improvements, and a clarification 
 of the Requirements for HCP identification during Medication Dispense Discard use case (eHDSI Business Requirements and eHDSI SAML Profile update).
 This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 July 2021 as a replacement of version 5.1.4.
 
