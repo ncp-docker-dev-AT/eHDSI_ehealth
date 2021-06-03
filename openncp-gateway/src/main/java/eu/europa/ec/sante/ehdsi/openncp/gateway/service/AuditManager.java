@@ -120,6 +120,7 @@ public class AuditManager {
         } catch (URISyntaxException e) {
             LOGGER.error("URISyntaxException: '{}'", e.getMessage(), e);
         }
+
         return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, DateTimeUtil.timeUTC(),
                 EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                 serviceConsumerUserId, serviceProviderUserId, participantId, null,

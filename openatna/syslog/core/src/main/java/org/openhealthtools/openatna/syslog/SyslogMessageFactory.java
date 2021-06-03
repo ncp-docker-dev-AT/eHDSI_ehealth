@@ -77,7 +77,7 @@ public abstract class SyslogMessageFactory {
             }
         }
         try {
-            return m.newInstance();
+            return m.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new SyslogException(e);
         }
@@ -91,7 +91,7 @@ public abstract class SyslogMessageFactory {
     public static String readBom(PushbackInputStream in, String expectedEncoding) throws IOException {
 
         String encoding = expectedEncoding;
-        byte[] bom = new byte[4];
+        var bom = new byte[4];
         int unread;
         int n = in.read(bom);
 

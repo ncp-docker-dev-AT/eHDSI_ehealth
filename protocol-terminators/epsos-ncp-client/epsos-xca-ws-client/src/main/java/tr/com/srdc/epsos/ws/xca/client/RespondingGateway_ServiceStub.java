@@ -236,7 +236,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addAttribute(att1);
 
             SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             SOAPHeaderBlock to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
@@ -514,16 +514,14 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                     //make the fault by reflection
                     try {
-                        java.lang.String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
-                        java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                        java.lang.Exception ex
-                                = (java.lang.Exception) exceptionClass.newInstance();
+                        String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
+                        Class exceptionClass = java.lang.Class.forName(exceptionClassName);
+                        Exception ex = (java.lang.Exception) exceptionClass.getDeclaredConstructor().newInstance();
                         //message class
-                        java.lang.String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
-                        java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
-                        java.lang.Object messageObject = fromOM(faultElt, messageClass, null);
-                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
-                                messageClass);
+                        String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
+                        Class messageClass = java.lang.Class.forName(messageClassName);
+                        Object messageObject = fromOM(faultElt, messageClass, null);
+                        Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
                         m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
@@ -589,7 +587,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addChild(node);
 
             OMElement id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             OMElement to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
@@ -815,7 +813,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 try {
                     String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
                     Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                    Exception ex = (Exception) exceptionClass.newInstance();
+                    Exception ex = (Exception) exceptionClass.getDeclaredConstructor().newInstance();
                     //message class
                     String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
                     Class messageClass = java.lang.Class.forName(messageClassName);

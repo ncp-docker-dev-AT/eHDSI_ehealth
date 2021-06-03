@@ -14,6 +14,7 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.cryptacular.util.CertUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensaml.core.config.InitializationException;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
@@ -200,12 +200,10 @@ public class STSService implements Provider<SOAPMessage> {
                     certFactory = CertificateFactory.getInstance("X.509");
                     java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) certFactory
                             .generateCertificate(inputStream);
-                    logger.info(((X500Name) cert.getSubjectDN()).getCommonName());
-                    return ((X500Name) cert.getSubjectDN()).getCommonName();
+                    logger.info(getCommonName(cert));
+                    return getCommonName(cert);
                 } catch (CertificateException e) {
                     logger.error("CertificateException: '{}'", e.getMessage());
-                } catch (IOException e) {
-                    logger.error("IOException: '{}'", e.getMessage());
                 }
             }
         }
@@ -414,4 +412,10 @@ public class STSService implements Provider<SOAPMessage> {
             }
         }
     }
+
+    private String getCommonName(java.security.cert.X509Certificate cert){
+        return CertUtil.subjectCN(cert);
+    }
+
+
 }

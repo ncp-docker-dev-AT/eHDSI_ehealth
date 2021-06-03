@@ -435,7 +435,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 try {
                     String exceptionClassName = (String) faultExceptionClassNameMap.get(faultElt.getQName());
                     Class exceptionClass = Class.forName(exceptionClassName);
-                    Exception ex = (Exception) exceptionClass.newInstance();
+                    Exception ex = (Exception) exceptionClass.getDeclaredConstructor().newInstance();
                     // message class
                     String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                     Class messageClass = Class.forName(messageClassName);
