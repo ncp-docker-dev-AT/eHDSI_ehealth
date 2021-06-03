@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.nio.file.Paths;
 
 /**
  * @author Inês Garganta
@@ -123,7 +120,7 @@ public class AuditManager {
         } catch (URISyntaxException e) {
             LOGGER.error("URISyntaxException: '{}'", e.getMessage(), e);
         }
-        URI uri = Paths.get(smpServerUri).toUri();
+
         return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, DateTimeUtil.timeUTC(),
                 EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                 serviceConsumerUserId, serviceProviderUserId, participantId, null,
