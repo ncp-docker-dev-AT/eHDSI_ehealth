@@ -1,6 +1,6 @@
 package epsos.ccd.gnomon.xslt.util;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 
@@ -31,13 +31,11 @@ public class PdfValidator extends AbstractValidator {
                 " " +
                 xpath.evaluate("/*[local-name()='ClinicalDocument']/*[local-name()='recordTarget']/*[local-name()='patientRole']/*[local-name()='patient']/*[local-name()='name']/*[local-name()='family']/text()",
                         cdaDoc, XPathConstants.STRING);
-        String patientNameHtml = StringEscapeUtils.unescapeHtml(new StringBuilder()
-                .append(((String) xpath.evaluate("((((/html/body/table[@class='header_table']/tbody/tr)[3]/table[@class='header_table']/tbody/tr)[2]/td)[3])/text()",
-                        resultDoc, XPathConstants.STRING)).trim())
-                .append(" ")
-                .append(((String) xpath.evaluate("((((/html/body/table[@class='header_table']/tbody/tr)[3]/table[@class='header_table']/tbody/tr)[2]/td)[2])/text()",
-                        resultDoc, XPathConstants.STRING)).trim())
-                .toString());
+        String patientNameHtml = StringEscapeUtils.unescapeHtml4(((String) xpath.evaluate("((((/html/body/table[@class='header_table']/tbody/tr)[3]/table[@class='header_table']/tbody/tr)[2]/td)[3])/text()",
+                resultDoc, XPathConstants.STRING)).trim() +
+                " " +
+                ((String) xpath.evaluate("((((/html/body/table[@class='header_table']/tbody/tr)[3]/table[@class='header_table']/tbody/tr)[2]/td)[2])/text()",
+                        resultDoc, XPathConstants.STRING)).trim());
         Assert.assertEquals(patientNameCda, patientNameHtml);
     }
 }
