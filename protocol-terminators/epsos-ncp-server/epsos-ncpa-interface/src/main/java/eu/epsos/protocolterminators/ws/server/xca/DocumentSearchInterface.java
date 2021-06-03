@@ -40,12 +40,36 @@ public interface DocumentSearchInterface extends NationalConnectorInterface {
     List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
 
     /**
-     * This method returns one/several OrCDDocumentMetaData in XML format) that matches the searchCriteria.
+     * This method returns one/several OrCD Laboratory Results DocumentMetaData in XML format that matches the searchCriteria.
      *
      * @param searchCriteria (see SearchCriteria interface for more info)
      * @return List<OrCDDocumentMetaData>
      */
-    List<OrCDDocumentMetaData> getOrCDLaboratoryDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
+    List<OrCDDocumentMetaData> getOrCDLaboratoryResultsDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
+
+    /**
+     * This method returns one/several OrCD Hospital Discharge Reports DocumentMetaData in XML format that matches the searchCriteria.
+     *
+     * @param searchCriteria (see SearchCriteria interface for more info)
+     * @return List<OrCDDocumentMetaData>
+     */
+    List<OrCDDocumentMetaData> getOrCDHospitalDischargeReportsDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
+
+    /**
+     * This method returns one/several OrCD Medical Imaging Reports DocumentMetaData in XML format that matches the searchCriteria.
+     *
+     * @param searchCriteria (see SearchCriteria interface for more info)
+     * @return List<OrCDDocumentMetaData>
+     */
+    List<OrCDDocumentMetaData> getOrCDMedicalImagingReportsDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
+
+    /**
+     * This method returns one/several OrCD Medical Images DocumentMetaData in XML format that matches the searchCriteria.
+     *
+     * @param searchCriteria (see SearchCriteria interface for more info)
+     * @return List<OrCDDocumentMetaData>
+     */
+    List<OrCDDocumentMetaData> getOrCDMedicalImagesDocumentList(SearchCriteria searchCriteria) throws NIException, InsufficientRightsException;
 
     /**
      * This method returns one EPSOSDocument which includes document metaData
