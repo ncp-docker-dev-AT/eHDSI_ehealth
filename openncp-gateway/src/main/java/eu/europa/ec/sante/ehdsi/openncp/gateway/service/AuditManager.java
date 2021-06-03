@@ -27,6 +27,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Paths;
@@ -115,6 +117,12 @@ public class AuditManager {
         String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServerUri);
         String localIp = IPUtil.getPrivateServerIp();
         String participantId = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
+        URI uri = null;
+        try {
+            uri = new URI(smpServerUri);
+        } catch (URISyntaxException e) {
+            LOGGER.error("URISyntaxException: '{}'", e.getMessage(), e);
+        }
         URI uri = Paths.get(smpServerUri).toUri();
         return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, DateTimeUtil.timeUTC(),
                 EventOutcomeIndicator.FULL_SUCCESS, null, null, null,

@@ -289,6 +289,7 @@ public class SAML2Validator {
      */
     public static List<Assertion> getAssertions(Element soapHeader) {
 
+        LOGGER.info("Retrieving SAML tokens from SOAP Header");
         NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
 
         Element security = (Element) securityList.item(0);
@@ -305,7 +306,7 @@ public class SAML2Validator {
             try {
                 // Validate Assertion according to SAML XSD
                 SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
+                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
                 result.add((Assertion) SAML.fromElement(ass));
 
             } catch (UnmarshallingException | IOException | SAXException ex) {

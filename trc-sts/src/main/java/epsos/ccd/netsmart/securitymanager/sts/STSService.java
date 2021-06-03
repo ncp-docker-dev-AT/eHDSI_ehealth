@@ -12,6 +12,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.cryptacular.util.CertUtil;
 import org.joda.time.DateTime;
@@ -211,10 +212,10 @@ public class STSService implements Provider<SOAPMessage> {
 
     private String removeDisplayCharacter(String certificateValue) {
 
-        String certificatePEM = StringUtils.removeAll(certificateValue, "-----BEGIN CERTIFICATE-----");
-        certificatePEM = StringUtils.removeAll(certificatePEM, "-----END CERTIFICATE-----");
-        certificatePEM = StringUtils.removeAll(certificatePEM, StringUtils.LF);
-        certificatePEM = StringUtils.removeAll(certificatePEM, StringUtils.CR);
+        String certificatePEM = RegExUtils.removeAll(certificateValue, "-----BEGIN CERTIFICATE-----");
+        certificatePEM = RegExUtils.removeAll(certificatePEM, "-----END CERTIFICATE-----");
+        certificatePEM = RegExUtils.removeAll(certificatePEM, StringUtils.LF);
+        certificatePEM = RegExUtils.removeAll(certificatePEM, StringUtils.CR);
         return certificatePEM;
     }
 

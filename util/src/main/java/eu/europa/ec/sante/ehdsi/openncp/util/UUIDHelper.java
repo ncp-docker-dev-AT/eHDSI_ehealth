@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.util;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ public class UUIDHelper {
 
     public static String encodeAsURN(String uuid) {
 
-        uuid = StringUtils.removeAll(uuid, "urn:uuid:");
-        uuid = StringUtils.removeAll(uuid, "_");
-        uuid = StringUtils.removeAll(uuid, "-");
+        uuid = RegExUtils.removeAll(uuid, "urn:uuid:");
+        uuid = RegExUtils.removeAll(uuid, "_");
+        uuid = RegExUtils.removeAll(uuid, "-");
 
         Pattern pattern = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
 
