@@ -16,6 +16,10 @@ public class Constants {
     public static final String EDD_CLASSCODE = "DISCARD-60593-1";
     public static final String ED_CLASSCODE = "60593-1";
     public static final String MRO_CLASSCODE = "56445-0";
+    public static final String ORCD_LABORATORY_RESULTS_CLASSCODE = "11502-2";
+    public static final String ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE= "34105-7";
+    public static final String ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE= "18748-4";
+    public static final String ORCD_MEDICAL_IMAGES_CLASSCODE= "x-clinical-image";
     public static final String CONSENT_CLASSCODE = "57016-8";
     public static final String HCER_CLASSCODE = "34133-9";
     public static final int FORMAT_XML = 1;
