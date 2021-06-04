@@ -1,9 +1,13 @@
 package eu.europa.ec.sante.ehdsi.openncp.configmanager;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property;
-import org.hibernate.*;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.query.Query;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

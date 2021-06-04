@@ -159,7 +159,7 @@ public class TRCAssertionCreator {
 
             // Set factory
             String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
 
             // Set keyStore
             FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH);

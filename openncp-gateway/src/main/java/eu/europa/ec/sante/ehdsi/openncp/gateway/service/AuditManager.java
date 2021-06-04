@@ -1,6 +1,5 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.service;
 
-import com.sun.jndi.toolkit.url.Uri;
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
@@ -28,7 +27,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Inês Garganta
@@ -114,12 +114,13 @@ public class AuditManager {
         String serviceProviderUserId = HTTPUtil.getTlsCertificateCommonName(smpServerUri);
         String localIp = IPUtil.getPrivateServerIp();
         String participantId = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION");
-        Uri uri = null;
+        URI uri = null;
         try {
-            uri = new Uri(smpServerUri);
-        } catch (MalformedURLException e) {
-            LOGGER.error("MalformedURLException: '{}'", e.getMessage(), e);
+            uri = new URI(smpServerUri);
+        } catch (URISyntaxException e) {
+            LOGGER.error("URISyntaxException: '{}'", e.getMessage(), e);
         }
+
         return EventLog.createEventLogPatientPrivacy(transactionName, EventActionCode.EXECUTE, DateTimeUtil.timeUTC(),
                 EventOutcomeIndicator.FULL_SUCCESS, null, null, null,
                 serviceConsumerUserId, serviceProviderUserId, participantId, null,

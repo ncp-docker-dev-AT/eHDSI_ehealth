@@ -4,8 +4,7 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
     <!--  placeHolder defined in tm -->
-    <bean id="placeholderConfig"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="placeholderConfig" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="location" value="tsam.properties"/>
     </bean>
 
