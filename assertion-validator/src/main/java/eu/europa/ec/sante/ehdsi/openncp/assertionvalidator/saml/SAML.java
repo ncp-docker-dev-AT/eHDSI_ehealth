@@ -1,9 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
-import net.shibboleth.utilities.java.support.security.SecureRandomIdentifierGenerationStrategy;
+import net.shibboleth.utilities.java.support.security.impl.SecureRandomIdentifierGenerationStrategy;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
@@ -30,6 +28,8 @@ import javax.xml.transform.TransformerException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,7 +98,7 @@ public class SAML {
         if (StringUtils.equals(command, "generate")) {
             String type = args[1];
 
-            SAML handler = new SAML("http://saml.r.us/AssertingParty");
+            var handler = new SAML("http://saml.r.us/AssertingParty");
 
             switch (type) {
 
@@ -118,7 +118,7 @@ public class SAML {
                     System.exit(-1);
             }
         } else {
-            SAML handler = new SAML();
+            var handler = new SAML();
             handler.printToFile(handler.readFromFile(args[0]), args.length > 1 ? args[1] : null);
         }
     }
@@ -128,7 +128,7 @@ public class SAML {
      */
     public static Element addToElement(XMLObject object, Element parent) throws MarshallingException {
 
-        Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
+        var out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
         return out.marshall(object, parent);
     }
 
@@ -243,9 +243,8 @@ public class SAML {
         Assertion assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
         assertion.setID(generator.generateIdentifier());
 
-        DateTime now = new DateTime();
-        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        assertion.setIssueInstant(nowUTC.toDateTime());
+        Instant issueInstant = Instant.now();
+        assertion.setIssueInstant(issueInstant);
 
         if (issuerURL != null) {
             assertion.setIssuer(spawnIssuer());
@@ -253,8 +252,8 @@ public class SAML {
         assertion.setSubject(subject);
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-        conditions.setNotBefore(nowUTC.toDateTime());
-        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(4));
+        conditions.setNotBefore(issueInstant);
+        conditions.setNotOnOrAfter(issueInstant.plus(Duration.ofHours(4)));
         assertion.setConditions(conditions);
 
         return assertion;
@@ -289,9 +288,8 @@ public class SAML {
             response.setInResponseTo(inResponseTo);
         }
 
-        DateTime now = new DateTime();
-        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        response.setIssueInstant(nowUTC.toDateTime());
+        Instant issueInstant = Instant.now();
+        response.setIssueInstant(issueInstant);
 
         if (issuerURL != null) {
             response.setIssuer(spawnIssuer());
@@ -307,7 +305,7 @@ public class SAML {
         if (message != null) {
 
             StatusMessage statusMessage = create(StatusMessage.class, StatusMessage.DEFAULT_ELEMENT_NAME);
-            statusMessage.setMessage(message);
+            statusMessage.setValue(message);
             status.setStatusMessage(statusMessage);
         }
 
@@ -336,7 +334,7 @@ public class SAML {
 
         Assertion assertion = createAssertion(subject);
         AuthnContextClassRef ref = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-        ref.setAuthnContextClassRef(authnCtx);
+        ref.setURI(authnCtx);
 
         // As of this writing, OpenSAML doesn't model the wide range of authentication context namespaces defined in SAML 2.0.
         // For a real project we'd probably move on to XSAny objects, setting QNames and values each-by-each a

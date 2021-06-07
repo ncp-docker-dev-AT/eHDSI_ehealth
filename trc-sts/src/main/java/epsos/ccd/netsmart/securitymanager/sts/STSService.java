@@ -55,6 +55,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -143,8 +144,8 @@ public class STSService implements Provider<SOAPMessage> {
             Assertion trc = samlTRCIssuer.issueTrcToken(hcpIdAssertion, patientID, purposeOfUse, dispensationPinCode, prescriptionId, null);
             if (hcpIdAssertion != null) {
                 logger.info("HCP Assertion Date: '{}' TRC Assertion Date: '{}' -- '{}'",
-                        hcpIdAssertion.getIssueInstant().withZone(DateTimeZone.UTC),
-                        trc.getIssueInstant().withZone(DateTimeZone.UTC), trc.getAuthnStatements().isEmpty());
+                        hcpIdAssertion.getIssueInstant().atZone(ZoneId.of("UTC")),
+                        trc.getIssueInstant().atZone(ZoneId.of("UTC")), trc.getAuthnStatements().isEmpty());
             }
 
             Document signedDoc = builder.newDocument();
@@ -413,7 +414,7 @@ public class STSService implements Provider<SOAPMessage> {
         }
     }
 
-    private String getCommonName(java.security.cert.X509Certificate cert){
+    private String getCommonName(java.security.cert.X509Certificate cert) {
         return CertUtil.subjectCN(cert);
     }
 
