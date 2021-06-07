@@ -248,10 +248,10 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorPS(Assertion assertion) throws InsufficientRightsException {
 
-        boolean medicalHistory = false;
-        boolean vitalSign = false;
-        boolean patientMedications = false;
-        boolean reviewProblem = false;
+        var medicalHistory = false;
+        var vitalSign = false;
+        var patientMedications = false;
+        var reviewProblem = false;
 
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
@@ -317,8 +317,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorEP(Assertion assertion) throws InsufficientRightsException {
 
-        boolean reviewExistingOrders = false;
-        boolean patientMedications = false;
+        var reviewExistingOrders = false;
+        var patientMedications = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
@@ -407,8 +407,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorSubmitDocument(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
-
+        var recordMedicationAdministrationRecord = false;
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
         String functionalRole;
@@ -461,7 +460,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorConsent(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
+        var recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;

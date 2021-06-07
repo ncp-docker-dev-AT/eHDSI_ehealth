@@ -256,7 +256,7 @@ public class SAML2Validator {
     private static void checkTRCAdviceIdReferenceAgainstHCPId(Assertion trcAssertion, Assertion hcpAssertion) throws InsufficientRightsException {
 
         try {
-            String trcFirstReferenceId = trcAssertion.getAdvice().getAssertionIDReferences().get(0).getAssertionID();
+            String trcFirstReferenceId = trcAssertion.getAdvice().getAssertionIDReferences().get(0).getValue();
 
             if (trcFirstReferenceId != null && trcFirstReferenceId.equals(hcpAssertion.getID())) {
                 LOGGER.info("Assertion id reference equals to id.");
