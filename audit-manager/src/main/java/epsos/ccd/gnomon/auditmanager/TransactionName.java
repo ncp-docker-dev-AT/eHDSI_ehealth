@@ -16,6 +16,8 @@ public enum TransactionName {
     PATIENT_SERVICE_RETRIEVE("PatientService::Retrieve"),
     ORDER_SERVICE_LIST("OrderService::List"),
     ORDER_SERVICE_RETRIEVE("OrderService::Retrieve"),
+    ORCD_SERVICE_LIST("OrCDService::List"),
+    ORCD_SERVICE_RETRIEVE("OrCDService::Retrieve"),
     DISPENSATION_SERVICE_INITIALIZE("DispensationService::Initialize"),
     DISPENSATION_SERVICE_DISCARD("DispensationService::Discard"),
     CONSENT_SERVICE_PUT("ConsentService::Put"),
