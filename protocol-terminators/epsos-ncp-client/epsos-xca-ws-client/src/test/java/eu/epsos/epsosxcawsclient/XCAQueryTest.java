@@ -32,7 +32,7 @@ public class XCAQueryTest {
     private static final String PATIENT_COUNTRY = TestConstants.PATIENT_COUNTRY;
     private static final String PATIENT_ID = TestConstants.PATIENT_ID;
     private static final String CLASSCODE = Constants.EP_CLASSCODE;
-    private static final String CLASSCODE_SCHEMA = IheConstants.ClASSCODE_SCHEME;
+    private static final String CLASSCODE_SCHEMA = IheConstants.CLASSCODE_SCHEME;
     private static final String HOME_COMMUNITY_ID = TestConstants.HOME_CUMMUNITY_ID;
 
     public XCAQueryTest() {

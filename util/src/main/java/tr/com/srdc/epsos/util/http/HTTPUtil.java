@@ -5,9 +5,9 @@ import eu.epsos.util.proxy.ProxyCredentials;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import org.cryptacular.util.CertUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.*;
@@ -49,12 +49,7 @@ public class HTTPUtil {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 
         if (certs != null && certs.length > 0) {
-
-            try {
-                result = ((X500Name) certs[0].getSubjectDN()).getCommonName();
-            } catch (IOException e) {
-                result = "Warning!: No Client certificate found!";
-            }
+            result = getCommonName(certs[0]);
         } else {
             if ("https".equals(request.getScheme())) {
                 LOGGER.warn("This was an HTTPS request, " + "but no client certificate is available");
@@ -72,18 +67,14 @@ public class HTTPUtil {
         Certificate[] certificates = getSSLPeerCertificate(host, false);
         if (certificates != null && certificates.length > 0) {
             X509Certificate cert = (X509Certificate) certificates[0];
-            try {
-                return ((X500Name) cert.getSubjectDN()).getCommonName();
-            } catch (IOException e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            }
+            return getCommonName(cert);
         }
         return "Warning!: No Server certificate found!";
     }
 
     private static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
 
-        HttpsURLConnection con = null;
+        HttpsURLConnection urlConnection = null;
 
         if (!sslValidation) {
 
@@ -91,7 +82,7 @@ public class HTTPUtil {
 
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                    return new X509Certificate[0];
                 }
 
                 @Override
@@ -113,26 +104,26 @@ public class HTTPUtil {
                 keyManagerFactory.init(keyStore, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
 
                 // Install the all-trusting trust manager
-                SSLContext sc;
-                sc = SSLContext.getInstance("TLSv1.2");
-                sc.init(keyManagerFactory.getKeyManagers(), trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                SSLContext sslContext;
+                sslContext = SSLContext.getInstance("TLSv1.2");
+                sslContext.init(keyManagerFactory.getKeyManagers(), trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
                 URL url;
                 url = new URL(host);
-                con = (HttpsURLConnection) url.openConnection();
-                con.setHostnameVerifier((hostname, session) -> true);
-                con.setSSLSocketFactory(sc.getSocketFactory());
-                con.connect();
-                return con.getServerCertificates();
+                urlConnection = (HttpsURLConnection) url.openConnection();
+                urlConnection.setHostnameVerifier((hostname, session) -> true);
+                urlConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                urlConnection.connect();
+                return urlConnection.getServerCertificates();
 
             } catch (IOException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException
                     | KeyManagementException | CertificateException e) {
                 LOGGER.error("Error: '{}'", e.getMessage(), e);
             } finally {
 
-                if (con != null) {
-                    con.disconnect();
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
                 }
             }
         }
@@ -163,9 +154,9 @@ public class HTTPUtil {
      */
     public static String getServerCertificate(String endpoint) {
 
-        LOGGER.info("Trying to find certificate from : '{}'", endpoint);
+        LOGGER.debug("Trying to find certificate from : '{}'", endpoint);
         String result = "";
-        HttpsURLConnection con = null;
+        HttpsURLConnection urlConnection = null;
 
         try {
             if (!endpoint.startsWith("https")) {
@@ -175,18 +166,18 @@ public class HTTPUtil {
 
                 URL url;
                 url = new URL(endpoint);
-                con = (HttpsURLConnection) url.openConnection();
+                urlConnection = (HttpsURLConnection) url.openConnection();
                 //TODO: not sustainable solution: EHNCP-1363
-                con.setHostnameVerifier((hostname, session) -> true);
+                urlConnection.setHostnameVerifier((hostname, session) -> true);
                 // End EHNCP-1363
-                con.setSSLSocketFactory(sslsocketfactory);
-                con.connect();
-                Certificate[] certs = con.getServerCertificates();
+                urlConnection.setSSLSocketFactory(sslsocketfactory);
+                urlConnection.connect();
+                Certificate[] certs = urlConnection.getServerCertificates();
 
                 // Get the first certificate
                 if (certs != null && certs.length > 0) {
                     X509Certificate cert = (X509Certificate) certs[0];
-                    result = ((X500Name) cert.getSubjectDN()).getCommonName();
+                    result = getCommonName(cert);
                 } else {
                     result = "Warning!: No Server certificate found!";
                 }
@@ -194,8 +185,8 @@ public class HTTPUtil {
         } catch (IOException e) {
             LOGGER.error("IOException: '{}'", e.getMessage(), e);
         } finally {
-            if (con != null) {
-                con.disconnect();
+            if (urlConnection != null) {
+                urlConnection.disconnect();
             }
         }
         LOGGER.debug("Server Certificate: '{}'", result);
@@ -231,8 +222,7 @@ public class HTTPUtil {
             }
             if (cert instanceof X509Certificate) {
                 X509Certificate x509Certificate = (X509Certificate) cert;
-                Principal principal = x509Certificate.getSubjectDN();
-                return ((X500Name) principal).getCommonName();
+                return getCommonName(x509Certificate);
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
@@ -275,5 +265,9 @@ public class HTTPUtil {
             return ps;
         }
         return null;
+    }
+
+    private static String getCommonName(java.security.cert.X509Certificate cert){
+        return CertUtil.subjectCN(cert);
     }
 }

@@ -180,6 +180,22 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
+     * @param assertion
+     * @param documentClass
+     * @throws MissingFieldException
+     * @throws InvalidFieldException
+     */
+    @Override
+    public void XSPAOrganizationIdValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+
+        String organizationId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION_ID);
+        if (StringUtils.isBlank(organizationId)) {
+            throw new InvalidFieldException("XSPA Organization ID 'urn:oasis:names:tc:xspa:1.0:subject:organization-id' attribute in assertion should be filled.");
+        }
+        logger.debug("HCP Identity Assertion XSPA Organization ID: '{}", organizationId);
+    }
+
+    /**
      * @param assertion - SAML user assertion.
      * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
@@ -232,10 +248,10 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorPS(Assertion assertion) throws InsufficientRightsException {
 
-        boolean medicalHistory = false;
-        boolean vitalSign = false;
-        boolean patientMedications = false;
-        boolean reviewProblem = false;
+        var medicalHistory = false;
+        var vitalSign = false;
+        var patientMedications = false;
+        var reviewProblem = false;
 
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
@@ -301,8 +317,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorEP(Assertion assertion) throws InsufficientRightsException {
 
-        boolean reviewExistingOrders = false;
-        boolean patientMedications = false;
+        var reviewExistingOrders = false;
+        var patientMedications = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
@@ -366,7 +382,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         switch (documentClass) {
             //  eDispensation document
             case Constants.ED_CLASSCODE:
-                XDRPermissionValidatorDispense(assertion);
+            case Constants.EDD_CLASSCODE:
+                XDRPermissionValidatorSubmitDocument(assertion);
                 break;
             //  HCER is not supported currently in eHDSI project.
             case Constants.HCER_CLASSCODE:
@@ -383,15 +400,14 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
-     * XDR validation of dispensation service.
+     * XDR validation of Submit Document service (Dispense or Discard Medication).
      *
      * @param assertion - SAML user assertion.
      * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
-    private void XDRPermissionValidatorDispense(Assertion assertion) throws InsufficientRightsException {
+    private void XDRPermissionValidatorSubmitDocument(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
-
+        var recordMedicationAdministrationRecord = false;
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
         String functionalRole;
@@ -433,7 +449,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorEncounterReport(Assertion assertion) throws InsufficientRightsException {
 
-        XDRPermissionValidatorDispense(assertion);
+        XDRPermissionValidatorSubmitDocument(assertion);
     }
 
     /**
@@ -444,7 +460,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorConsent(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
+        var recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;

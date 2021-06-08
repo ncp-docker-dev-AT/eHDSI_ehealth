@@ -28,7 +28,7 @@
 
     <xs:complexType name="queryPatient">
         <xs:sequence>
-            <xs:element name="arg0" type="tns:queryPatientRequest" minOccurs="0"/>
+            <xs:element name="arg0" type="tns:queryPatientRequest"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -36,7 +36,7 @@
         <xs:complexContent>
             <xs:extension base="tns:epsosServiceRequest">
                 <xs:sequence>
-                    <xs:element name="patientDemographics" type="tns:patientDemographics" minOccurs="0"/>
+                    <xs:element name="patientDemographics" type="tns:patientDemographics"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -44,7 +44,7 @@
 
     <xs:complexType name="epsosServiceRequest">
         <xs:sequence>
-            <xs:element name="countryCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="countryCode" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -79,7 +79,7 @@
 
     <xs:complexType name="retrieveDocument">
         <xs:sequence>
-            <xs:element name="arg0" type="tns:retrieveDocumentRequest" minOccurs="0"/>
+            <xs:element name="arg0" type="tns:retrieveDocumentRequest"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -87,10 +87,10 @@
         <xs:complexContent>
             <xs:extension base="tns:epsosServiceRequest">
                 <xs:sequence>
-                    <xs:element name="homeCommunityId" type="xs:string" minOccurs="0"/>
-                    <xs:element name="documentId" type="tns:documentId" minOccurs="0"/>
-                    <xs:element name="classCode" type="tns:genericDocumentCode" minOccurs="0"/>
-                    <xs:element name="targetLanguage" type="xs:string" minOccurs="0"/>
+                    <xs:element name="homeCommunityId" type="xs:string"/>
+                    <xs:element name="documentId" type="tns:documentId"/>
+                    <xs:element name="classCode" type="tns:genericDocumentCode"/>
+                    <xs:element name="targetLanguage" type="xs:string"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -148,7 +148,7 @@
 
     <xs:complexType name="submitDocument">
         <xs:sequence>
-            <xs:element name="arg0" type="tns:submitDocumentRequest" minOccurs="0"/>
+            <xs:element name="arg0" type="tns:submitDocumentRequest"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -156,7 +156,7 @@
         <xs:complexContent>
             <xs:extension base="tns:epsosServiceRequest">
                 <xs:sequence>
-                    <xs:element name="document" type="tns:epsosDocument" minOccurs="0"/>
+                    <xs:element name="document" type="tns:epsosDocument"/>
                     <xs:element name="patientDemographics" type="tns:patientDemographics" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
@@ -164,12 +164,14 @@
     </xs:complexType>
 
     <xs:complexType name="submitDocumentResponse">
-        <xs:sequence/>
+        <xs:sequence>
+            <xs:element name="responseStatus" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="sayHello">
         <xs:sequence>
-            <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+            <xs:element name="arg0" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -181,7 +183,7 @@
 
     <xs:complexType name="queryDocuments">
         <xs:sequence>
-            <xs:element name="arg0" type="tns:queryDocumentRequest" minOccurs="0"/>
+            <xs:element name="arg0" type="tns:queryDocumentRequest"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -189,8 +191,8 @@
         <xs:complexContent>
             <xs:extension base="tns:epsosServiceRequest">
                 <xs:sequence>
-                    <xs:element name="patientId" type="tns:patientId" minOccurs="0"/>
-                    <xs:element name="classCode" type="tns:genericDocumentCode" minOccurs="0"/>
+                    <xs:element name="patientId" type="tns:patientId"/>
+                    <xs:element name="classCode" type="tns:genericDocumentCode"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

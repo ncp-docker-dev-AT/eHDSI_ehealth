@@ -8,7 +8,6 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -21,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -90,17 +91,18 @@ public class SamlTRCIssuer {
                 throw new SMgrException("Patiend ID cannot be null");
             }
 
-            DateTime now = new DateTime();
-            DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-
-            trc.setIssueInstant(nowUTC.toDateTime());
+            //DateTime now = new DateTime();
+            //DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
+            //nowUTC.toDateTime()
+            Instant issuanceInstant = Instant.now();
+            trc.setIssueInstant(issuanceInstant);
             trc.setID("_" + UUID.randomUUID());
             trc.setVersion(SAMLVersion.VERSION_20);
 
             // Create and add the Subject
             Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
             trc.setSubject(subject);
-            Issuer issuer = new IssuerBuilder().buildObject();
+            var issuer = new IssuerBuilder().buildObject();
             String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
             String confIssuer = "urn:initgw:" + countryCode + ":countryB";
 
@@ -120,8 +122,8 @@ public class SamlTRCIssuer {
 
             //Create and add conditions
             Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-            conditions.setNotBefore(nowUTC.toDateTime());
-            conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2)); // According to Spec
+            conditions.setNotBefore(issuanceInstant);
+            conditions.setNotOnOrAfter(issuanceInstant.plus(Duration.ofHours(2))); // According to Spec
             trc.setConditions(conditions);
 
             //Create and add Advice
@@ -130,18 +132,18 @@ public class SamlTRCIssuer {
 
             //Create and add AssertionIDRef
             AssertionIDRef aIdRef = create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
-            aIdRef.setAssertionID(idaReference);
+            aIdRef.setValue(idaReference);
             advice.getAssertionIDReferences().add(aIdRef);
 
             //Add and create the authentication statement
             AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-            authStmt.setAuthnInstant(nowUTC.toDateTime());
+            authStmt.setAuthnInstant(issuanceInstant);
             trc.getAuthnStatements().add(authStmt);
 
             //Creata and add AuthnContext
             AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
             AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-            accr.setAuthnContextClassRef(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
+            accr.setURI(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
             ac.setAuthnContextClassRef(accr);
             authStmt.setAuthnContext(ac);
 
@@ -211,7 +213,7 @@ public class SamlTRCIssuer {
                                    List<Attribute> attrValuePair) throws SMgrException {
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
+            loggerClinical.debug("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
                     hcpIdentityAssertion.getID(), patientID, purposeOfUse);
         }
         // Initializing the Map
@@ -227,18 +229,19 @@ public class SamlTRCIssuer {
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
 
-        DateTime nowUTC = new DateTime(DateTimeZone.UTC);
+        //DateTime nowUTC = new DateTime(DateTimeZone.UTC);
+        Instant issuanceInstant = Instant.now();
         logger.info("Assertion validity: '{}' - '{}'", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
-        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(nowUTC.toDateTime())) {
+        if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(issuanceInstant)) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used before " +
-                    hcpIdentityAssertion.getConditions().getNotBefore() + ". Current UTC time is " + nowUTC.toDateTime();
+                    hcpIdentityAssertion.getConditions().getNotBefore() + ". Current UTC time is " + issuanceInstant;
             logger.error("SecurityManagerException: '{}'", msg);
             throw new SMgrException(msg);
         }
-        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(nowUTC.toDateTime())) {
+        if (hcpIdentityAssertion.getConditions().getNotOnOrAfter().isBefore(issuanceInstant)) {
             String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + " can't be used after " +
-                    hcpIdentityAssertion.getConditions().getNotOnOrAfter() + ". Current UTC time is " + nowUTC.toDateTime();
+                    hcpIdentityAssertion.getConditions().getNotOnOrAfter() + ". Current UTC time is " + issuanceInstant;
             logger.error("SecurityManagerException: '{}'", msg);
             throw new SMgrException(msg);
         }
@@ -254,7 +257,7 @@ public class SamlTRCIssuer {
 
         auditDataMap.put("patientID", patientID);
 
-        trc.setIssueInstant(nowUTC.toDateTime());
+        trc.setIssueInstant(issuanceInstant);
         trc.setID("_" + UUID.randomUUID());
         auditDataMap.put("trcAssertionID", trc.getID());
 
@@ -297,8 +300,8 @@ public class SamlTRCIssuer {
 
         //Create and add conditions according specifications (validity 2 hours)
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-        conditions.setNotBefore(nowUTC.toDateTime());
-        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(2));
+        conditions.setNotBefore(issuanceInstant);
+        conditions.setNotOnOrAfter(issuanceInstant.plus(Duration.ofHours(2)));
         trc.setConditions(conditions);
 
         //Create and add Advice
@@ -307,18 +310,18 @@ public class SamlTRCIssuer {
 
         //Create and add AssertionIDRef
         AssertionIDRef aIdRef = create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
-        aIdRef.setAssertionID(hcpIdentityAssertion.getID());
+        aIdRef.setValue(hcpIdentityAssertion.getID());
         advice.getAssertionIDReferences().add(aIdRef);
 
         //Add and create the authentication statement
         AuthnStatement authStmt = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-        authStmt.setAuthnInstant(nowUTC.toDateTime());
+        authStmt.setAuthnInstant(issuanceInstant);
         trc.getAuthnStatements().add(authStmt);
 
         //Creata and add AuthnContext
         AuthnContext ac = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
         AuthnContextClassRef accr = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-        accr.setAuthnContextClassRef(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
+        accr.setURI(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
         ac.setAuthnContextClassRef(accr);
         authStmt.setAuthnContext(ac);
 
@@ -395,7 +398,7 @@ public class SamlTRCIssuer {
         Attribute pointOfCareIdAttr = findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
-            String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
+            String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getURI();
             auditDataMap.put("pointOfCareID", pocId);
         } else {
             auditDataMap.put("pointOfCareID", "No Organization ID - POC information");
@@ -512,11 +515,9 @@ public class SamlTRCIssuer {
                     attr.setName(attribute.getNameFormat());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    //XMLObjectBuilder uriBuilder = Configuration.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
                     XMLObjectBuilder uriBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSURI.TYPE_NAME);
                     XSURI attrVal = (XSURI) uriBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
-
-                    attrVal.setValue(((XSURI) attribute.getAttributeValues().get(0)).getValue());
+                    attrVal.setURI(((XSURI) attribute.getAttributeValues().get(0)).getURI());
                     attr.getAttributeValues().add(attrVal);
 
                     return attr;

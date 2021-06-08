@@ -1,9 +1,10 @@
 package tr.com.srdc.epsos.data.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opensaml.saml.saml2.core.Assertion;
 
 /**
- * @author erdem
+ * @author DG-Sante A4
  */
 public class XdrRequest {
 
@@ -93,5 +94,20 @@ public class XdrRequest {
      */
     public void setDocumentCode(GenericDocumentCode documentCode) {
         this.documentCode = documentCode;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("idAssertion", idAssertion)
+                .append("trcAssertion", trcAssertion)
+                .append("countryCode", countryCode)
+                .append("countryName", countryName)
+                .append("cdaId", cdaId)
+                .append("submissionSetId", submissionSetId)
+                .append("cda", cda)
+                .append("documentCode", documentCode)
+                .append("patient", patient)
+                .toString();
     }
 }
