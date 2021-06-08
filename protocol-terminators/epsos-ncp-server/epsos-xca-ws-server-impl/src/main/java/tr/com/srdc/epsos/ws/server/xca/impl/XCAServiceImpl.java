@@ -1564,7 +1564,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                 registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-                registryError.setErrorCode("1103");
+                registryError.setErrorCode("1104");
                 registryError.setValue("No original clinical document of the requested type is registered for the given patient.");
                 registryError.setCodeContext("The XDS repository does not contain any OrCD of the requested type related to the current patient");
                 break;
