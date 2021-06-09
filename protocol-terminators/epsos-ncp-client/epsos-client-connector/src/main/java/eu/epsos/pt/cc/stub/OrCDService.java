@@ -20,8 +20,11 @@ public class OrCDService {
     private OrCDService() {
     }
 
-    public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
-                                     final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
+    public static QueryResponse list(final PatientId pid,
+                                     final String countryCode,
+                                     final GenericDocumentCode documentCode,
+                                     final Assertion idAssertion,
+                                     final Assertion trcAssertion) throws XCAException {
 
         return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCode, idAssertion, trcAssertion,
                 RegisteredService.ORCD_SERVICE.getServiceName());
