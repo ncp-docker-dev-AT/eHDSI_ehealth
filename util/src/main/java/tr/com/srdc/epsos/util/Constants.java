@@ -36,6 +36,10 @@ public class Constants {
     public static final String MRO_TITLE = "MRO Summary";
     public static final String EP_TITLE = "ePrescription";
     public static final String ED_TITLE = "eDispensation";
+    public static final String ORCD_HOSPITAL_DISCHARGE_SUMMARY_TITLE = "OrCD Hospital Discharge Summary";
+    public static final String ORCD_LABORATORY_REPORT_TITLE = "OrCD Laboratory Report";
+    public static final String ORCD_DIAGNOSTIC_IMAGING_STUDY_TITLE = "OrCD Diagnostic Imaging Study";
+    public static final String ORCD_MEDICAL_IMAGES_TITLE = "OrCD Medical Image";
     public static final String CONSENT_TITLE = "Privacy Policy Acknowledgement Document";
     public static final String UNKNOWN_TITLE = "Unknown Document Type";
 

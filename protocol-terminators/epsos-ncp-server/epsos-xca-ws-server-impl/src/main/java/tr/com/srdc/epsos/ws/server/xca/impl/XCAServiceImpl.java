@@ -570,6 +570,138 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
+     * @param docType
+     * @param effectiveTime
+     * @param repositoryId
+     * @param request
+     * @param eot
+     * @param documentId
+     * @return
+     */
+    private String prepareExtrinsicObjectOrCD(DocumentType docType,
+                                              Date effectiveTime,
+                                              String repositoryId,
+                                              AdhocQueryRequest request,
+                                              ExtrinsicObjectType eot,
+                                              String documentId,
+                                              String confidentialityCode,
+                                              String confidentialityDisplay,
+                                              String languageCode,
+                                              OrCDDocumentMetaData.DocumentFileType documentFileType) {
+
+        final String classCode = getDocumentEntryClassCode(request);
+        final String title;
+        final String nodeRepresentation;
+        final String displayName;
+
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
+                title = Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
+                title = Constants.ORCD_LABORATORY_REPORT_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
+                title = Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGES_TITLE;
+                switch (documentFileType) {
+                    case PNG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.DISPLAY_NAME;
+                        break;
+                    case JPEG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.DISPLAY_NAME;
+                        break;
+                    default:
+                        logger.error("Unsupported document file type '{}' for OrCD Medical Images", documentFileType);
+                        return "";
+                }
+                break;
+            default:
+                logger.error("Unsupported classCode for OrCD query in OpenNCP. Requested classCode: {}", classCode);
+                return "";
+
+        }
+
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
+        // Set Extrinsic Object
+        eot.setStatus(IheConstants.REGREP_STATUSTYPE_APPROVED);
+        eot.setHome(Constants.OID_PREFIX + Constants.HOME_COMM_ID);
+        eot.setId(uuid);
+        eot.setLid(uuid);
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
+
+        // Status
+        eot.setMimeType(MediaType.TEXT_XML_VALUE);
+
+        // Name
+        eot.setName(ofRim.createInternationalStringType());
+        eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
+        eot.getName().getLocalizedString().get(0).setValue(title);
+
+        // Description (optional)
+        eot.setDescription(ofRim.createInternationalStringType());
+        eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
+
+        // Version Info
+        eot.setVersionInfo(ofRim.createVersionInfoType());
+        eot.getVersionInfo().setVersionName("1.1");
+
+        // Creation Date (optional)
+        eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
+
+        // Source Patient Id
+        eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+
+        // LanguageCode (optional)
+        eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
+
+        // repositoryUniqueId (optional)
+        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+
+        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Type code (not written in 3.4.2)
+        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Confidentiality Code
+        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+        // FormatCode
+        eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+                    uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
+
+        /*
+         * Healthcare facility code
+         * TODO: Get healthcare facility info from national implementation
+         */
+        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+                uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
+        // Practice Setting code
+        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+
+        // External Identifiers
+        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
+                uuid, getDocumentEntryPatientId(request), "XDSDocumentEntry.patientId"));
+
+        eot.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
+                uuid, documentId, XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
+
+        return uuid;
+    }
+
+    /**
      * @param request
      * @param eot
      * @param document
@@ -803,6 +935,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
             } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+            } else if (StringUtils.contains(classCodeValue, Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE)
+                    || StringUtils.contains(classCodeValue, Constants.ORCD_LABORATORY_REPORT_CLASSCODE)
+                    || StringUtils.contains(classCodeValue, Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE)
+                    || StringUtils.contains(classCodeValue, Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
+                rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
                 rel.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
@@ -1089,8 +1226,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 || orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
                 : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
         final String languageCode = orCDDocumentMetaData.getLanguage();
-        String xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
-                orCDDocumentMetaData.getRepositoryId(), request, eotXML, false, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode);
+        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
+                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getDocumentFileType());
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         //TODO Mathias - To be reviewed if this is ok for the OrCD, for the other services an association object with both the XML and PDF is returned.
         if (!StringUtils.isEmpty(xmlUUID)) {

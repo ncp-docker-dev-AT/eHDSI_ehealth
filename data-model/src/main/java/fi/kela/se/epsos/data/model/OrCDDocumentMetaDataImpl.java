@@ -8,9 +8,15 @@ package fi.kela.se.epsos.data.model;
  */
 public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements OrCDDocumentMetaData {
 
-    private String orCDClassCode;
+    private DocumentFileType documentFileType;
 
-    public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData) {
+    public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, DocumentFileType documentFileType) {
         super(metaData);
+        this.documentFileType = documentFileType;
+    }
+
+    @Override
+    public DocumentFileType getDocumentFileType() {
+        return documentFileType;
     }
 }
