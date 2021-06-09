@@ -31,6 +31,7 @@ public class Constants {
     public static final String ConsentService = "ConsentService";
     public static final String DispensationService = "DispensationService";
     public static final String OrderService = "OrderService";
+    public static final String OrCDService = "OrCDService";
 
     public static final String PS_TITLE = "Patient Summary";
     public static final String MRO_TITLE = "MRO Summary";
