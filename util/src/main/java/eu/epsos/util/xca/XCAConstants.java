@@ -187,6 +187,42 @@ public final class XCAConstants {
                     }
                 }
             }
+
+            public static final class OrCD {
+
+                private OrCD() {
+                }
+
+                public static final class PdfSourceCoded {
+
+                    public static final String DISPLAY_NAME = "PDF/A coded document";
+                    public static final String NODE_REPRESENTATION = "urn:ihe:iti:xds-sd:pdf:2008";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
+
+                    private PdfSourceCoded() {
+                    }
+                }
+
+                public static final class PngSourceCoded {
+
+                    public static final String DISPLAY_NAME = "PNG coded document";
+                    public static final String NODE_REPRESENTATION = "urn:eHDSI:orcd:png:2021";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
+
+                    private PngSourceCoded() {
+                    }
+                }
+
+                public static final class JpegSourceCoded {
+
+                    public static final String DISPLAY_NAME = "JPEG coded document";
+                    public static final String NODE_REPRESENTATION = "urn:eHDSI:orcd:jpeg:2021";
+                    public static final String CODING_SCHEME = "eHDSI formatCodes";
+
+                    private JpegSourceCoded() {
+                    }
+                }
+            }
         }
     }
 }

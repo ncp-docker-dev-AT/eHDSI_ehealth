@@ -166,6 +166,60 @@ public class DocumentFactory {
     }
 
     /**
+     * OrCDDocument
+     */
+    private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate,
+                                                       String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType) {
+        OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
+        if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
+            confidentiality = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
+        }
+        EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
+                orCDClassCode, repositoryId, title, author, confidentiality, languageCode);
+        return new OrCDDocumentMetaDataImpl(metaData, documentFileType);
+    }
+
+    /**
+     * Laboratory Results
+     */
+    public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
+                                                         String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+
+        return createOrCDDocument(Constants.ORCD_LABORATORY_REPORT_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
+    }
+
+    /**
+     * Hospital Discharge Reports
+     */
+    public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
+                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+
+        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
+    }
+
+    /**
+     * Medical Imaging Reports
+     */
+    public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
+                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+
+        return createOrCDDocument(Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
+    }
+
+    /**
+     * Medical Images
+     */
+    public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, String repositoryId,
+                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType) {
+
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType);
+    }
+
+    /**
      * EDDocument
      */
     private static EDDocumentMetaData createEDDocument(int documentFormat, String id, String patientId, Date effectiveDate,
