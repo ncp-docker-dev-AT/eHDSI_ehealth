@@ -10,6 +10,8 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 
+import java.util.Arrays;
+
 /**
  * TODO: Insert description for OrderService class.
  *
@@ -24,7 +26,7 @@ public class OrderService {
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
 
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCode, idAssertion, trcAssertion,
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), idAssertion, trcAssertion,
                 RegisteredService.ORDER_SERVICE.getServiceName());
     }
 

@@ -10,6 +10,8 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.util.Arrays;
+
 /**
  * @author Marcelo Fonseca <marcelo.fonseca@iuz.pt>
  */
@@ -20,7 +22,7 @@ public class MroService {
 
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCode, idAssertion, trcAssertion, Constants.MroService);
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), idAssertion, trcAssertion, Constants.MroService);
     }
 
     public static RetrieveDocumentSetResponseType.DocumentResponse retrieve(

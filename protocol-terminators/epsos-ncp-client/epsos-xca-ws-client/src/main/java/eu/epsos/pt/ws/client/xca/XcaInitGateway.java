@@ -15,11 +15,13 @@ import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import net.bytebuddy.description.type.TypeList;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.commons.digester.parser.GenericParser;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,20 +60,20 @@ public class XcaInitGateway {
     private XcaInitGateway() {
     }
 
-    public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
+    public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode, final List<GenericDocumentCode> documentCodes,
                                                   final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
 
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
-                    documentCode.getValue(), idAssertion.getID(), trcAssertion.getID(), service);
+                    Arrays.toString(documentCodes.toArray()), idAssertion.getID(), trcAssertion.getID(), service);
         }
         QueryResponse result = null;
 
         try {
 
             /* queryRequest */
-            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCode);
+            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCodes);
 
             /* Stub */
             RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();
@@ -82,7 +85,11 @@ public class XcaInitGateway {
             respondingGatewayStub.setCountryCode(countryCode);
 
             /* queryResponse */
-            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCode.getValue());
+            List<String> documentCodeValues = new ArrayList<>();
+            for (GenericDocumentCode genericDocumentCode: documentCodes) {
+                documentCodeValues.add(genericDocumentCode.getValue());
+            }
+            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCodeValues);
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
@@ -137,6 +144,7 @@ public class XcaInitGateway {
                     classCode = Constants.MRO_CLASSCODE;
                     break;
                 case Constants.OrCDService:
+                    //TODO: Mathias - this needs to be reviewed. Best would be to use the document.getClassCode()...
                     classCode = Constants.ORCD_LABORATORY_RESULTS_CLASSCODE;
                     break;
                 default:

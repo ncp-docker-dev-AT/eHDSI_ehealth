@@ -10,6 +10,8 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 
+import java.util.List;
+
 /**
  *  * TODO: Insert description for OrCDService class.
  *
@@ -22,11 +24,11 @@ public class OrCDService {
 
     public static QueryResponse list(final PatientId pid,
                                      final String countryCode,
-                                     final GenericDocumentCode documentCode,
+                                     final List<GenericDocumentCode> documentCodes,
                                      final Assertion idAssertion,
                                      final Assertion trcAssertion) throws XCAException {
 
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCode, idAssertion, trcAssertion,
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCodes, idAssertion, trcAssertion,
                 RegisteredService.ORCD_SERVICE.getServiceName());
     }
 

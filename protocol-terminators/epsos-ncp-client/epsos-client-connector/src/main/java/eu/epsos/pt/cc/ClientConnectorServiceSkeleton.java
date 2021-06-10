@@ -19,6 +19,7 @@ import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,36 +104,44 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         PatientId tmp = queryDocumentRequest.getPatientId();
         tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
 
-        GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
-        tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
+        List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
+        List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
-        if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
-            throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
+        for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode: documentCodes) {
+            if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
+                throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
+            }
         }
 
         /* perform the call */
         try {
             QueryResponse response;
 
-            switch (documentCode.getValue()) {
-                case Constants.PS_CLASSCODE:
-                    response = PatientService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-                    break;
-                case Constants.EP_CLASSCODE:
-                    response = OrderService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-                    break;
-                case Constants.MRO_CLASSCODE:
-                    response = MroService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-                    break;
-                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                    response = OrCDService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
-                    break;
-                default:
-                    throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + documentCode.getValue());
+            if (documentCodes.size()==1) {
+                switch (documentCodes.get(0).getValue()) {
+                    case Constants.PS_CLASSCODE:
+                        response = PatientService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        response = OrderService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        break;
+                    case Constants.MRO_CLASSCODE:
+                        response = MroService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        break;
+                    case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), hcpAssertion, trcAssertion);
+                        break;
+                    default:
+                        throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
+                }
+            } else {
+                //TODO Mathias - ensure only OrCD documentCodes are presented...
+                response = OrCDService.list(patientId, countryCode, documentCodes, hcpAssertion, trcAssertion);
             }
+
 
             if (response.getDocumentAssociations() != null && !response.getDocumentAssociations().isEmpty()) {
                 result.setReturnArray(DocumentDts.newInstance(response.getDocumentAssociations()));
