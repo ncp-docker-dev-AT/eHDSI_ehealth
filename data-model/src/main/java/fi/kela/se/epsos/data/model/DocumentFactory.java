@@ -185,7 +185,7 @@ public class DocumentFactory {
     public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
-        return createOrCDDocument(Constants.ORCD_LABORATORY_REPORT_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+        return createOrCDDocument(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
                 repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
     }
 
@@ -195,7 +195,7 @@ public class DocumentFactory {
     public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
                                                                            String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
-        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
                 repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
     }
 
@@ -205,7 +205,7 @@ public class DocumentFactory {
     public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
                                                                                   String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
-        return createOrCDDocument(Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
                 repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF);
     }
 

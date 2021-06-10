@@ -15,13 +15,9 @@ public class Constants {
     public static final String PS_CLASSCODE = "60591-5";
     public static final String EDD_CLASSCODE = "DISCARD-60593-1";
     public static final String ED_CLASSCODE = "60593-1";
-    public static final String ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE = "34105-7";
-    public static final String ORCD_LABORATORY_REPORT_CLASSCODE = "11502-2";
-    public static final String ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE = "18748-4";
-    public static final String ORCD_MEDICAL_IMAGES_CLASSCODE = "x-clinical-image";
     public static final String MRO_CLASSCODE = "56445-0";
-    public static final String ORCD_LABORATORY_RESULTS_CLASSCODE = "11502-2";
     public static final String ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE= "34105-7";
+    public static final String ORCD_LABORATORY_RESULTS_CLASSCODE = "11502-2";
     public static final String ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE= "18748-4";
     public static final String ORCD_MEDICAL_IMAGES_CLASSCODE= "x-clinical-image";
     public static final String CONSENT_CLASSCODE = "57016-8";
@@ -41,9 +37,9 @@ public class Constants {
     public static final String MRO_TITLE = "MRO Summary";
     public static final String EP_TITLE = "ePrescription";
     public static final String ED_TITLE = "eDispensation";
-    public static final String ORCD_HOSPITAL_DISCHARGE_SUMMARY_TITLE = "OrCD Hospital Discharge Summary";
-    public static final String ORCD_LABORATORY_REPORT_TITLE = "OrCD Laboratory Report";
-    public static final String ORCD_DIAGNOSTIC_IMAGING_STUDY_TITLE = "OrCD Diagnostic Imaging Study";
+    public static final String ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE = "OrCD Hospital Discharge Summary";
+    public static final String ORCD_LABORATORY_RESULTS_TITLE = "OrCD Laboratory Report";
+    public static final String ORCD_MEDICAL_IMAGING_REPORTS_TITLE = "OrCD Diagnostic Imaging Study";
     public static final String ORCD_MEDICAL_IMAGES_TITLE = "OrCD Medical Image";
     public static final String CONSENT_TITLE = "Privacy Policy Acknowledgement Document";
     public static final String UNKNOWN_TITLE = "Unknown Document Type";

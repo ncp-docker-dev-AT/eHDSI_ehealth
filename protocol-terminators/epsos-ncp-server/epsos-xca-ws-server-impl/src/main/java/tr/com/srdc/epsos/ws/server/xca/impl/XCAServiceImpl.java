@@ -140,9 +140,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
-            case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
-            case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE:
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
@@ -252,9 +252,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     eventLog.setEventType(EventType.MRO_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
                     break;
-                case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
-                case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
-                case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                     eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
@@ -595,18 +595,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
         final String displayName;
 
         switch (classCode) {
-            case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
-                title = Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_TITLE;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                title = Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE;
                 nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
                 displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
                 break;
-            case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
-                title = Constants.ORCD_LABORATORY_REPORT_TITLE;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                title = Constants.ORCD_LABORATORY_RESULTS_TITLE;
                 nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
                 displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
                 break;
-            case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
-                title = Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_TITLE;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE;
                 nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
                 displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
                 break;
@@ -935,9 +935,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
             } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
-            } else if (StringUtils.contains(classCodeValue, Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE)
-                    || StringUtils.contains(classCodeValue, Constants.ORCD_LABORATORY_REPORT_CLASSCODE)
-                    || StringUtils.contains(classCodeValue, Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE)
+            } else if (StringUtils.contains(classCodeValue, Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
+                    || StringUtils.contains(classCodeValue, Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
+                    || StringUtils.contains(classCodeValue, Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
                     || StringUtils.contains(classCodeValue, Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
@@ -1137,7 +1137,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 break;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                 List<OrCDDocumentMetaData> orcdHospitalDischargeReportList = documentSearchService.getOrCDHospitalDischargeReportsDocumentList(
                         DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
@@ -1153,7 +1153,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 break;
-            case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
                 List<OrCDDocumentMetaData> orcdLaboratoryReportList = documentSearchService.getOrCDLaboratoryResultsDocumentList(
                         DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
@@ -1169,7 +1169,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                 }
                 break;
-            case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 List<OrCDDocumentMetaData> orCDMedicalImagingReportList = documentSearchService.getOrCDMedicalImagingReportsDocumentList(
                         DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
@@ -1696,9 +1696,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 registryError.setValue("No patient summary is registered for the given patient.");
                 registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
                 break;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_SUMMARY_CLASSCODE:
-            case Constants.ORCD_LABORATORY_REPORT_CLASSCODE:
-            case Constants.ORCD_DIAGNOSTIC_IMAGING_STUDY_CLASSCODE:
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                 registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                 registryError.setErrorCode("1104");
