@@ -124,6 +124,12 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 case Constants.MRO_CLASSCODE:
                     response = MroService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
                     break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    response = OrCDService.list(patientId, countryCode, documentCode, hcpAssertion, trcAssertion);
+                    break;
                 default:
                     throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + documentCode.getValue());
             }
@@ -199,6 +205,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     break;
                 case Constants.MRO_CLASSCODE:
                     response = MroService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
+                            hcpAssertion, trcAssertion);
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    response = OrCDService.retrieve(request, homeCommunityId, countryCode, targetLanguage,
                             hcpAssertion, trcAssertion);
                     break;
                 default:

@@ -136,6 +136,9 @@ public class XcaInitGateway {
                 case Constants.MroService:
                     classCode = Constants.MRO_CLASSCODE;
                     break;
+                case Constants.OrCDService:
+                    classCode = Constants.ORCD_LABORATORY_RESULTS_CLASSCODE;
+                    break;
                 default:
                     LOGGER.error("Service Not Supported");
                     //TODO: Has to be managed as an error.

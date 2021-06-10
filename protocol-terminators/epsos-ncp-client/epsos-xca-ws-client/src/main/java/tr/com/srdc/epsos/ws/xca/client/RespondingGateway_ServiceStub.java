@@ -348,6 +348,13 @@ public class RespondingGateway_ServiceStub extends Stub {
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
+                    case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                        endpoint = dynamicDiscoveryService.getEndpointUrl(
+                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORCD_SERVICE, true);
+                        break;
                     default:
                         break;
                 }
