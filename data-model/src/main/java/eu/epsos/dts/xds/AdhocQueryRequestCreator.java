@@ -6,10 +6,7 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.ResponseOptionType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
-import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
-
-import java.util.List;
 
 public class AdhocQueryRequestCreator {
 
@@ -22,10 +19,10 @@ public class AdhocQueryRequestCreator {
     /**
      * @param extension
      * @param root
-     * @param documentCodes
+     * @param docClassCode
      * @return
      */
-    public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root, List<GenericDocumentCode> documentCodes) {
+    public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root, GenericDocumentCode docClassCode) {
 
         AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
 
@@ -59,17 +56,7 @@ public class AdhocQueryRequestCreator {
         SlotType1 entryClassCode = new SlotType1();
         entryClassCode.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME);
         ValueListType v3 = new ValueListType();
-        String documentEntryClassCode = "('";
-        for(GenericDocumentCode documentCode : documentCodes) {
-
-            //v3.getValue().add("('" + documentCode.getValue() + "^^" + documentCode.getSchema() + "')");
-            if(StringUtils.length(documentEntryClassCode) > 2) {
-                documentEntryClassCode += ",";
-            }
-            documentEntryClassCode += documentCode.getValue() + "^^" + documentCode.getSchema();
-        }
-        documentEntryClassCode += "')";
-        v3.getValue().add(documentEntryClassCode);
+        v3.getValue().add("('" + docClassCode.getValue() + "^^" + docClassCode.getSchema() + "')");
         entryClassCode.setValueList(v3);
         adhocQueryRequest.getAdhocQuery().getSlot().add(entryClassCode);
 

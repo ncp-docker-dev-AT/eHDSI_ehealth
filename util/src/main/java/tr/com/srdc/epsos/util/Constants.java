@@ -18,7 +18,6 @@ public class Constants {
     public static final String MRO_CLASSCODE = "56445-0";
     public static final String CONSENT_CLASSCODE = "57016-8";
     public static final String HCER_CLASSCODE = "34133-9";
-    public static final String DISCHARGE_CLASSCODE = "34105-7";
     public static final int FORMAT_XML = 1;
     public static final int FORMAT_PDF = 2;
 

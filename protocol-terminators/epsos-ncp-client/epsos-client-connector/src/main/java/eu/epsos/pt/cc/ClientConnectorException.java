@@ -2,8 +2,6 @@ package eu.epsos.pt.cc;
 
 public class ClientConnectorException extends RuntimeException {
 
-    private static final long serialVersionUID = -7921992152572796564L;
-
     public ClientConnectorException() {
         super();
     }

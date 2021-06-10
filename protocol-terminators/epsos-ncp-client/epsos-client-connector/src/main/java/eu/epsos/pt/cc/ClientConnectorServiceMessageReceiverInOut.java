@@ -19,7 +19,6 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.xmlbeans.XmlBeansXMLReader;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -93,11 +92,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 Element soapHeader = XMLUtils.toDOM(reqEnv.getHeader());
                 List<Assertion> assertions = SAML2Validator.getAssertions(soapHeader);
 
-                if (CollectionUtils.isEmpty(assertions)) {
-                    logger.info("SAML Assertions not found");
-                    throw new ClientConnectorException("Security Error: No Assertions retrieved into the SOAP Header");
-                }
-                logger.info("SAML Assertions FOUND");
                 //  Submit Document
                 if (StringUtils.equals(ClientConnectorOperation.SERVICE_SUBMIT_DOCUMENT, methodName)) {
 
