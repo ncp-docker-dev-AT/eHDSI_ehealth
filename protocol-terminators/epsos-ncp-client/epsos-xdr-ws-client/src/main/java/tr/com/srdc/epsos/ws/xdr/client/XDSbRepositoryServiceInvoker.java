@@ -14,29 +14,35 @@ import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
+import tr.com.srdc.epsos.util.XMLUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author erdem
  */
 public class XDSbRepositoryServiceInvoker {
 
+    //TODO: this class implementation needs to be reviewed deeply
     private static final ObjectFactory ofRim = new ObjectFactory();
     private final Logger logger = LoggerFactory.getLogger(XDSbRepositoryServiceInvoker.class);
 
@@ -54,8 +60,7 @@ public class XDSbRepositoryServiceInvoker {
 
         logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", request.getIdAssertion().getID(), countryCode, docClassCode);
         RegistryResponseType response;
-        String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-
+        String submissionSetUuid = Constants.UUID_PREFIX + UUID.randomUUID();
 
         String endpointReference = null;
         DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
@@ -82,6 +87,15 @@ public class XDSbRepositoryServiceInvoker {
         // Dummy handler for any mustUnderstand header within server response
         EventLogClientUtil.createDummyMustUnderstandHandler(axisClient);
 
+        //  Retrieving XDR document from request
+        Document document = null;
+        try {
+            document = XMLUtil.parseContent(request.getCda());
+        } catch (Exception e) {
+            logger.warn("Could not parse dispense", e);
+        }
+        String languageCode = document != null ? getLanguageCode(document) : XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_DEFAULT_VALUE;
+
         // ProvideAndRegisterDocumentSetRequestType
         ihe.iti.xds_b._2007.ObjectFactory ofXds = new ihe.iti.xds_b._2007.ObjectFactory();
         oasis.names.tc.ebxml_regrep.xsd.lcm._3.ObjectFactory ofLcm = new oasis.names.tc.ebxml_regrep.xsd.lcm._3.ObjectFactory();
@@ -91,8 +105,8 @@ public class XDSbRepositoryServiceInvoker {
         registerDocumentSetRequest.getSubmitObjectsRequest().setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         //  XDS Document
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
-        ExtrinsicObjectType extrinsicObject = makeExtrinsicObject(request, uuid, docClassCode);
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
+        ExtrinsicObjectType extrinsicObject = makeExtrinsicObject(request, uuid, docClassCode, languageCode);
         registerDocumentSetRequest.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable()
                 .add(ofRim.createExtrinsicObject(extrinsicObject));
 
@@ -112,19 +126,12 @@ public class XDSbRepositoryServiceInvoker {
         ProvideAndRegisterDocumentSetRequestType.Document xdrDocument = new ProvideAndRegisterDocumentSetRequestType.Document();
         xdrDocument.setId(uuid);
 
-        byte[] cdaBytes = null;
+        byte[] cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
         try {
-            cdaBytes = request.getCda().getBytes(StandardCharsets.UTF_8);
-
             /* Validate CDA epSOS Friendly */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(cdaBytes).getDocumentElement()).toString(),
-                        NcpSide.NCP_B, docClassCode, false);
+                OpenNCPValidation.validateCdaDocument(request.getCda(), NcpSide.NCP_B, docClassCode, false);
             }
-        } catch (Exception ex) {
-            logger.error("Exception during Remote Validation process: '{}'", ex.getMessage(), ex);
-        }
-        try {
             if (!StringUtils.equals(docClassCode, Constants.EDD_CLASSCODE)) {
                 byte[] transformedCda = TMServices.transformDocument(cdaBytes);
                 xdrDocument.setValue(transformedCda);
@@ -133,10 +140,8 @@ public class XDSbRepositoryServiceInvoker {
             }
             /* Validate CDA epSOS Pivot */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(eu.epsos.pt.transformation.TMServices.byteToDocument(xdrDocument.getValue())
-                        .getDocumentElement()).toString(), NcpSide.NCP_B, docClassCode, true);
+                OpenNCPValidation.validateCdaDocument(new String(xdrDocument.getValue(), StandardCharsets.UTF_8), NcpSide.NCP_B, docClassCode, true);
             }
-
         } catch (DocumentTransformationException ex) {
             logger.error(ex.getLocalizedMessage(), ex);
             xdrDocument.setValue(cdaBytes);
@@ -174,7 +179,7 @@ public class XDSbRepositoryServiceInvoker {
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject,
                                                   String nodeRepresentation, String value, String name) {
 
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         ClassificationType cl = ofRim.createClassificationType();
         cl.setId(uuid);
         cl.setNodeRepresentation(nodeRepresentation);
@@ -195,7 +200,7 @@ public class XDSbRepositoryServiceInvoker {
      */
     private ClassificationType makeClassification0(String classificationScheme, String classifiedObject, String nodeRepresentation) {
 
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         ClassificationType rimClassification = ofRim.createClassificationType();
         rimClassification.setId(uuid);
         rimClassification.setNodeRepresentation(nodeRepresentation);
@@ -225,7 +230,7 @@ public class XDSbRepositoryServiceInvoker {
      */
     private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
 
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         ExternalIdentifierType ex = ofRim.createExternalIdentifierType();
         ex.setId(uuid);
         ex.setIdentificationScheme(identificationScheme);
@@ -244,8 +249,8 @@ public class XDSbRepositoryServiceInvoker {
      * @param docClassCode
      * @return
      */
-    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode) {
-        return makeExtrinsicObject(request, uuid, docClassCode, Boolean.FALSE);
+    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, String language) {
+        return makeExtrinsicObject(request, uuid, docClassCode, language, Boolean.FALSE);
     }
 
     /**
@@ -255,12 +260,13 @@ public class XDSbRepositoryServiceInvoker {
      * @param isPDF
      * @return
      */
-    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, Boolean isPDF) {
+    private ExtrinsicObjectType makeExtrinsicObject(XdrRequest request, String uuid, String docClassCode, String language, Boolean isPDF) {
 
         if (Boolean.TRUE.equals(isPDF)) {
             // TODO A.R. isPDF unfinished...
             logger.warn("PDF document will be processed, but this is not fully supported by current implementation");
         }
+
         ExtrinsicObjectType result = ofRim.createExtrinsicObjectType();
         PatientDemographics patient = request.getPatient();
         PatientId patientId = patient.getIdList().get(0);
@@ -272,9 +278,9 @@ public class XDSbRepositoryServiceInvoker {
         result.setStatus(IheConstants.REGREP_STATUSTYPE_APPROVED);
 
         // rim:Slot
-        String now = DateUtil.getDateByDateFormat(XDRConstants.EXTRINSIC_OBJECT.DATE_FORMAT, new Date());
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME, now));
-        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_VALUE));
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.CREATION_TIME,
+                DateUtil.getCurrentTimeUTC(XDRConstants.EXTRINSIC_OBJECT.DATE_FORMAT)));
+        result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_STR, language));
         result.getSlot().add(makeSlot(XDRConstants.EXTRINSIC_OBJECT.SOURCE_PATIENT_ID, patientId.toString()));
 
         /*
@@ -294,7 +300,6 @@ public class XDSbRepositoryServiceInvoker {
                 XDRConstants.EXTRINSIC_OBJECT.CONFIDENTIALITY_CODE_STR));
 
         // eHDSI Class Code
-        logger.info("makeExtrinsicObject: '{}'", docClassCode);
         switch (docClassCode) {
             case Constants.ED_CLASSCODE:
                 //  urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a
@@ -379,7 +384,7 @@ public class XDSbRepositoryServiceInvoker {
         // result.setHome(Constants.HOME_COMM_ID) and result.setLid(uuid)
 
         // sourcePatientInfo
-        SlotType1 slId = makeSlot(XDRConstants.EXTRINSIC_OBJECT.SRC_PATIENT_INFO_STR, "PID-3|" + patientId.toString());
+        SlotType1 slId = makeSlot(XDRConstants.EXTRINSIC_OBJECT.SRC_PATIENT_INFO_STR, "PID-3|" + patientId);
         slId.getValueList().getValue().add("PID-5|" + patient.getFamilyName() + "^" + patient.getGivenName());
         slId.getValueList().getValue().add("PID-7|" + new SimpleDateFormat("yyyyMMddkkmmss.SSSZZZZ", Locale.ENGLISH).format(patient.getBirthDate()));
         result.getSlot().add(slId);
@@ -425,37 +430,38 @@ public class XDSbRepositoryServiceInvoker {
      */
     private RegistryPackageType prepareRegistryPackage(XdrRequest request, String docClassCode, String submissionSetUuid) {
 
-        RegistryPackageType rpt = ofRim.createRegistryPackageType();
+        RegistryPackageType registryPackageType = ofRim.createRegistryPackageType();
         PatientId patientId = request.getPatient().getIdList().get(0);
 
-        rpt.setId(submissionSetUuid);
-        rpt.setObjectType(XDRConstants.REGISTRY_PACKAGE.OBJECT_TYPE_UUID);
+        registryPackageType.setId(submissionSetUuid);
+        registryPackageType.setObjectType(XDRConstants.REGISTRY_PACKAGE.OBJECT_TYPE_UUID);
 
-        rpt.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_STR, DateUtil.getDateByDateFormat(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_FORMAT)));
-        rpt.setName(makeInternationalString(getNameFromClassCode(docClassCode)));
-        rpt.setDescription(makeInternationalString(getDescriptionFromClassCode(docClassCode)));
+        registryPackageType.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_STR,
+                DateUtil.getDateByDateFormat(XDRConstants.REGISTRY_PACKAGE.SUBMISSION_TIME_FORMAT)));
+        registryPackageType.setName(makeInternationalString(getNameFromClassCode(docClassCode)));
+        registryPackageType.setDescription(makeInternationalString(getDescriptionFromClassCode(docClassCode)));
 
         ClassificationType classification;
         classification = makeClassification0(XDRConstants.REGISTRY_PACKAGE.AUTHOR_CLASSIFICATION_UUID, submissionSetUuid, "");
         classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_INSTITUTION_STR, getAuthorInstitution(request)));
         classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_PERSON_STR, getAuthorPerson(request)));
-        rpt.getClassification().add(classification);
+        registryPackageType.getClassification().add(classification);
 
-        rpt.getClassification().add(makeClassification(XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_UUID, submissionSetUuid,
+        registryPackageType.getClassification().add(makeClassification(XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_UUID, submissionSetUuid,
                 docClassCode, XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_VALUE, getSubmissionSetFromClassCode(docClassCode)));
 
-        rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_SCHEME,
+        registryPackageType.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_SCHEME,
                 submissionSetUuid, request.getSubmissionSetId(), XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_UNIQUEID_STR));
 
-        rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_SCHEME,
+        registryPackageType.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_SCHEME,
                 submissionSetUuid, patientId.toString(), XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_PATIENTID_STR));
 
         // The XDSSubmissionSet.SourceId value should be the OID of the sender (e.g. HOME_COMMUNITY_ID),
         // according to ITI TF-3, Table 4.1-6, but not all OID prefixes are supported in IHE validator.
-        rpt.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_SCHEME,
+        registryPackageType.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_SCHEME,
                 submissionSetUuid, XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_VALUE,
                 XDRConstants.REGISTRY_PACKAGE.XDSSUBMSET_SOURCEID_STR));
-        return rpt;
+        return registryPackageType;
     }
 
     /**
@@ -465,7 +471,7 @@ public class XDSbRepositoryServiceInvoker {
     private ClassificationType prepareClassification(String submissionSetUuid) {
 
         ClassificationType classification = ofRim.createClassificationType();
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         classification.setId(uuid);
         classification.setClassificationNode(XDRConstants.SUBMISSION_SET_CLASSIFICATION.CLASSIFICATION_NODE_UUID);
         classification.setClassifiedObject(submissionSetUuid);
@@ -480,7 +486,7 @@ public class XDSbRepositoryServiceInvoker {
      */
     private AssociationType1 prepareAssociation(String targetObject, String submissionSetUuid) {
 
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         AssociationType1 ast = ofRim.createAssociationType1();
         ast.setId(uuid);
         ast.setAssociationType(XDRConstants.REGREP_HAS_MEMBER);
@@ -629,6 +635,8 @@ public class XDSbRepositoryServiceInvoker {
                 return XDRConstants.REGISTRY_PACKAGE.NAME_CONSENT;
             case Constants.ED_CLASSCODE:
                 return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
+            case Constants.EDD_CLASSCODE:
+                return "Medication Dispensation Discard";
             default:
                 logger.error("Class code does not have a matching name!");
                 return null;
@@ -648,6 +656,8 @@ public class XDSbRepositoryServiceInvoker {
                 return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_CONSENT;
             case Constants.ED_CLASSCODE:
                 return XDRConstants.REGISTRY_PACKAGE.DESCRIPTION_ED;
+            case Constants.EDD_CLASSCODE:
+                return "Description of Medication Dispensation Discard";
             default:
                 logger.error("Class code does not have a matching description!");
                 return "Class Code does not have a matching description!";
@@ -667,9 +677,28 @@ public class XDSbRepositoryServiceInvoker {
                 return XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_CONS_STR;
             case Constants.ED_CLASSCODE:
                 return XDRConstants.REGISTRY_PACKAGE.NAME_ED;
+            case Constants.EDD_CLASSCODE:
+                return "Medication Dispensation Discard";
             default:
                 logger.error("Class Code does not have a matching submission set designation!");
                 return "Class Code does not have a matching submission set designation!";
         }
+    }
+
+    /**
+     * Util method retrieving the language code from a CDA document.
+     *
+     * @param document - CDA document as DOM object.
+     * @return ISO language code of the document.
+     */
+    private String getLanguageCode(Document doc) {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
+        String languageCode = XDRConstants.EXTRINSIC_OBJECT.LANGUAGE_CODE_DEFAULT_VALUE;
+        for (Node node : nodeList) {
+            if (node.getNodeType() == Node.ELEMENT_NODE && node.getAttributes().getNamedItem("code") != null) {
+                languageCode = node.getAttributes().getNamedItem("code").getTextContent();
+            }
+        }
+        return StringUtils.trim(languageCode);
     }
 }

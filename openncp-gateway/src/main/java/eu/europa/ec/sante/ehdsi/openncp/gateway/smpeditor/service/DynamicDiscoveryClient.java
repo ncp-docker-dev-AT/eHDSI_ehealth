@@ -1,6 +1,5 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service;
 
-
 import eu.europa.ec.dynamicdiscovery.DynamicDiscovery;
 import eu.europa.ec.dynamicdiscovery.DynamicDiscoveryBuilder;
 import eu.europa.ec.dynamicdiscovery.core.locator.dns.impl.DefaultDNSLookup;
@@ -10,6 +9,7 @@ import eu.europa.ec.dynamicdiscovery.core.security.impl.DefaultSignatureValidato
 import eu.europa.ec.dynamicdiscovery.exception.TechnicalException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.GatewayProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +33,11 @@ public class DynamicDiscoveryClient {
             NoSuchAlgorithmException, TechnicalException {
 
         LOGGER.info("[Gateway] DynamicDiscovery getInstance()");
-
         if (instance == null) {
             LOGGER.debug("Instantiating new instance of DynamicDiscovery");
             KeyStore trustStore = KeyStore.getInstance("JKS");
-            trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE)),
-                    ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray());
+            trustStore.load(new FileInputStream(ConfigurationManagerFactory.getConfigurationManager().getProperty(GatewayProperties.GTW_TRUSTSTORE_PATH)),
+                    ConfigurationManagerFactory.getConfigurationManager().getProperty(GatewayProperties.GTW_TRUSTSTORE_PWD).toCharArray());
 
             DynamicDiscoveryBuilder dynamicDiscoveryBuilder = ConfigurationManagerFactory.getConfigurationManager().initializeDynamicDiscoveryFetcher()
                     .locator(new DefaultBDXRLocator(ConfigurationManagerFactory.getConfigurationManager()

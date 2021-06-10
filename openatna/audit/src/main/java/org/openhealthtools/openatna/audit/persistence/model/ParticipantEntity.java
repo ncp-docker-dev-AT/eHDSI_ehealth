@@ -1,5 +1,6 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
 
 import javax.persistence.*;
@@ -105,9 +106,15 @@ public class ParticipantEntity extends PersistentEntity {
         return result;
     }
 
+    @Override
     public String toString() {
-        return "[" + getClass().getName() + " id=" + getId() + ", version=" + getVersion() + ", userID=" + getUserId()
-                + ", user name=" + getUserName() + ", alternative user id=" + getAlternativeUserId()
-                + ", codes=" + getParticipantTypeCodes() + "]";
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("version", version)
+                .append("userId", userId)
+                .append("alternativeUserId", alternativeUserId)
+                .append("userName", userName)
+                .append("participantTypeCodes", participantTypeCodes)
+                .toString();
     }
 }

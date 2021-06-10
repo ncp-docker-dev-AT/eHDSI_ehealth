@@ -97,7 +97,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             Date startTime = new Date();
             // get the implementation class for the Web Service
             Object serviceObject = getTheImplementationObject(msgContext);
-            XDR_ServiceSkeleton skel = (XDR_ServiceSkeleton) serviceObject;
+            XDR_ServiceSkeleton xdrServiceSkeleton = (XDR_ServiceSkeleton) serviceObject;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
@@ -109,7 +109,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                                 "SOAP Action to use the RawXMLProvider");
             }
 
-            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
             String methodName;
             Document eDispenseCda;
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
@@ -142,14 +142,13 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    RegistryResponseType registryResponse = skel.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, soapHeader, eventLog);
+                    RegistryResponseType registryResponse = xdrServiceSkeleton.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, soapHeader, eventLog);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), registryResponse, false);
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
-                    LOGGER.info("[XDR] ServiceMessageReceiverInOut: '{}'", eventLog.toString());
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 

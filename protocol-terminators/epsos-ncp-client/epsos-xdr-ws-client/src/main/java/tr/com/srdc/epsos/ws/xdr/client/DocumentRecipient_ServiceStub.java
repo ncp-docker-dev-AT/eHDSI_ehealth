@@ -29,11 +29,14 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.OperationClient;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.client.Stub;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
@@ -57,7 +60,7 @@ import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.*;
 
-public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub {
+public class DocumentRecipient_ServiceStub extends Stub {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentRecipient_ServiceStub.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
@@ -110,8 +113,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
         populateAxisService();
         populateFaults();
 
-        _serviceClient = new org.apache.axis2.client.ServiceClient(configurationContext, _service);
-        _serviceClient.getOptions().setTo(new org.apache.axis2.addressing.EndpointReference(targetEndpoint));
+        _serviceClient = new ServiceClient(configurationContext, _service);
+        _serviceClient.getOptions().setTo(new EndpointReference(targetEndpoint));
         _serviceClient.getOptions().setUseSeparateListener(useSeparateListener);
         //  Wait time after which a client times out in a blocking scenario: 3 minutes
         _serviceClient.getOptions().setTimeOutInMilliSeconds(180000);
@@ -144,7 +147,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
 
     private static synchronized String getUniqueSuffix() {
         if (counter > 99999) {
-            counter = 0;    // reset the counter if it is greater than 99999
+            // reset the counter if it is greater than 99999
+            counter = 0;
         }
         counter++;
         return System.currentTimeMillis() + "_" + counter;
@@ -163,10 +167,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
     }
 
     /**
-     * Auto generated method signature
-     *
      * @param provideAndRegisterDocumentSetRequest
-     * @see tr.com.srdc.epsos.ws.xdr.client.DocumentRecipient_Service#documentRecipient_ProvideAndRegisterDocumentSetB
+     * @see tr.com.srdc.epsos.ws.xdr.client.DocumentRecipient_ServiceStub#documentRecipient_ProvideAndRegisterDocumentSetB
      */
     public RegistryResponseType documentRecipient_ProvideAndRegisterDocumentSetB(ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest,
                                                                                  Assertion idAssertion, Assertion trcAssertion)
@@ -177,7 +179,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             operationClient.getOptions().setAction(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
             operationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
 
-            addPropertyToOperationClient(operationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+            addPropertyToOperationClient(operationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
 
             // create a message context
             _messageContext = new MessageContext();
@@ -187,10 +189,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     provideAndRegisterDocumentSetRequest,
                     optimizeContent(new QName(XDRConstants.NAMESPACE_URI, XDRConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART)));
 
-            /*
-             * adding SOAP soap_headers
-             */
-            //SOAPFactory soapFactory = getFactory(operationClient.getOptions().getSoapVersionURI());
+            //  Adding SOAP soap_headers
             OMFactory factory = OMAbstractFactory.getOMFactory();
 
             OMNamespace ns2 = factory.createOMNamespace(XDRConstants.SOAP_HEADERS.OM_NAMESPACE, "");
@@ -203,7 +202,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             action.addAttribute(att);
 
             SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(XDRConstants.SOAP_HEADERS.MESSAGEID_STR, ns2);
-            OMNode node2 = factory.createOMText(tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             Element idAssertionElement = idAssertion.getDOM();
@@ -239,7 +238,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             String requestLogMsg;
             try {
                 String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope));
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (LOGGER_CLINICAL.isDebugEnabled()
+                        && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.OUTGOING_XDR_PROVIDEANDREGISTER_MESSAGE,
                             System.getProperty("line.separator"), logRequestMsg);
                 }
@@ -304,7 +304,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                     org.apache.axis2.client.OperationClient newOperationClient = _serviceClient.createClient(axisOperations[0].getName());
                     newOperationClient.getOptions().setAction(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
                     newOperationClient.getOptions().setExceptionToBeThrownOnSOAPFault(true);
-                    addPropertyToOperationClient(newOperationClient, org.apache.axis2.description.WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
+                    addPropertyToOperationClient(newOperationClient, WSDL2Constants.ATTR_WHTTP_QUERY_PARAMETER_SEPARATOR, "&");
 
                     SOAPFactory newSoapFactory = getFactory(newOperationClient.getOptions().getSoapVersionURI());
 
@@ -358,7 +358,8 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
             //  Log SOAP response message.
             String responseLogMsg;
             try {
-                if (!org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (LOGGER_CLINICAL.isDebugEnabled()
+                        && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv));
                     LOGGER_CLINICAL.debug("{} {} '{}'", XDRConstants.LOG.INCOMING_XDR_PROVIDEANDREGISTER_MESSAGE,
                             System.getProperty("line.separator"), logResponseMsg);
@@ -406,7 +407,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
                 try {
                     String exceptionClassName = (String) faultExceptionClassNameMap.get(faultElt.getQName());
                     Class exceptionClass = Class.forName(exceptionClassName);
-                    Exception ex = (Exception) exceptionClass.newInstance();
+                    Exception ex = (Exception) exceptionClass.getDeclaredConstructor().newInstance();
                     // message class
                     String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                     Class messageClass = Class.forName(messageClassName);
@@ -433,7 +434,7 @@ public class DocumentRecipient_ServiceStub extends org.apache.axis2.client.Stub 
     /**
      * get the default envelope
      */
-    private org.apache.axiom.soap.SOAPEnvelope toEnvelope(org.apache.axiom.soap.SOAPFactory factory) {
+    private SOAPEnvelope toEnvelope(SOAPFactory factory) {
 
         return factory.getDefaultEnvelope();
     }

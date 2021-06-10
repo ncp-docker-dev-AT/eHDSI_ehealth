@@ -86,15 +86,15 @@ public class RespondingGateway_ServiceStub extends Stub {
         }
     }
 
-    protected AxisOperation[] _operations;
     // HashMap to keep the fault mapping
     private final HashMap faultExceptionNameMap = new HashMap();
     private final HashMap faultExceptionClassNameMap = new HashMap();
     private final HashMap faultMessageMap = new HashMap();
+    private final QName[] opNameArray = null;
+    protected AxisOperation[] _operations;
     private String countryCode;
     private Date transactionStartTime;
     private Date transactionEndTime;
-    private final QName[] opNameArray = null;
 
     /**
      * Constructor that takes in a configContext
@@ -216,7 +216,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addAttribute(att);
 
             SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             OMNamespace ns = factory.createOMNamespace(XCPDConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
@@ -247,7 +247,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             /* Log soap request */
             String logRequestBody;
             try {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(env));
                     loggerClinical.debug(XCPDConstants.LOG.OUTGOING_XCPD_MESSAGE + System.getProperty("line.separator") + logRequestMsg);
                 }
@@ -351,7 +351,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             /* Log soap response */
             String logResponseBody;
             try {
-                if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+                if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                     String logResponseMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv));
                     loggerClinical.debug(XCPDConstants.LOG.INCOMING_XCPD_MESSAGE + System.getProperty("line.separator") + logResponseMsg);
                 }
@@ -435,7 +435,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 try {
                     String exceptionClassName = (String) faultExceptionClassNameMap.get(faultElt.getQName());
                     Class exceptionClass = Class.forName(exceptionClassName);
-                    Exception ex = (Exception) exceptionClass.newInstance();
+                    Exception ex = (Exception) exceptionClass.getDeclaredConstructor().newInstance();
                     // message class
                     String messageClassName = (String) faultMessageMap.get(faultElt.getQName());
                     Class messageClass = Class.forName(messageClassName);

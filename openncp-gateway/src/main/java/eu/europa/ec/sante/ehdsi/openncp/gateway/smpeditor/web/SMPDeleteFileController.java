@@ -8,23 +8,21 @@ import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ReadSMPProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.AuditManager;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.service.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.Alert;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPHttp.ReferenceCollection;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.SMPType;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.service.AuditManager;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.DynamicDiscoveryClient;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.cfg.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.util.HttpUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.ssl.PrivateKeyStrategy;
-import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +43,14 @@ import javax.net.ssl.SSLContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +67,8 @@ public class SMPDeleteFileController {
 
     private static final String ALERT_BACKGROUND_COLOR = "#f2dede";
     private final Logger logger = LoggerFactory.getLogger(SMPDeleteFileController.class);
-    private ReadSMPProperties readProperties;
-    private Environment env;
+    private final ReadSMPProperties readProperties;
+    private final Environment env;
 
     @Autowired
     public SMPDeleteFileController(ReadSMPProperties readProperties, Environment env) {
@@ -196,7 +195,7 @@ public class SMPDeleteFileController {
             return "redirect:/smpeditor/deletesmpinfo";
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - '{}'", model.toString());
+            logger.debug("\n********* MODEL - '{}'", model);
         }
         return "redirect:/smpeditor/deletesmpinfo";
     }
@@ -248,7 +247,7 @@ public class SMPDeleteFileController {
         model.addAttribute("referenceCollection", smpdelete.getReferenceCollection());
 
         if (logger.isDebugEnabled()) {
-            logger.debug("\n********* MODEL - '{}'", model.toString());
+            logger.debug("\n********* MODEL - '{}'", model);
         }
         return "smpeditor/deletesmpinfo";
     }
@@ -315,33 +314,8 @@ public class SMPDeleteFileController {
 
             logger.debug("\n ************** URI - {}", uri);
 
-            PrivateKeyStrategy privatek = (map, socket) -> configurationManager.getProperty(StandardProperties.SMP_SML_CLIENT_KEY_ALIAS);
-
             // Trust own CA and all self-signed certs
-            SSLContext sslcontext = null;
-            try {
-                sslcontext = SSLContexts.custom()
-                        .loadKeyMaterial(new File(configurationManager.getProperty("SC_KEYSTORE_PATH")),
-                                configurationManager.getProperty("SC_KEYSTORE_PASSWORD").toCharArray(),
-                                configurationManager.getProperty("SC_SMP_CLIENT_PRIVATEKEY_PASSWORD").toCharArray(), //must be the same as SC_KEYSTORE_PASSWORD
-                                privatek)
-                        .loadTrustMaterial(new File(configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE)),
-                                configurationManager.getProperty(StandardProperties.NCP_TRUSTSTORE_PASSWORD).toCharArray(),
-                                new TrustSelfSignedStrategy())
-                        .build();
-            } catch (NoSuchAlgorithmException ex) {
-                logger.error("\n NoSuchAlgorithmException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (KeyStoreException ex) {
-                logger.error("\n KeyStoreException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (CertificateException ex) {
-                logger.error("\n CertificateException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (IOException ex) {
-                logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (KeyManagementException ex) {
-                logger.error("\n KeyManagementException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            } catch (UnrecoverableKeyException ex) {
-                logger.error("\n UnrecoverableKeyException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            }
+            SSLContext sslcontext = HttpUtil.createSSLContext();
 
             //DELETE
             HttpDelete httpdelete = new HttpDelete(uri);
@@ -446,7 +420,7 @@ public class SMPDeleteFileController {
         smpdelete.setAllItems(allItems);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Web Model:\n'{}'", model.toString());
+            logger.debug("Web Model:\n'{}'", model);
         }
         return "redirect:/smpeditor/deletesmpresult";
     }
@@ -502,7 +476,7 @@ public class SMPDeleteFileController {
         model.addAttribute("items", smpdelete.getAllItems());
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Model: {}", model.toString());
+            logger.debug("Model: {}", model);
         }
         return "smpeditor/deletesmpresult";
     }

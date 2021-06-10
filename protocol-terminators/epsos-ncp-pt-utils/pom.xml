@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-protocol-terminators</artifactId>
-        <version>5.1.3-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
@@ -101,7 +101,12 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
-            <version>${axis2.version}</version>
+            <exclusions>
+            	<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>

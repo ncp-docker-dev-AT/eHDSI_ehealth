@@ -1,7 +1,6 @@
 package eu.esens.abb.nonrep;
 
 import com.sun.xml.messaging.saaj.soap.ver1_2.SOAPMessageFactory1_2Impl;
-import org.apache.commons.lang.StringUtils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.Marshaller;
@@ -97,12 +96,8 @@ public class Utilities {
     }
 
     public static void serialize(Element request) throws TransformerException {
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         serialize(request, outputStream);
-        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
-            LOGGER_CLINICAL.debug("Stream:\n'{}'", outputStream.toString());
-        }
     }
 
     /**
@@ -158,9 +153,7 @@ public class Utilities {
                 LOGGER.info("ADDING MIME: '{}' : '{}'", mimeItem.getName(), retValue);
                 message.getMimeHeaders().addHeader(mimeItem.getName(), retValue);
             }
-
             message.saveChanges();
-
         }
         if (message.saveRequired()) {
             LOGGER.info("Saving changes");

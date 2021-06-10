@@ -1,10 +1,10 @@
 package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
+import eu.epsos.exceptions.InvalidInput;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
-import eu.epsos.exceptions.InvalidInput;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
-import org.joda.time.DateTime;
 import org.opensaml.core.xml.Namespace;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
@@ -20,8 +20,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
+import javax.xml.XMLConstants;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -35,6 +35,8 @@ import java.security.KeyStore;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -113,34 +115,34 @@ public class HCPIAssertionCreator {
         assertion.setVersion(version);
 
         // Set Conditions/AudienceRestriction
-        AudienceRestrictionBuilder arb = new AudienceRestrictionBuilder();
-        AudienceRestriction ar = arb.buildObject();
-        AudienceBuilder ab = new AudienceBuilder();
-        Audience a = ab.buildObject();
-        a.setAudienceURI("http://ihe.connecthaton.XUA/X-ServiceProvider-IHE-Connectathon");
-        ar.getAudiences().add(a);
-        assertion.getConditions().getAudienceRestrictions().add(ar);
+        var audienceRestrictionBuilder = new AudienceRestrictionBuilder();
+        var audienceRestriction = audienceRestrictionBuilder.buildObject();
+        var audienceBuilder = new AudienceBuilder();
+        var audience = audienceBuilder.buildObject();
+        audience.setURI("http://ihe.connecthaton.XUA/X-ServiceProvider-IHE-Connectathon");
+        audienceRestriction.getAudiences().add(audience);
+        assertion.getConditions().getAudienceRestrictions().add(audienceRestriction);
 
         // Set AuthnStatement
-        DateTime dateTime = new DateTime();
-        AuthnStatement authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-        authnStatement.setAuthnInstant(dateTime);
-        authnStatement.setSessionNotOnOrAfter(dateTime.plusHours(2));
+        var issueInstant = Instant.now();
+        var authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
+        authnStatement.setAuthnInstant(issueInstant);
+        authnStatement.setSessionNotOnOrAfter(issueInstant.plus(Duration.ofHours(2)));
 
         // Set AuthnStatement/AuthnContext
-        AuthnContext authnContext = saml.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
-        AuthnContextClassRef authnContextClassRef = saml.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-        authnContextClassRef.setAuthnContextClassRef("urn:oasis:names:tc:SAML:2.0:ac:classes:X509");
+        var authnContext = saml.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
+        var authnContextClassRef = saml.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+        authnContextClassRef.setURI("urn:oasis:names:tc:SAML:2.0:ac:classes:X509");
         authnContext.setAuthnContextClassRef(authnContextClassRef);
         authnStatement.setAuthnContext(authnContext);
         assertion.getAuthnStatements().add(authnStatement);
 
         // Create AttributeStatement
-        AttributeStatement attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
+        var attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
         // Namespaces
-        Namespace ns1 = new Namespace("http://www.w3.org/2001/XMLSchema", "xs");
-        Namespace ns2 = new Namespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+        var ns1 = new Namespace(XMLConstants.W3C_XML_SCHEMA_NS_URI, "xs");
+        var ns2 = new Namespace(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "xsi");
 
         // Set HCP Identifier
         if (true) {
@@ -156,7 +158,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -177,7 +179,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -198,7 +200,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -219,7 +221,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -240,7 +242,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -261,7 +263,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -282,7 +284,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -303,7 +305,7 @@ public class HCPIAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -326,7 +328,7 @@ public class HCPIAssertionCreator {
 
                 attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
                 attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-                QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+                QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
                 attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
                 att.getAttributeValues().add(attVal);
@@ -345,7 +347,7 @@ public class HCPIAssertionCreator {
 
             resourceIdVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             resourceIdVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName resourceIdributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName resourceIdributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             resourceIdVal.getUnknownAttributes().put(resourceIdributeName, "xs:string");
 
             resourceId.getAttributeValues().add(resourceIdVal);
@@ -363,7 +365,7 @@ public class HCPIAssertionCreator {
 
             homeCommunityIdVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             homeCommunityIdVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName homeCommunityIdributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName homeCommunityIdributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             homeCommunityIdVal.getUnknownAttributes().put(homeCommunityIdributeName, "xs:string");
 
             homeCommunityIdAttr.getAttributeValues().add(homeCommunityIdVal);
@@ -375,7 +377,7 @@ public class HCPIAssertionCreator {
             attVal.setTextContent("urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:PPD-046");
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
             att.getAttributeValues().add(attVal);
             attributeStatement.getAttributes().add(att);
@@ -386,7 +388,7 @@ public class HCPIAssertionCreator {
             attVal.setTextContent("urn:oasis:names:tc:xspa:1.0:subject:hl7:permission:PPD-032");
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
             att.getAttributeValues().add(attVal);
             attributeStatement.getAttributes().add(att);
@@ -405,16 +407,17 @@ public class HCPIAssertionCreator {
 
             // Set factory
             String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).newInstance());
+            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
 
             // Set keyStore
-            FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH.split(Constants.EPSOS_PROPS_PATH)[0]);
-            keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
-            is.close();
+            try (var fileInputStream = new FileInputStream(Constants.SC_KEYSTORE_PATH.split(Constants.EPSOS_PROPS_PATH)[0])) {
 
-            PasswordProtection pp = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
-            PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, pp);
+                keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(fileInputStream, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
+            }
+
+            PasswordProtection passwordProtection = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
+            PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, passwordProtection);
 
             // Set keyPair
             keyPair = new KeyPair(entry.getCertificate().getPublicKey(), entry.getPrivateKey());

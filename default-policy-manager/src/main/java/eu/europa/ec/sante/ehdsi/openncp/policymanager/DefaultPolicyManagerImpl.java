@@ -1,10 +1,10 @@
 package eu.europa.ec.sante.ehdsi.openncp.policymanager;
 
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
-import org.opensaml.saml.saml2.core.Assertion;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import org.opensaml.saml.saml2.core.Assertion;
 
 public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
@@ -60,6 +60,11 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             throws MissingFieldException, InvalidFieldException {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void XSPAOrganizationIdValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {
+        // TODO Auto-generated method stub
     }
 
     @Override

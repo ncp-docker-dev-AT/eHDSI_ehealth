@@ -11,6 +11,8 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -599,14 +601,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 }
                 List<PRPAMT201306UV02LivingSubjectAdministrativeGender> administrativeGenders = inputQBP.getParameterList().getLivingSubjectAdministrativeGender();
                 if (!CollectionUtils.isEmpty(administrativeGenders)) {
-                    logger.info("PRPAMT201306UV02LivingSubjectAdministrativeGender: '{}'", administrativeGenders.get(0).getValue().get(0).getCode());
-                    stringBuilderNRO.append("<livingSubjectAdministrativeGender>").append(administrativeGenders.get(0).getValue().get(0).getCode()).append("</livingSubjectAdministrativeGender>");
+                    stringBuilderNRO.append("<livingSubjectAdministrativeGender>").append(administrativeGenders
+                            .get(0).getValue().get(0).getCode()).append("</livingSubjectAdministrativeGender>");
                 }
 
                 List<PRPAMT201306UV02LivingSubjectBirthTime> subjectBirthTimes = inputQBP.getParameterList().getLivingSubjectBirthTime();
                 if (!CollectionUtils.isEmpty(subjectBirthTimes)) {
-                    logger.info("PRPAMT201306UV02LivingSubjectBirthTime: '{}'", subjectBirthTimes.get(0).getValue().get(0).getValue());
-                    stringBuilderNRO.append("<livingSubjectBirthTime>").append(subjectBirthTimes.get(0).getValue().get(0).getValue()).append("</livingSubjectBirthTime>");
+                    stringBuilderNRO.append("<livingSubjectBirthTime>").append(subjectBirthTimes.get(0).getValue()
+                            .get(0).getValue()).append("</livingSubjectBirthTime>");
                 }
 
                 List<PRPAMT201306UV02LivingSubjectName> livingSubjectNames = inputQBP.getParameterList().getLivingSubjectName();
@@ -621,7 +623,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     logger.info("Patient Addresses must be added to the NRO message");
                 }
                 stringBuilderNRO.append("</patient>");
-                logger.info("Patient Identifier:\n'{}'", stringBuilderNRO.toString());
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                    loggerClinical.info("Patient Identifier:\n'{}'", stringBuilderNRO);
+                }
 
                 // Joao: we have an adhoc XML document, so we can generate this evidence correctly
                 try {

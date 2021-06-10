@@ -130,6 +130,12 @@ public class Helper {
         return result;
     }
 
+    public static String getXSPALocality(Element soapHeader) {
+
+        String result = getXSPAAttributeByName(soapHeader, "urn:oasis:names:tc:xspa:1.0:environment:locality", false);
+        return StringUtils.isBlank(result) ? "N/A" : result;
+    }
+
     /**
      * Util method which return the Point of Care information related to the HCP assertions, based on the element provided
      * Organization is the subject:Organization (Optional) value or if not present the environment:locality value (Required).

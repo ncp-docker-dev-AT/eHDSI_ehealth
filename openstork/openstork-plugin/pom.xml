@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-openstork</artifactId>
-        <version>5.1.3-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-openstork-plugin</artifactId>
@@ -214,8 +214,21 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
+            	<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+            	<exclusion>
+                    <groupId>org.apache.xmlgraphics</groupId>
+   		 			<artifactId>batik-css</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+    		<groupId>org.apache.xmlgraphics</groupId>
+   		 	<artifactId>batik-css</artifactId>
+    		<version>${batik-css.version}</version>
+		</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

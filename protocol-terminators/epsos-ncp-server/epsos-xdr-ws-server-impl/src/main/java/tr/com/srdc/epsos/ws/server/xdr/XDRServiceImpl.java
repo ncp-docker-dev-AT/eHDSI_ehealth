@@ -10,6 +10,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.epsos.util.EvidenceUtils;
+import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -318,15 +319,55 @@ public class XDRServiceImpl implements XDRServiceInterface {
     public RegistryResponseType discardMedicationDispensed(ProvideAndRegisterDocumentSetRequestType request,
                                                            SOAPHeader soapHeader, EventLog eventLog) throws Exception {
 
+        logger.info("Processing Discard Dispense Medication");
+        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
         Element soapHeaderElement = XMLUtils.toDOM(soapHeader);
         documentSubmitService.setSOAPHeader(soapHeaderElement);
-        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
-        RegistryResponseType response = new RegistryResponseType();
+
+        //  Validate HCP SAML token according de Medication Discard Dispense rule:
+        String sealCountryCode = null;
+
+        try {
+            sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, Constants.EDD_CLASSCODE);
+
+        } catch (InsufficientRightsException e) {
+            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+        } catch (AssertionValidationException e) {
+            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+        } catch (SMgrException e) {
+            logger.error("SMgrException: '{}'", e.getMessage(), e);
+            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+        }
+
         String patientId = getPatientId(request);
+        String countryCode = "";
+        String distinguishedName = eventLog.getSC_UserID();
+        int cIndex = distinguishedName.indexOf("C=");
+
+        if (cIndex > 0) {
+            countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
+        } else {
+            logger.info("Could not get client country code from the service consumer certificate. " +
+                    "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
+            if (sealCountryCode != null) {
+                logger.info("Found the client country code via the signature certificate.");
+                countryCode = sealCountryCode;
+            }
+        }
+        logger.info("The client country code to be used by the PDP: '{}'", countryCode);
+        if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
+            logger.debug("No consent given, throwing InsufficientRightsException");
+            InsufficientRightsException e = new InsufficientRightsException(4701);
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+        }
+
+        RegistryResponseType response = new RegistryResponseType();
         String documentId = "";
         String discardId = "";
         String discardDate = "";
-        logger.info("Received an eDispensation document for patient: '{}'", patientId);
+
         try {
             org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
             EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
@@ -376,9 +417,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
             discardDetails.setPatientId(patientId);
             discardDetails.setHealthCareProvider(Helper.getAlternateUserID(soapHeaderElement));
             discardDetails.setHealthCareProviderId(Helper.getAssertionsSPProvidedId(soapHeaderElement));
-            discardDetails.setHealthCareProviderFacility(Helper.getPointOfCareUserId(soapHeaderElement));
-            discardDetails.setHealthCareProviderOrganization(Helper.getOrganizationId(soapHeaderElement));
+            discardDetails.setHealthCareProviderFacility(Helper.getXSPALocality(soapHeaderElement));
             discardDetails.setHealthCareProviderOrganization(Helper.getOrganization(soapHeaderElement));
+            discardDetails.setHealthCareProviderOrganizationId(Helper.getOrganizationId(soapHeaderElement));
+            //  TODO: EHNCP-2055 Inconsistency in handling patient id
             documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
 
         } catch (NationalInfrastructureException e) {
@@ -390,6 +432,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+        }
+
+        if (registryErrorList.getRegistryError().isEmpty()) {
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        } else {
+            response.setRegistryErrorList(registryErrorList);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
         }
         prepareEventLogForDiscardMedication(eventLog, discardId, request, response, soapHeaderElement);
 
@@ -403,12 +452,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @return
      * @throws Exception
      */
-    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader
-            soapHeader,
+    public RegistryResponseType saveDispensation(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader soapHeader,
                                                  EventLog eventLog) throws Exception {
 
+        logger.info("Processing Dispense Medication");
         RegistryResponseType response = new RegistryResponseType();
-        String sigCountryCode = null;
+        String sealCountryCode = null;
 
         Element shElement;
         try {
@@ -419,19 +468,19 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
         documentSubmitService.setSOAPHeader(shElement);
 
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
+        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
         try {
-            sigCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
 
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -449,19 +498,19 @@ public class XDRServiceImpl implements XDRServiceInterface {
         else {
             logger.info("Could not get client country code from the service consumer certificate. " +
                     "The reason can be that the call was not via HTTPS. Will check the country code from the signature certificate now.");
-            if (sigCountryCode != null) {
+            if (sealCountryCode != null) {
                 logger.info("Found the client country code via the signature certificate.");
-                countryCode = sigCountryCode;
+                countryCode = sealCountryCode;
             }
         }
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             InsufficientRightsException e = new InsufficientRightsException(4701);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
-        if (!rel.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(rel);
+        if (!registryErrorList.getRegistryError().isEmpty()) {
+            response.setRegistryErrorList(registryErrorList);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
             try {
@@ -535,17 +584,17 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                    }
                 } catch (NationalInfrastructureException e) {
                     logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
-                    rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
                 } catch (NIException e) {
                     logger.error("NIException: '{}'", e.getMessage());
-                    rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
-                    rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+                    registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
                 }
             }
-            if (!rel.getRegistryError().isEmpty()) {
-                response.setRegistryErrorList(rel);
+            if (!registryErrorList.getRegistryError().isEmpty()) {
+                response.setRegistryErrorList(registryErrorList);
                 response.setStatus(AdhocQueryResponseStatus.FAILURE);
             } else {
                 response.setStatus(AdhocQueryResponseStatus.SUCCESS);
@@ -579,18 +628,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
             // Traverse all Classification blocks in the ExtrinsicObject selected
             for (ClassificationType classification : extrinsicObject.getClassification()) {
 
-                logger.info("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
-                if (StringUtils.equals(classification.getClassificationScheme(), "urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d")) {
+                logger.debug("[WS] XDR Service: Classification: '{}'-'{}'", classification.getClassificationScheme(), classification.getNodeRepresentation());
+                if (StringUtils.equals(classification.getClassificationScheme(), IheConstants.FORMAT_CODE_SCHEME)) {
 
                     // TODO: check the right LOINC code, currently coded as in example 3.4.2 ver. 2.2 p. 82
                     if (StringUtils.equals(classification.getNodeRepresentation(), "urn:epSOS:ep:dis:2010")) {
                         //  urn:epSOS:ep:dis:2010
-                        logger.info("Dispense Medication");
                         return saveDispensation(request, soapHeader, eventLog);
 
                     } else if (StringUtils.equals(classification.getNodeRepresentation(), "urn:eHDSI:ed:discard:2020")) {
                         //  "urn:eHDSI:ed:discard:2020"
-                        logger.info("Discard Dispense Medication");
                         return discardMedicationDispensed(request, soapHeader, eventLog);
                     }
                 }
@@ -611,7 +658,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             sh, EventLog eventLog) {
 
         RegistryResponseType response = new RegistryResponseType();
-        String sigCountryCode = null;
+        String sealCountryCode = null;
 
         Element shElement = null;
         try {
@@ -623,7 +670,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
-            sigCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
 
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
@@ -732,8 +779,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return response;
     }
 
-    protected String validateXDRHeader(Element sh, String classCode) throws
-            MissingFieldException, InvalidFieldException,
+    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException,
             SMgrException, InsufficientRightsException {
 
         return SAML2Validator.validateXDRHeader(sh, classCode);
@@ -896,17 +942,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private String getDocumentId(org.w3c.dom.Document document) {
 
-        String oid = "";
+        String uid = "";
         if (document != null && document.getElementsByTagNameNS(HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(HL7_NAMESPACE, "id").item(0);
             if (id.getAttributes().getNamedItem("root") != null) {
-                oid = oid + id.getAttributes().getNamedItem("root").getTextContent();
+                uid = uid + id.getAttributes().getNamedItem("root").getTextContent();
             }
             if (id.getAttributes().getNamedItem("extension") != null) {
-                oid = oid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
+                uid = uid + "^" + id.getAttributes().getNamedItem("extension").getTextContent();
             }
         }
-        logger.info("Document ID: '{}'", oid);
-        return oid;
+        return uid;
     }
 }
