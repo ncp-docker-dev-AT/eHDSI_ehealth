@@ -240,6 +240,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                 XCAPermissionValidatorOrCD(assertion);
+                break;
             default:
                 String errorMsg = "Invalid document class code: " + documentClass;
                 logger.error(errorMsg);
