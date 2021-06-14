@@ -5,12 +5,9 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.opensaml.core.xml.Namespace;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.Marshaller;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
@@ -21,10 +18,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
 
-import javax.xml.crypto.dsig.*;
+import javax.xml.XMLConstants;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.namespace.QName;
@@ -34,6 +32,8 @@ import java.security.KeyStore;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,15 +49,14 @@ public class TRCAssertionCreator {
         KeyPair keyPair;
         KeyInfo keyInfo;
 
-        SAML saml = new SAML();
-
-        Subject subject = saml.createSubject("physician the",
+        var saml = new SAML();
+        var subject = saml.createSubject("physician the",
                 "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "sender-vouches");
 
         // Create assertion
-        Assertion assertion = saml.createAssertion(subject);
+        var assertion = saml.createAssertion(subject);
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
-        Issuer issuer = saml.create(Issuer.class, Issuer.DEFAULT_ELEMENT_NAME);
+        var issuer = saml.create(Issuer.class, Issuer.DEFAULT_ELEMENT_NAME);
         issuer.setValue("urn:initgw:" + countryCode + ":countryB");
         issuer.setFormat("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified");
         issuer.setNameQualifier("urn:epsos:wp34:assertions");
@@ -68,32 +67,32 @@ public class TRCAssertionCreator {
         assertion.setVersion(version);
 
         // Set AuthnStatement
-        DateTime dateTime = new DateTime().toDateTime(DateTimeZone.UTC);
-        AuthnStatement authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
-        authnStatement.setAuthnInstant(dateTime);
-        authnStatement.setSessionNotOnOrAfter(dateTime.plusHours(2));
+        var issueInstant = Instant.now();
+        var authnStatement = saml.create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
+        authnStatement.setAuthnInstant(issueInstant);
+        authnStatement.setSessionNotOnOrAfter(issueInstant.plus(Duration.ofHours(2)));
 
         // Set AuthnStatement/AuthnContext
-        AuthnContext authnContext = saml.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
-        AuthnContextClassRef authnContextClassRef = saml.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-        authnContextClassRef.setAuthnContextClassRef("urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession");
+        var authnContext = saml.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
+        var authnContextClassRef = saml.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+        authnContextClassRef.setURI("urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession");
         authnContext.setAuthnContextClassRef(authnContextClassRef);
         authnStatement.setAuthnContext(authnContext);
         assertion.getAuthnStatements().add(authnStatement);
 
         // Set Advice
-        Advice advice = saml.create(Advice.class, Advice.DEFAULT_ELEMENT_NAME);
-        AssertionIDRef aidr = saml.create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
-        aidr.setAssertionID(assertion.getID());
-        advice.getAssertionIDReferences().add(aidr);
+        var advice = saml.create(Advice.class, Advice.DEFAULT_ELEMENT_NAME);
+        var assertionIDRef = saml.create(AssertionIDRef.class, AssertionIDRef.DEFAULT_ELEMENT_NAME);
+        assertionIDRef.setValue(assertion.getID());
+        advice.getAssertionIDReferences().add(assertionIDRef);
         assertion.setAdvice(advice);
 
         // Create AttributeStatement
-        AttributeStatement attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
+        var attributeStatement = saml.create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
 
         // Namespaces
-        Namespace ns1 = new Namespace("http://www.w3.org/2001/XMLSchema", "xs");
-        Namespace ns2 = new Namespace("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+        var ns1 = new Namespace(XMLConstants.W3C_XML_SCHEMA_NS_URI, "xs");
+        var ns2 = new Namespace(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "xsi");
 
         // Set patient Identifier
         if (true) {
@@ -103,14 +102,12 @@ public class TRCAssertionCreator {
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
-
-
             XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             attVal.setTextContent("6212122451^^^&2.16.17.710.815.1000.990.1&ISO");
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -131,7 +128,7 @@ public class TRCAssertionCreator {
 
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
-            QName attributeName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type", "xsi");
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
             attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
@@ -144,64 +141,60 @@ public class TRCAssertionCreator {
         // Set Signature
         try {
             // Set assertion.DOM
-            Marshaller marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
-            Element elem;
-            elem = marshaller.marshall(assertion);
-            assertion.setDOM(elem);
+            var marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
+            Element element = marshaller.marshall(assertion);
+            assertion.setDOM(element);
 
             // Set factory
-            String providerName = System.getProperty
-                    ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-            factory = XMLSignatureFactory.getInstance("DOM",
-                    (Provider) Class.forName(providerName).newInstance());
+            String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+            factory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
 
             // Set keyStore
-            try (FileInputStream is = new FileInputStream(Constants.SC_KEYSTORE_PATH)) {
+            try (var is = new FileInputStream(Constants.SC_KEYSTORE_PATH)) {
                 keyStore = KeyStore.getInstance("JKS");
                 keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
             }
 
-            PasswordProtection pp = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
-            PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, pp);
+            var passwordProtection = new PasswordProtection(Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
+            PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(Constants.SC_PRIVATEKEY_ALIAS, passwordProtection);
 
             // Set keyPair
             keyPair = new KeyPair(entry.getCertificate().getPublicKey(), entry.getPrivateKey());
 
             // Set keyInfo
-            KeyInfoFactory kFactory = factory.getKeyInfoFactory();
-            keyInfo = kFactory.newKeyInfo(Collections.singletonList(kFactory.newX509Data
+            var keyInfoFactory = factory.getKeyInfoFactory();
+            keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(keyInfoFactory.newX509Data
                     (Collections.singletonList(entry.getCertificate()))));
 
             // Create Signature/SignedInfo/Reference
             List<Transform> lst = new ArrayList<>();
             lst.add(factory.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
             lst.add(factory.newTransform(CryptographicConstant.ALGO_ID_C14N_EXCL_OMIT_COMMENTS, (TransformParameterSpec) null));
-            Reference ref = factory.newReference("#" + assertion.getID(),
+            var reference = factory.newReference("#" + assertion.getID(),
                     factory.newDigestMethod(CryptographicConstant.ALGO_ID_DIGEST_SHA256, null),
                     lst, null, null);
 
             // Set Signature/SignedInfo
-            SignedInfo signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod
+            var signedInfo = factory.newSignedInfo(factory.newCanonicalizationMethod
                     (CryptographicConstant.ALGO_ID_C14N_EXCL_WITH_COMMENTS,
                             (C14NMethodParameterSpec) null), factory.newSignatureMethod
-                    (CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null), Collections.singletonList(ref));
+                    (CryptographicConstant.ALGO_ID_SIGNATURE_RSA_SHA256, null), Collections.singletonList(reference));
 
             // Sign Assertion
-            XMLSignature signature = factory.newXMLSignature(signedInfo, keyInfo);
-            DOMSignContext signContext = new DOMSignContext
-                    (keyPair.getPrivate(), assertion.getDOM());
-            signature.sign(signContext);
+            var xmlSignature = factory.newXMLSignature(signedInfo, keyInfo);
+            var domSignContext = new DOMSignContext(keyPair.getPrivate(), assertion.getDOM());
+            xmlSignature.sign(domSignContext);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
 
         // Set Signature's place
-        org.w3c.dom.Node signatureElement = assertion.getDOM().getLastChild();
+        Node signatureElement = assertion.getDOM().getLastChild();
 
-        boolean foundIssuer = false;
-        org.w3c.dom.Node elementAfterIssuer = null;
+        var foundIssuer = false;
+        Node elementAfterIssuer = null;
         NodeList children = assertion.getDOM().getChildNodes();
-        for (int c = 0; c < children.getLength(); ++c) {
+        for (var c = 0; c < children.getLength(); ++c) {
             org.w3c.dom.Node child = children.item(c);
 
             if (foundIssuer) {
@@ -209,8 +202,7 @@ public class TRCAssertionCreator {
                 break;
             }
 
-            if (child.getNodeType() == Node.ELEMENT_NODE &&
-                    StringUtils.equals(child.getLocalName(), "Issuer"))
+            if (child.getNodeType() == Node.ELEMENT_NODE && StringUtils.equals(child.getLocalName(), "Issuer"))
                 foundIssuer = true;
         }
 

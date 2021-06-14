@@ -22,7 +22,7 @@ public class DateUtil {
     private static final DatatypeFactory DATATYPE_FACTORY;
     private static final int RAND_LIMIT = 10000;
     private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
-    private static Random rand = new Random();
+    private static final Random rand = new Random();
 
     static {
         try {
@@ -63,10 +63,14 @@ public class DateUtil {
     }
 
     public static String getCurrentTimeUTC() {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat(TIME_DATE_FORMAT);
-        df.setTimeZone(tz);
-        return df.format(new Date());
+        return getCurrentTimeUTC(TIME_DATE_FORMAT);
+    }
+
+    public static String getCurrentTimeUTC(String format) {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        DateFormat dateFormat = new SimpleDateFormat(format);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(new Date());
     }
 
     // Returns the current time in given format

@@ -5,9 +5,9 @@ import eu.epsos.util.proxy.ProxyCredentials;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import org.cryptacular.util.CertUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.x509.X500Name;
 import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.*;
@@ -49,12 +49,7 @@ public class HTTPUtil {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 
         if (certs != null && certs.length > 0) {
-
-            try {
-                result = ((X500Name) certs[0].getSubjectDN()).getCommonName();
-            } catch (IOException e) {
-                result = "Warning!: No Client certificate found!";
-            }
+            result = getCommonName(certs[0]);
         } else {
             if ("https".equals(request.getScheme())) {
                 LOGGER.warn("This was an HTTPS request, " + "but no client certificate is available");
@@ -72,11 +67,7 @@ public class HTTPUtil {
         Certificate[] certificates = getSSLPeerCertificate(host, false);
         if (certificates != null && certificates.length > 0) {
             X509Certificate cert = (X509Certificate) certificates[0];
-            try {
-                return ((X500Name) cert.getSubjectDN()).getCommonName();
-            } catch (IOException e) {
-                LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            }
+            return getCommonName(cert);
         }
         return "Warning!: No Server certificate found!";
     }
@@ -186,7 +177,7 @@ public class HTTPUtil {
                 // Get the first certificate
                 if (certs != null && certs.length > 0) {
                     X509Certificate cert = (X509Certificate) certs[0];
-                    result = ((X500Name) cert.getSubjectDN()).getCommonName();
+                    result = getCommonName(cert);
                 } else {
                     result = "Warning!: No Server certificate found!";
                 }
@@ -231,8 +222,7 @@ public class HTTPUtil {
             }
             if (cert instanceof X509Certificate) {
                 X509Certificate x509Certificate = (X509Certificate) cert;
-                Principal principal = x509Certificate.getSubjectDN();
-                return ((X500Name) principal).getCommonName();
+                return getCommonName(x509Certificate);
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
@@ -275,5 +265,9 @@ public class HTTPUtil {
             return ps;
         }
         return null;
+    }
+
+    private static String getCommonName(java.security.cert.X509Certificate cert){
+        return CertUtil.subjectCN(cert);
     }
 }

@@ -6,7 +6,7 @@
     <import resource="ctx_tsam.xml"/>
 
     <!-- Allow the user of properties from application.properties throughout this configuration file(s) -->
-    <bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="placeholderConfig" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <!-- Assumption is that EPSOS_PROPS_PATH SHALL end with a "/" -->

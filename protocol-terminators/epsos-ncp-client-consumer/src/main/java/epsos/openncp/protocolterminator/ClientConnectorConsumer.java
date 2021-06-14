@@ -6,11 +6,9 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.util.XMLUtils;
@@ -45,7 +43,7 @@ public class ClientConnectorConsumer {
         if (AssertionHelper.isExpired(idAssertion)) {
             throw new ClientConnectorConsumerException("HCP Assertion expired");
         }
-        OMFactory omFactory = OMAbstractFactory.getOMFactory();
+        var omFactory = OMAbstractFactory.getOMFactory();
         OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
                 "Security", "wsse"), null);
         if (trcAssertion != null) {
@@ -62,11 +60,11 @@ public class ClientConnectorConsumer {
 
         // Adding custom phase for evidence emitter processing.
         logger.debug("Adding custom phase for outflow evidence emitter processing");
-        HandlerDescription outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
+        var outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
         outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
-        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
+        var axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
         List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
-        Phase outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
+        var outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
         try {
             outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
         } catch (PhaseException ex) {
@@ -87,9 +85,9 @@ public class ClientConnectorConsumer {
         try {
             addAssertions(stub, idAssertion, trcAssertion);
 
-            QueryDocumentsDocument queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
-            QueryDocuments queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
-            QueryDocumentRequest queryDocumentRequest = queryDocuments.addNewArg0();
+            var queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
+            var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
+            var queryDocumentRequest = queryDocuments.addNewArg0();
             queryDocumentRequest.setClassCode(classCode);
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
@@ -114,38 +112,18 @@ public class ClientConnectorConsumer {
 
         logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
         ClientConnectorServiceStub stub = initializeServiceStub();
-//        OMFactory factory = OMAbstractFactory.getOMFactory();
-//        OMNamespace ns2 = factory.createOMNamespace(AddressingConstants.Final.WSA_NAMESPACE, "");
-//
-//        SOAPHeaderBlock action = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_ACTION, ns2);
-//        OMNode node = factory.createOMText("urn:ehdsi:queryPatient");
-//        action.addChild(node);
-//        // OMAttribute att2 = factory.createOMAttribute("mustUnderstand", ns2, "1");
-//        // action.addAttribute(att2);
-//
-//        SOAPHeaderBlock headerBlock = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_MESSAGE_ID, ns2);
-//        OMNode messageIdNode = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
-//        headerBlock.addChild(messageIdNode);
-//
-//        SOAPHeaderBlock to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock(AddressingConstants.WSA_TO, ns2);
-//        OMNode node3 = factory.createOMText(epr);
-//        to.addChild(node3);
-//
-//        stub._getServiceClient().addHeader(action);
-//        stub._getServiceClient().addHeader(headerBlock);
-//        stub._getServiceClient().addHeader(to);
 
         try {
             trimPatientDemographics(patientDemographics);
             addAssertions(stub, idAssertion, null);
-            QueryPatientRequest queryPatientRequest = QueryPatientRequest.Factory.newInstance();
+            var queryPatientRequest = QueryPatientRequest.Factory.newInstance();
             queryPatientRequest.setPatientDemographics(patientDemographics);
             queryPatientRequest.setCountryCode(countryCode);
 
-            QueryPatientDocument queryPatientDocument = QueryPatientDocument.Factory.newInstance();
+            var queryPatientDocument = QueryPatientDocument.Factory.newInstance();
             queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
 
-            QueryPatientResponseDocument queryPatientResponseDocument = stub.queryPatient(queryPatientDocument);
+            var queryPatientResponseDocument = stub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (Exception ex) {
@@ -162,10 +140,10 @@ public class ClientConnectorConsumer {
         ClientConnectorServiceStub stub = initializeServiceStub();
         try {
             addAssertions(stub, idAssertion, null);
-            SayHelloDocument sayHelloDocument = SayHelloDocument.Factory.newInstance();
+            var sayHelloDocument = SayHelloDocument.Factory.newInstance();
             sayHelloDocument.addNewSayHello().setArg0(name);
 
-            SayHelloResponseDocument sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
+            var sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
@@ -184,14 +162,14 @@ public class ClientConnectorConsumer {
             RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
             RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
 
-            RetrieveDocumentRequest retrieveDocumentRequest = retrieveDocument.addNewArg0();
+            var retrieveDocumentRequest = retrieveDocument.addNewArg0();
             retrieveDocumentRequest.setDocumentId(documentId);
             retrieveDocumentRequest.setHomeCommunityId(homeCommunityId);
             retrieveDocumentRequest.setCountryCode(countryCode);
             retrieveDocumentRequest.setClassCode(classCode);
             retrieveDocumentRequest.setTargetLanguage(targetLanguage);
 
-            RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
+            var retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
         } catch (Exception ex) {
@@ -202,7 +180,7 @@ public class ClientConnectorConsumer {
     /**
      * @deprecated Method has been deprecated in favor of the implementation of retrieveDocument() with language parameter.
      */
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
 
@@ -244,7 +222,7 @@ public class ClientConnectorConsumer {
 
         try {
             logger.debug("Initializing Client Connector Stub Services");
-            ClientConnectorServiceStub clientConnectorStub = new ClientConnectorServiceStub(endpointReference);
+            var clientConnectorStub = new ClientConnectorServiceStub(endpointReference);
             clientConnectorStub._getServiceClient().getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             clientConnectorStub._getServiceClient().engageModule("addressing");
