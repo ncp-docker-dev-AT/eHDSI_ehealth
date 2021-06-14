@@ -39,6 +39,7 @@
         <module>assertion-validator</module>
         <module>cda-display-tool</module>
         <module>default-policy-manager</module>
+        <module>assertion-provider</module>
         <module>trc-sts</module>
         <module>trc-sts-client</module>
         <module>tsam</module>
@@ -52,7 +53,6 @@
         <module>openstork</module>
         <module>openncp-gateway</module>
         <module>openncp-gazelle-validation</module>
-        <module>assertion-provider</module>
     </modules>
 
     <scm>
@@ -139,7 +139,7 @@
         <spring.version>5.3.7</spring.version>
         <spring.data.jpa.version>2.3.6.RELEASE</spring.data.jpa.version>
         <xalan.version>2.7.2</xalan.version>
-        <xerces.version>2.12.0</xerces.version>
+        <xerces.version>2.12.1</xerces.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
         <xmlsec.version>2.1.5</xmlsec.version>
         <xml-apis.version>1.4.01</xml-apis.version>

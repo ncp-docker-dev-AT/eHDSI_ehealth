@@ -44,7 +44,7 @@ public class IdentityProviderConfiguration {
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
 
-        SpringBus cxfBus = new SpringBus();
+        var cxfBus = new SpringBus();
         cxfBus.getFeatures().add(loggingFeature());
         cxfBus.getFeatures().add(new WSAddressingFeature());
         return cxfBus;
@@ -53,7 +53,7 @@ public class IdentityProviderConfiguration {
     @Bean
     public LoggingFeature loggingFeature() {
 
-        LoggingFeature loggingFeature = new LoggingFeature();
+        var loggingFeature = new LoggingFeature();
         loggingFeature.setPrettyLogging(true);
         return loggingFeature;
     }
@@ -61,10 +61,10 @@ public class IdentityProviderConfiguration {
     @Bean
     public Endpoint endpoint(ISecurityTokenService serviceEndpoint) {
 
-        EndpointImpl endpoint = new EndpointImpl(springBus(), serviceEndpoint);
+        var endpoint = new EndpointImpl(springBus(), serviceEndpoint);
         endpoint.setBindingUri(SoapBindingConstants.SOAP12_BINDING_ID);
         endpoint.getInInterceptors().add(new SoapHeaderInterceptor());
-        endpoint.publish("/ClientConnectorService");
+        endpoint.publish("/TRC-STS");
         return endpoint;
     }
 }

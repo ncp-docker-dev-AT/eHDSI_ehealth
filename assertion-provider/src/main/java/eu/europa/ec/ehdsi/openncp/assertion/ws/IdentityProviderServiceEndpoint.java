@@ -1,7 +1,7 @@
 package eu.europa.ec.ehdsi.openncp.assertion.ws;
 
 import com.message.schemas.message.MessageBody;
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import org.apache.xerces.dom.ElementNSImpl;
 import eu.epsos.ISecurityTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
