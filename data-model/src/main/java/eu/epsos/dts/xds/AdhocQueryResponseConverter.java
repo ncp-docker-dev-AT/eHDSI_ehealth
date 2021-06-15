@@ -168,7 +168,11 @@ public final class AdhocQueryResponseConverter {
                 XDSDocument targetObject = null;
 
                 for (XDSDocument doc : documents) {
-                    if (doc.getId().matches(sourceObjectId)) {
+                    if(doc.getId().matches(targetObjectId) && doc.getId().matches(sourceObjectId)) {
+                        //OrCD
+                        sourceObject = doc;
+                        targetObject = doc;
+                    }else if (doc.getId().matches(sourceObjectId)) {
                         sourceObject = doc;
                     } else if (doc.getId().matches(targetObjectId)) {
                         targetObject = doc;
