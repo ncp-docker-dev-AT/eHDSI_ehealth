@@ -71,7 +71,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result.setQueryPatientResponse(response);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
         LoggingSlf4j.end(logger, methodName);
@@ -148,7 +148,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             }
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
 
@@ -230,7 +230,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result = RetrieveDocumentResponseDTS.newInstance(response);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
 
@@ -308,7 +308,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result.setSubmitDocumentResponse(SubmitDocumentResponseDts.newInstance(response));
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
         LoggingSlf4j.end(logger, methodName);

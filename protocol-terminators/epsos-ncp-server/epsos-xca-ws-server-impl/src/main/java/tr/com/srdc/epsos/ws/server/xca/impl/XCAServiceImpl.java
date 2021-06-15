@@ -1231,7 +1231,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         //TODO Mathias - To be reviewed if this is ok for the OrCD, for the other services an association object with both the XML and PDF is returned.
         if (!StringUtils.isEmpty(xmlUUID)) {
-            response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(null, xmlUUID)));
+            response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(xmlUUID, xmlUUID)));
         }
     }
 
