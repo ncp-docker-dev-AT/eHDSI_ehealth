@@ -1522,7 +1522,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
                     // Transcode to eHDSI Pivot
-                    doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    if(!Constants.getClassCodesOrCD().contains(classCodeValue)) {
+                        doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    }
                     if (!checkIfOnlyWarnings(registryErrorList)) {
 
                         // If the transformation process has raised at least one FATAL Error, we should determine which

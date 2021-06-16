@@ -135,17 +135,10 @@ public class XcaInitGateway {
             // This is a rather dirty hack, but document.getClassCode() returns null for some reason.
             switch (service) {
                 case Constants.OrderService:
-                    classCode = Constants.EP_CLASSCODE;
-                    break;
                 case Constants.PatientService:
-                    classCode = Constants.PS_CLASSCODE;
-                    break;
                 case Constants.MroService:
-                    classCode = Constants.MRO_CLASSCODE;
-                    break;
                 case Constants.OrCDService:
-                    //TODO: Mathias - this needs to be reviewed. Best would be to use the document.getClassCode()...
-                    classCode = Constants.ORCD_LABORATORY_RESULTS_CLASSCODE;
+                    classCode = document.getClassCode().getValue();
                     break;
                 default:
                     LOGGER.error("Service Not Supported");

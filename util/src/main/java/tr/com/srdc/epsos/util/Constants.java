@@ -4,6 +4,9 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Constants {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Constants.class);
@@ -134,5 +137,14 @@ public class Constants {
         }
 
         return path;
+    }
+
+    public static List<String> getClassCodesOrCD() {
+        List<String> list = new ArrayList<>();
+        list.add(ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE);
+        list.add(ORCD_LABORATORY_RESULTS_CLASSCODE);
+        list.add(ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE);
+        list.add(ORCD_MEDICAL_IMAGES_CLASSCODE);
+        return list;
     }
 }
