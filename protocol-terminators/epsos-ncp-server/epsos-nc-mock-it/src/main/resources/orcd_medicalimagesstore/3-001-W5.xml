@@ -18,7 +18,7 @@
    <recordTarget>
       <patientRole>
          <!-- Primary Patient Identifier -->
-         <id extension="3-003-W5" root="1.3.6.1.4.1.48336" />
+         <id extension="3-001-W5" root="1.3.6.1.4.1.48336" />
          <addr>
             <streetAddressLine>Markt 1</streetAddressLine>
             <postalCode>9300</postalCode>
