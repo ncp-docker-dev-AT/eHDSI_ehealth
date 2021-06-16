@@ -32,6 +32,8 @@ import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.sax.SAXSource;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -166,6 +168,10 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                             QueryDocumentsDocument.class, getEnvelopeNamespaces(reqEnv));
                     QueryDocumentsResponseDocument queryDocumentsResponseDocument = clientConnectorServiceSkeletonInterface
                             .queryDocuments(wrappedParam, hcpAssertion, trcAssertion);
+
+                    Writer writer = new StringWriter();
+                    toOM(wrappedParam).serialize(writer);
+                    logger.error("wrappedParam : " + writer.toString());
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), queryDocumentsResponseDocument);
                 }

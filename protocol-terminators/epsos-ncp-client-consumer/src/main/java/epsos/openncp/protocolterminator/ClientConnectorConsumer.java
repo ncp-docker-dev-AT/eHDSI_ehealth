@@ -77,7 +77,7 @@ public class ClientConnectorConsumer {
     }
 
     public List<EpsosDocument1> queryDocuments(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                               PatientId patientId, GenericDocumentCode classCode) {
+                                               PatientId patientId, List<GenericDocumentCode> classCodes) {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         ClientConnectorServiceStub stub = initializeServiceStub();
@@ -88,7 +88,12 @@ public class ClientConnectorConsumer {
             var queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
-            queryDocumentRequest.setClassCode(classCode);
+            GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
+            for(int i = 0; i < classCodes.size(); i++) {
+                array[i] = classCodes.get(i);
+            }
+            queryDocumentRequest.setClassCodeArray(array);
+//            queryDocumentRequest.setClassCodeArray(classCodes.toArray(GenericDocumentCode[]::new));
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
 

@@ -83,7 +83,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
      * This method is an adapter for the usage of a XCA client.
      *
      * @param queryDocuments axis wrapper for element: <code>queryDocuments</code>. This encapsulates, destination
-     *                       Country Code, patient's identification and documents class code.
+     *                       Country Code, patient's identification and documents class codes.
      * @return a QueryDocumentsResponseDocument containing the query response(s).
      */
     @Override
@@ -105,6 +105,8 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
 
         List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
+        logger.error("queryDocumentRequest.getClassCodeArray() : " + queryDocumentRequest.getClassCodeArray());
+        logger.error("classCodes.size() : " + classCodes.size());
         List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
         for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode: documentCodes) {
@@ -116,7 +118,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         /* perform the call */
         try {
             QueryResponse response;
-
+            logger.error("documentCodes.size()" + documentCodes.size());
             if (documentCodes.size()==1) {
                 switch (documentCodes.get(0).getValue()) {
                     case Constants.PS_CLASSCODE:
@@ -153,11 +155,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         }
 
         // create return wrapper
-        QueryDocumentsResponseDocument wapper = QueryDocumentsResponseDocument.Factory.newInstance();
-        wapper.setQueryDocumentsResponse(result);
+        QueryDocumentsResponseDocument wrapper = QueryDocumentsResponseDocument.Factory.newInstance();
+        wrapper.setQueryDocumentsResponse(result);
 
         LoggingSlf4j.end(logger, methodName);
-        return wapper;
+        return wrapper;
     }
 
     /**

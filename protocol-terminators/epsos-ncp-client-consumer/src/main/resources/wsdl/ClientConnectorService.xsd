@@ -190,7 +190,7 @@
             <xs:extension base="tns:epsosServiceRequest">
                 <xs:sequence>
                     <xs:element name="patientId" type="tns:patientId"/>
-                    <xs:element name="classCode" type="tns:genericDocumentCode"/>
+                    <xs:element name="classCode" type="tns:genericDocumentCode" maxOccurs="unbounded"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

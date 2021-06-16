@@ -27,6 +27,7 @@ public class AdhocQueryRequestCreator {
      */
     public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root, List<GenericDocumentCode> documentCodes) {
 
+
         AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
 
         // Set AdhocQueryRequest/ResponseOption
@@ -69,6 +70,7 @@ public class AdhocQueryRequestCreator {
             documentEntryClassCode += documentCode.getValue() + "^^" + documentCode.getSchema();
         }
         documentEntryClassCode += "')";
+
         v3.getValue().add(documentEntryClassCode);
         entryClassCode.setValueList(v3);
         adhocQueryRequest.getAdhocQuery().getSlot().add(entryClassCode);
