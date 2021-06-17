@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class AdhocQueryRequestCreator {
@@ -79,6 +80,7 @@ public class AdhocQueryRequestCreator {
 
 
         //FilterParameters
+
         // Set XDSDocumentEntryFilterMaximumSize  Slot
         if(filterParams.getMaximumSize() != null) {
             SlotType1 entryFilterMaximumSize = new SlotType1();
@@ -94,7 +96,7 @@ public class AdhocQueryRequestCreator {
             SlotType1 entryFilterCreatedBefore = new SlotType1();
             entryFilterCreatedBefore.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME);
             ValueListType v5 = new ValueListType();
-            v5.getValue().add(String.valueOf(filterParams.getMaximumSize()));
+            v5.getValue().add(String.valueOf(filterParams.getCreatedBefore()));
             entryFilterCreatedBefore.setValueList(v5);
             adhocQueryRequest.getAdhocQuery().getSlot().add(entryFilterCreatedBefore);
         }
@@ -104,7 +106,7 @@ public class AdhocQueryRequestCreator {
             SlotType1 entryFilterCreatedAfter = new SlotType1();
             entryFilterCreatedAfter.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME);
             ValueListType v6 = new ValueListType();
-            v6.getValue().add(String.valueOf(filterParams.getMaximumSize()));
+            v6.getValue().add(String.valueOf(filterParams.getCreatedAfter()));
             entryFilterCreatedAfter.setValueList(v6);
             adhocQueryRequest.getAdhocQuery().getSlot().add(entryFilterCreatedAfter);
         }

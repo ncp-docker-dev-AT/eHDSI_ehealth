@@ -60,6 +60,8 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class XCAServiceImpl implements XCAServiceInterface {
@@ -349,12 +351,23 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         FilterParams filterParams = new FilterParams();
 
+        //TODO fix the formatter Date
+        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss");
+
         for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
             if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME)) {
-              //  filterParams.setCreatedAfter( sl.getValueList().getValue().get(0));
+                try {
+                    filterParams.setCreatedAfter(formatterDate.parse(sl.getValueList().getValue().get(0)));
+                } catch (ParseException e) {
+                    logger.warn("Could not parse CreatedAfter of filter parameters");
+                }
             }
             if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME)) {
-              //  filterParams.setCreatedBefore( sl.getValueList().getValue().get(0));
+                try {
+                    filterParams.setCreatedBefore(formatterDate.parse(sl.getValueList().getValue().get(0)));
+                } catch (ParseException e) {
+                    logger.warn("Could not parse CreatedBefore of filter parameters");
+                }
             }
             if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME)) {
                 filterParams.setMaximumSize(Integer.parseInt(sl.getValueList().getValue().get(0)));
