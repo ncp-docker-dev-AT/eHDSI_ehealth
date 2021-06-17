@@ -120,7 +120,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         /* perform the call */
         try {
             QueryResponse response;
-            logger.error("documentCodes.size()" + documentCodes.size());
             if (documentCodes.size()==1) {
                 switch (documentCodes.get(0).getValue()) {
                     case Constants.PS_CLASSCODE:

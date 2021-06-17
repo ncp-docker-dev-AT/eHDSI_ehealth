@@ -61,6 +61,18 @@ public class DocumentDts {
                 case Constants.ED_CLASSCODE:
                     result.setTitle(Constants.ED_TITLE);
                     break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
+                    break;
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:_CLASSCODE:
+                    result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
+                    break;
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    result.setTitle(Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE);
+                    break;
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    result.setTitle(Constants.ORCD_MEDICAL_IMAGES_TITLE);
+                    break;
                 default:
                     // Document Type not supported
                     result.setTitle(Constants.UNKNOWN_TITLE);

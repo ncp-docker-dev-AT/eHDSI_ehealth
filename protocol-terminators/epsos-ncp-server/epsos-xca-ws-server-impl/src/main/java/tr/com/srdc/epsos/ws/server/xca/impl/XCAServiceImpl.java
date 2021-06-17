@@ -610,7 +610,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                               String confidentialityDisplay,
                                               String languageCode,
                                               String classCode,
-                                              OrCDDocumentMetaData.DocumentFileType documentFileType) {
+                                              OrCDDocumentMetaData.DocumentFileType documentFileType,
+                                              long size) {
 
         final String title;
         final String nodeRepresentation;
@@ -662,7 +663,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setLid(uuid);
         eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
 
-        // Status
+        // MimeType
         eot.setMimeType(MediaType.TEXT_XML_VALUE);
 
         // Name
@@ -683,6 +684,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Source Patient Id
         eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+
+        // Size
+        eot.getSlot().add(makeSlot("size", String.valueOf(size)));
 
         // LanguageCode (optional)
         eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
@@ -1238,7 +1242,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
         final String languageCode = orCDDocumentMetaData.getLanguage();
         String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
-                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType());
+                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize());
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         //TODO Mathias - To be reviewed if this is ok for the OrCD, for the other services an association object with both the XML and PDF is returned.
         if (!StringUtils.isEmpty(xmlUUID)) {
