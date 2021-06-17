@@ -68,6 +68,7 @@ public class XCAQueryTest {
                 patientId,
                 PATIENT_COUNTRY,
                 Arrays.asList(classcode),
+                null,
                 idAssertion,
                 trcAssertion, Constants.PatientService);
 

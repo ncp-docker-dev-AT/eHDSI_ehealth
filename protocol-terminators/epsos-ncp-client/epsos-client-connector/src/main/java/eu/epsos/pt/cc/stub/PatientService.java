@@ -24,7 +24,7 @@ public class PatientService {
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
 
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), idAssertion, trcAssertion,
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), null, idAssertion, trcAssertion,
                 RegisteredService.PATIENT_SERVICE.getServiceName());
     }
 

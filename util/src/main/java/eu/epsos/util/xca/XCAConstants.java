@@ -37,6 +37,10 @@ public final class XCAConstants {
         /* XDSDocumentEntryClassCode Slot */
         public static final String XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME = "$XDSDocumentEntryClassCode";
         public static final String XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_VALUE = "('60591-5^^2.16.840.1.113883.6.1')";
+        /* XDSDocumentEntryFilterParameters Slot */
+        public static final String XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME = "$XDSDocumentEntryFilterMaximumSize";
+        public static final String XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME = "$XDSDocumentEntryFilterCreatedBefore";
+        public static final String XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME = "$XDSDocumentEntryFilterCreatedAfter";
 
         private AdHocQueryRequest() {
         }

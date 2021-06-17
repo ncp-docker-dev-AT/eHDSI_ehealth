@@ -191,9 +191,18 @@
                 <xs:sequence>
                     <xs:element name="patientId" type="tns:patientId"/>
                     <xs:element name="classCode" type="tns:genericDocumentCode" maxOccurs="unbounded"/>
+                    <xs:element name="filterParams" type="tns:filterParams" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="filterParams">
+        <xs:sequence>
+            <xs:element name="createdBefore" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="createdAfter" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="maximumSize" type="xs:int" minOccurs="0"/>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="queryDocumentsResponse">

@@ -76,8 +76,9 @@ public class ClientConnectorConsumer {
         logger.debug("Ended phases restructuring");
     }
 
-    public List<EpsosDocument1> queryDocuments(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                               PatientId patientId, List<GenericDocumentCode> classCodes) {
+    public List<EpsosDocument1> queryDocuments(Assertion idAssertion, Assertion trcAssertion,
+                                               String countryCode, PatientId patientId,
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         ClientConnectorServiceStub stub = initializeServiceStub();
@@ -96,6 +97,7 @@ public class ClientConnectorConsumer {
 //            queryDocumentRequest.setClassCodeArray(classCodes.toArray(GenericDocumentCode[]::new));
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
+            queryDocumentRequest.setFilterParams(filterParams);
 
             QueryDocumentsResponseDocument queryDocumentsResponseDocument;
             queryDocumentsResponseDocument = stub.queryDocuments(queryDocumentsDocument);

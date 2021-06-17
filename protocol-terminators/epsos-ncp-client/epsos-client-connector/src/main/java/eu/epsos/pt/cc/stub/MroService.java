@@ -22,7 +22,7 @@ public class MroService {
 
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Assertion idAssertion, final Assertion trcAssertion) throws XCAException {
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), idAssertion, trcAssertion, Constants.MroService);
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), null,  idAssertion, trcAssertion, Constants.MroService);
     }
 
     public static RetrieveDocumentSetResponseType.DocumentResponse retrieve(

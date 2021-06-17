@@ -25,6 +25,7 @@ import org.apache.commons.digester.parser.GenericParser;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
@@ -60,20 +61,30 @@ public class XcaInitGateway {
     private XcaInitGateway() {
     }
 
-    public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode, final List<GenericDocumentCode> documentCodes,
-                                                  final Assertion idAssertion, final Assertion trcAssertion, String service) throws XCAException {
+    public static QueryResponse crossGatewayQuery(final PatientId pid,
+                                                  final String countryCode,
+                                                  final List<GenericDocumentCode> documentCodes,
+                                                  final FilterParams filterParams,
+                                                  final Assertion idAssertion,
+                                                  final Assertion trcAssertion,
+                                                  String service) throws XCAException {
 
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
                     Arrays.toString(documentCodes.toArray()), idAssertion.getID(), trcAssertion.getID(), service);
+            if(filterParams != null){
+                LOGGER_CLINICAL.info("FilterParams created Before: " + filterParams.getCreatedBefore());
+                LOGGER_CLINICAL.info("FilterParams created After: " + filterParams.getCreatedAfter());
+                LOGGER_CLINICAL.info("FilterParams size : " + filterParams.getMaximumSize());
+            }
         }
         QueryResponse result = null;
 
         try {
 
             /* queryRequest */
-            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCodes);
+            AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCodes, filterParams);
 
             /* Stub */
             RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();

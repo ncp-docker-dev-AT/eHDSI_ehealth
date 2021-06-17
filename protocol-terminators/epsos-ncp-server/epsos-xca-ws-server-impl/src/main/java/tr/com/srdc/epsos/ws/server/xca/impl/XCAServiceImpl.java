@@ -45,6 +45,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
@@ -342,6 +343,24 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
         }
         return "$XDSDocumentEntryPatientId Not Found!";
+    }
+
+    private FilterParams getFilterParams(AdhocQueryRequest request) {
+
+        FilterParams filterParams = new FilterParams();
+
+        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
+            if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME)) {
+              //  filterParams.setCreatedAfter( sl.getValueList().getValue().get(0));
+            }
+            if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME)) {
+              //  filterParams.setCreatedBefore( sl.getValueList().getValue().get(0));
+            }
+            if (sl.getName().equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME)) {
+                filterParams.setMaximumSize(Integer.parseInt(sl.getValueList().getValue().get(0)));
+            }
+        }
+        return filterParams;
     }
 
     /**
@@ -1143,69 +1162,35 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     }
                     break;
                 case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-                    List<OrCDDocumentMetaData> orcdHospitalDischargeReportList = documentSearchService.getOrCDHospitalDischargeReportsDocumentList(
-                            DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
-
-                    if (orcdHospitalDischargeReportList == null || orcdHospitalDischargeReportList.isEmpty()) {
-                        response = handleOrCDExceptionCases(response, rel, orcdHospitalDischargeReportList);
-                    } else {
-
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-                        for (OrCDDocumentMetaData orCDDocumentMetaData : orcdHospitalDischargeReportList) {
-
-                            logger.debug("OrCD Hospital Discharge report Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
-                            buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
-                        }
-                    }
-                    break;
                 case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                    List<OrCDDocumentMetaData> orcdLaboratoryReportList = documentSearchService.getOrCDLaboratoryResultsDocumentList(
-                            DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
-
-                    if (orcdLaboratoryReportList == null || orcdLaboratoryReportList.isEmpty()) {
-                        response = handleOrCDExceptionCases(response, rel, orcdLaboratoryReportList);
-                    } else {
-
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-                        for (OrCDDocumentMetaData orCDDocumentMetaData : orcdLaboratoryReportList) {
-
-                            logger.debug("OrCD Laboratory Report Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
-                            buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
-                        }
-                    }
-                    break;
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                    List<OrCDDocumentMetaData> orCDMedicalImagingReportList = documentSearchService.getOrCDMedicalImagingReportsDocumentList(
-                            DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
-
-                    if (orCDMedicalImagingReportList == null || orCDMedicalImagingReportList.isEmpty()) {
-                        response = handleOrCDExceptionCases(response, rel, orCDMedicalImagingReportList);
-                    } else {
-
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-                        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMedicalImagingReportList) {
-
-                            logger.debug("OrCD Medical Imaging Report Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
-                            buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
-                        }
-                    }
-                    break;
                 case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                    List<OrCDDocumentMetaData> orCDMedicalImagesList = documentSearchService.getOrCDMedicalImagesDocumentList(
-                            DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                    SearchCriteria searchCriteria = DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId);
+                    FilterParams filterParams = getFilterParams(request);
+                    if(filterParams.getMaximumSize() != null){
+                        searchCriteria.add(Criteria.MaximumSize, filterParams.getMaximumSize().toString());
+                    }
+                    if(filterParams.getCreatedBefore() != null){
+                        searchCriteria.add(Criteria.CreatedBefore, filterParams.getCreatedBefore().toString());
+                    }
+                    if(filterParams.getCreatedAfter() != null){
+                        searchCriteria.add(Criteria.CreatedAfter, filterParams.getCreatedAfter().toString());
+                    }
 
-                    if (orCDMedicalImagesList == null || orCDMedicalImagesList.isEmpty()) {
-                        response = handleOrCDExceptionCases(response, rel, orCDMedicalImagesList);
+                    List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
+
+                    if (orCDDocumentMetaDataList == null || orCDDocumentMetaDataList.isEmpty()) {
+                        response = handleOrCDExceptionCases(response, rel, orCDDocumentMetaDataList);
                     } else {
 
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-                        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMedicalImagesList) {
-
-                            logger.debug("OrCD Medical Images Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
+                        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDDocumentMetaDataList) {
+                            logger.debug("OrCD Document Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
                             buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
                         }
                     }
                     break;
+
                 default:
                     rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
                     response.setRegistryErrorList(rel);
@@ -1221,6 +1206,26 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 // Is this fatal?
             }
         }
+    }
+
+    private List<OrCDDocumentMetaData> getOrCDDocumentMetaDataList(String classCode, SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+        List<OrCDDocumentMetaData> orCDDocumentMetaDataList = new ArrayList<>();
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDHospitalDischargeReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDLaboratoryResultsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagingReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagesDocumentList(searchCriteria);
+                break;
+        }
+
+        return orCDDocumentMetaDataList;
     }
 
     private void buildOrCDExtrinsicObject(AdhocQueryRequest request, AdhocQueryResponse response, OrCDDocumentMetaData orCDDocumentMetaData) {

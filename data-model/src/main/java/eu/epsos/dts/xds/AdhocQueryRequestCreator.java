@@ -7,6 +7,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.AdhocQueryType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ValueListType;
 import org.apache.commons.lang3.StringUtils;
+import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
 import java.util.List;
@@ -25,7 +26,8 @@ public class AdhocQueryRequestCreator {
      * @param documentCodes
      * @return
      */
-    public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root, List<GenericDocumentCode> documentCodes) {
+    public static AdhocQueryRequest createAdhocQueryRequest(String extension, String root,
+                                                            List<GenericDocumentCode> documentCodes, FilterParams filterParams) {
 
 
         AdhocQueryRequest adhocQueryRequest = new AdhocQueryRequest();
@@ -74,6 +76,39 @@ public class AdhocQueryRequestCreator {
         v3.getValue().add(documentEntryClassCode);
         entryClassCode.setValueList(v3);
         adhocQueryRequest.getAdhocQuery().getSlot().add(entryClassCode);
+
+
+        //FilterParameters
+        // Set XDSDocumentEntryFilterMaximumSize  Slot
+        if(filterParams.getMaximumSize() != null) {
+            SlotType1 entryFilterMaximumSize = new SlotType1();
+            entryFilterMaximumSize.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME);
+            ValueListType v4 = new ValueListType();
+            v4.getValue().add(String.valueOf(filterParams.getMaximumSize()));
+            entryFilterMaximumSize.setValueList(v4);
+            adhocQueryRequest.getAdhocQuery().getSlot().add(entryFilterMaximumSize);
+        }
+
+        // Set XDSDocumentEntryFilterMaximumSize  Slot
+        if(filterParams.getCreatedBefore() != null) {
+            SlotType1 entryFilterCreatedBefore = new SlotType1();
+            entryFilterCreatedBefore.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME);
+            ValueListType v5 = new ValueListType();
+            v5.getValue().add(String.valueOf(filterParams.getMaximumSize()));
+            entryFilterCreatedBefore.setValueList(v5);
+            adhocQueryRequest.getAdhocQuery().getSlot().add(entryFilterCreatedBefore);
+        }
+
+        // Set XDSDocumentEntryFilterMaximumSize  Slot
+        if(filterParams.getCreatedAfter() != null) {
+            SlotType1 entryFilterCreatedAfter = new SlotType1();
+            entryFilterCreatedAfter.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME);
+            ValueListType v6 = new ValueListType();
+            v6.getValue().add(String.valueOf(filterParams.getMaximumSize()));
+            entryFilterCreatedAfter.setValueList(v6);
+            adhocQueryRequest.getAdhocQuery().getSlot().add(entryFilterCreatedAfter);
+        }
+
 
         return adhocQueryRequest;
     }

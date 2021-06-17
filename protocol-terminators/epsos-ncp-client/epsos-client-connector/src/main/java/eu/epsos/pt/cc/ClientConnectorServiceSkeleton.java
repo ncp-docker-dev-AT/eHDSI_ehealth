@@ -105,9 +105,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
 
         List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
-        logger.error("queryDocumentRequest.getClassCodeArray() : " + queryDocumentRequest.getClassCodeArray());
-        logger.error("classCodes.size() : " + classCodes.size());
         List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
+
+        FilterParams filterParamsReceived = queryDocumentRequest.getFilterParams();
+
+        tr.com.srdc.epsos.data.model.FilterParams filterParams = eu.epsos.pt.cc.dts.FilterParamsDts.newInstance(filterParamsReceived);
 
         for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode: documentCodes) {
             if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
@@ -134,14 +136,14 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), hcpAssertion, trcAssertion);
+                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), filterParams, hcpAssertion, trcAssertion);
                         break;
                     default:
                         throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
                 }
             } else {
                 //TODO Mathias - ensure only OrCD documentCodes are presented...
-                response = OrCDService.list(patientId, countryCode, documentCodes, hcpAssertion, trcAssertion);
+                response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, hcpAssertion, trcAssertion);
             }
 
 
