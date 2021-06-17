@@ -65,8 +65,15 @@ public class XcaInitGateway {
 
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("[");
+            documentCodes.forEach(s->{
+                builder.append(s.getValue() + ",");
+            });
+            builder.replace(builder.length()-1, builder.length(), "]");
+            String classCodes = builder.toString();
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
-                    Arrays.toString(documentCodes.toArray()), idAssertion.getID(), trcAssertion.getID(), service);
+                    classCodes, idAssertion.getID(), trcAssertion.getID(), service);
         }
         QueryResponse result = null;
 

@@ -9,4 +9,6 @@ public interface OrCDDocumentMetaData extends EPSOSDocumentMetaData {
         PDF, PNG, JPEG;
     }
     DocumentFileType getDocumentFileType();
+
+    long getSize();
 }

@@ -105,8 +105,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
 
         List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
-        logger.error("queryDocumentRequest.getClassCodeArray() : " + queryDocumentRequest.getClassCodeArray());
-        logger.error("classCodes.size() : " + classCodes.size());
         List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
         for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode: documentCodes) {
@@ -118,7 +116,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         /* perform the call */
         try {
             QueryResponse response;
-            logger.error("documentCodes.size()" + documentCodes.size());
             if (documentCodes.size()==1) {
                 switch (documentCodes.get(0).getValue()) {
                     case Constants.PS_CLASSCODE:
