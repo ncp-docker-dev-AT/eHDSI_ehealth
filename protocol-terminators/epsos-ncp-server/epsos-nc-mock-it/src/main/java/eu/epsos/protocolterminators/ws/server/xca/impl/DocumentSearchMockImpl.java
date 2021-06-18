@@ -502,19 +502,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
         for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMetaDataList) {
             Instant creationInstant = orCDDocumentMetaData.getEffectiveTime().toInstant();
-            logger.error("orCDDocumentMetaData().getTitle() : " + orCDDocumentMetaData.getTitle());
-            logger.error("orCDDocumentMetaData().getSize() : " + orCDDocumentMetaData.getSize());
-            logger.error("orCDDocumentMetaData.getEffectiveTime() : " + orCDDocumentMetaData.getEffectiveTime());
-            logger.error("maximumSize : " + maximumSize);
-            logger.error("createdAfter : " + createdAfter);
-            logger.error("createdBefore : " + createdBefore);
-            logger.error("creationInstant.compareTo(createdBefore) < 1 : " + (creationInstant.compareTo(createdBefore) < 1));
-            logger.error("creationInstant.compareTo(createdAfter) > 1 : " + (creationInstant.compareTo(createdAfter) > 1));
             if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))
                     && (maximumSize != null ? orCDDocumentMetaData.getSize() < maximumSize : true)
                     && (createdBefore != null ? (creationInstant.compareTo(createdBefore) < 1) : true)
                     && (createdAfter != null ? (createdAfter.compareTo(creationInstant) < 1) : true)) {
-                logger.error(orCDDocumentMetaData.getTitle() + " added");
                 metaDatas.add(orCDDocumentMetaData);
                 logger.debug("getOrCDDocumentList(SearchCriteria searchCriteria): '{}'", orCDDocumentMetaData);
             }
