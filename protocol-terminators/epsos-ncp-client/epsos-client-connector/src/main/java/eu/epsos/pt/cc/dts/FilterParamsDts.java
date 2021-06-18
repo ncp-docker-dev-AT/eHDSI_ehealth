@@ -39,10 +39,10 @@ public class FilterParamsDts {
         final FilterParams result = new FilterParams();
 
         if(filterParams.getCreatedBefore() != null) {
-            result.setCreatedBefore(filterParams.getCreatedBefore().getTime());
+            result.setCreatedBefore(filterParams.getCreatedBefore().getTime().toInstant());
         }
         if(filterParams.getCreatedAfter() != null) {
-            result.setCreatedAfter(filterParams.getCreatedAfter().getTime());
+            result.setCreatedAfter(filterParams.getCreatedAfter().getTime().toInstant());
         }
         result.setMaximumSize(filterParams.getMaximumSize());
 

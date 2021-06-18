@@ -207,7 +207,7 @@
         <xs:sequence>
             <xs:element name="createdBefore" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="createdAfter" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="maximumSize" type="xs:int" minOccurs="0"/>
+            <xs:element name="maximumSize" type="xs:long" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

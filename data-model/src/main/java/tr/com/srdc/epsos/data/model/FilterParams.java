@@ -1,34 +1,35 @@
 package tr.com.srdc.epsos.data.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class FilterParams {
 
-    private Date createdBefore;
-    private Date createdAfter;
-    private Integer maximumSize;
+    private Instant createdBefore;
+    private Instant createdAfter;
+    private Long maximumSize;
 
-    public Date getCreatedBefore() {
+    public Instant getCreatedBefore() {
         return createdBefore;
     }
 
-    public void setCreatedBefore(Date createdBefore) {
+    public void setCreatedBefore(Instant createdBefore) {
         this.createdBefore = createdBefore;
     }
 
-    public Date getCreatedAfter() {
+    public Instant getCreatedAfter() {
         return createdAfter;
     }
 
-    public void setCreatedAfter(Date createdAfter) {
+    public void setCreatedAfter(Instant createdAfter) {
         this.createdAfter = createdAfter;
     }
 
-    public Integer getMaximumSize() {
+    public Long getMaximumSize() {
         return maximumSize;
     }
 
-    public void setMaximumSize(int maximumSize) {
+    public void setMaximumSize(Long maximumSize) {
         this.maximumSize = maximumSize;
     }
 }

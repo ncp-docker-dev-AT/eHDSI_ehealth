@@ -8,7 +8,7 @@
    <code code="18748-4" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Diagnostic imaging study" />
    <!-- Title used for display purposes -->
    <title>Diagnostic Imaging Report</title>
-   <effectiveTime value="20200918080000+0200" />
+   <effectiveTime value="20210618080000+0200" />
    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" displayName="normal" codeSystemName="Confidentiality" />
    <!-- document language code -->
    <languageCode code="nl-BE" />

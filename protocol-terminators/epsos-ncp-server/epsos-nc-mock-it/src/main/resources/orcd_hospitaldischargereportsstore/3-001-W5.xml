@@ -8,7 +8,7 @@
    <code code="34105-7" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Hospital Discharge summary" />
    <!-- Title used for display purposes -->
    <title>Hospital Discharge Report</title>
-   <effectiveTime value="20200918080000+0200" />
+   <effectiveTime value="20180918080000+0200" />
    <confidentialityCode code="N" codeSystem="2.16.840.1.113883.5.25" displayName="normal" codeSystemName="Confidentiality" />
    <!-- document language code -->
    <languageCode code="nl-BE" />

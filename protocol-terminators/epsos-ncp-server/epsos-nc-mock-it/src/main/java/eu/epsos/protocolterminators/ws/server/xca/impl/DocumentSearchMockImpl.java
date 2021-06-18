@@ -7,6 +7,7 @@ import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
+import javassist.Loader;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -173,17 +177,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
+                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDHospitalDischargeReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        getCreationDateFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
                         this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
+                orCDDocumentHospitalDischargeReportsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
 
-                orCDDocumentHospitalDischargeReportsMetaDatas.add(orcddXml);
             } catch (Exception e) {
                 logger.warn("Could not read file at " + xmlFilename, e);
             }
@@ -197,17 +202,17 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
+                logger.error("file '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDLaboratoryResultsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        getCreationDateFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
                         this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
-                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
-
                 orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
                 logger.warn("Could not read file at " + xmlFilename, e);
             }
@@ -221,17 +226,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
+                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagingReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        getCreationDateFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
                         this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
-                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
 
                 orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
                 logger.warn("Could not read file at " + xmlFilename, e);
             }
@@ -240,22 +246,23 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         /* Medical Images */
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_MEDICAL_IMAGES));
         for (String xmlFilename : documentlist) {
-            logger.debug("Reading file '{}", xmlFilename);
+            logger.debug("Reading file '{}'", xmlFilename);
             try {
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
+                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagesDocument(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        getCreationDateFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
                         this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
-                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
 
                 orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
                 logger.warn("Could not read file at " + xmlFilename, e);
             }
@@ -377,6 +384,19 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return StringUtils.trim(display);
     }
 
+    private Date getCreationDateFromDocument(Document doc) throws ParseException {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/effectiveTime");
+        Date creationDate = null;
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("value") != null) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssZ");
+                creationDate = simpleDateFormat.parse(node.getAttributes().getNamedItem("value").getTextContent());
+                logger.debug("creationDate: '{}'", creationDate);
+            }
+        }
+        return creationDate;
+    }
+
     private String getClinicalDocumentConfidentialityCode(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
         String code = "";
@@ -391,14 +411,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     private String getClinicalDocumentLanguage(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
-        String code = "";
+        String documentLanguage = "";
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("code") != null) {
-                code = node.getAttributes().getNamedItem("code").getTextContent();
-                logger.debug("confidentiality code: '{}'", code);
+                documentLanguage = node.getAttributes().getNamedItem("code").getTextContent();
+                logger.debug("clinical Document language: '{}'", documentLanguage);
             }
         }
-        return StringUtils.trim(code);
+        return StringUtils.trim(documentLanguage);
     }
 
     @Override
@@ -464,8 +484,37 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private List<OrCDDocumentMetaData> getOrCDDocumentList(SearchCriteria searchCriteria, List<OrCDDocumentMetaData> orCDMetaDataList) {
         List<OrCDDocumentMetaData> metaDatas = new ArrayList<>();
 
+        Long maximumSize = null;
+        String maximumSizeCriteriaString = searchCriteria.getCriteriaValue(Criteria.MaximumSize);
+        if (!StringUtils.isEmpty(maximumSizeCriteriaString)) {
+            maximumSize = Long.parseLong(maximumSizeCriteriaString);
+        }
+        Instant createdAfter = null;
+        String createdAfterCriteriaString = searchCriteria.getCriteriaValue(Criteria.CreatedAfter);
+        if (createdAfterCriteriaString != null) {
+            createdAfter = Instant.parse(createdAfterCriteriaString);
+        }
+        Instant createdBefore = null;
+        String createdBeforeCriteriaString = searchCriteria.getCriteriaValue(Criteria.CreatedBefore);
+        if (createdBeforeCriteriaString != null) {
+            createdBefore = Instant.parse(createdBeforeCriteriaString);
+        }
+
         for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMetaDataList) {
-            if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
+            Instant creationInstant = orCDDocumentMetaData.getEffectiveTime().toInstant();
+            logger.error("orCDDocumentMetaData().getTitle() : " + orCDDocumentMetaData.getTitle());
+            logger.error("orCDDocumentMetaData().getSize() : " + orCDDocumentMetaData.getSize());
+            logger.error("orCDDocumentMetaData.getEffectiveTime() : " + orCDDocumentMetaData.getEffectiveTime());
+            logger.error("maximumSize : " + maximumSize);
+            logger.error("createdAfter : " + createdAfter);
+            logger.error("createdBefore : " + createdBefore);
+            logger.error("creationInstant.compareTo(createdBefore) < 1 : " + (creationInstant.compareTo(createdBefore) < 1));
+            logger.error("creationInstant.compareTo(createdAfter) > 1 : " + (creationInstant.compareTo(createdAfter) > 1));
+            if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))
+                    && (maximumSize != null ? orCDDocumentMetaData.getSize() < maximumSize : true)
+                    && (createdBefore != null ? (creationInstant.compareTo(createdBefore) < 1) : true)
+                    && (createdAfter != null ? (createdAfter.compareTo(creationInstant) < 1) : true)) {
+                logger.error(orCDDocumentMetaData.getTitle() + " added");
                 metaDatas.add(orCDDocumentMetaData);
                 logger.debug("getOrCDDocumentList(SearchCriteria searchCriteria): '{}'", orCDDocumentMetaData);
             }
@@ -623,5 +672,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         return description;
+    }
+
+    public static void main(String[] args) {
+        String test = "test";
+        boolean bool = test != null ? 1 < 1 : true;
+        System.out.println(bool);
     }
 }
