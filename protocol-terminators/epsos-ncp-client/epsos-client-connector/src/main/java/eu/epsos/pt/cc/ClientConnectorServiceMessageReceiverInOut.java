@@ -1,6 +1,9 @@
 package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
+import eu.epsos.exceptions.NoPatientIdDiscoveredException;
+import eu.epsos.exceptions.XCAException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
@@ -14,7 +17,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.XMLUtils;
@@ -35,11 +37,19 @@ import javax.xml.transform.sax.SAXSource;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * ClientConnectorServiceServiceMessageReceiverInOut message receiver.
  */
 public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMessageReceiver {
+
+    private static final String LOG_INCOMING_REQUEST = "Incoming '{}' request message from portal:\\n{}";
+    private static final String LOG_OUTGOING_REQUEST = "Outgoing '{}' response message to portal:\n{}";
 
     static {
         org.apache.xml.security.Init.init();
@@ -51,33 +61,19 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
     @Override
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
-        SOAPEnvelope reqEnv = msgContext.getEnvelope();
+        var requestSoapEnvelope = msgContext.getEnvelope();
         String operationName = msgContext.getOperationContext().getOperationName();
 
-        /*
-         * Log soap request
-         */
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            try {
-                String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(reqEnv));
-                loggerClinical.debug("Incoming '{}' request message from portal:\n{}", operationName, logRequestMsg);
-
-            } catch (Exception ex) {
-                logger.debug(ex.getLocalizedMessage(), ex);
-            }
-        }
+        //  Log soap request.
+        logSoapMessage(operationName, requestSoapEnvelope, LOG_INCOMING_REQUEST);
 
         try {
 
-            // Retrieving the implementation class for the Web Service.
-            Object implementationObject = getTheImplementationObject(msgContext);
-            ClientConnectorServiceSkeletonInterface clientConnectorServiceSkeletonInterface = (ClientConnectorServiceSkeletonInterface) implementationObject;
-
             /* Out Envelop */
-            SOAPEnvelope envelope;
+            SOAPEnvelope responseSoapEnvelope;
 
             /* Find the axisOperation that has been set by the Dispatch phase. */
-            AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
+            var axisOperation = msgContext.getOperationContext().getAxisOperation();
             logger.info("[ClientConnector] Axis Operation: '{}' - Target Namespace: {}' - WSAddressing Action: '{}'",
                     msgContext.getOperationContext().getAxisOperation().getName().getLocalPart(),
                     msgContext.getOperationContext().getAxisOperation().getName().getNamespaceURI(),
@@ -90,147 +86,47 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             String methodName;
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
 
-                Element soapHeader = XMLUtils.toDOM(reqEnv.getHeader());
+                Element soapHeader = XMLUtils.toDOM(requestSoapEnvelope.getHeader());
                 List<Assertion> assertions = SAML2Validator.getAssertions(soapHeader);
 
                 //  Submit Document
                 if (StringUtils.equals(ClientConnectorOperation.SERVICE_SUBMIT_DOCUMENT, methodName)) {
 
                     //TODO: Analysis if the Validation of the Assertions Header has been required at this step.
-                    // SAML2Validator.validateXDRHeader(soapHeader, Constants.CONSENT_CLASSCODE);
-
-                    Assertion hcpAssertion = null;
-                    Assertion trcAssertion = null;
-                    for (Assertion ass : assertions) {
-                        if (ass.getAdvice() == null) {
-                            hcpAssertion = ass;
-                        } else {
-                            trcAssertion = ass;
-                        }
-                    }
-
-                    SubmitDocumentDocument1 wrappedParam = (SubmitDocumentDocument1) fromOM(reqEnv.getBody().getFirstElement(),
-                            SubmitDocumentDocument1.class, getEnvelopeNamespaces(reqEnv));
-                    SubmitDocumentResponseDocument submitDocumentResponseDocument = clientConnectorServiceSkeletonInterface
-                            .submitDocument(wrappedParam, hcpAssertion, trcAssertion);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext), submitDocumentResponseDocument);
-
+                    responseSoapEnvelope = processSubmitDocumentOperation(msgContext, requestSoapEnvelope, assertions);
                 }
                 //  Query Patient
                 else if (StringUtils.equals(ClientConnectorOperation.SERVICE_QUERY_PATIENT, methodName)) {
 
                     //TODO: Analysis if the Validation of the Assertions Header has been required at this step.
-                    //  SAML2Validator.validateXCPDHeader(soapHeader);
-
-                    Assertion hcpAssertion = null;
-                    for (Assertion ass : assertions) {
-                        hcpAssertion = ass;
-                        if (hcpAssertion.getAdvice() == null) {
-                            break;
-                        }
-                    }
-
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-                    }
-
-                    QueryPatientDocument wrappedParam = (QueryPatientDocument) fromOM(reqEnv.getBody().getFirstElement(),
-                            QueryPatientDocument.class, getEnvelopeNamespaces(reqEnv));
-
-                    QueryPatientResponseDocument queryPatientResponseDocument = clientConnectorServiceSkeletonInterface
-                            .queryPatient(wrappedParam, hcpAssertion);
-                    envelope = toEnvelope(getSOAPFactory(msgContext), queryPatientResponseDocument);
+                    responseSoapEnvelope = processQueryPatientOperation(msgContext, requestSoapEnvelope, assertions);
                 }
                 // Query Documents
                 else if (StringUtils.equals(ClientConnectorOperation.SERVICE_QUERY_DOCUMENTS, methodName)) {
 
                     //TODO: Analysis if the Validation of the Assertions Header has been required at this step.
-                    //  SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
-
-                    Assertion hcpAssertion = null;
-                    Assertion trcAssertion = null;
-
-                    for (Assertion ass : assertions) {
-
-                        if (ass.getAdvice() == null) {
-                            hcpAssertion = ass;
-
-                        } else {
-                            trcAssertion = ass;
-                        }
-                    }
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-                    }
-
-                    QueryDocumentsDocument wrappedParam = (QueryDocumentsDocument) fromOM(reqEnv.getBody().getFirstElement(),
-                            QueryDocumentsDocument.class, getEnvelopeNamespaces(reqEnv));
-                    QueryDocumentsResponseDocument queryDocumentsResponseDocument = clientConnectorServiceSkeletonInterface
-                            .queryDocuments(wrappedParam, hcpAssertion, trcAssertion);
-
-                    Writer writer = new StringWriter();
-                    toOM(wrappedParam).serialize(writer);
-                    logger.error("wrappedParam : " + writer.toString());
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext), queryDocumentsResponseDocument);
+                    responseSoapEnvelope = processQueryDocumentsOperation(msgContext, requestSoapEnvelope, assertions);
                 }
                 //  Retrieve Document
                 else if (StringUtils.equals(ClientConnectorOperation.SERVICE_RETRIEVE_DOCUMENT, methodName)) {
 
                     //TODO: Analysis if the Validation of the Assertions Header has been required at this step.
-                    //  SAML2Validator.validateXCAHeader(soapHeader, Constants.PS_CLASSCODE);
-
-                    Assertion hcpAssertion = null;
-                    Assertion trcAssertion = null;
-
-                    for (Assertion ass : assertions) {
-
-                        if (ass.getAdvice() == null) {
-                            hcpAssertion = ass;
-                        } else {
-                            trcAssertion = ass;
-                        }
-                    }
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
-                    }
-
-                    RetrieveDocumentDocument1 wrappedParam = (RetrieveDocumentDocument1) fromOM(reqEnv.getBody().getFirstElement(),
-                            RetrieveDocumentDocument1.class, getEnvelopeNamespaces(reqEnv));
-                    RetrieveDocumentResponseDocument retrieveDocumentResponseDocument = clientConnectorServiceSkeletonInterface
-                            .retrieveDocument(wrappedParam, hcpAssertion, trcAssertion);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext), retrieveDocumentResponseDocument);
+                    responseSoapEnvelope = processRetrieveDocumentOperation(msgContext, requestSoapEnvelope, assertions);
                 }
                 // Say hello
                 else if (StringUtils.equals(ClientConnectorOperation.SERVICE_TEST_SAY_HELLO, methodName)) {
 
-                    SayHelloDocument wrappedParam = (SayHelloDocument) fromOM(reqEnv.getBody().getFirstElement(),
-                            SayHelloDocument.class, getEnvelopeNamespaces(reqEnv));
-                    SayHelloResponseDocument sayHelloResponseDocument = clientConnectorServiceSkeletonInterface.sayHello(wrappedParam);
-
-                    envelope = toEnvelope(getSOAPFactory(msgContext), sayHelloResponseDocument);
+                    responseSoapEnvelope = processTestOperation(msgContext, requestSoapEnvelope);
                 } else {
                     // Else Method not Available
                     throw new ClientConnectorException("Client Connector Error: Method not found");
                 }
 
-                /*
-                 * Log SOAP response
-                 */
-                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-                    try {
-                        String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope));
-                        loggerClinical.debug("Outgoing '{}' response message to portal:\n{}", operationName, logRequestMsg);
-
-                    } catch (Exception ex) {
-                        logger.error(ex.getLocalizedMessage(), ex);
-                    }
-                }
+                //  Log SOAP response
+                logSoapMessage(operationName, responseSoapEnvelope, LOG_OUTGOING_REQUEST);
                 // Soap message: HTTP header set.
                 String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
-                newMsgContext.setEnvelope(envelope);
+                newMsgContext.setEnvelope(responseSoapEnvelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
             }
         } catch (Exception e) {
@@ -241,7 +137,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
 
     private OMElement toOM(final XmlObject param) throws AxisFault {
 
-        XmlOptions xmlOptions = new XmlOptions();
+        var xmlOptions = new XmlOptions();
         xmlOptions.setSaveNoXmlDecl();
         xmlOptions.setSaveAggressiveNamespaces();
         xmlOptions.setSaveNamespacesFirst();
@@ -263,13 +159,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         return envelope;
     }
 
-    /**
-     * @param param
-     * @param type
-     * @param extraNamespaces
-     * @return
-     * @throws AxisFault
-     */
     public XmlObject fromOM(OMElement param, Class type, Map extraNamespaces) throws AxisFault {
 
         try {
@@ -385,17 +274,140 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         return null;
     }
 
+    private ClientConnectorServiceSkeletonInterface getClientConnectorServiceSkeleton(MessageContext messageContext) throws AxisFault {
+
+        // Retrieving the implementation class for the Web Service.
+        var implementationObject = getTheImplementationObject(messageContext);
+        return (ClientConnectorServiceSkeletonInterface) implementationObject;
+    }
+
     /**
      * A utility method that copies the namespaces from the SOAPEnvelope.
      */
-    private Map getEnvelopeNamespaces(SOAPEnvelope env) {
+    private Map<String, String> getEnvelopeNamespaces(SOAPEnvelope env) {
 
         Map<String, String> returnMap = new HashMap<>();
-        Iterator namespaceIterator = env.getAllDeclaredNamespaces();
+        var namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
             OMNamespace ns = (OMNamespace) namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;
+    }
+
+    private void logSoapMessage(String operationName, SOAPEnvelope soapEnvelope, String message) {
+
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            try {
+                String logRequestMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope));
+                loggerClinical.debug(message, operationName, logRequestMsg);
+
+            } catch (Exception ex) {
+                logger.error(ex.getLocalizedMessage(), ex);
+            }
+        }
+    }
+
+    private SOAPEnvelope processQueryDocumentsOperation(MessageContext messageContext, SOAPEnvelope requestEnvelope,
+                                                        List<Assertion> assertions) throws AxisFault, XCAException {
+
+        Assertion hcpAssertion = null;
+        Assertion trcAssertion = null;
+
+        for (Assertion ass : assertions) {
+
+            if (ass.getAdvice() == null) {
+                hcpAssertion = ass;
+
+            } else {
+                trcAssertion = ass;
+            }
+        }
+        if (OpenNCPValidation.isValidationEnable()) {
+            OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+        }
+
+        QueryDocumentsDocument wrappedParam = (QueryDocumentsDocument) fromOM(requestEnvelope.getBody().getFirstElement(),
+                QueryDocumentsDocument.class, getEnvelopeNamespaces(requestEnvelope));
+        var queryDocumentsResponseDocument = getClientConnectorServiceSkeleton(messageContext)
+                .queryDocuments(wrappedParam, hcpAssertion, trcAssertion);
+
+        return toEnvelope(getSOAPFactory(messageContext), queryDocumentsResponseDocument);
+    }
+
+    private SOAPEnvelope processQueryPatientOperation(MessageContext messageContext, SOAPEnvelope requestEnvelope,
+                                                      List<Assertion> assertions) throws AxisFault, ParseException, NoPatientIdDiscoveredException {
+        Assertion hcpAssertion = null;
+        for (Assertion ass : assertions) {
+            hcpAssertion = ass;
+            if (hcpAssertion.getAdvice() == null) {
+                break;
+            }
+        }
+
+        if (OpenNCPValidation.isValidationEnable()) {
+            OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+        }
+
+        QueryPatientDocument wrappedParam = (QueryPatientDocument) fromOM(requestEnvelope.getBody().getFirstElement(),
+                QueryPatientDocument.class, getEnvelopeNamespaces(requestEnvelope));
+        var queryPatientResponseDocument = getClientConnectorServiceSkeleton(messageContext).queryPatient(wrappedParam, hcpAssertion);
+        return toEnvelope(getSOAPFactory(messageContext), queryPatientResponseDocument);
+    }
+
+    private SOAPEnvelope processRetrieveDocumentOperation(MessageContext messageContext, SOAPEnvelope requestEnvelope,
+                                                          List<Assertion> assertions) throws AxisFault, XCAException {
+
+        Assertion hcpAssertion = null;
+        Assertion trcAssertion = null;
+
+        for (Assertion ass : assertions) {
+
+            if (ass.getAdvice() == null) {
+                hcpAssertion = ass;
+            } else {
+                trcAssertion = ass;
+            }
+        }
+        if (OpenNCPValidation.isValidationEnable()) {
+            OpenNCPValidation.validateHCPAssertion(hcpAssertion, NcpSide.NCP_B);
+        }
+
+        var retrieveDocumentDocument1 = (RetrieveDocumentDocument1) fromOM(requestEnvelope.getBody().getFirstElement(),
+                RetrieveDocumentDocument1.class, getEnvelopeNamespaces(requestEnvelope));
+        var retrieveDocumentResponseDocument = getClientConnectorServiceSkeleton(messageContext)
+                .retrieveDocument(retrieveDocumentDocument1, hcpAssertion, trcAssertion);
+
+        return toEnvelope(getSOAPFactory(messageContext), retrieveDocumentResponseDocument);
+    }
+
+    private SOAPEnvelope processSubmitDocumentOperation(MessageContext messageContext, SOAPEnvelope requestEnvelope,
+                                                        List<Assertion> assertions) throws AxisFault, XDRException, ParseException {
+
+        Assertion hcpAssertion = null;
+        Assertion trcAssertion = null;
+        for (Assertion ass : assertions) {
+            if (ass.getAdvice() == null) {
+                hcpAssertion = ass;
+            } else {
+                trcAssertion = ass;
+            }
+        }
+
+        SubmitDocumentDocument1 wrappedParam = (SubmitDocumentDocument1) fromOM(requestEnvelope.getBody().getFirstElement(),
+                SubmitDocumentDocument1.class, getEnvelopeNamespaces(requestEnvelope));
+        var submitDocumentResponseDocument = getClientConnectorServiceSkeleton(messageContext)
+                .submitDocument(wrappedParam, hcpAssertion, trcAssertion);
+
+        return toEnvelope(getSOAPFactory(messageContext), submitDocumentResponseDocument);
+    }
+
+    private SOAPEnvelope processTestOperation(MessageContext messageContext, SOAPEnvelope requestEnvelope) throws AxisFault {
+
+        SayHelloDocument wrappedParam = (SayHelloDocument) fromOM(requestEnvelope.getBody().getFirstElement(),
+                SayHelloDocument.class, getEnvelopeNamespaces(requestEnvelope));
+        var sayHelloResponseDocument = getClientConnectorServiceSkeleton(messageContext).sayHello(wrappedParam);
+
+        return toEnvelope(getSOAPFactory(messageContext), sayHelloResponseDocument);
     }
 }
