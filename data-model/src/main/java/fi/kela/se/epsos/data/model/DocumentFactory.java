@@ -50,12 +50,16 @@ public class DocumentFactory {
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String description) {
 
-        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, description, null, null, true, null, null, null);
+        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, description,
+                    null, null, true,
+                    null, null, null,
+                    null, null, null);
     }
 
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author, String description, String productCode, String productName,
-                                                       boolean dispensable, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+                                                       String repositoryId, String title, String author, String description, String productCode, String productName, boolean dispensable,
+                                                       String atcCode, String doseFormCode, String strength,
+                                                       String confidentialityCode, String confidentialityDisplay, String languageCode) {
         EPDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
         if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
             confidentiality = new EPDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
@@ -65,9 +69,9 @@ public class DocumentFactory {
                 new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, Constants.EP_CLASSCODE, repositoryId, title, author,
                         confidentiality, languageCode);
         if (StringUtils.isNoneBlank(productCode, productName)) {
-            return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), dispensable, atcCode, doseFormCode, strength);
         } else {
-            return new EPDocumentMetaDataImpl(metaData, description, dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, dispensable, atcCode, doseFormCode, strength);
         }
     }
 
@@ -80,21 +84,28 @@ public class DocumentFactory {
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode, String productName) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true, null, null, null);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true,
+                null, null, null,
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable, null, null, null);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable,
+                null, null, null,
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String description, String productCode, String productName, boolean dispensable, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+                                                         String title, String author, String description, String productCode, String productName, boolean dispensable,
+                                                         String atcCode, String doseFormCode, String strength,
+                                                         String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate,
-                repositoryId, title, author, description, productCode, productName, dispensable, confidentialityCode,
-                confidentialityDisplay, languageCode);
+                repositoryId, title, author, description, productCode, productName, dispensable,
+                atcCode, doseFormCode, strength,
+                confidentialityCode, confidentialityDisplay, languageCode);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
@@ -105,22 +116,28 @@ public class DocumentFactory {
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode, String productName) {
 
-        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true, null, null, null);
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName, true,
+                null, null, null,
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable, null, null, null);
+        return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null, dispensable,
+                null, null, null,
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode, String productName, boolean dispensable,
+                                                         String atcCode, String doseFormCode, String strength,
                                                          String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, description, productCode, productName, dispensable, confidentialityCode,
-                confidentialityDisplay, languageCode);
+                repositoryId, title, author, description, productCode, productName, dispensable,
+                atcCode, doseFormCode, strength,
+                confidentialityCode, confidentialityDisplay, languageCode);
     }
 
     /**

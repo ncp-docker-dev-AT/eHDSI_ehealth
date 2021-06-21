@@ -20,6 +20,61 @@ public class XDSDocument {
     private GenericDocumentCode formatCode;
     private GenericDocumentCode classCode;
 
+    private String atcCode;
+    private String atcText;
+    private String strength;
+    private String doseFormCode;
+    private String doseFormText;
+    private String Substitution;
+
+    public String getAtcCode() {
+        return atcCode;
+    }
+
+    public void setAtcCode(String atcCode) {
+        this.atcCode = atcCode;
+    }
+
+    public String getAtcText() {
+        return atcText;
+    }
+
+    public void setAtcText(String atcText) {
+        this.atcText = atcText;
+    }
+
+    public String getStrength() {
+        return strength;
+    }
+
+    public void setStrength(String strength) {
+        this.strength = strength;
+    }
+
+    public String getDoseFormCode() {
+        return doseFormCode;
+    }
+
+    public void setDoseFormCode(String doseFormCode) {
+        this.doseFormCode = doseFormCode;
+    }
+
+    public String getDoseFormText() {
+        return doseFormText;
+    }
+
+    public void setDoseFormText(String doseFormText) {
+        this.doseFormText = doseFormText;
+    }
+
+    public String getSubstitution() {
+        return Substitution;
+    }
+
+    public void setSubstitution(String substitution) {
+        Substitution = substitution;
+    }
+
     /**
      * @return the hcid
      */
