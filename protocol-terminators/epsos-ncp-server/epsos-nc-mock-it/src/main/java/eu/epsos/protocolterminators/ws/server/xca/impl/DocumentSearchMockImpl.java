@@ -177,7 +177,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
-                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
@@ -202,7 +201,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
-                logger.error("file '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
@@ -226,7 +224,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
-                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
@@ -251,7 +248,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 long size = getFileSize(xmlFilename);
-                logger.error("filename '{}' with size '{}'", xmlFilename, size);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
@@ -503,9 +499,9 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMetaDataList) {
             Instant creationInstant = orCDDocumentMetaData.getEffectiveTime().toInstant();
             if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))
-                    && (maximumSize != null ? orCDDocumentMetaData.getSize() < maximumSize : true)
-                    && (createdBefore != null ? (creationInstant.compareTo(createdBefore) < 1) : true)
-                    && (createdAfter != null ? (createdAfter.compareTo(creationInstant) < 1) : true)) {
+                    && (maximumSize == null || orCDDocumentMetaData.getSize() <= maximumSize)
+                    && (createdBefore == null || (creationInstant.compareTo(createdBefore) <= 0))
+                    && (createdAfter == null || (createdAfter.compareTo(creationInstant) <= 0))) {
                 metaDatas.add(orCDDocumentMetaData);
                 logger.debug("getOrCDDocumentList(SearchCriteria searchCriteria): '{}'", orCDDocumentMetaData);
             }
@@ -665,9 +661,4 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return description;
     }
 
-    public static void main(String[] args) {
-        String test = "test";
-        boolean bool = test != null ? 1 < 1 : true;
-        System.out.println(bool);
-    }
 }
