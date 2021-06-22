@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Factory class for Clinical Document container (metadatas and associations).
@@ -169,54 +170,62 @@ public class DocumentFactory {
      * OrCDDocument
      */
     private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size) {
+                                                            String repositoryId, String title, String author, String confidentialityCode,
+                                                           String confidentialityDisplay, String languageCode,
+                                                           OrCDDocumentMetaData.DocumentFileType documentFileType,
+                                                           long size,
+                                                           List<OrCDDocumentMetaData.Author> authors) {
         OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
         if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
             confidentiality = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
         }
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
                 orCDClassCode, repositoryId, title, author, confidentiality, languageCode);
-        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, size);
+        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, size, authors);
     }
 
     /**
      * Laboratory Results
      */
     public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                         String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
+                                                         String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode
+            , long size, List<OrCDDocumentMetaData.Author> authors){
 
         return createOrCDDocument(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
-    }
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors);
+                    }
 
     /**
      * Hospital Discharge Reports
      */
     public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
+                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size,
+                                                                                  List<OrCDDocumentMetaData.Author> authors) {
 
         return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors);
     }
 
     /**
      * Medical Imaging Reports
      */
     public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
+                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size,
+                                                                               List<OrCDDocumentMetaData.Author> authors) {
 
         return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors);
     }
 
     /**
      * Medical Images
      */
     public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size) {
+                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size,
+                                                                       List<OrCDDocumentMetaData.Author> authors) {
 
         return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType, size);
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType, size, authors);
     }
 
     /**

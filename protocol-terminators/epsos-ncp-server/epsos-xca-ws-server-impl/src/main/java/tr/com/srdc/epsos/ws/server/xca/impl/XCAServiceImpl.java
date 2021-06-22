@@ -415,6 +415,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return sl;
     }
 
+    private SlotType1 makeSlot(String name, List<String> values) {
+
+        SlotType1 sl = ofRim.createSlotType1();
+        sl.setName(name);
+        sl.setValueList(ofRim.createValueListType());
+        values.forEach(value -> sl.getValueList().getValue().add(value));
+        return sl;
+    }
+
     /**
      * @param classificationScheme
      * @param classifiedObject
@@ -618,7 +627,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                               String languageCode,
                                               String classCode,
                                               OrCDDocumentMetaData.DocumentFileType documentFileType,
-                                              long size) {
+                                              long size,
+                                              List<OrCDDocumentMetaData.Author> authors) {
 
         final String title;
         final String nodeRepresentation;
@@ -723,6 +733,34 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+
+        for(OrCDDocumentMetaData.Author author : authors) {
+            ClassificationType classificationAuthor = makeClassification("urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d",
+                    uuid, "");
+
+            if(author.getAuthorPerson() != null){
+                SlotType1 authorPersonSlot = makeSlot(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
+                classificationAuthor.getSlot().add(authorPersonSlot);
+            }
+            if(author.getAuthorInstitution() != null && !author.getAuthorInstitution().isEmpty()) {
+                SlotType1 authorInstitutionSlot = makeSlot(IheConstants.AUTHOR_INSTITUTION_STR, author.getAuthorInstitution());
+                classificationAuthor.getSlot().add(authorInstitutionSlot);
+            }
+            if(author.getAuthorRole() != null && !author.getAuthorRole().isEmpty()) {
+            SlotType1 authorRoleSlot = makeSlot(IheConstants.AUTHOR_ROLE_STR, author.getAuthorRole());
+            classificationAuthor.getSlot().add(authorRoleSlot);
+            }
+            if(author.getAuthorSpeciality() != null && !author.getAuthorSpeciality().isEmpty()) {
+            SlotType1 authorSpecialtySlot = makeSlot(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
+            classificationAuthor.getSlot().add(authorSpecialtySlot);
+            }
+            if(author.getAuthorTelecommunication() != null) {
+                SlotType1 authorTelecommunicationSlot = makeSlot(IheConstants.AUTHOR_TELECOMMUNICATION_STR, author.getAuthorTelecommunication());
+                classificationAuthor.getSlot().add(authorTelecommunicationSlot);
+            }
+
+            eot.getClassification().add(classificationAuthor);
+        }
 
         // External Identifiers
         eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
@@ -1249,7 +1287,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
         final String languageCode = orCDDocumentMetaData.getLanguage();
         String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
-                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize());
+                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode,
+                orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getAuthors());
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         //TODO Mathias - To be reviewed if this is ok for the OrCD, for the other services an association object with both the XML and PDF is returned.
         if (!StringUtils.isEmpty(xmlUUID)) {
