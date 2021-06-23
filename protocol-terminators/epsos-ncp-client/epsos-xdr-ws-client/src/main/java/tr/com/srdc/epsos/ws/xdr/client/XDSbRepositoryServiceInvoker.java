@@ -443,8 +443,8 @@ public class XDSbRepositoryServiceInvoker {
 
         ClassificationType classification;
         classification = makeClassification0(XDRConstants.REGISTRY_PACKAGE.AUTHOR_CLASSIFICATION_UUID, submissionSetUuid, "");
-        classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_INSTITUTION_STR, getAuthorInstitution(request)));
-        classification.getSlot().add(makeSlot(XDRConstants.REGISTRY_PACKAGE.AUTHOR_PERSON_STR, getAuthorPerson(request)));
+        classification.getSlot().add(makeSlot(IheConstants.AUTHOR_INSTITUTION_STR, getAuthorInstitution(request)));
+        classification.getSlot().add(makeSlot(IheConstants.AUTHOR_PERSON_STR, getAuthorPerson(request)));
         registryPackageType.getClassification().add(classification);
 
         registryPackageType.getClassification().add(makeClassification(XDRConstants.REGISTRY_PACKAGE.CODING_SCHEME_UUID, submissionSetUuid,
@@ -688,7 +688,7 @@ public class XDSbRepositoryServiceInvoker {
     /**
      * Util method retrieving the language code from a CDA document.
      *
-     * @param document - CDA document as DOM object.
+     * @param doc - CDA document as DOM object.
      * @return ISO language code of the document.
      */
     private String getLanguageCode(Document doc) {

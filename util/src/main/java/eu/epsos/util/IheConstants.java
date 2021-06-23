@@ -34,7 +34,13 @@ public final class IheConstants {
     public static final String CONSENT_FORMATCODE_NODEREPRESENTATION = "urn:ihe:iti:bppc:2007";
     public static final String CONSENT_FORMATCODE_CODINGSCHEMA = "2.16.840.1.113883.6.1";
 
-    private IheConstants() {
+    public static final String AUTHOR_INSTITUTION_STR = "authorInstitution";
+    public static final String AUTHOR_PERSON_STR = "authorPerson";
+    public static final String AUTHOR_ROLE_STR = "authorRole";
+    public static final String AUTHOR_SPECIALITY_STR = "authorSpecialty";
+    public static final String AUTHOR_TELECOMMUNICATION_STR = "authorTelecommunication";
+
+   private IheConstants() {
     }
 
     public static class SOAP_HEADERS {
