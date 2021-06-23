@@ -436,7 +436,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId,
                                                   AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF,
-                                                  String documentId, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+                                                  String documentId, SimpleConfidentiality confidentiality, String languageCode) {
 
         final String title;
         final String classCode;
@@ -512,7 +512,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Confidentiality Code
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
-                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+                uuid, confidentiality.code(), "2.16.840.1.113883.5.25", confidentiality.name()));
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
@@ -641,16 +641,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(strengthClassification);
 
         // Confidentiality Code
-        String confidentialityCode = document.getConfidentiality() != null
-                && document.getConfidentiality().getConfidentialityCode() != null
-                ? document.getConfidentiality().getConfidentialityCode()
-                : "N";
-        String confidentialityDisplay = document.getConfidentiality() != null
-                && document.getConfidentiality().getConfidentialityDisplay() != null
-                ? document.getConfidentiality().getConfidentialityDisplay()
-                : "Normal";
+        SimpleConfidentiality confidentiality = document.getConfidentiality() != null ? document.getConfidentiality() : SimpleConfidentiality.NORMAL;
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
-                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+                uuid, document.getConfidentiality().code(), "2.16.840.1.113883.5.25", document.getConfidentiality().name()));
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
@@ -921,30 +914,21 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         String xmlUUID = "";
                         if (docXml != null) {
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
-                            String confidentialityCode = docXml.getConfidentiality() == null
-                                    || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
-                                    : docXml.getConfidentiality().getConfidentialityCode();
-                            String confidentialityDisplay = docXml.getConfidentiality() == null
-                                    || docXml.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
-                                    : docXml.getConfidentiality().getConfidentialityDisplay();
+                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
                             String languageCode = docXml.getLanguage();
                             xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY,
                                     docXml.getEffectiveTime(), docXml.getRepositoryId(), request, eotXML, false,
-                                    docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
+                                    docXml.getId(), confidentiality, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
                         }
                         String pdfUUID = "";
                         if (docPdf != null) {
                             ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
-                            String confidentialityCode = docPdf.getConfidentiality() == null
-                                    || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
-                                    : docPdf.getConfidentiality().getConfidentialityCode();
-                            String confidentialityDisplay = docPdf.getConfidentiality() == null
-                                    || docPdf.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
-                                    : docPdf.getConfidentiality().getConfidentialityDisplay();
+                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
                             String languageCode = docPdf.getLanguage();
-                            pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY, docPdf.getEffectiveTime(), docPdf.getRepositoryId(), request, eotPDF, true,
-                                    docPdf.getId(), confidentialityCode, confidentialityDisplay, languageCode);
+                            pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY,
+                                    docPdf.getEffectiveTime(), docPdf.getRepositoryId(), request, eotPDF, true,
+                                    docPdf.getId(), confidentiality, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
                         }
                         if (!xmlUUID.equals("") && !pdfUUID.equals("")) {
@@ -971,19 +955,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         String xmlUUID = "";
                         if (docXml != null) {
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
-                            String confidentialityCode = docXml.getConfidentiality() == null
-                                    || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
-                                    : docXml.getConfidentiality().getConfidentialityCode();
-                            String confidentialityDisplay = docXml.getConfidentiality() == null
-                                    || docXml.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
-                                    : docXml.getConfidentiality().getConfidentialityDisplay();
+                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
                             String languageCode = docXml.getLanguage();
                             xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.MRO, docXml.getEffectiveTime(),
-                                    docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
+                                    docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentiality, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
+
                         }
                         String pdfUUID = "";
                         if (docPdf != null) {
+                            /* //AMA
                             ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
                             String confidentialityCode = docPdf.getConfidentiality() == null
                                     || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
@@ -994,6 +975,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             String languageCode = docPdf.getLanguage();
                             pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.MRO, docPdf.getEffectiveTime(),
                                     docPdf.getRepositoryId(), request, eotPDF, true, docPdf.getId(), confidentialityCode, confidentialityDisplay, languageCode);
+                            response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
+                             */
+
+                            ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
+                            SimpleConfidentiality confidentiality = docPdf.getConfidentiality() != null ? docPdf.getConfidentiality() : SimpleConfidentiality.NORMAL;
+                            String languageCode = docPdf.getLanguage();
+                            pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.MRO, docPdf.getEffectiveTime(),
+                                    docPdf.getRepositoryId(), request, eotPDF, true, docPdf.getId(), confidentiality, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
                         }
                         if (!xmlUUID.equals("") && !pdfUUID.equals("")) {

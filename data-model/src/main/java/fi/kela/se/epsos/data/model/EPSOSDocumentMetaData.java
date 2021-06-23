@@ -28,11 +28,5 @@ public interface EPSOSDocumentMetaData {
 
     String getLanguage();
 
-    ConfidentialityMetadata getConfidentiality();
-
-    interface ConfidentialityMetadata {
-        String getConfidentialityCode();
-
-        String getConfidentialityDisplay();
-    }
+    SimpleConfidentiality getConfidentiality();
 }

@@ -90,17 +90,20 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String atcCode = getAtcCode(xmlDoc);
                 String doseFormCode = getDoseFormCode(xmlDoc);
                 String strength = getStrength(xmlDoc);
+                SimpleConfidentiality confidentiality;
 
+                confidentiality = getConfidentiality(xmlDoc);
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
-                        atcCode, doseFormCode, strength, getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        atcCode, doseFormCode, strength, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
+                confidentiality = getConfidentiality(pdfDoc);
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
-                        atcCode, doseFormCode, strength, getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        atcCode, doseFormCode, strength, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -132,18 +135,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
                 logger.debug("Parsing PS patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+                SimpleConfidentiality confidentiality;
 
-
+                confidentiality = getConfidentiality(pdfDoc);
                 PSDocumentMetaData psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(pdfDoc), this.getClinicalDocumentConfidentialityDisplay(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        confidentiality, getClinicalDocumentLanguage(pdfDoc));
+                logger.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
+
+                confidentiality = getConfidentiality(xmlDoc);
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
-                documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
-                logger.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
+                        confidentiality, getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id=" + psdXml.getId() + " into PS repository");
+                documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
 
                 psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
@@ -173,23 +179,37 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
                 logger.debug("Parsing MRO patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+                SimpleConfidentiality confidentiality;
 
+                confidentiality = getConfidentiality(pdfDoc);
                 MroDocumentMetaData psdPdf = DocumentFactory.createMroDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(pdfDoc), this.getClinicalDocumentConfidentialityDisplay(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        confidentiality, getClinicalDocumentLanguage(pdfDoc));
+                logger.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
+
+                confidentiality = getConfidentiality(xmlDoc);
                 MroDocumentMetaData psdXml = DocumentFactory.createMroDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
-                documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
-                logger.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
+                        confidentiality, getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' into MRO repository", psdXml.getId());
+                documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
 
                 mroDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
                 logger.warn("Could not read file at " + xmlFilename, e);
             }
         }
+    }
+
+    private SimpleConfidentiality getConfidentiality(Document xmlDoc) {
+        String confCode;
+        String confDesc;
+        SimpleConfidentiality confidentiality;
+        confCode = getClinicalDocumentConfidentialityCode(xmlDoc);
+        confDesc = getClinicalDocumentConfidentialityDisplay(xmlDoc);
+        confidentiality = SimpleConfidentiality.findByCode(confCode);
+        return confidentiality;
     }
 
     private Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
