@@ -90,20 +90,24 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String atcCode = getAtcCode(xmlDoc);
                 String doseFormCode = getDoseFormCode(xmlDoc);
                 String strength = getStrength(xmlDoc);
+
                 SimpleConfidentiality confidentiality;
+                EpListParam epListParam = new EpListParam(true, atcCode, doseFormCode, strength);
 
                 confidentiality = getConfidentiality(xmlDoc);
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
-                        atcCode, doseFormCode, strength, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description,
+                        productCode, productName,
+                        epListParam, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 confidentiality = getConfidentiality(pdfDoc);
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
-                        atcCode, doseFormCode, strength, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description,
+                        productCode, productName,
+                        epListParam, confidentiality, this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 

@@ -14,25 +14,25 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     private String strength;
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description) {
-        this(metaData, description, null);
+        this(metaData, description, (ProductMetadata)null);
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product) {
-        this(metaData, description, product, false, null, null, null);
+        this(metaData, description, product, new EpListParam(false, null, null, null));
     }
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, boolean dispensable, String atcCode, String doseFormCode, String strength) {
-        this(metaData, description, null, dispensable, atcCode, doseFormCode, strength);
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, EpListParam epListParam) {
+        this(metaData, description, null, epListParam);
     }
 
-    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product, boolean dispensable, String atcCode, String doseFormCode, String strength) {
+    public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product, EpListParam epListParam) {
         super(metaData);
-        this.product = product;
-        this.dispensable = dispensable;
         this.description = description;
-        this.atcCode = atcCode;
-        this.doseFormCode = doseFormCode;
-        this.strength = strength;
+        this.product = product;
+        this.dispensable = epListParam.isDispensable();
+        this.atcCode = epListParam.getAtcCode();
+        this.doseFormCode = epListParam.getDoseFormCode();
+        this.strength = epListParam.getStrength();
     }
 
     @Override
