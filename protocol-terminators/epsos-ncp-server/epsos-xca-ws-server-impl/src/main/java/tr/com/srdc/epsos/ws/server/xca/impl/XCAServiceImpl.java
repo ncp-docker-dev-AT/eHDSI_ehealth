@@ -609,6 +609,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private String prepareExtrinsicObjectOrCD(DocumentType docType,
                                               Date effectiveTime,
+                                              Date serviceStartTime,
                                               String repositoryId,
                                               AdhocQueryRequest request,
                                               ExtrinsicObjectType eot,
@@ -618,7 +619,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                               String languageCode,
                                               String classCode,
                                               OrCDDocumentMetaData.DocumentFileType documentFileType,
-                                              long size) {
+                                              long size,
+                                              OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
 
         final String title;
         final String nodeRepresentation;
@@ -689,6 +691,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Creation Date (optional)
         eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
 
+        // Service Start time (optional)
+        eot.getSlot().add(makeSlot("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", serviceStartTime)));
+
         // Source Patient Id
         eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
 
@@ -720,9 +725,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
 
+        // Reason of hospitalisation
+        if (reasonOfHospitalisation != null) {
+        eot.getClassification().add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                uuid, reasonOfHospitalisation.getCode(), reasonOfHospitalisation.getCodingScheme(), reasonOfHospitalisation.getText()));
+        }
+
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
-                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+                uuid, "eventCode", "eventCodeDisplayName", "Not Used"));
 
         // External Identifiers
         eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
@@ -1031,7 +1042,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (!rel.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(rel);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
-
         } else {
 
         }
@@ -1248,8 +1258,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 || orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
                 : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
         final String languageCode = orCDDocumentMetaData.getLanguage();
-        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
-                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize());
+        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(), orCDDocumentMetaData.getServiceStartTime(),
+                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode, orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getReasonOfHospitalisation());
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         //TODO Mathias - To be reviewed if this is ok for the OrCD, for the other services an association object with both the XML and PDF is returned.
         if (!StringUtils.isEmpty(xmlUUID)) {

@@ -168,55 +168,55 @@ public class DocumentFactory {
     /**
      * OrCDDocument
      */
-    private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size) {
+    private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate, Date serviceStartTime,
+                                                           String repositoryId, String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
         OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
         if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
             confidentiality = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
         }
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
                 orCDClassCode, repositoryId, title, author, confidentiality, languageCode);
-        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, size);
+        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, size, serviceStartTime, reasonOfHospitalisation);
     }
 
     /**
      * Laboratory Results
      */
-    public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
+    public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
                                                          String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
 
-        return createOrCDDocument(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
+        return createOrCDDocument(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, null);
     }
 
     /**
      * Hospital Discharge Reports
      */
-    public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
+    public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
 
-        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
+        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, reasonOfHospitalisation);
     }
 
     /**
      * Medical Imaging Reports
      */
-    public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size) {
+    public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
 
-        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size);
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, reasonOfHospitalisation);
     }
 
     /**
      * Medical Images
      */
-    public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, String repositoryId,
-                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size) {
+    public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
 
-        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType, size);
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType, size, reasonOfHospitalisation);
     }
 
     /**
