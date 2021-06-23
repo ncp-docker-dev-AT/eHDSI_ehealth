@@ -1,9 +1,6 @@
 package fi.kela.se.epsos.data.model;
 
-import java.awt.desktop.UserSessionEvent;
 import java.util.Date;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,21 +14,21 @@ public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implemen
     private DocumentFileType documentFileType;
     private long size;
     private Date serviceStartTime;
+    private List<Author> authors;
     private ReasonOfHospitalisation reasonOfHospitalisation;
-    private List<Author> authors = new ArrayList<>();
-
-    public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, DocumentFileType documentFileType, long size, Date serviceStartTime, ReasonOfHospitalisation reasonOfHospitalisation) {
 
     public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData,
                                     DocumentFileType documentFileType,
                                     long size,
-                                    List<Author> authors) {
+                                    Date serviceStartTime,
+                                    List<Author> authors,
+                                    ReasonOfHospitalisation reasonOfHospitalisation) {
         super(metaData);
         this.documentFileType = documentFileType;
         this.size = size;
         this.serviceStartTime = serviceStartTime;
-        this.reasonOfHospitalisation = reasonOfHospitalisation;
         this.authors = authors;
+        this.reasonOfHospitalisation = reasonOfHospitalisation;
     }
 
     @Override
@@ -50,14 +47,12 @@ public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implemen
     }
 
     @Override
-    public ReasonOfHospitalisation getReasonOfHospitalisation() {
-        return reasonOfHospitalisation;
-    }
-
-    @Override
     public List<Author> getAuthors() {
         return authors;
     }
 
-
+    @Override
+    public ReasonOfHospitalisation getReasonOfHospitalisation() {
+        return reasonOfHospitalisation;
+    }
 }
