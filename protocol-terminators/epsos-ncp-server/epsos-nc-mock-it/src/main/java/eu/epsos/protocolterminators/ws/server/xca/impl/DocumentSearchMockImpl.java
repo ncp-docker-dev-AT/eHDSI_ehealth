@@ -410,7 +410,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         Date serviceStartTime = null;
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("value") != null) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssZ");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                 serviceStartTime = simpleDateFormat.parse(node.getAttributes().getNamedItem("value").getTextContent());
                 logger.debug("serviceStartTime: '{}'", serviceStartTime);
             }
