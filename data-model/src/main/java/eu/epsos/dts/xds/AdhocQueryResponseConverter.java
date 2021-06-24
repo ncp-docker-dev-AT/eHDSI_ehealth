@@ -79,6 +79,16 @@ public final class AdhocQueryResponseConverter {
                             document.setCreationTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
                         }
 
+                        // Set serviceStartTime
+                        if (str.equals("serviceStartTime")) {
+                            document.setEventTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
+                        }
+
+                        // Set size
+                        if (str.equals("size")) {
+                            document.setSize(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
+                        }
+
                         // Set repositoryUniqueId
                         if (str.equals("repositoryUniqueId")) {
                             document.setRepositoryUniqueId(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));

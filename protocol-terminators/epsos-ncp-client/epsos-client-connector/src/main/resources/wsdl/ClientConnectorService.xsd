@@ -112,9 +112,11 @@
             <xs:element name="author" type="xs:string" minOccurs="0"/>
             <xs:element name="classCode" type="tns:genericDocumentCode" minOccurs="0"/>
             <xs:element name="creationDate" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="eventDate" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="description" type="xs:string" minOccurs="0"/>
             <xs:element name="formatCode" type="tns:genericDocumentCode" minOccurs="0"/>
             <xs:element name="mimeType" type="xs:string" minOccurs="0"/>
+            <xs:element name="size" type="xs:integer" minOccurs="0"/>
             <xs:element name="title" type="xs:string" minOccurs="0"/>
             <xs:element name="uuid" type="xs:string" minOccurs="0"/>
             <xs:element name="submissionSetId" type="xs:string" minOccurs="0"/>

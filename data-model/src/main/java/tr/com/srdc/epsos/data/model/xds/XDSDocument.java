@@ -12,8 +12,10 @@ public class XDSDocument {
     private String repositoryUniqueId;
     private String documentUniqueId;
     private String name;
+    private String size;
     private String description;
     private String creationTime;
+    private String eventTime;
     private String healthcareFacility;
     private String authorPerson;
     private boolean isPDF;
@@ -58,6 +60,10 @@ public class XDSDocument {
         this.name = name;
     }
 
+    public String getSize() { return size; }
+
+    public void setSize(String size) { this.size = size; }
+
     public String getDescription() {
         return description;
     }
@@ -73,6 +79,10 @@ public class XDSDocument {
     public void setCreationTime(String creationTime) {
         this.creationTime = creationTime;
     }
+
+    public String getEventTime() { return eventTime; }
+
+    public void setEventTime(String eventTime) { this.eventTime = eventTime; }
 
     public String getHealthcareFacility() {
         return healthcareFacility;

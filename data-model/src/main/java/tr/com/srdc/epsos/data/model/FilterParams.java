@@ -1,7 +1,6 @@
 package tr.com.srdc.epsos.data.model;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class FilterParams {
 
