@@ -34,11 +34,13 @@ public final class IheConstants {
     public static final String CONSENT_FORMATCODE_NODEREPRESENTATION = "urn:ihe:iti:bppc:2007";
     public static final String CONSENT_FORMATCODE_CODINGSCHEMA = "2.16.840.1.113883.6.1";
 
+    /* Classification Scheme */
+    public static final String CLASSIFICATION_SCHEME_AUTHOR_UUID = "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d";
+
+    /* Slot name */
     public static final String AUTHOR_INSTITUTION_STR = "authorInstitution";
     public static final String AUTHOR_PERSON_STR = "authorPerson";
-    public static final String AUTHOR_ROLE_STR = "authorRole";
     public static final String AUTHOR_SPECIALITY_STR = "authorSpecialty";
-    public static final String AUTHOR_TELECOMMUNICATION_STR = "authorTelecommunication";
 
    private IheConstants() {
     }

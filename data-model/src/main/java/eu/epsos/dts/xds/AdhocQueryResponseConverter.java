@@ -110,7 +110,7 @@ public final class AdhocQueryResponseConverter {
                         }
 
                         // Set AuthorPerson
-                        if (str.equals("urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                        if (str.equals(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID) && eo.getValue().getClassification().get(j).getSlot() != null) {
                             for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
                                 if (slot.getName().equals("authorPerson") && slot.getValueList().getValue().get(0) != null) {
                                     document.setAuthorPerson(slot.getValueList().getValue().get(0));

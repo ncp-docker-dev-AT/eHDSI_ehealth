@@ -746,30 +746,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         for(OrCDDocumentMetaData.Author author : authors) {
-            ClassificationType classificationAuthor = makeClassification("urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d",
+            ClassificationType classificationAuthor = makeClassification(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID,
                     uuid, "");
 
             if(author.getAuthorPerson() != null){
                 SlotType1 authorPersonSlot = makeSlot(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
                 classificationAuthor.getSlot().add(authorPersonSlot);
             }
-            if(author.getAuthorInstitution() != null && !author.getAuthorInstitution().isEmpty()) {
-                SlotType1 authorInstitutionSlot = makeSlot(IheConstants.AUTHOR_INSTITUTION_STR, author.getAuthorInstitution());
-                classificationAuthor.getSlot().add(authorInstitutionSlot);
-            }
-            if(author.getAuthorRole() != null && !author.getAuthorRole().isEmpty()) {
-            SlotType1 authorRoleSlot = makeSlot(IheConstants.AUTHOR_ROLE_STR, author.getAuthorRole());
-            classificationAuthor.getSlot().add(authorRoleSlot);
-            }
+
             if(author.getAuthorSpeciality() != null && !author.getAuthorSpeciality().isEmpty()) {
             SlotType1 authorSpecialtySlot = makeSlot(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
             classificationAuthor.getSlot().add(authorSpecialtySlot);
             }
-            if(author.getAuthorTelecommunication() != null) {
-                SlotType1 authorTelecommunicationSlot = makeSlot(IheConstants.AUTHOR_TELECOMMUNICATION_STR, author.getAuthorTelecommunication());
-                classificationAuthor.getSlot().add(authorTelecommunicationSlot);
-            }
-
             eot.getClassification().add(classificationAuthor);
         }
 
@@ -889,8 +877,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Author Person
         ClassificationType authorClassification = makeClassification(
-                "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d", uuid, "");
-        authorClassification.getSlot().add(makeSlot("authorPerson", document.getAuthor()));
+                IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID, uuid, "");
+        authorClassification.getSlot().add(makeSlot(IheConstants.AUTHOR_PERSON_STR, document.getAuthor()));
         eot.getClassification().add(authorClassification);
 
         // External Identifiers

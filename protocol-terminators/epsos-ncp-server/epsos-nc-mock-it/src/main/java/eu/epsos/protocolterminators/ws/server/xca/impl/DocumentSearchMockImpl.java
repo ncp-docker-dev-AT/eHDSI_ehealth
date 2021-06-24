@@ -171,10 +171,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
         OrCDDocumentMetaData.Author author = new OrCDDocumentMetaData.Author();
         author.setAuthorPerson("AuthorPerson OrCD Test");
-        author.setAuthorInstitution(Arrays.asList("Institution 1", "Institution 2", "Institution 3"));
-        author.setAuthorRole(Arrays.asList("Role 1", "Role 2", "Role 3"));
         author.setAuthorSpeciality(Arrays.asList("Speciality 1", "Speciality 2", "Speciality 3"));
-        author.setAuthorTelecommunication("Author Telecommunication");
 
         List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
         authors.add(author);
