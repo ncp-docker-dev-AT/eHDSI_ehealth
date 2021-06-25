@@ -54,7 +54,9 @@ public class ClientConnectorServiceSkeletonMock implements ClientConnectorServic
 
         EpsosDocument1 documentMetaData = EpsosDocument1.Factory.newInstance();
         documentMetaData.setUuid(id);
-        documentMetaData.setAuthor("R. R. Tolkien");
+        Author author = Author.Factory.newInstance();
+        author.setPerson("R. R. Tolkien");
+        documentMetaData.setAuthorsArray(new Author[]{author});
         documentMetaData.setDescription("Fantasy");
         documentMetaData.setTitle("The lord of the rings");
         GenericDocumentCode classCode = GenericDocumentCode.Factory.newInstance();
