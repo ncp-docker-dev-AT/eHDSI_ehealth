@@ -3,6 +3,7 @@ package tr.com.srdc.epsos.data.model.xds;
 import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,10 +22,9 @@ public class XDSDocument {
     private String creationTime;
     private String eventTime;
     private String healthcareFacility;
-    private String authorPerson;
     private boolean isPDF;
     private OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation;
-    private List<OrCDDocumentMetaData.Author> authors;
+    private List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
 
     private GenericDocumentCode formatCode;
     private GenericDocumentCode classCode;
@@ -177,17 +177,4 @@ public class XDSDocument {
         this.classCode = documentCode;
     }
 
-    /**
-     * @return the authorPerson
-     */
-    public String getAuthorPerson() {
-        return authorPerson;
-    }
-
-    /**
-     * @param authorPerson the authorPerson to set
-     */
-    public void setAuthorPerson(String authorPerson) {
-        this.authorPerson = authorPerson;
-    }
 }

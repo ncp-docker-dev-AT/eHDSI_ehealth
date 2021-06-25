@@ -115,11 +115,18 @@ public final class AdhocQueryResponseConverter {
 
                         // Set AuthorPerson
                         if (str.equals(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID) && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            OrCDDocumentMetaData.Author author = new OrCDDocumentMetaData.Author();
                             for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
-                                if (slot.getName().equals("authorPerson") && slot.getValueList().getValue().get(0) != null) {
-                                    document.setAuthorPerson(slot.getValueList().getValue().get(0));
+                                if (slot.getName().equals(IheConstants.AUTHOR_PERSON_STR) && slot.getValueList().getValue().get(0) != null) {
+                                    author.setAuthorPerson(slot.getValueList().getValue().get(0));
                                 }
                             }
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals(IheConstants.AUTHOR_SPECIALITY_STR) && !slot.getValueList().getValue().isEmpty()) {
+                                    author.setAuthorSpeciality(slot.getValueList().getValue());
+                                }
+                            }
+                            document.getAuthors().add(author);
                         }
 
                         // Set Reason of Hospitalisation

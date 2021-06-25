@@ -52,7 +52,6 @@ public class DocumentDts {
         result.setHcid(document.getHcid());
         result.setSize(new BigInteger(document.getSize()));
         result.setMimeType(document.getMimeType());
-        result.setAuthor(document.getAuthorPerson());
         if (document.getAuthors() != null) {
             result.setAuthorsArray(convertAuthorList(document.getAuthors()));
         }
