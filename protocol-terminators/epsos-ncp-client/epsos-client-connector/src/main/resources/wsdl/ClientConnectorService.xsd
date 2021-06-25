@@ -123,8 +123,24 @@
             <xs:element name="hcid" type="xs:string" minOccurs="0"/>
             <xs:element name="repositoryId" type="xs:string" minOccurs="0"/>
             <xs:element name="base64Binary" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="authors" type="tns:author" maxOccurs="unbounded" minOccurs="0" />
+            <xs:element name="reasonOfHospitalisation" type="tns:reasonOfHospitalisation" minOccurs="0" />
             <xs:element name="associatedDocuments" type="tns:epsosDocument" nillable="true" minOccurs="0"
                         maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="author">
+        <xs:sequence>
+            <xs:element name="person" type="xs:string" minOccurs="0"/>
+            <xs:element name="specialty" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="reasonOfHospitalisation">
+        <xs:sequence>
+            <xs:element name="code" type="xs:string" minOccurs="0"/>
+            <xs:element name="text" type="xs:string" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 

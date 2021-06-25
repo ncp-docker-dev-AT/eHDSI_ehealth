@@ -71,27 +71,20 @@ public final class AdhocQueryResponseConverter {
                         }
                     }
 
-                    for (int j = 0; j < eo.getValue().getSlot().size(); j++) {
-                        str = eo.getValue().getSlot().get(j).getName();
-
-                        // Set creationTime
-                        if (str.equals("creationTime")) {
-                            document.setCreationTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
-
-                        // Set serviceStartTime
-                        if (str.equals("serviceStartTime")) {
-                            document.setEventTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
-
-                        // Set size
-                        if (str.equals("size")) {
-                            document.setSize(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
-
-                        // Set repositoryUniqueId
-                        if (str.equals("repositoryUniqueId")) {
-                            document.setRepositoryUniqueId(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
+                    for (SlotType1 slotType: eo.getValue().getSlot()) {
+                        switch (slotType.getName()) {
+                            case "creationTime" :
+                                document.setCreationTime(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "serviceStartTime" :
+                                document.setEventTime(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "size" :
+                                document.setSize(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "repositoryUniqueId" :
+                                document.setRepositoryUniqueId(slotType.getValueList().getValue().get(0));
+                                break;
                         }
                     }
                     String documentClassCodeType = "";

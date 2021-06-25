@@ -1,6 +1,9 @@
 package tr.com.srdc.epsos.data.model.xds;
 
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
+
+import java.util.List;
 
 /**
  * This class encapsulates a set of properties related to a document, but not it's content.
@@ -11,6 +14,7 @@ public class XDSDocument {
     private String hcid;
     private String repositoryUniqueId;
     private String documentUniqueId;
+    private String mimeType;
     private String name;
     private String size;
     private String description;
@@ -19,6 +23,9 @@ public class XDSDocument {
     private String healthcareFacility;
     private String authorPerson;
     private boolean isPDF;
+    private OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation;
+    private List<OrCDDocumentMetaData.Author> authors;
+
     private GenericDocumentCode formatCode;
     private GenericDocumentCode classCode;
 
@@ -107,6 +114,18 @@ public class XDSDocument {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getMimeType() { return mimeType; }
+
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+
+    public OrCDDocumentMetaData.ReasonOfHospitalisation getReasonOfHospitalisation() { return reasonOfHospitalisation; }
+
+    public void setReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) { this.reasonOfHospitalisation = reasonOfHospitalisation; }
+
+    public List<OrCDDocumentMetaData.Author> getAuthors() { return authors; }
+
+    public void setAuthors(List<OrCDDocumentMetaData.Author> authors) { this.authors = authors; }
 
     /**
      * @return the formatCode

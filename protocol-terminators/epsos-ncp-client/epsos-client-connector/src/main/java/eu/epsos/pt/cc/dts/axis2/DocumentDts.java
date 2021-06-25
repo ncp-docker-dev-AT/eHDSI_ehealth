@@ -1,18 +1,19 @@
 package eu.epsos.pt.cc.dts.axis2;
 
+import epsos.openncp.protocolterminator.clientconnector.Author;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
+import epsos.openncp.protocolterminator.clientconnector.ReasonOfHospitalisation;
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is an Data Transformation Service providing functions to transform data into a Document object.
@@ -44,11 +45,20 @@ public class DocumentDts {
         result.setUuid(document.getDocumentUniqueId());
         result.setDescription(document.getDescription());
         result.setCreationDate(convertDate(document.getCreationTime()));
+        result.setEventDate(convertDate(document.getEventTime()));
         result.setClassCode(GenericDocumentCodeDts.newInstance(document.getClassCode()));
         result.setFormatCode(GenericDocumentCodeDts.newInstance(document.getFormatCode()));
         result.setRepositoryId(document.getRepositoryUniqueId());
         result.setHcid(document.getHcid());
+        result.setSize(new BigInteger(document.getSize()));
+        result.setMimeType(document.getMimeType());
         result.setAuthor(document.getAuthorPerson());
+        if (document.getAuthors() != null) {
+            result.setAuthorsArray(convertAuthorList(document.getAuthors()));
+        }
+        if (document.getReasonOfHospitalisation() != null) {
+            result.setReasonOfHospitalisation(convertReasonOfHospitalisation(document.getReasonOfHospitalisation()));
+        }
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
@@ -65,7 +75,7 @@ public class DocumentDts {
                     result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
                     break;
                 case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:_CLASSCODE:
-                    result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
+                result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
                     break;
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE);
@@ -81,6 +91,27 @@ public class DocumentDts {
         }
 
         return result;
+    }
+
+    private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {
+        Author[] convertedAuthors = new Author[authors.size()];
+        for (int i=0; i<authors.size();i++) {
+            OrCDDocumentMetaData.Author author = authors.get(i);
+            String authorPerson = author.getAuthorPerson();
+            String[] authorSpecialities = author.getAuthorSpeciality().toArray(new String[author.getAuthorSpeciality().size()]);
+            Author convertedAuthor = Author.Factory.newInstance();
+            convertedAuthor.setPerson(authorPerson);
+            convertedAuthor.setSpecialtyArray(authorSpecialities);
+            convertedAuthors[i] = convertedAuthor;
+        }
+        return convertedAuthors;
+    }
+
+    private static ReasonOfHospitalisation convertReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+        ReasonOfHospitalisation convertedReasonOfHospitalisation = ReasonOfHospitalisation.Factory.newInstance();
+        convertedReasonOfHospitalisation.setCode(reasonOfHospitalisation.getCode());
+        convertedReasonOfHospitalisation.setText(reasonOfHospitalisation.getText());
+        return convertedReasonOfHospitalisation;
     }
 
     /**
