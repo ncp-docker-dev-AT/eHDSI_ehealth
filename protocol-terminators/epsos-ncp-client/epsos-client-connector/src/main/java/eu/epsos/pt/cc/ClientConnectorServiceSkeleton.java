@@ -141,8 +141,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                         throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
                 }
             } else {
-                //TODO Mathias - ensure only OrCD documentCodes are presented...
+                if (!documentCodes.contains(Constants.EP_CLASSCODE)
+                        && !documentCodes.contains(Constants.PS_CLASSCODE)
+                        && !documentCodes.contains(Constants.MRO_CLASSCODE)) {
                 response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, hcpAssertion, trcAssertion);
+                } else {
+                    throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
+                }
             }
 
 
