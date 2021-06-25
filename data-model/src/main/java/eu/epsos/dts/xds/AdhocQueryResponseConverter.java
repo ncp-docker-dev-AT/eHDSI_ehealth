@@ -2,6 +2,7 @@ package eu.epsos.dts.xds;
 
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -119,6 +120,19 @@ public final class AdhocQueryResponseConverter {
                                     document.setAuthorPerson(slot.getValueList().getValue().get(0));
                                 }
                             }
+                        }
+
+                        // Set Reason of Hospitalisation
+                        if (str.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && eo.getValue().getClassification().get(j) != null) {
+                            String code = eo.getValue().getClassification().get(j).getNodeRepresentation();
+                            String text = eo.getValue().getClassification().get(j).getName().getLocalizedString().get(0).getValue();
+                            String codingScheme = null;
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("codingScheme") && slot.getValueList().getValue().get(0) != null) {
+                                    codingScheme = slot.getValueList().getValue().get(0);
+                                }
+                            }
+                            document.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
                         }
                     }
 

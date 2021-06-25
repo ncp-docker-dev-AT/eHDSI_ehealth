@@ -176,7 +176,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
         authors.add(author);
 
-        OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation = new OrCDDocumentMetaData.ReasonOfHospitalisation("K56.2 ", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "Volvulus");
+        OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation = new OrCDDocumentMetaData.ReasonOfHospitalisation("K56.2", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "Volvulus");
 
         /* Hospital Discharge Reports */
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_HOSPITAL_DISCHARGE_REPORTS));
