@@ -65,6 +65,9 @@ public final class AdhocQueryResponseConverter {
                     // Set name
                     document.setName(eo.getValue().getName().getLocalizedString().get(0).getValue());
 
+                    // Set mimeType
+                    document.setMimeType(eo.getValue().getMimeType());
+
                     // Set documentUniqueId
                     for (ExternalIdentifierType idenType : eo.getValue().getExternalIdentifier()) {
                         if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
