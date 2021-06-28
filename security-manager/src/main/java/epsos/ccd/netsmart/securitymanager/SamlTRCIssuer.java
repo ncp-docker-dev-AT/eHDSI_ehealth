@@ -30,20 +30,18 @@ import java.util.UUID;
  * The TRC Assertion issuer is a sub-component that issues Treatment Relationship Assertions as specified in eHDSI SAML
  * Profile specification document. It makes use of the Signature Manager for signing the assertions.
  * An audit trail entry is written after the successful issuance of a TRC assertion.
- *
- * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
 public class SamlTRCIssuer {
 
     private final Logger logger = LoggerFactory.getLogger(SamlTRCIssuer.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
-    KeyStoreManager ksm;
+    KeyStoreManager keyStoreManager;
     HashMap<String, String> auditDataMap;
 
     public SamlTRCIssuer() {
 
-        ksm = new DefaultKeyStoreManager();
+        keyStoreManager = new DefaultKeyStoreManager();
         auditDataMap = new HashMap<>();
     }
 
@@ -51,7 +49,7 @@ public class SamlTRCIssuer {
      * @param ksm
      */
     public SamlTRCIssuer(KeyStoreManager ksm) {
-        this.ksm = ksm;
+        this.keyStoreManager = ksm;
     }
 
     /**
@@ -90,11 +88,7 @@ public class SamlTRCIssuer {
             if (patientID == null) {
                 throw new SMgrException("Patiend ID cannot be null");
             }
-
-            //DateTime now = new DateTime();
-            //DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-            //nowUTC.toDateTime()
-            Instant issuanceInstant = Instant.now();
+            var issuanceInstant = Instant.now();
             trc.setIssueInstant(issuanceInstant);
             trc.setID("_" + UUID.randomUUID());
             trc.setVersion(SAMLVersion.VERSION_20);
@@ -188,7 +182,6 @@ public class SamlTRCIssuer {
 
             return trc;
         } catch (Exception ex) {
-            logger.error(null, ex);
             throw new SMgrException(ex.getMessage());
         }
     }
@@ -221,7 +214,7 @@ public class SamlTRCIssuer {
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 
         //  Doing an indirect copy so, because when cloning, signatures are lost.
-        SignatureManager signatureManager = new SignatureManager(ksm);
+        var signatureManager = new SignatureManager(keyStoreManager);
 
         try {
             signatureManager.verifySAMLAssertion(hcpIdentityAssertion);
@@ -229,8 +222,7 @@ public class SamlTRCIssuer {
             throw new SMgrException("SAML Assertion Validation Failed: " + ex.getMessage());
         }
 
-        //DateTime nowUTC = new DateTime(DateTimeZone.UTC);
-        Instant issuanceInstant = Instant.now();
+        var issuanceInstant = Instant.now();
         logger.info("Assertion validity: '{}' - '{}'", hcpIdentityAssertion.getConditions().getNotBefore(),
                 hcpIdentityAssertion.getConditions().getNotOnOrAfter());
         if (hcpIdentityAssertion.getConditions().getNotBefore().isAfter(issuanceInstant)) {
@@ -267,7 +259,7 @@ public class SamlTRCIssuer {
         Subject subject = create(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
 
         trc.setSubject(subject);
-        Issuer issuer = new IssuerBuilder().buildObject();
+        var issuer = new IssuerBuilder().buildObject();
 
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         String confIssuer = "urn:initgw:" + countryCode + ":countryB";
@@ -287,11 +279,10 @@ public class SamlTRCIssuer {
 
         auditDataMap.put("humanRequestorNameID", humanRequestorNameID);
 
-        Attribute subjectIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        var subjectIdAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
-        String HR_AlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
-        //nameID.getValue()
-        auditDataMap.put("humanRequestorSubjectID", HR_AlternativeUserID);
+        String humanRequesterAlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
+        auditDataMap.put("humanRequestorSubjectID", humanRequesterAlternativeUserID);
 
         //Create and add Subject Confirmation
         SubjectConfirmation subjectConf = create(SubjectConfirmation.class, SubjectConfirmation.DEFAULT_ELEMENT_NAME);
@@ -383,7 +374,7 @@ public class SamlTRCIssuer {
             attributeDocumentId.getAttributeValues().add(attrValDocumentId);
             attrStmt.getAttributes().add(attributeDocumentId);
         }
-        Attribute pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        var pointOfCareAttr = findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization");
         if (pointOfCareAttr != null) {
             String poc = ((XSString) pointOfCareAttr.getAttributeValues().get(0)).getValue();
@@ -395,7 +386,7 @@ public class SamlTRCIssuer {
             auditDataMap.put("pointOfCare", poc);
         }
 
-        Attribute pointOfCareIdAttr = findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        var pointOfCareIdAttr = findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
             String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getURI();
@@ -439,9 +430,9 @@ public class SamlTRCIssuer {
      */
     public void verifyTrcToken(Assertion trcAssertion, Assertion hcpIdentityAssertion, String patientID) throws SMgrException {
 
-        SignatureManager sm = new SignatureManager(ksm);
-        sm.verifySAMLAssertion(trcAssertion);
-        sm.verifySAMLAssertion(hcpIdentityAssertion);
+        var signatureManager = new SignatureManager(keyStoreManager);
+        signatureManager.verifySAMLAssertion(trcAssertion);
+        signatureManager.verifySAMLAssertion(hcpIdentityAssertion);
     }
 
     /**
@@ -458,7 +449,6 @@ public class SamlTRCIssuer {
         attr.setName(name);
         attr.setNameFormat(nameFormat);
 
-        //XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
         XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
         XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -485,7 +475,6 @@ public class SamlTRCIssuer {
                     attr.setName(attribute.getName());
                     attr.setNameFormat(attribute.getNameFormat());
 
-                    //XMLObjectBuilder stringBuilder = Configuration.getBuilderFactory().getBuilder(XSString.TYPE_NAME);
                     XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
                     XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
@@ -550,7 +539,7 @@ public class SamlTRCIssuer {
      */
     protected NameID getXspaSubjectFromAttributes(List<AttributeStatement> stmts) {
 
-        Attribute xspaSubjectAttribute = findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        var xspaSubjectAttribute = findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
         NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         nameID.setFormat(NameID.UNSPECIFIED);
         nameID.setValue(((XSString) xspaSubjectAttribute.getAttributeValues().get(0)).getValue());
@@ -569,7 +558,7 @@ public class SamlTRCIssuer {
     /**
      * @return
      */
-    public String getPointofCareID() {
+    public String getPointOfCareID() {
 
         return auditDataMap.get("pointOfCareID");
     }
