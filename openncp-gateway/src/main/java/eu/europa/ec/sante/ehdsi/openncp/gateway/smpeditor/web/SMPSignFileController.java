@@ -6,7 +6,9 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.smp.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.entities.*;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.exception.GenericException;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.*;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SMPConverter;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SignFile;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor.service.SimpleErrorHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.EndpointType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.eu.RedirectType;
@@ -45,13 +47,13 @@ import java.util.regex.Pattern;
 @SessionAttributes("smpfilesign")
 public class SMPSignFileController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SMPSignFileController.class);
+    private final Logger logger = LoggerFactory.getLogger(SMPSignFileController.class);
 
-    private SMPConverter smpconverter;
+    private final SMPConverter smpconverter;
 
-    private Environment env;
+    private final Environment env;
 
-    private ReadSMPProperties readProperties;
+    private final ReadSMPProperties readProperties;
 
     private String type;
 
@@ -70,7 +72,7 @@ public class SMPSignFileController {
      */
     @GetMapping(value = "/smpeditor/signsmpfile")
     public String signFile(Model model) {
-        LOGGER.debug("\n==== in signFile ====");
+        logger.debug("\n==== in signFile ====");
         model.addAttribute("smpfilesign", new SMPFileOps());
 
         return "smpeditor/signsmpfile";
@@ -86,7 +88,7 @@ public class SMPSignFileController {
     @GetMapping(value = "/smpeditor/signsmpfile/generated")
     public String signCreatedFile(Model model, @ModelAttribute("smpfile") SMPFile smpfile) {
 
-        LOGGER.debug("\n==== in signCreatedFile ====");
+        logger.debug("\n==== in signCreatedFile ====");
         SMPFileOps smpfilesign = new SMPFileOps();
 
         if (smpfile.getGeneratedFile() == null) {
@@ -98,7 +100,7 @@ public class SMPSignFileController {
         try {
             input = new FileInputStream(file);
         } catch (FileNotFoundException ex) {
-            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
         MultipartFile fileSign = null;
         try {
@@ -109,7 +111,7 @@ public class SMPSignFileController {
             smpfilesign.setSignFiles(files);
             smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         model.addAttribute("hasfile", true);
@@ -128,7 +130,7 @@ public class SMPSignFileController {
     @GetMapping(value = "/smpeditor/signsmpfile/updated")
     public String signUpdatedFile(Model model, @ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate) {
 
-        LOGGER.debug("\n==== in signCreatedFile ====");
+        logger.debug("\n==== in signCreatedFile ====");
         SMPFileOps smpfilesign = new SMPFileOps();
 
         if (smpfileupdate.getGeneratedFile() == null) {
@@ -141,7 +143,7 @@ public class SMPSignFileController {
         try {
             input = new FileInputStream(file);
         } catch (FileNotFoundException ex) {
-            LOGGER.error("\nFileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\nFileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
         MultipartFile fileSign;
         try {
@@ -152,7 +154,7 @@ public class SMPSignFileController {
             smpfilesign.setSignFiles(files);
             smpfilesign.setSignFileName(fileSign.getOriginalFilename());
         } catch (IOException ex) {
-            LOGGER.error("\nIOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\nIOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         model.addAttribute("hasfile", true);
@@ -172,7 +174,7 @@ public class SMPSignFileController {
     @PostMapping(value = "/smpeditor/signsmpfile")
     public String postSign(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) throws IOException {
 
-        LOGGER.debug("\n==== in postSign ====");
+        logger.debug("\n==== in postSign ====");
         model.addAttribute("smpfilesign", smpfilesign);
 
         List<SMPFileOps> allFiles = new ArrayList<>();
@@ -182,7 +184,7 @@ public class SMPSignFileController {
         /*Iterate each chosen file*/
         for (int k = 0; k < signFiles.size(); k++) {
 
-            LOGGER.debug("\n***** MULTIPLE FILE NAME '{}-{}'", k, signFiles.get(k).getOriginalFilename());
+            logger.debug("\n***** MULTIPLE FILE NAME '{}-{}'", k, signFiles.get(k).getOriginalFilename());
             SMPFileOps smpfile = new SMPFileOps();
             SMPFields smpfields = new SMPFields();
 
@@ -192,9 +194,9 @@ public class SMPSignFileController {
             try {
                 smpfile.getSignFile().transferTo(convFile);
             } catch (IOException ex) {
-                LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             } catch (IllegalStateException ex) {
-                LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
             String contentFile = new String(Files.readAllBytes(Paths.get(convFile.getPath())));
             //boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
@@ -202,21 +204,21 @@ public class SMPSignFileController {
             boolean fileDeleted;
 
             if (valid) {
-                LOGGER.debug("\n****VALID XML File");
+                logger.debug("\n****VALID XML File");
             } else {
-                LOGGER.debug("\n****NOT VALID XML File");
+                logger.debug("\n****NOT VALID XML File");
                 String message = env.getProperty("error.notsmp"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
 
                 fileDeleted = convFile.delete();
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Converted File deleted: '{}'", fileDeleted);
                 }
                 return "redirect:/smpeditor/signsmpfile";
             }
             fileDeleted = convFile.delete();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Converted File deleted: '{}'", fileDeleted);
             }
 
             ServiceMetadata serviceMetadata;
@@ -224,28 +226,28 @@ public class SMPSignFileController {
 
             boolean isSigned = smpconverter.getIsSignedServiceMetadata();
             if (isSigned) {
-                LOGGER.debug("\n****SIGNED SMP File");
+                logger.debug("\n****SIGNED SMP File");
                 fileDeleted = convFile.delete();
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Converted File deleted: '{}'", fileDeleted);
                 }
                 String message = env.getProperty("warning.isSigned.sigmenu"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.warning));
                 return "redirect:/smpeditor/signsmpfile";
             } else {
-                LOGGER.debug("\n****NOT SIGNED File");
+                logger.debug("\n****NOT SIGNED File");
             }
 
       /*
        Condition to know the type of file (Redirect|ServiceInformation) in order to build the form
        */
             if (serviceMetadata.getRedirect() != null) {
-                LOGGER.debug("\n******** REDIRECT");
+                logger.debug("\n******** REDIRECT");
                 type = "Redirect";
                 smpfile.setType(SMPType.Redirect);
 
                 if (!serviceMetadata.getRedirect().getExtensions().isEmpty()) {
-                    LOGGER.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getRedirect().getExtensions().get(0).getAny().getNodeName());
+                    logger.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getRedirect().getExtensions().get(0).getAny().getNodeName());
                     String message = env.getProperty("warning.isSignedExtension");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.warning);
                     smpfile.setAlert(alert);
@@ -261,11 +263,7 @@ public class SMPSignFileController {
                 Matcher matcher = pattern.matcher(href);
                 if (matcher.find()) {
                     String result = matcher.group(0);
-                    try {
-                        result = java.net.URLDecoder.decode(result, "UTF-8");
-                    } catch (UnsupportedEncodingException ex) {
-                        LOGGER.error("\n UnsupportedEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                    }
+                    result = java.net.URLDecoder.decode(result, StandardCharsets.UTF_8);
                     String[] ids = result.split("/services/");//SPECIFICATION
                     participantID = ids[0];
                     String[] cc = participantID.split(":");//SPECIFICATION May change if Participant Identifier specification change
@@ -294,7 +292,7 @@ public class SMPSignFileController {
                         if (docuID.equals(mentry2.getKey().toString())) {
                             String[] docs = mentry2.getValue().toString().split("\\.");
                             documentID = docs[0];
-                            LOGGER.debug("\n ****** documentID - '{}'", documentID);
+                            logger.debug("\n ****** documentID - '{}'", documentID);
                             break;
                         }
                     }
@@ -310,21 +308,21 @@ public class SMPSignFileController {
                     String timeStamp = new SimpleDateFormat("yyyyMMdd'T'HHmmss").format(new java.util.Date());
                     String fileName = smpfile.getType().name() + "_" + smpType + "_" + smpfile.getCountry().toUpperCase() + "_Signed_" + timeStamp + ".xml";
                     smpfile.setFileName(fileName);
-                    LOGGER.debug("\n********* FILENAME REDIRECT - '{}'", fileName);
+                    logger.debug("\n********* FILENAME REDIRECT - '{}'", fileName);
 
                 } else {
-                    LOGGER.error("\n****NOT VALID HREF IN REDIRECT");
+                    logger.error("\n****NOT VALID HREF IN REDIRECT");
                     String message = env.getProperty("error.redirect.href"); //messages.properties
                     redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                     return "redirect:/smpeditor/signsmpfile";
                 }
 
             } else if (serviceMetadata.getServiceInformation() != null) { /*Service Information Type*/
-                LOGGER.debug("\n******** SERVICE INFORMATION");
+                logger.debug("\n******** SERVICE INFORMATION");
                 type = "ServiceInformation";
 
                 if (!serviceMetadata.getServiceInformation().getExtensions().isEmpty()) {
-                    LOGGER.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getServiceInformation().getExtensions().get(0).getAny().getNodeName());
+                    logger.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getServiceInformation().getExtensions().get(0).getAny().getNodeName());
                     String message = env.getProperty("warning.isSignedExtension");//messages.properties
                     Alert alert = new Alert(message, Alert.alertType.warning);
                     smpfile.setAlert(alert);
@@ -333,7 +331,7 @@ public class SMPSignFileController {
                 smpfile.setDocumentIdentifier(serviceMetadata.getServiceInformation().getDocumentIdentifier().getValue());
                 smpfile.setDocumentIdentifierScheme(serviceMetadata.getServiceInformation().getDocumentIdentifier().getScheme());
                 String documentIdentifier = smpfile.getDocumentIdentifier();
-                LOGGER.debug("\n************ DOC ID - '{}'", documentIdentifier);
+                logger.debug("\n************ DOC ID - '{}'", documentIdentifier);
 
                 String documentID = "";
                 Map<String, String> propertiesMap = readProperties.readPropertiesFile();
@@ -344,7 +342,7 @@ public class SMPSignFileController {
                     if (documentIdentifier.equals(mentry2.getKey().toString())) {
                         String[] docs = mentry2.getValue().toString().split("\\.");
                         documentID = docs[0];
-                        LOGGER.debug("\n ****** documentID - '{}'", documentID);
+                        logger.debug("\n ****** documentID - '{}'", documentID);
                         break;
                     }
                 }
@@ -363,10 +361,10 @@ public class SMPSignFileController {
                 }
 
                 String participanteID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
-                LOGGER.debug("\n ************* participanteID - '{}'", participanteID);
+                logger.debug("\n ************* participanteID - '{}'", participanteID);
                 String[] cc = participanteID.split(":");
                 for (int i = 0; i < cc.length; i++) {
-                    LOGGER.debug("\n ************* CC - '{}' -> '{}'", i, cc[i]);
+                    logger.debug("\n ************* CC - '{}' -> '{}'", i, cc[i]);
                 }
 
                 Countries[] countries = Countries.getALL();
@@ -422,16 +420,16 @@ public class SMPSignFileController {
                 if (smpfields.getCertificate().isEnable()) {
                     try {
                         InputStream in = new ByteArrayInputStream(endpoint.getCertificate());
-                        LOGGER.debug("Endpoint Certificate PEM:\n'{}'", DatatypeConverter.printBase64Binary(endpoint.getCertificate()));
+                        logger.debug("Endpoint Certificate PEM:\n'{}'", DatatypeConverter.printBase64Binary(endpoint.getCertificate()));
                         cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(in);
                         if (cert != null) {
                             subjectName = "Issuer: " + cert.getIssuerX500Principal().getName() + "\nSerial Number #" + cert.getSerialNumber();
-                            LOGGER.debug("Certificate: '{}'", subjectName);
+                            logger.debug("Certificate: '{}'", subjectName);
                             smpfile.setCertificateContent(subjectName);
                             smpfile.setCertificate(cert.getEncoded());
                         }
                     } catch (CertificateException ex) {
-                        LOGGER.error("CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                        logger.error("CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
                 } else {
                     smpfile.setCertificate(null);
@@ -461,7 +459,7 @@ public class SMPSignFileController {
                         String[] endA = capturedString.split("<Extension>");
                         smpfile.setExtensionContent(endA[1]);
                     } catch (IOException ex) {
-                        LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                        logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                     }
                 }
 
@@ -478,8 +476,8 @@ public class SMPSignFileController {
             allFiles.add(k, smpfile);
         }
         smpfilesign.setAllFiles(allFiles);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - '{}'", model);
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model);
         }
         return "redirect:checksignsmpfile";
     }
@@ -494,12 +492,12 @@ public class SMPSignFileController {
     @GetMapping(value = "smpeditor/checksignsmpfile")
     public String signFileForm(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model) {
 
-        LOGGER.debug("\n==== in signFileForm ====");
+        logger.debug("\n==== in signFileForm ====");
         model.addAttribute("smpfilesign", smpfilesign);
         model.addAttribute("smpfiles", smpfilesign.getAllFiles());
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("\n********* MODEL - '{}'", model);
+        if (logger.isDebugEnabled()) {
+            logger.debug("\n********* MODEL - '{}'", model);
         }
         return "smpeditor/checksignsmpfile";
     }
@@ -515,30 +513,24 @@ public class SMPSignFileController {
      */
     @PostMapping(value = "/smpeditor/checksignsmpfile")
     public String signSMPFile(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model, final RedirectAttributes redirectAttributes) {
-        LOGGER.debug("\n==== in signSMPFile ====");
-    
-    /*
-    mock
-    sample_national_infrastructure
-    mock
-    */
 
-        File file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH"));
+        logger.info("[GATEWAY] Signing SML file: '{}'", smpfilesign.getFileName());
+        var file = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PATH"));
         FileInputStream input = null;
         try {
             input = new FileInputStream(file);
         } catch (FileNotFoundException ex) {
-            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
         MultipartFile keystore = null;
         try {
             keystore = new MockMultipartFile("keystore", file.getName(), "text/xml", input);
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
-        for (int i = 0; i < smpfilesign.getAllFiles().size(); i++) {
-            SignFile signFile = new SignFile();
+        for (var i = 0; i < smpfilesign.getAllFiles().size(); i++) {
+            var signFile = new SignFile();
             try {
                 signFile.signFiles(smpfilesign.getAllFiles().get(i).getType().name(),
                         smpfilesign.getAllFiles().get(i).getFileName(),
@@ -548,17 +540,17 @@ public class SMPSignFileController {
                         ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD"),
                         smpfilesign.getAllFiles().get(i).getSignFile());
             } catch (Exception ex) {
-                LOGGER.error("\nException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\nException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
             if (signFile.isInvalidKeystoreSMP()) {
-                LOGGER.error("\n****INVALID KEYSTORE");
+                logger.error("\n****INVALID KEYSTORE");
                 String message = env.getProperty("error.keystore.invalid"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/signsmpfile";
             }
             if (signFile.isInvalidKeyPairSMP()) {
-                LOGGER.error("\n****INVALID KEY PAIR");
+                logger.error("\n****INVALID KEY PAIR");
                 String message = env.getProperty("error.keypair.invalid"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/signsmpfile";
@@ -579,7 +571,7 @@ public class SMPSignFileController {
      */
     @GetMapping(value = "smpeditor/savesignedsmpfile")
     public String saveSignFile(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model) {
-        LOGGER.debug("\n==== in saveSignFile ====");
+        logger.debug("\n==== in saveSignFile ====");
         model.addAttribute("smpfilesign", smpfilesign);
         model.addAttribute("smpfiles", smpfilesign.getAllFiles());
 
@@ -598,12 +590,13 @@ public class SMPSignFileController {
     @GetMapping(value = "smpeditor/savesignedsmpfile/download/{filename}")
     public void downloadFile(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, HttpServletRequest request,
                              HttpServletResponse response, Model model, @PathVariable("filename") String filename) {
-        LOGGER.debug("\n==== in download Signed File ====");
+
+        logger.info("[Gateway] Downloading generated SMP file: '{}'", filename);
         model.addAttribute("smpfilesign", smpfilesign);
 
-        for (int i = 0; i < smpfilesign.getAllFiles().size(); i++) {
+        for (var i = 0; i < smpfilesign.getAllFiles().size(); i++) {
 
-            if (smpfilesign.getAllFiles().get(i).getFileName().equals(filename + ".xml")) {
+            if (StringUtils.equals(smpfilesign.getAllFiles().get(i).getFileName(), filename)) {
                 response.setContentType("application/xml");
                 response.setHeader("Content-Disposition", "attachment; filename=" + smpfilesign.getAllFiles().get(i).getFileName());
                 response.setContentLength((int) smpfilesign.getAllFiles().get(i).getGeneratedFile().length());
@@ -612,9 +605,9 @@ public class SMPSignFileController {
                     FileCopyUtils.copy(inputStream, response.getOutputStream());
 
                 } catch (FileNotFoundException ex) {
-                    LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (IOException ex) {
-                    LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             }
         }
@@ -630,11 +623,11 @@ public class SMPSignFileController {
     @GetMapping(value = "smpeditor/smpeditor/clean3")
     public String cleanSmpFile(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model) {
 
-        LOGGER.debug("\n==== in cleanSmpFile ====");
+        logger.debug("\n==== in cleanSmpFile ====");
         model.addAttribute("smpfilesign", smpfilesign);
         for (int i = 0; i < smpfilesign.getAllFiles().size(); i++) {
             if (smpfilesign.getAllFiles().get(i).getGeneratedFile() != null) {
-                LOGGER.debug("\n****DELETED ? '{}'", smpfilesign.getAllFiles().get(i).getGeneratedFile().delete());
+                logger.debug("\n****DELETED ? '{}'", smpfilesign.getAllFiles().get(i).getGeneratedFile().delete());
             }
         }
         return "redirect:/smpeditor/smpeditor";
@@ -649,11 +642,11 @@ public class SMPSignFileController {
      */
     @GetMapping(value = "smpeditor/checksignsmpfile/clean")
     public String cleanFile(@ModelAttribute("smpfilesign") SMPFileOps smpfilesign, Model model) {
-        LOGGER.debug("\n==== in cleanFile ====");
+        logger.debug("\n==== in cleanFile ====");
         model.addAttribute("smpfilesign", smpfilesign);
         for (int i = 0; i < smpfilesign.getAllFiles().size(); i++) {
             if (smpfilesign.getAllFiles().get(i).getGeneratedFile() != null) {
-                LOGGER.debug("\n****DELETED ? '{}'", smpfilesign.getAllFiles().get(i).getGeneratedFile().delete());
+                logger.debug("\n****DELETED ? '{}'", smpfilesign.getAllFiles().get(i).getGeneratedFile().delete());
             }
         }
         return "redirect:/smpeditor/checksignsmpfile";
