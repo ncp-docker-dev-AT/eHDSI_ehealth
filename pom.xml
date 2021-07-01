@@ -39,7 +39,7 @@
         <module>assertion-validator</module>
         <module>cda-display-tool</module>
         <module>default-policy-manager</module>
-        <module>assertion-provider</module>
+        <module>security-token-service</module>
         <module>trc-sts</module>
         <module>trc-sts-client</module>
         <module>tsam</module>
