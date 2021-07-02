@@ -12,6 +12,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -36,10 +37,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * XCA Initiating Gateway
@@ -65,10 +63,8 @@ public class XcaInitGateway {
                                                   final String countryCode,
                                                   final List<GenericDocumentCode> documentCodes,
                                                   final FilterParams filterParams,
-                                                  final Assertion idAssertion,
-                                                  final Assertion trcAssertion,
-                                                  String service) throws XCAException {
-
+                                                  final Map<AssertionEnum, Assertion> assertionMap,
+                                                  final String service) throws XCAException {
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             final StringBuilder builder = new StringBuilder();
@@ -79,7 +75,7 @@ public class XcaInitGateway {
             builder.replace(builder.length()-1, builder.length(), "]");
             String classCodes = builder.toString();
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
-                    classCodes, idAssertion.getID(), trcAssertion.getID(), service);
+                    classCodes, assertionMap.get(AssertionEnum.CLINICIAN).getID(), assertionMap.get(AssertionEnum.TREATMENT).getID(), service);
             if(filterParams != null){
                 LOGGER_CLINICAL.info("FilterParams created Before: " + filterParams.getCreatedBefore());
                 LOGGER_CLINICAL.info("FilterParams created After: " + filterParams.getCreatedAfter());
@@ -94,8 +90,8 @@ public class XcaInitGateway {
             AdhocQueryRequest queryRequest = AdhocQueryRequestCreator.createAdhocQueryRequest(pid.getExtension(), pid.getRoot(), documentCodes, filterParams);
 
             /* Stub */
-            RespondingGateway_ServiceStub respondingGatewayStub = new RespondingGateway_ServiceStub();
-            DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
+            var respondingGatewayStub = new RespondingGateway_ServiceStub();
+            var dynamicDiscoveryService = new DynamicDiscoveryService();
             String epr = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.fromName(service));
             respondingGatewayStub.setAddr(epr);
             respondingGatewayStub._getServiceClient().getOptions().setTo(new EndpointReference(epr));
@@ -107,7 +103,7 @@ public class XcaInitGateway {
             for (GenericDocumentCode genericDocumentCode: documentCodes) {
                 documentCodeValues.add(genericDocumentCode.getValue());
             }
-            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, idAssertion, trcAssertion, documentCodeValues);
+            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentCodeValues);
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
@@ -122,11 +118,12 @@ public class XcaInitGateway {
 
     public static DocumentResponse crossGatewayRetrieve(final XDSDocument document, final String homeCommunityId,
                                                         final String countryCode, final String targetLanguage,
-                                                        final Assertion idAssertion, final Assertion trcAssertion,
+                                                        final Map<AssertionEnum, Assertion> assertionMap,
                                                         String service) throws XCAException {
 
         LOGGER.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}', '{}')", homeCommunityId, countryCode,
-                targetLanguage, idAssertion.getID(), trcAssertion.getID(), service);
+                targetLanguage, assertionMap.get(AssertionEnum.CLINICIAN).getID(),
+                assertionMap.get(AssertionEnum.TREATMENT).getID(), service);
         DocumentResponse result = null;
         RetrieveDocumentSetResponseType queryResponse;
         String classCode = null;
@@ -162,11 +159,11 @@ public class XcaInitGateway {
                     LOGGER.error("Service Not Supported");
                     //TODO: Has to be managed as an error.
             }
-            queryResponse = stub.respondingGateway_CrossGatewayRetrieve(queryRequest, idAssertion, trcAssertion, classCode);
+            queryResponse = stub.respondingGateway_CrossGatewayRetrieve(queryRequest, assertionMap, classCode);
 
             if (queryResponse.getRegistryResponse() != null) {
 
-                RegistryErrorList registryErrorList = queryResponse.getRegistryResponse().getRegistryErrorList();
+                var registryErrorList = queryResponse.getRegistryResponse().getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException ex) {

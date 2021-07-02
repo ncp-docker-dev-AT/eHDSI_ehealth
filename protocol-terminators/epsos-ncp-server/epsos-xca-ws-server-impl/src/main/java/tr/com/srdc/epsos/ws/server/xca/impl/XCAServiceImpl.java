@@ -971,7 +971,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
-    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
+    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader soapHeader,
                                            EventLog eventLog) throws Exception {
 
         String sigCountryCode = null;
@@ -983,18 +983,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
         response.setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         try {
-            shElement = XMLUtils.toDOM(sh);
+            shElement = XMLUtils.toDOM(soapHeader);
             documentSearchService.setSOAPHeader(shElement);
             sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValues.get(0));
         } catch (InsufficientRightsException e) {
             logger.debug(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.debug(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             throw e;
         }
 
@@ -1011,16 +1011,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
-                rel.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
+                registryErrorList.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
         }
         String patientId = trimDocumentEntryPatientId(fullPatientId);
-        String countryCode = "";
-        String DN = eventLog.getSC_UserID();
-        int cIndex = DN.indexOf("C=");
+        var countryCode = "";
+        String distinguishedName = eventLog.getSC_UserID();
+        int cIndex = distinguishedName.indexOf("C=");
 
         if (cIndex > 0) {
-            countryCode = DN.substring(cIndex + 2, cIndex + 4);
+            countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
         } // Mustafa: This part is added for handling consents when the call is not https
         // In this case, we check the country code of the signature certificate that
         // ships within the HCP assertion
@@ -1039,11 +1039,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             InsufficientRightsException e = new InsufficientRightsException(4701);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
 
         if (classCodeValues == null || classCodeValues.isEmpty()) {
-            rel.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
+            registryErrorList.add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
         }
 
         // Evidence for call to NI for XCA List
@@ -1065,8 +1065,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // Handling of the Response Status message and Errors.
-        if (!rel.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(rel);
+        if (!registryErrorList.getRegistryError().isEmpty()) {
+            response.setRegistryErrorList(registryErrorList);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else {
 
@@ -1080,13 +1080,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (prescriptions == null) {
 
-                        rel.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     } else if (prescriptions.isEmpty()) {
 
-                        rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -1117,8 +1117,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
 
-                        rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -1165,8 +1165,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
 
-                        rel.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -1239,10 +1239,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     break;
 
                 default:
-                    rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
-                    response.setRegistryErrorList(rel);
+                    registryErrorList.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
+                    response.setRegistryErrorList(registryErrorList);
                     response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     break;
+
 
             }
 

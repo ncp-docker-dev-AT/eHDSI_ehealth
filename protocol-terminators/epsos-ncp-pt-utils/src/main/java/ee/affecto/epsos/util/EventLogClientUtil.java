@@ -8,7 +8,6 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.client.Stub;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.HandlerDescription;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.commons.lang.StringUtils;
@@ -36,17 +35,14 @@ public class EventLogClientUtil {
     private EventLogClientUtil() {
     }
 
-    /**
-     * @param stub
-     */
     public static void createDummyMustUnderstandHandler(Stub stub) {
 
-        HandlerDescription description = new HandlerDescription("DummyMustUnderstandHandler");
+        var description = new HandlerDescription("DummyMustUnderstandHandler");
         description.setHandler(new DummyMustUnderstandHandler());
-        AxisConfiguration axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext()
+        var axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext()
                 .getAxisConfiguration();
         List<Phase> phasesList = axisConfiguration.getInFlowPhases();
-        Phase myPhase = new Phase("MyPhase");
+        var myPhase = new Phase("MyPhase");
         try {
             myPhase.addHandler(description);
         } catch (PhaseException ex) {
@@ -75,13 +71,13 @@ public class EventLogClientUtil {
     public static String getTargetGatewayIdentifier(String endpointReference) {
 
         try {
-            URI url = new URI(endpointReference);
-            InetAddress inetAddress = InetAddress.getByName(url.getHost());
+            var uri = new URI(endpointReference);
+            var inetAddress = InetAddress.getByName(uri.getHost());
             if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
                     && (inetAddress instanceof Inet4Address)) {
                 return inetAddress.getHostAddress();
             } else {
-                return url.getHost();
+                return uri.getHost();
             }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
@@ -89,15 +85,9 @@ public class EventLogClientUtil {
         }
     }
 
-    /**
-     * @param msgContext
-     * @param soapEnvelope
-     * @param endpointReference
-     * @return
-     */
     public static EventLog prepareEventLog(MessageContext msgContext, SOAPEnvelope soapEnvelope, String endpointReference) {
 
-        EventLog eventLog = new EventLog();
+        var eventLog = new EventLog();
         eventLog.setEI_EventDateTime(DateUtil.getDateAsXMLGregorian(new Date()));
 
         // Set Active Participant Identification: Service Consumer NCP
@@ -126,17 +116,13 @@ public class EventLogClientUtil {
         return eventLog;
     }
 
-    /**
-     * @param eventLog
-     * @param idAssertion
-     */
     public static void logIdAssertion(EventLog eventLog, Assertion idAssertion) {
 
         String spProvidedID = idAssertion.getSubject().getNameID().getSPProvidedID();
         String humanReqUserId = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + idAssertion.getSubject().getNameID().getValue()
                 + "@" + idAssertion.getIssuer().getValue() + ">";
         eventLog.setHR_UserID(humanReqUserId);
-        boolean isOrganizationProvided = false;
+        var isOrganizationProvided = false;
 
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
@@ -156,10 +142,6 @@ public class EventLogClientUtil {
         }
     }
 
-    /**
-     * @param eventLog
-     * @param idAssertion
-     */
     public static void logTrcAssertion(EventLog eventLog, Assertion idAssertion) {
 
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
@@ -172,18 +154,11 @@ public class EventLogClientUtil {
         }
     }
 
-    /**
-     * @param eventLog
-     */
     public static void sendEventLog(EventLog eventLog) {
 
         AuditServiceFactory.getInstance().write(eventLog, "", "1");
     }
 
-    /**
-     * @param uuid
-     * @return
-     */
     public static String appendUrnUuid(String uuid) {
 
         if (uuid == null || uuid.isEmpty() || uuid.startsWith(Constants.UUID_PREFIX)) {

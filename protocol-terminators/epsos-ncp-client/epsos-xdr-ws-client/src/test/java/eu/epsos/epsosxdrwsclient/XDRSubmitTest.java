@@ -7,6 +7,7 @@ import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -17,9 +18,7 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.XdrRequest;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Test class for the XDR Document Submit Service.
@@ -56,6 +55,9 @@ public class XDRSubmitTest {
         // build assertions
         Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
+        Map<AssertionEnum, Assertion> assertionMap = new EnumMap<>(AssertionEnum.class);
+        assertionMap.put(AssertionEnum.CLINICIAN, idAssertion);
+        assertionMap.put(AssertionEnum.TREATMENT, trcAssertion);
 
         // build patient id
         PatientId patientId = new PatientId();
@@ -86,11 +88,9 @@ public class XDRSubmitTest {
         request.setCdaId(CDA_EDISP_ID);
         request.setCountryCode(PATIENT_COUNTRY);
         request.setCountryName(PATIENT_COUNTRY_NAME);
-        request.setIdAssertion(idAssertion);
         request.setPatient(patientDemographics);
-        request.setTrcAssertion(trcAssertion);
 
         // call the service
-        XdrDocumentSource.initialize(request, TestConstants.PATIENT_COUNTRY);
+        XdrDocumentSource.initialize(request, TestConstants.PATIENT_COUNTRY, assertionMap);
     }
 }

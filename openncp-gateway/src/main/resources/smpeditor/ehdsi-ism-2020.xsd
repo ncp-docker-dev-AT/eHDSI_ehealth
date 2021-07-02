@@ -14,8 +14,9 @@
     <!-- Identification of the eHNCP providing its cross border traits (ISO Country Code of NCP_A) -->
     <xs:complexType name="country">
         <xs:sequence>
-            <xs:element name="patientSearch" type="patientSearch"/>
+            <xs:element name="patientSearch" type="personSearch"/>
             <xs:element name="documentSearch" type="documentSearch" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="nextOfKinSearch" type="personSearch" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="code" type="countryCode" use="required"/>
         <xs:attribute name="label" type="labelList" use="required"/>
@@ -52,7 +53,7 @@
     </xs:complexType>
 
     <!-- eHDSI Search Mask for patient identification -->
-    <xs:complexType name="patientSearch">
+    <xs:complexType name="personSearch">
         <xs:sequence>
             <xs:element name="identifier" maxOccurs="unbounded">
                 <xs:complexType>
@@ -78,7 +79,7 @@
             </xs:element>
             <xs:element name="textField" type="textField" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="birthDate" type="birthDate" minOccurs="0"/>
-            <xs:element name="sex" type="administrativeGender" minOccurs="0"/>
+            <xs:element name="gender" type="administrativeGender" minOccurs="0"/>
             <xs:element name="media" type="mediaDetails" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="friendlyName" type="xs:string" default="ALL"/>
