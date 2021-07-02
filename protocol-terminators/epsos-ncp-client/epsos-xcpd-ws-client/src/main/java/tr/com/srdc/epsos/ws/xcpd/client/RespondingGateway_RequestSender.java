@@ -4,6 +4,7 @@ import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xcpd.PRPAIN201305UV022DTS;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -13,6 +14,7 @@ import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.util.OidUtil;
 
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * RespondingGateway_RequestSender class.
@@ -32,48 +34,32 @@ public final class RespondingGateway_RequestSender {
 
     /**
      * Builds and sends a PRPA_IN201305UV02 HL7 message, representing an XCPD Request process.
-     *
-     * @param pd          the Patient Demographics object.
-     * @param idAssertion the assertion.
-     * @param countryCode The two-letter country code
-     * @return a PRPAIN201306UV02 (XCPD Response) message.
-     * @see PRPAIN201306UV02
-     * @see PatientDemographics
-     * @see Assertion
-     * @see String
      */
-    public static PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(final PatientDemographics pd,
-                                                                       final Assertion idAssertion,
+    public static PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(final PatientDemographics patientDemographics,
+                                                                       final Map<AssertionEnum, Assertion> assertionMap,
                                                                        final String countryCode) {
 
-        DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
+        var dynamicDiscoveryService = new DynamicDiscoveryService();
         String endpointUrl = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
                 RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
 
         String dstHomeCommunityId = OidUtil.getHomeCommunityId(countryCode.toLowerCase(Locale.ENGLISH));
-        PRPAIN201305UV02 hl7Request = PRPAIN201305UV022DTS.newInstance(pd, dstHomeCommunityId);
+        var hl7Request = PRPAIN201305UV022DTS.newInstance(patientDemographics, dstHomeCommunityId);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("ClientConnector is trying to contact remote NCP-A:\nEndpoint: '{}'\nHomeCommunityId: '{}'",
                     endpointUrl, dstHomeCommunityId);
         }
-        return sendRequest(endpointUrl, hl7Request, idAssertion, countryCode);
+        return sendRequest(endpointUrl, hl7Request, assertionMap, countryCode);
     }
 
-    /**
-     * @param endpointUrl
-     * @param pRPAIN201305UV022
-     * @param idAssertion
-     * @param countryCode
-     * @return
-     */
     private static PRPAIN201306UV02 sendRequest(String endpointUrl, PRPAIN201305UV02 pRPAIN201305UV022,
-                                                Assertion idAssertion, final String countryCode) {
+                                                Map<AssertionEnum, Assertion> assertionMap, final String countryCode) {
 
-        RespondingGateway_ServiceStub stub = new RespondingGateway_ServiceStub(endpointUrl);
+        var respondingGatewayServiceStub = new RespondingGateway_ServiceStub(endpointUrl);
         // Dummy handler for any mustUnderstand
-        EventLogClientUtil.createDummyMustUnderstandHandler(stub);
-        stub.setCountryCode(countryCode);
+        EventLogClientUtil.createDummyMustUnderstandHandler(respondingGatewayServiceStub);
+        respondingGatewayServiceStub.setCountryCode(countryCode);
 
-        return stub.respondingGateway_PRPA_IN201305UV02(pRPAIN201305UV022, idAssertion);
+        return respondingGatewayServiceStub.respondingGateway_PRPA_IN201305UV02(pRPAIN201305UV022, assertionMap);
     }
 }

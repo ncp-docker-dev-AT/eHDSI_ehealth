@@ -52,7 +52,7 @@ import java.util.UUID;
  * @author Jerry Dimitriou <jerouris at netsmart.gr>, Massimiliano Masi <massimiliano.masi@tiani-spirit.com>
  */
 @ServiceMode(value = Mode.MESSAGE)
-@WebServiceProvider(targetNamespace = "http://epsos.eu/", serviceName = "SecurityTokenServiceEID", portName = "ISecurityTokenServiceEID_Port")
+@WebServiceProvider(targetNamespace = "https://ehdsi.eu/", serviceName = "SecurityTokenServiceEID", portName = "ISecurityTokenServiceEID_Port")
 @BindingType(value = "http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class STSServiceEID implements Provider<SOAPMessage> {
 
@@ -71,7 +71,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
     // Issuance
     // is
     // supported
-    private static final String TRC_NS = "http://epsos.eu/trc"; // TRC
+    private static final String TRC_NS = "https://ehdsi.eu/trc"; // TRC
     // Parameters
     // Namespace
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; // WS-Trust
@@ -322,7 +322,7 @@ public class STSServiceEID implements Provider<SOAPMessage> {
 
             SOAPFactory fac = SOAPFactory.newInstance();
             SOAPElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, "MessageID", "wsa"));
-            messageIdResponse = "uuid:" + UUID.randomUUID().toString();
+            messageIdResponse = "uuid:" + UUID.randomUUID();
             messageIdElem.setTextContent(messageIdResponse);
 
             SOAPElement securityHeaderElem = header.addHeaderElement(new QName(WS_SEC_NS, "Security", "wsse"));

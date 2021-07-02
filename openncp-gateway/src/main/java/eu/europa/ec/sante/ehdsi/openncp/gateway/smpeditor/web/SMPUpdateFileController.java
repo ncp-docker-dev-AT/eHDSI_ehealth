@@ -47,15 +47,15 @@ import java.util.regex.Pattern;
 @SessionAttributes("smpfileupdate")
 public class SMPUpdateFileController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SMPUpdateFileController.class);
+    private final Logger logger = LoggerFactory.getLogger(SMPUpdateFileController.class);
 
     private final SMPFields smpfields = new SMPFields();
 
-    private ReadSMPProperties readProperties;
+    private final ReadSMPProperties readProperties;
 
-    private SMPConverter smpconverter;
+    private final SMPConverter smpconverter;
 
-    private Environment env;
+    private final Environment env;
 
     private String type;
 
@@ -64,7 +64,7 @@ public class SMPUpdateFileController {
     @Autowired
     public SMPUpdateFileController(SMPConverter smpconverter, Environment env, ReadSMPProperties readProperties) {
 
-        LOGGER.debug("SMPUpdateFileController('{}', '{}', '{}'", smpconverter, env, readProperties);
+        logger.debug("SMPUpdateFileController('{}', '{}', '{}'", smpconverter, env, readProperties);
         this.smpconverter = smpconverter;
         this.env = env;
         this.readProperties = readProperties;
@@ -79,7 +79,7 @@ public class SMPUpdateFileController {
     @GetMapping(value = "/smpeditor/updatesmpfile")
     public String updateFile(Model model) {
 
-        LOGGER.debug("\n==== in updateFile ====");
+        logger.debug("\n==== in updateFile ====");
         model.addAttribute("smpfileupdate", new SMPFileOps());
         return "smpeditor/updatesmpfile";
     }
@@ -96,21 +96,21 @@ public class SMPUpdateFileController {
     public String post(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model,
                        final RedirectAttributes redirectAttributes) throws IOException {
 
-        LOGGER.debug("\n==== in post ====");
+        logger.debug("\n==== in post ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("SMP File Update - '{}'", smpfileupdate);
+        if (logger.isDebugEnabled()) {
+            logger.debug("SMP File Update - '{}'", smpfileupdate);
         }
         isSigned = false;
-        LOGGER.debug("File: '{}' will be loaded for update", smpfileupdate.getUpdateFile().getOriginalFilename());
+        logger.debug("File: '{}' will be loaded for update", smpfileupdate.getUpdateFile().getOriginalFilename());
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + smpfileupdate.getUpdateFile().getOriginalFilename());
         try {
             smpfileupdate.getUpdateFile().transferTo(convFile);
-            LOGGER.debug("File: '{}' loaded", smpfileupdate.getUpdateFile().getOriginalFilename());
+            logger.debug("File: '{}' loaded", smpfileupdate.getUpdateFile().getOriginalFilename());
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IllegalStateException ex) {
-            LOGGER.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         /*Validate xml file*/
@@ -119,20 +119,20 @@ public class SMPUpdateFileController {
         boolean fileDeleted;
 
         if (valid) {
-            LOGGER.debug("\n****VALID XML File");
+            logger.debug("\n****VALID XML File");
         } else {
-            LOGGER.debug("\n****NOT VALID XML File");
+            logger.debug("\n****NOT VALID XML File");
             String message = env.getProperty("error.notsmp"); //messages.properties
             redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
             fileDeleted = convFile.delete();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Converted File deleted: '{}'", fileDeleted);
             }
             return "redirect:/smpeditor/updatesmpfile";
         }
         fileDeleted = convFile.delete();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Converted File deleted: '{}'", fileDeleted);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Converted File deleted: '{}'", fileDeleted);
         }
 
         /*Read data from xml*/
@@ -143,12 +143,12 @@ public class SMPUpdateFileController {
      Condition to know the type of file (Redirect|ServiceInformation) in order to build the form
      */
         if (serviceMetadata.getRedirect() != null) {
-            LOGGER.debug("\n******** REDIRECT");
+            logger.debug("\n******** REDIRECT");
             type = "Redirect";
             smpfileupdate.setType(SMPType.Redirect);
 
             if (!serviceMetadata.getRedirect().getExtensions().isEmpty()) {
-                LOGGER.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getRedirect().getExtensions().get(0).getAny().getNodeName());
+                logger.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getRedirect().getExtensions().get(0).getAny().getNodeName());
                 isSigned = true;
             }
 
@@ -162,11 +162,7 @@ public class SMPUpdateFileController {
             Matcher matcher = pattern.matcher(href);
             if (matcher.find()) {
                 String result = matcher.group(0);
-                try {
-                    result = java.net.URLDecoder.decode(result, "UTF-8");
-                } catch (UnsupportedEncodingException ex) {
-                    LOGGER.error("\n UnsupportedEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                }
+                result = java.net.URLDecoder.decode(result, StandardCharsets.UTF_8);
                 String[] ids = result.split("/services/");
                 participantID = ids[0];
                 String[] cc = participantID.split(":");
@@ -183,25 +179,25 @@ public class SMPUpdateFileController {
                     return "redirect:/smpeditor/updatesmpfile";
                 }
             } else {
-                LOGGER.error("\n****NOT VALID HREF IN REDIRECT");
+                logger.error("\n****NOT VALID HREF IN REDIRECT");
                 String message = env.getProperty("error.redirect.href"); //messages.properties
                 redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                 return "redirect:/smpeditor/updatesmpfile";
             }
 
         } else if (serviceMetadata.getServiceInformation() != null) {
-            LOGGER.debug("\n******** SERVICE INFORMATION");
+            logger.debug("\n******** SERVICE INFORMATION");
             type = "ServiceInformation";
 
             if (!serviceMetadata.getServiceInformation().getExtensions().isEmpty()) {
-                LOGGER.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getServiceInformation().getExtensions().get(0).getAny().getNodeName());
+                logger.debug("\n******* SIGNED EXTENSION - '{}'", serviceMetadata.getServiceInformation().getExtensions().get(0).getAny().getNodeName());
                 isSigned = true;
             }
 
             smpfileupdate.setDocumentIdentifier(serviceMetadata.getServiceInformation().getDocumentIdentifier().getValue());
             smpfileupdate.setDocumentIdentifierScheme(serviceMetadata.getServiceInformation().getDocumentIdentifier().getScheme());
             String documentIdentifier = smpfileupdate.getDocumentIdentifier();
-            LOGGER.debug("\n******** DOC ID 1 - '{}'", documentIdentifier);
+            logger.debug("\n******** DOC ID 1 - '{}'", documentIdentifier);
 
             //  Used to check SMP File type in order to render html updatesmpfileform page
             String documentID = "";
@@ -214,7 +210,7 @@ public class SMPUpdateFileController {
 
                     String[] docs = mentry2.getValue().toString().split("\\.");
                     documentID = docs[0];
-                    LOGGER.debug("\n ****** documentID - '{}'", documentID);
+                    logger.debug("\n ****** documentID - '{}'", documentID);
                     //  Country_B_Identity_Provider case: can have two different DocIds
                     if (docs.length > 2) {
                         smpfileupdate.setIssuanceType(docs[2]);
@@ -301,7 +297,7 @@ public class SMPUpdateFileController {
                         smpfileupdate.setCertificate(cert.getEncoded());
                     }
                 } catch (CertificateException ex) {
-                    LOGGER.error("\n CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n CertificateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             } else {
                 smpfileupdate.setCertificate(null);
@@ -320,7 +316,7 @@ public class SMPUpdateFileController {
                 datead = format.parse(formatted);
                 dateed = format.parse(formatted2);
             } catch (ParseException ex) {
-                LOGGER.error("\n ParseException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                logger.error("\n ParseException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
             }
 
             smpfileupdate.setServiceActivationDate(datead);
@@ -335,7 +331,7 @@ public class SMPUpdateFileController {
                     String content = scanner.useDelimiter("\\Z").next();
                     String capturedString = content.substring(content.indexOf("<Extension>"), content.indexOf("</Extension>"));
                     String[] endA = capturedString.split("<Extension>");
-                    LOGGER.debug("\n*****Content from Extension 1 : \n '{}'", endA[1]);
+                    logger.debug("\n*****Content from Extension 1 : \n '{}'", endA[1]);
                     smpfileupdate.setExtensionContent(endA[1]);
 
                     Document docOriginal = smpconverter.parseDocument(endA[1]);
@@ -344,11 +340,11 @@ public class SMPUpdateFileController {
                     smpfileupdate.setExtension(docOriginal.getDocumentElement());
 
                 } catch (IOException ex) {
-                    LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (SAXException ex) {
-                    LOGGER.error("\n SAXException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n SAXException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 } catch (ParserConfigurationException ex) {
-                    LOGGER.error("\n ParserConfigurationException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                    logger.error("\n ParserConfigurationException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                 }
             }
 
@@ -362,7 +358,7 @@ public class SMPUpdateFileController {
             isSigned = smpconverter.getIsSignedServiceMetadata();
         }
 
-        LOGGER.debug("\n********* MODEL - '{}'", model);
+        logger.debug("\n********* MODEL - '{}'", model);
         return "redirect:updatesmpfileform";
     }
 
@@ -376,14 +372,14 @@ public class SMPUpdateFileController {
     @GetMapping(value = "smpeditor/updatesmpfileform")
     public String updateFileForm(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model) {
 
-        LOGGER.debug("\n==== in updateFileForm ====");
+        logger.debug("\n==== in updateFileForm ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
         model.addAttribute("smpfields", smpfields);
         model.addAttribute(type, "Type " + type);
         model.addAttribute(smpfileupdate.getType().name(), "SMPType " + smpfileupdate.getType().name());
         model.addAttribute("signed" + isSigned, "Signed -> " + isSigned);
 
-        LOGGER.debug("\n********* MODEL - '{}'", model);
+        logger.debug("\n********* MODEL - '{}'", model);
         return "smpeditor/updatesmpfileform";
     }
 
@@ -401,14 +397,14 @@ public class SMPUpdateFileController {
     public String updatenewfile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model,
                                 final RedirectAttributes redirectAttributes, @RequestParam(value = "action") String action) throws IOException {
 
-        LOGGER.debug("\n==== in updatenewfile ==== ");
+        logger.debug("\n==== in updatenewfile ==== ");
 
         model.addAttribute("smpfileupdate", smpfileupdate);
 
         if (null != smpfileupdate.getType().name()) {
             switch (type) {
                 case "ServiceInformation":
-                    LOGGER.debug("\n****Type Service Information");
+                    logger.debug("\n****Type Service Information");
 
                     if (!smpfields.getCertificate().isEnable()) {
                         smpfileupdate.setCertificateFile(null);
@@ -421,7 +417,7 @@ public class SMPUpdateFileController {
                         try {
                             fis = new FileInputStream(certificatePath);
                         } catch (FileNotFoundException ex) {
-                            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+                            logger.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
                         }
 
                         smpfileupdate.setCertificateFile(fis);
@@ -449,7 +445,7 @@ public class SMPUpdateFileController {
                     if (smpfields.getCertificate().isEnable() && smpfileupdate.getCertificateFile() != null
                             && smpconverter.getCertificateSubjectName() == null) {
 
-                        LOGGER.error("\n****NOT VALID Certificate File");
+                        logger.error("\n****NOT VALID Certificate File");
                         String message = env.getProperty("error.certificate.invalid"); //messages.properties
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/updatesmpfileform";
@@ -457,14 +453,14 @@ public class SMPUpdateFileController {
                     if (smpfields.getExtension().isEnable() && smpfileupdate.getExtensionFile() != null
                             && smpconverter.isNullExtension()) {
 
-                        LOGGER.error("\n****NOT VALID Extension File");
+                        logger.error("\n****NOT VALID Extension File");
                         String message = env.getProperty("error.extension.invalid"); //messages.properties
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/updatesmpfileform";
                     }
                     break;
                 case "Redirect":
-                    LOGGER.debug("\n****Type Redirect");
+                    logger.debug("\n****Type Redirect");
 
                     /*get documentIdentifier from redierct href*/
                     /*May change if Document Identifier specification change*/
@@ -474,18 +470,14 @@ public class SMPUpdateFileController {
                     Matcher matcher = pattern.matcher(href);
                     if (matcher.find()) {
                         String result = matcher.group(0);
-                        try {
-                            result = java.net.URLDecoder.decode(result, "UTF-8");
-                        } catch (UnsupportedEncodingException ex) {
-                            LOGGER.error("\n UnsupportedEncodingException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                        }
+                        result = java.net.URLDecoder.decode(result, StandardCharsets.UTF_8);
                         String[] ids = result.split("/services/");//SPECIFICATION
 
                         String docID = ids[1];
                         Map<String, String> propertiesMap = readProperties.readPropertiesFile();
                         String[] nIDs = docID.split(env.getProperty("DocumentIdentifier.Scheme") + "::");//SPECIFICATION May change if Document Identifier specification change
                         String docuID = nIDs[1];
-                        LOGGER.debug("\n ****** docuID - '{}'", docuID);
+                        logger.debug("\n ****** docuID - '{}'", docuID);
                         Set set2 = propertiesMap.entrySet();
                         for (Object aSet2 : set2) {
 
@@ -493,7 +485,7 @@ public class SMPUpdateFileController {
                             if (docuID.equals(mentry2.getKey().toString())) {
                                 String[] docs = mentry2.getValue().toString().split("\\.");
                                 documentID = docs[0];
-                                LOGGER.debug("\n ****** documentID - '{}'", documentID);
+                                logger.debug("\n ****** documentID - '{}'", documentID);
                                 break;
                             }
                         }
@@ -511,7 +503,7 @@ public class SMPUpdateFileController {
                         smpfileupdate.setFileName(fileName);
 
                     } else {
-                        LOGGER.error("\n****NOT VALID HREF IN REDIRECT");
+                        logger.error("\n****NOT VALID HREF IN REDIRECT");
                         String message = env.getProperty("error.redirect.href"); //messages.properties
                         redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
                         return "redirect:/smpeditor/updatesmpfile";
@@ -529,9 +521,9 @@ public class SMPUpdateFileController {
         boolean valid = BdxSmpValidator.validateFile(contentFile);
 
         if (valid) {
-            LOGGER.debug("\n****VALID XML File");
+            logger.debug("\n****VALID XML File");
         } else {
-            LOGGER.debug("\n****NOT VALID XML File");
+            logger.debug("\n****NOT VALID XML File");
             smpfileupdate.getGeneratedFile().deleteOnExit();
             String message = env.getProperty("error.file.xsd"); //messages.properties
             redirectAttributes.addFlashAttribute("alert", new Alert(message, Alert.alertType.danger));
@@ -540,7 +532,7 @@ public class SMPUpdateFileController {
 
         /*chosen options sign file in html modal*/
         if (action.equals("sign")) {
-            LOGGER.debug("\n****ACTION SIGN");
+            logger.debug("\n****ACTION SIGN");
             return "redirect:saveupdatedsmpfile/sign";
         }
 
@@ -556,7 +548,7 @@ public class SMPUpdateFileController {
      */
     @GetMapping(value = "smpeditor/saveupdatedsmpfile")
     public String saveFile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model) {
-        LOGGER.debug("\n==== in saveFile ====");
+        logger.debug("\n==== in saveFile ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
         return "smpeditor/saveupdatedsmpfile";
     }
@@ -570,7 +562,7 @@ public class SMPUpdateFileController {
      */
     @GetMapping(value = "/smpeditor/saveupdatedsmpfile/sign")
     public String signFile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, final RedirectAttributes redirectAttributes) {
-        LOGGER.debug("\n==== in Update signFile ====");
+        logger.debug("\n==== in Update signFile ====");
         redirectAttributes.addFlashAttribute("smpfileupdate", smpfileupdate);
         return "redirect:/smpeditor/signsmpfile/updated";
     }
@@ -585,7 +577,7 @@ public class SMPUpdateFileController {
     @GetMapping(value = "smpeditor/saveupdatedsmpfile/download")
     public void downloadFile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, HttpServletResponse response, Model model) {
 
-        LOGGER.debug("\n==== in download Updated File ====");
+        logger.info("[GATEWAY] Download SML file");
         model.addAttribute("smpfileupdate", smpfileupdate);
 
         response.setContentType("application/xml");
@@ -595,9 +587,9 @@ public class SMPUpdateFileController {
 
             FileCopyUtils.copy(inputStream, response.getOutputStream());
         } catch (FileNotFoundException ex) {
-            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
     }
 
@@ -611,10 +603,10 @@ public class SMPUpdateFileController {
     @GetMapping(value = "smpeditor/smpeditor/clean2")
     public String cleanSmpFile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model) {
 
-        LOGGER.debug("\n==== in cleanSmpFile ====");
+        logger.debug("\n==== in cleanSmpFile ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
         if (smpfileupdate.getGeneratedFile() != null) {
-            LOGGER.debug("\n****DELETED ? '{}'", smpfileupdate.getGeneratedFile().delete());
+            logger.debug("\n****DELETED ? '{}'", smpfileupdate.getGeneratedFile().delete());
         }
         return "redirect:/smpeditor/smpeditor";
     }
@@ -629,10 +621,10 @@ public class SMPUpdateFileController {
     @GetMapping(value = "smpeditor/updatesmpfileform/clean")
     public String cleanFile(@ModelAttribute("smpfileupdate") SMPFileOps smpfileupdate, Model model) {
 
-        LOGGER.debug("\n==== in cleanFile ====");
+        logger.debug("\n==== in cleanFile ====");
         model.addAttribute("smpfileupdate", smpfileupdate);
         if (smpfileupdate.getGeneratedFile() != null) {
-            LOGGER.debug("\n****DELETED ? '{}'", smpfileupdate.getGeneratedFile().delete());
+            logger.debug("\n****DELETED ? '{}'", smpfileupdate.getGeneratedFile().delete());
         }
         return "redirect:/smpeditor/updatesmpfileform";
     }

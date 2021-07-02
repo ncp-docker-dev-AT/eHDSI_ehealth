@@ -260,19 +260,19 @@ public enum AuditTrailUtils {
     private ParticipantObjectIdentificationType createParticipantObjectIdentification(String action, String participantObjectId,
                                                                                       byte[] participantObjectDetail) {
 
-        ParticipantObjectIdentificationType participantObjectIdentification = new ParticipantObjectIdentificationType();
+        var participantObjectIdentification = new ParticipantObjectIdentificationType();
         participantObjectIdentification.setParticipantObjectID(participantObjectId);
         participantObjectIdentification.setParticipantObjectTypeCode(Short.valueOf("4"));
 
-        CodedValueType codedValue = new CodedValueType();
-        codedValue.setCode(action);
-        codedValue.setCodeSystemName("eHealth DSI Msg");
+        var codedValueType = new CodedValueType();
+        codedValueType.setCode(action);
+        codedValueType.setCodeSystemName("eHealth DSI Msg");
         if (StringUtils.equals("rsp", action)) {
-            codedValue.setDisplayName("Response Message");
+            codedValueType.setDisplayName("Response Message");
         } else {
-            codedValue.setDisplayName("Request Message");
+            codedValueType.setDisplayName("Request Message");
         }
-        participantObjectIdentification.setParticipantObjectIDTypeCode(codedValue);
+        participantObjectIdentification.setParticipantObjectIDTypeCode(codedValueType);
 
         if (ArrayUtils.isNotEmpty(participantObjectDetail)) {
             TypeValuePairType typeValuePairType = new TypeValuePairType();

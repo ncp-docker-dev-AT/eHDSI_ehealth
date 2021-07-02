@@ -59,7 +59,7 @@ public class TRCAssertionCreator {
         var issuer = saml.create(Issuer.class, Issuer.DEFAULT_ELEMENT_NAME);
         issuer.setValue("urn:initgw:" + countryCode + ":countryB");
         issuer.setFormat("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified");
-        issuer.setNameQualifier("urn:epsos:wp34:assertions");
+        issuer.setNameQualifier("urn:ehdsi:assertions:trc");
         assertion.setIssuer(issuer);
 
         // Set version

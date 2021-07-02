@@ -15,6 +15,7 @@
     <name>OpenNCP CC Protocol Terminators</name>
 
     <modules>
+        <module>openncp-ncp-commons</module>
         <module>epsos-ncp-pt-utils</module>
         <module>epsos-integration-test</module>
         <module>epsos-ncp-client</module>

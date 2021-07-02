@@ -2,7 +2,6 @@ package tr.com.srdc.epsos.util.http;
 
 import eu.epsos.util.proxy.CustomProxySelector;
 import eu.epsos.util.proxy.ProxyCredentials;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
 import org.cryptacular.util.CertUtil;
@@ -28,20 +27,17 @@ import java.security.cert.X509Certificate;
 public class HTTPUtil {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(HTTPUtil.class);
+    private static final String WARNING_NO_CERTIFICATE_FOUND = "Warning!: No Server certificate found!";
 
     public static String getHostIpAddress(String host) {
+
         try {
-            //return IPUtil.getPrivateServerIp();
             return InetAddress.getByName(host).getHostAddress();
         } catch (UnknownHostException e) {
             return "Server IP Unknown";
         }
     }
 
-    /**
-     * @param request
-     * @return
-     */
     public static String getClientCertificate(HttpServletRequest request) {
 
         LOGGER.info("Trying to find certificate from : '{}'", request.getRequestURI());
@@ -69,7 +65,7 @@ public class HTTPUtil {
             X509Certificate cert = (X509Certificate) certificates[0];
             return getCommonName(cert);
         }
-        return "Warning!: No Server certificate found!";
+        return WARNING_NO_CERTIFICATE_FOUND;
     }
 
     private static Certificate[] getSSLPeerCertificate(String host, boolean sslValidation) {
@@ -78,7 +74,7 @@ public class HTTPUtil {
 
         if (!sslValidation) {
 
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            var trustAllCerts = new TrustManager[]{new X509TrustManager() {
 
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
@@ -87,20 +83,22 @@ public class HTTPUtil {
 
                 @Override
                 public void checkClientTrusted(X509Certificate[] arg0, String arg1) {
+                    //  No implemented.
                 }
 
                 @Override
                 public void checkServerTrusted(X509Certificate[] arg0, String arg1) {
+                    //  No implemented.
                 }
             }
             };
 
-            try (InputStream is = getKeystoreInputStream(Constants.SC_KEYSTORE_PATH)) {
+            try (var keystoreInputStream = getKeystoreInputStream(Constants.SC_KEYSTORE_PATH)) {
 
                 // Install the all-trusting trust manager
-                KeyStore keyStore = KeyStore.getInstance("JKS");
-                keyStore.load(is, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
-                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                var keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(keystoreInputStream, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
+                var keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
                 keyManagerFactory.init(keyStore, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
 
                 // Install the all-trusting trust manager
@@ -133,11 +131,11 @@ public class HTTPUtil {
     private static InputStream getKeystoreInputStream(String location) {
 
         try {
-            File file = new File(location);
+            var file = new File(location);
             if (file.exists()) {
                 return new FileInputStream(file);
             }
-            URL url = new URL(location);
+            var url = new URL(location);
             return url.openStream();
 
         } catch (Exception e) {
@@ -148,29 +146,24 @@ public class HTTPUtil {
         return null;
     }
 
-    /**
-     * @param endpoint
-     * @return
-     */
     public static String getServerCertificate(String endpoint) {
 
         LOGGER.debug("Trying to find certificate from : '{}'", endpoint);
-        String result = "";
+        var result = "";
         HttpsURLConnection urlConnection = null;
 
         try {
             if (!endpoint.startsWith("https")) {
-                result = "Warning!: No Server certificate found!";
+                result = WARNING_NO_CERTIFICATE_FOUND;
             } else {
-                SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-
+                var sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 URL url;
                 url = new URL(endpoint);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 //TODO: not sustainable solution: EHNCP-1363
                 urlConnection.setHostnameVerifier((hostname, session) -> true);
                 // End EHNCP-1363
-                urlConnection.setSSLSocketFactory(sslsocketfactory);
+                urlConnection.setSSLSocketFactory(sslSocketFactory);
                 urlConnection.connect();
                 Certificate[] certs = urlConnection.getServerCertificates();
 
@@ -179,7 +172,7 @@ public class HTTPUtil {
                     X509Certificate cert = (X509Certificate) certs[0];
                     result = getCommonName(cert);
                 } else {
-                    result = "Warning!: No Server certificate found!";
+                    result = WARNING_NO_CERTIFICATE_FOUND;
                 }
             }
         } catch (IOException e) {
@@ -194,10 +187,6 @@ public class HTTPUtil {
 
     }
 
-    /**
-     * @param isProvider
-     * @return
-     */
     public static String getSubjectDN(boolean isProvider) {
 
         Certificate cert;
@@ -208,20 +197,18 @@ public class HTTPUtil {
             keystorePath = Constants.SC_KEYSTORE_PATH;
         }
 
-        try (FileInputStream inputStream = new FileInputStream(keystorePath)) {
+        try (var inputStream = new FileInputStream(keystorePath)) {
 
+            var keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             if (isProvider) {
-                KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keystore.load(inputStream, Constants.SP_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SP_PRIVATEKEY_ALIAS);
             } else {
-
-                KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keystore.load(inputStream, Constants.SC_KEYSTORE_PASSWORD.toCharArray());
                 cert = keystore.getCertificate(Constants.SC_PRIVATEKEY_ALIAS);
             }
             if (cert instanceof X509Certificate) {
-                X509Certificate x509Certificate = (X509Certificate) cert;
+                var x509Certificate = (X509Certificate) cert;
                 return getCommonName(x509Certificate);
             }
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
@@ -230,44 +217,34 @@ public class HTTPUtil {
         return "";
     }
 
-    /**
-     * @return
-     */
     public static boolean isBehindProxy() {
 
         return Boolean.parseBoolean(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED));
     }
 
-    /**
-     * @return
-     */
     public static ProxyCredentials getProxyCredentials() {
 
-        ProxyCredentials credentials = new ProxyCredentials();
-        ConfigurationManager configService = ConfigurationManagerFactory.getConfigurationManager();
-        credentials.setProxyAuthenticated(Boolean.parseBoolean(configService.getProperty(StandardProperties.HTTP_PROXY_USED)));
-        credentials.setHostname(configService.getProperty(StandardProperties.HTTP_PROXY_HOST));
-        credentials.setPassword(configService.getProperty(StandardProperties.HTTP_PROXY_PASSWORD));
-        credentials.setPort(configService.getProperty(StandardProperties.HTTP_PROXY_PORT));
-        credentials.setUsername(configService.getProperty(StandardProperties.HTTP_PROXY_USERNAME));
+        var credentials = new ProxyCredentials();
+        credentials.setProxyAuthenticated(Boolean.parseBoolean(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USED)));
+        credentials.setHostname(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_HOST));
+        credentials.setPassword(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_PASSWORD));
+        credentials.setPort(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_PORT));
+        credentials.setUsername(ConfigurationManagerFactory.getConfigurationManager().getProperty(StandardProperties.HTTP_PROXY_USERNAME));
         return credentials;
     }
 
-    /**
-     * @return
-     */
-    public CustomProxySelector setCustomProxyServerForURLConnection() {
-
-        CustomProxySelector ps;
-        if (isBehindProxy()) {
-            ProxyCredentials proxyCredentials = getProxyCredentials();
-            ps = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
-            return ps;
-        }
-        return null;
+    private static String getCommonName(java.security.cert.X509Certificate cert) {
+        return CertUtil.subjectCN(cert);
     }
 
-    private static String getCommonName(java.security.cert.X509Certificate cert){
-        return CertUtil.subjectCN(cert);
+    public CustomProxySelector setCustomProxyServerForURLConnection() {
+
+        CustomProxySelector customProxySelector;
+        if (isBehindProxy()) {
+            var proxyCredentials = getProxyCredentials();
+            customProxySelector = new CustomProxySelector(ProxySelector.getDefault(), proxyCredentials);
+            return customProxySelector;
+        }
+        return null;
     }
 }
