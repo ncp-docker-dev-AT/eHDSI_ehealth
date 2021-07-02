@@ -25,10 +25,6 @@ public class Helper {
     private Helper() {
     }
 
-    /**
-     * @param sh
-     * @return
-     */
     public static Assertion getHCPAssertion(Element sh) {
 
         try {
@@ -45,14 +41,13 @@ public class Helper {
             Assertion hcpAssertion = null;
 
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
-                    //SAMLSchemaBuilder.getSAML11Schema().newValidator().validate(new DOMSource(hcpAss));
-                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
+                    var samlSchemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    samlSchemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
-                    if (hcpAssertion.getAdvice() == null) {
+                    if (StringUtils.equals(hcpAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         break;
                     }
                 }
@@ -139,9 +134,6 @@ public class Helper {
     /**
      * Util method which return the Point of Care information related to the HCP assertions, based on the element provided
      * Organization is the subject:Organization (Optional) value or if not present the environment:locality value (Required).
-     *
-     * @param sh
-     * @return
      */
     public static String getPointOfCareUserId(Element sh) {
 
@@ -179,10 +171,10 @@ public class Helper {
     /**
      * @author Konstantin.Hypponen@kela.fi
      */
-    public static Assertion getTRCAssertion(Element sh) {
+    public static Assertion getTRCAssertion(Element soapHeaderElement) {
 
         try {
-            NodeList securityList = sh.getElementsByTagNameNS(
+            NodeList securityList = soapHeaderElement.getElementsByTagNameNS(
                     "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
             Element security;
             if (securityList.getLength() > 0) {
@@ -191,15 +183,13 @@ public class Helper {
                 throw (new MissingFieldException("Security element is required."));
             }
             NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
-            Element trcAss;
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
-                    trcAss = (Element) assertionList.item(i);
-
-                    trcAssertion = (Assertion) SAML.fromElement(trcAss);
-                    if (trcAssertion.getAdvice() != null) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
+                    Element assertionElement = (Element) assertionList.item(i);
+                    trcAssertion = (Assertion) SAML.fromElement(assertionElement);
+                    if (StringUtils.equals(trcAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:trc")) {
                         break;
                     }
                 }
@@ -218,12 +208,12 @@ public class Helper {
     /**
      * Extracts XDS-formatted patient ID from TRCAssertion
      *
-     * @param sh SOAP header which includes TRC assertion
+     * @param soapHeaderElement SOAP header which includes TRC assertion
      * @return Patient ID in XDS format
      */
-    public static String getDocumentEntryPatientIdFromTRCAssertion(Element sh) {
+    public static String getDocumentEntryPatientIdFromTRCAssertion(Element soapHeaderElement) {
 
-        String patientId = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:1.0:resource:resource-id", true);
+        String patientId = getXSPAAttributeByName(soapHeaderElement, "urn:oasis:names:tc:xacml:1.0:resource:resource-id", true);
         if (patientId == null) {
             logger.error("Patient ID not found in TRC assertion");
         }
@@ -231,12 +221,12 @@ public class Helper {
     }
 
     /**
-     * @param sh            SOAP Header
-     * @param attributeName Attribute name
-     * @param trc           true, if attribute should be picked from TRC assertion
+     * @param soapHeaderElement SOAP Header
+     * @param attributeName     Attribute name
+     * @param trc               true, if attribute should be picked from TRC assertion
      * @return attribute value
      */
-    private static String getXSPAAttributeByName(Element sh, String attributeName, boolean trc) {
+    private static String getXSPAAttributeByName(Element soapHeaderElement, String attributeName, boolean trc) {
 
         String result = null;
         Assertion assertion;
@@ -244,18 +234,21 @@ public class Helper {
         try {
 
             if (trc) {
-                assertion = getTRCAssertion(sh);
+                assertion = getTRCAssertion(soapHeaderElement);
             } else {
-                assertion = getHCPAssertion(sh);
+                assertion = getHCPAssertion(soapHeaderElement);
             }
             if (assertion == null) {
                 return null;
             }
-            for (Attribute attr : assertion.getAttributeStatements().get(0).getAttributes()) {
-                if (attr.getName().equals(attributeName)) {
-                    String val = attr.getAttributeValues().get(0).getDOM().getTextContent();
-                    if (StringUtils.isNotBlank(val)) {
-                        result = val;
+            logger.info("***********************************");
+            for (Attribute attribute : assertion.getAttributeStatements().get(0).getAttributes()) {
+                logger.info("Attribute: '{}'", attribute.getName());
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    logger.info("Attribute: urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+                    String value = attribute.getAttributeValues().get(0).getDOM().getTextContent();
+                    if (StringUtils.isNotBlank(value)) {
+                        result = value;
                     }
                 }
             }

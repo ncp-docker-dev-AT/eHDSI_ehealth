@@ -52,7 +52,7 @@ public class AssertionValidatorTest {
                 "\n" +
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<saml2:Assertion xmlns:saml2=\"urn:oasis:names:tc:SAML:2.0:assertion\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" ID=\"_83706162-b7d1-4501-bbbc-87af68a63a5d\" IssueInstant=\"2018-01-05T14:35:35.800Z\" Version=\"2.0\">\n" +
-                "   <saml2:Issuer NameQualifier=\"urn:epsos:wp34:assertions\">urn:idp:EU:countryB</saml2:Issuer>\n" +
+                "   <saml2:Issuer NameQualifier=\"urn:ehdsi:assertions:hcp\">urn:idp:EU:countryB</saml2:Issuer>\n" +
                 "   <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n" +
                 "      <ds:SignedInfo>\n" +
                 "         <ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\" />\n" +

@@ -1,5 +1,6 @@
 package epsos.ccd.netsmart.securitymanager.sts.util;
 
+import epsos.ccd.netsmart.securitymanager.sts.NextOfKinDetail;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -38,7 +39,7 @@ public class STSUtils {
     public static final String NO_CLIENT_CERTIFICATE = "Unknown (No Client Certificate)";
     private static final Logger LOGGER = LoggerFactory.getLogger(STSUtils.class);
     // TRC Parameters Namespace
-    private static final String TRC_NS = "http://epsos.eu/trc";
+    private static final String TRC_NS = "https://ehdsi.eu/trc";
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
@@ -62,6 +63,22 @@ public class STSUtils {
         }
 
         return trcDetails.getElementsByTagNameNS(TRC_NS, "DispensationPinCode").item(0).getTextContent();
+    }
+
+    public static NextOfKinDetail getNextOfKinDetails(SOAPElement body) {
+
+        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
+            throw new WebServiceException("No TRC Parameters in RST");
+        }
+        var nextOfKinDetail = new NextOfKinDetail();
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGivenName").item(0) != null) {
+            nextOfKinDetail.setGivenName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGivenName").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinSurname").item(0) != null) {
+            nextOfKinDetail.setSurname(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinSurname").item(0).getTextContent());
+        }
+        return nextOfKinDetail;
     }
 
     /**

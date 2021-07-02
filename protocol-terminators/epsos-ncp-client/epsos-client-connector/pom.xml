@@ -22,6 +22,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-ncp-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${openncp.policy-manager.groupId}</groupId>
             <artifactId>${openncp.policy-manager.artifactId}</artifactId>
             <version>${openncp.policy-manager.version}</version>

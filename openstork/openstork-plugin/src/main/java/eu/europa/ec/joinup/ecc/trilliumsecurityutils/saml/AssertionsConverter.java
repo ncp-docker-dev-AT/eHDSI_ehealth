@@ -335,7 +335,7 @@ public class AssertionsConverter {
             String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
             var issuer = new IssuerBuilder().buildObject();
             issuer.setValue("urn:idp:" + countryCode + ":countryB");
-            issuer.setNameQualifier("urn:epsos:wp34:assertions");
+            issuer.setNameQualifier("urn:ehdsi:assertions:hcp");
             assertion.setIssuer(issuer);
 
             // Add and create the authentication statement

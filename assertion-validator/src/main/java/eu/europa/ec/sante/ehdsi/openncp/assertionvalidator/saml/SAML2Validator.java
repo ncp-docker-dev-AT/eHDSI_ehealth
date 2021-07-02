@@ -71,7 +71,7 @@ public class SAML2Validator {
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
-                    if (hcpAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(hcpAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         break;
                     }
                 }
@@ -130,7 +130,7 @@ public class SAML2Validator {
                     var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
                     var anAssertion = (Assertion) SAML.fromElement(ass);
-                    if (anAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(anAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         hcpAssertion = (Assertion) SAML.fromElement(ass);
                     } else {
                         trcAssertion = (Assertion) SAML.fromElement(ass);
@@ -194,7 +194,7 @@ public class SAML2Validator {
                     var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(assertionElement));
                     var anAssertion = (Assertion) SAML.fromElement(assertionElement);
-                    if (anAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(anAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         hcpAssertion = (Assertion) SAML.fromElement(assertionElement);
                     } else {
                         trcAssertion = (Assertion) SAML.fromElement(assertionElement);
@@ -389,7 +389,7 @@ public class SAML2Validator {
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
-                    if (hcpAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(hcpAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         break;
                     }
                 }

@@ -46,10 +46,10 @@ public class SamlTRCIssuer {
     }
 
     /**
-     * @param ksm
+     * @param keyStoreManager
      */
-    public SamlTRCIssuer(KeyStoreManager ksm) {
-        this.keyStoreManager = ksm;
+    public SamlTRCIssuer(KeyStoreManager keyStoreManager) {
+        this.keyStoreManager = keyStoreManager;
     }
 
     /**
@@ -202,8 +202,9 @@ public class SamlTRCIssuer {
      * @param attrValuePair        SAML {@link Attribute} that will be added to the assertion
      * @return the SAML TRC Assertion
      */
-    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse, String dispensationPinCode, String prescriptionId,
-                                   List<Attribute> attrValuePair) throws SMgrException {
+    public Assertion issueTrcToken(final Assertion hcpIdentityAssertion, String patientID, String purposeOfUse,
+                                   String dispensationPinCode, String prescriptionId, List<Attribute> attrValuePair)
+            throws SMgrException {
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.debug("Assertion HCP issued: '{}' for Patient: '{}' and Purpose of use: '{}' - Attributes: ",
@@ -263,8 +264,8 @@ public class SamlTRCIssuer {
 
         String countryCode = ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_CODE");
         String confIssuer = "urn:initgw:" + countryCode + ":countryB";
-
         issuer.setValue(confIssuer);
+        issuer.setNameQualifier("urn:ehdsi:assertions:trc");
         trc.setIssuer(issuer);
 
         //  Set the TRC Assertion Subject element to the same value as the HCP one.
