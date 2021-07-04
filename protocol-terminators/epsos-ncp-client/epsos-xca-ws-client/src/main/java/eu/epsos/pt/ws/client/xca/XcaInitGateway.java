@@ -181,15 +181,18 @@ public class XcaInitGateway {
             byte[] friendlyDocument;
 
             try {
-
                 //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(pivotDocument, StandardCharsets.UTF_8),
                             NcpSide.NCP_B, document.getClassCode().getValue(), true);
                 }
-                //  Resets the response document to a translated version.
-                friendlyDocument = TMServices.transformDocument(pivotDocument, targetLanguage);
-                queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
+                if (service.equals(Constants.OrCDService)) {
+                    queryResponse.getDocumentResponse().get(0).setDocument(pivotDocument);
+                } else {
+                    //  Resets the response document to a translated version.
+                    friendlyDocument = TMServices.transformDocument(pivotDocument, targetLanguage);
+                    queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
+                }
 
             } catch (DocumentTransformationException e) {
                 LOGGER.warn("DocumentTransformationException: CDA cannot be translated: Please check the TM result");

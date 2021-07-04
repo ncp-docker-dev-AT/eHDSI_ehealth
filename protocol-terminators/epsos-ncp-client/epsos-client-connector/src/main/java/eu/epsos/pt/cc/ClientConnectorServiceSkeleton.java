@@ -99,17 +99,11 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         var queryDocumentRequest = queryDocuments.getArg0();
         String countryCode = queryDocumentRequest.getCountryCode();
 
-
-        PatientId tmp = queryDocumentRequest.getPatientId();
-        tr.com.srdc.epsos.data.model.PatientId patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(tmp);
-
         List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
         List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
         FilterParams filterParamsReceived = queryDocumentRequest.getFilterParams();
         var patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(queryDocumentRequest.getPatientId());
-        GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
-        tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
 
         tr.com.srdc.epsos.data.model.FilterParams filterParams = eu.epsos.pt.cc.dts.FilterParamsDts.newInstance(filterParamsReceived);
 
@@ -125,19 +119,19 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             if (documentCodes.size()==1) {
                 switch (documentCodes.get(0).getValue()) {
                     case Constants.PS_CLASSCODE:
-                        response = PatientService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        response = PatientService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
                     case Constants.EP_CLASSCODE:
-                        response = OrderService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        response = OrderService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
                     case Constants.MRO_CLASSCODE:
-                        response = MroService.list(patientId, countryCode, documentCodes.get(0), hcpAssertion, trcAssertion);
+                        response = MroService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
                     case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                     case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), filterParams, hcpAssertion, trcAssertion);
+                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), filterParams, assertionMap);
                         break;
                     default:
                         throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
@@ -146,7 +140,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 if (!documentCodes.contains(Constants.EP_CLASSCODE)
                         && !documentCodes.contains(Constants.PS_CLASSCODE)
                         && !documentCodes.contains(Constants.MRO_CLASSCODE)) {
-                response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, hcpAssertion, trcAssertion);
+                response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, assertionMap);
                 } else {
                     throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
                 }
@@ -156,9 +150,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 queryDocumentsResponse.setReturnArray(DocumentDts.newInstance(response.getDocumentAssociations()));
             }
 
-        } catch (RuntimeException e) {
-            LoggingSlf4j.error(logger, methodName);
-            throw e;
         } catch (RuntimeException ex) {
             LoggingSlf4j.error(logger, methodName, ex);
             throw ex;

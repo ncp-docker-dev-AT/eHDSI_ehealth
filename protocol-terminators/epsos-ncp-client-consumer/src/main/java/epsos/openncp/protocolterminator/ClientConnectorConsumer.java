@@ -117,7 +117,7 @@ public class ClientConnectorConsumer {
 
     public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
                                                String countryCode, PatientId patientId,
-                                               List<GenericDocumentCode> classCodes, FilterParams filterParams)
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();

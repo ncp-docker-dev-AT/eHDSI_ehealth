@@ -3,6 +3,7 @@ package eu.epsos.pt.cc.stub;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.FilterParams;
@@ -12,6 +13,7 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *  * TODO: Insert description for OrCDService class.
@@ -27,10 +29,9 @@ public class OrCDService {
                                      final String countryCode,
                                      final List<GenericDocumentCode> documentCodes,
                                      final FilterParams filterParams,
-                                     final Assertion idAssertion,
-                                     final Assertion trcAssertion) throws XCAException {
+                                     final Map<AssertionEnum, Assertion> assertionMap) throws XCAException {
 
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCodes, filterParams, idAssertion, trcAssertion,
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCodes, filterParams, assertionMap,
                 RegisteredService.ORCD_SERVICE.getServiceName());
     }
 
@@ -38,11 +39,9 @@ public class OrCDService {
                                                                             final String homeCommunityId,
                                                                             final String countryCode,
                                                                             final String targetLanguage,
-                                                                            final Assertion hcpAssertion,
-                                                                            final Assertion trcAssertion)
+                                                                            final Map<AssertionEnum, Assertion> assertionMap)
             throws XCAException {
 
-        return XcaInitGateway.crossGatewayRetrieve(document, homeCommunityId, countryCode, targetLanguage, hcpAssertion,
-                trcAssertion, RegisteredService.ORCD_SERVICE.getServiceName());
+        return XcaInitGateway.crossGatewayRetrieve(document, homeCommunityId, countryCode, targetLanguage, assertionMap, RegisteredService.ORCD_SERVICE.getServiceName());
     }
 }

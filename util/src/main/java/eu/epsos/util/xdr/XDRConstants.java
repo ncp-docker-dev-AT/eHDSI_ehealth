@@ -254,6 +254,8 @@ public class XDRConstants {
     public static class REGISTRY_PACKAGE {
 
         public static final String SUBMISSION_SET_STR = "SubmissionSet";
+        public static final String AUTHOR_INSTITUTION_STR = "authorInstitution";
+        public static final String AUTHOR_PERSON_STR = "authorPerson";
         public static final String OBJECT_TYPE_UUID = "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd";
         public static final String SUBMISSION_TIME_STR = "submissionTime";
         public static final String SUBMISSION_TIME_FORMAT = "yyyyMMddhhmmss";

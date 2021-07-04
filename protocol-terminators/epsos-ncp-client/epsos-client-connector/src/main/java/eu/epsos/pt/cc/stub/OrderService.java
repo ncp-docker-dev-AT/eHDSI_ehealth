@@ -11,6 +11,7 @@ import tr.com.srdc.epsos.data.model.PatientId;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public class OrderService {
     public static QueryResponse list(final PatientId pid, final String countryCode, final GenericDocumentCode documentCode,
                                      final Map<AssertionEnum, Assertion> assertionMap) throws XCAException {
 
-        return XcaInitGateway.crossGatewayQuery(pid, countryCode, documentCode, assertionMap,
+        return XcaInitGateway.crossGatewayQuery(pid, countryCode, Arrays.asList(documentCode), null, assertionMap,
                 RegisteredService.ORDER_SERVICE.getServiceName());
     }
 
