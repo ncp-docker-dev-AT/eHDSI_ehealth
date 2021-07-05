@@ -53,6 +53,7 @@ public class DocumentDts {
         result.setAtcCode(document.getAtcCode());
         result.setDoseFormCode(document.getDoseFormCode());
         result.setStrength(document.getStrength());
+        result.setSubstitution(document.getSubstitution());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {

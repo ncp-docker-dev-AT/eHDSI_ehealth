@@ -49,7 +49,7 @@ public class DocumentFactory {
      */
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String description) {
-        EpListParam epListParam = new EpListParam(true, null, null, null);
+        EpListParam epListParam = new EpListParam(true, null, null, null, null);
         return createEPDocument(
                 documentFormat, id, patientId,
                 effectiveDate, repositoryId,
@@ -84,7 +84,7 @@ public class DocumentFactory {
 
         return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description,
                 productCode, productName,
-                new EpListParam(true, null, null, null),
+                new EpListParam(true, null, null, null, null),
                 SimpleConfidentiality.NORMAL, null);
     }
 
@@ -93,7 +93,7 @@ public class DocumentFactory {
 
         return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description,
                 null, null,
-                new EpListParam(dispensable, null, null, null),
+                new EpListParam(dispensable, null, null, null, null),
                 SimpleConfidentiality.NORMAL, null);
     }
 
@@ -120,7 +120,7 @@ public class DocumentFactory {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description,
                 productCode, productName,
-                new EpListParam(true, null, null, null),
+                new EpListParam(true, null, null, null, null),
                 SimpleConfidentiality.NORMAL, null);
     }
 
@@ -129,7 +129,7 @@ public class DocumentFactory {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description,
                 null, null,
-                new EpListParam(dispensable, null, null, null),
+                new EpListParam(dispensable, null, null, null, null),
                 SimpleConfidentiality.NORMAL, null);
     }
 

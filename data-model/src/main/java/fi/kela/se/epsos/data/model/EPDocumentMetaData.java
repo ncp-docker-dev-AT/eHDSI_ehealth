@@ -20,12 +20,10 @@ public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
     String getAtcCode();
     String getDoseFormCode();
     String getStrength();
+    String getSubstitution();
 
     interface ProductMetadata {
-
         String getProductCode();
-
         String getProductName();
-
     }
 }

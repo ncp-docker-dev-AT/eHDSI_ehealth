@@ -12,13 +12,14 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     private String atcCode;
     private String doseFormCode;
     private String strength;
+    private String substitution;
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description) {
         this(metaData, description, (ProductMetadata)null);
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product) {
-        this(metaData, description, product, new EpListParam(false, null, null, null));
+        this(metaData, description, product, new EpListParam(false, null, null, null, null));
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, EpListParam epListParam) {
@@ -33,6 +34,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
         this.atcCode = epListParam.getAtcCode();
         this.doseFormCode = epListParam.getDoseFormCode();
         this.strength = epListParam.getStrength();
+        this.substitution = epListParam.getSubstitution();
     }
 
     @Override
@@ -59,10 +61,12 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     @Override
     public String getStrength() { return strength; }
 
+    @Override
+    public String getSubstitution() { return substitution; }
+
     public static class SimpleProductMetadata implements ProductMetadata {
 
         private String productCode;
-
         private String productName;
 
         public SimpleProductMetadata(String productCode, String productName) {

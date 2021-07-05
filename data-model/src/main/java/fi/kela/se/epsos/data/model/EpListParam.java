@@ -5,12 +5,14 @@ public class EpListParam {
     private String atcCode;
     private String doseFormCode;
     private String strength;
+    private String substitution;
 
-    public EpListParam(boolean dispensable, String atcCode, String doseFormCode, String strength) {
+    public EpListParam(boolean dispensable, String atcCode, String doseFormCode, String strength, String substitution) {
         this.dispensable = dispensable;
         this.atcCode = atcCode;
         this.doseFormCode = doseFormCode;
         this.strength = strength;
+        this.substitution = substitution;
     }
 
     public boolean isDispensable() {
@@ -39,5 +41,13 @@ public class EpListParam {
 
     public void setStrength(String strength) {
         this.strength = strength;
+    }
+
+    public String getSubstitution() {
+        return substitution;
+    }
+
+    public void setSubstitution(String substitution) {
+        this.substitution = substitution;
     }
 }

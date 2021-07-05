@@ -146,6 +146,16 @@ public final class AdhocQueryResponseConverter {
                                 }
                             }
                         }
+
+                        // Set Substitution
+                        if (str.equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("substitution") && slot.getValueList().getValue().get(0) != null) {
+                                    document.setSubstitution(slot.getValueList().getValue().get(0));
+                                }
+                            }
+                        }
+
                     }
 
                     // Set description
