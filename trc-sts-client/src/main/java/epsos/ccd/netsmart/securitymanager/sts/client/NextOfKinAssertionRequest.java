@@ -1,7 +1,5 @@
 package epsos.ccd.netsmart.securitymanager.sts.client;
 
-import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
-import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
@@ -9,37 +7,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.MarshallingException;
-import org.opensaml.core.xml.io.Unmarshaller;
-import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import tr.com.srdc.epsos.util.Constants;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
  * It uses the Builder Design Pattern to create the request, in order to create a immutable final object.
  */
-public class NextOfKinAssertionRequest {
+public class NextOfKinAssertionRequest extends AssertionRequest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NextOfKinAssertionRequest.class);
 
@@ -61,11 +49,10 @@ public class NextOfKinAssertionRequest {
         } catch (InitializationException e) {
             LOGGER.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
         }
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url").length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.nextOfKin.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
-        DEFAULT_STS_URL = "https://s-sante-zbook-eu:8443/TRC-STS/NextOfKinService";
-        //DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url");
+        DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url");
 
         if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname").length() == 0) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.checkHostname", "false");
@@ -77,17 +64,17 @@ public class NextOfKinAssertionRequest {
     private final String purposeOfUse;
     private final String patientId;
     private final String nextOfKinId;
-    private final String nextOfKinSurname;
-    private final String nextOfKinGivenName;
+    private final String nextOfKinFamilyName;
+    private final String nextOfKinFirstName;
     private final Date nextOfKinBirthDate;
     private final String nextOfKinGender;
     private final String nextOfKinAddressStreet;
-    private final String nextOfKinAddressPostCode;
+    private final String nextOfKinAddressPostalCode;
     private final String nextOfKinAddressCity;
     private final String nextOfKinAddressCountry;
     private final SOAPMessage rstMsg;
     private final String messageId;
-    private final DocumentBuilder builder;
+
     private final URL location;
 
     /**
@@ -96,97 +83,29 @@ public class NextOfKinAssertionRequest {
      * @param builder
      * @throws Exception
      */
-    private NextOfKinAssertionRequest(Builder builder) throws Exception {
+    private NextOfKinAssertionRequest(Builder builder) throws STSClientException {
 
         this.idAssert = builder.idAssert;
         this.patientId = builder.patientId;
         this.nextOfKinId = builder.nextOfKinId;
         this.purposeOfUse = builder.purposeOfUse;
-        this.nextOfKinAddressCity = builder.nextOfKinCity;
-        this.nextOfKinAddressCountry = builder.nextOfKinCountry;
-        this.nextOfKinAddressPostCode = builder.nextOfKinPostCode;
-        this.nextOfKinGender = builder.nextOfKinAdministrativeGender;
-        this.nextOfKinGivenName = builder.nextOfKinGivenName;
-        this.nextOfKinSurname = builder.nextOfKinSurname;
-        this.nextOfKinAddressStreet = builder.nextOfKinStreet;
+        this.nextOfKinFamilyName = builder.nextOfKinFamilyName;
+        this.nextOfKinFirstName = builder.nextOfKinFirstName;
         this.nextOfKinBirthDate = builder.nextOfKinBirthdate;
+        this.nextOfKinGender = builder.nextOfKinAdministrativeGender;
+        this.nextOfKinAddressStreet = builder.nextOfKinAddressStreet;
+        this.nextOfKinAddressCity = builder.nextOfKinAddressCity;
+        this.nextOfKinAddressCountry = builder.nextOfKinAddressCountry;
+        this.nextOfKinAddressPostalCode = builder.nextOfKinAddressPostalCode;
         this.location = builder.location;
         this.messageId = createMessageId();
 
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        this.builder = documentBuilderFactory.newDocumentBuilder();
-
         try {
             rstMsg = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
-            createRSTHeader(rstMsg.getSOAPHeader());
+            createRSTHeader(rstMsg.getSOAPHeader(), messageId, idAssert);
             createRSTBody(rstMsg.getSOAPBody());
         } catch (SOAPException ex) {
-            throw new Exception("Unable to create RST Message");
-        }
-    }
-
-    private String createMessageId() {
-        return Constants.UUID_PREFIX + UUID.randomUUID();
-    }
-
-    private Element convertAssertionToElement(Assertion assertion) {
-
-        try {
-            Document doc = builder.newDocument();
-            var marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(assertion);
-            if (marshaller == null) {
-                LOGGER.error("SAML Marshalling is NULL");
-                return null;
-            }
-            marshaller.marshall(assertion, doc);
-            return doc.getDocumentElement();
-        } catch (MarshallingException e) {
-            LOGGER.error("MarshallingException: '{}", e.getMessage(), e);
-            return null;
-        }
-    }
-
-    /**
-     * @param element
-     * @return
-     */
-    private Assertion convertElementToAssertion(Element element) {
-
-        // Unmarshalling using the document root element, an EntitiesDescriptor in this case
-        try {
-
-            Unmarshaller unmarshaller = XMLObjectProviderRegistrySupport.getUnmarshallerFactory().getUnmarshaller(element);
-            if (unmarshaller == null) {
-                LOGGER.error("SAML Unmarshalling is NULL");
-                return null;
-            }
-            return (Assertion) unmarshaller.unmarshall(element);
-
-        } catch (UnmarshallingException e) {
-            LOGGER.error("UnmarshallingException: '{}", e.getMessage(), e);
-            return null;
-        }
-    }
-
-    /**
-     * @param header
-     */
-    private void createRSTHeader(SOAPHeader header) {
-
-        try {
-
-            SOAPHeaderElement messageIdElem = header.addHeaderElement(new QName(ADDRESSING_NS, "MessageID", "wsa"));
-            messageIdElem.setTextContent(messageId);
-
-            SOAPHeaderElement securityHeaderElem = header.addHeaderElement(new QName(WS_SEC_NS, "Security", "wsse"));
-            securityHeaderElem.setMustUnderstand(true);
-
-            Element idAssertElem = convertAssertionToElement(idAssert);
-            securityHeaderElem.appendChild(header.getOwnerDocument().importNode(idAssertElem, true));
-
-        } catch (SOAPException ex) {
-            LOGGER.error(null, ex);
+            throw new STSClientException("Unable to create RST Message");
         }
     }
 
@@ -224,10 +143,46 @@ public class NextOfKinAssertionRequest {
                 SOAPElement dispensationPinCodeElement = trcParamsElem.addChildElement(nextOfKinIdName);
                 dispensationPinCodeElement.addTextNode(nextOfKinId);
             }
-            if (StringUtils.isNotBlank(nextOfKinGivenName)) {
-                var nextOfKinIdName = soapFactory.createName("NextOfKinGivenName", "trc", TRC_NS);
+            if (StringUtils.isNotBlank(nextOfKinFirstName)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinFirstName", "trc", TRC_NS);
                 SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
-                nextOfKinGivenNameElement.addTextNode(nextOfKinGivenName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinFirstName);
+            }
+            if (StringUtils.isNotBlank(nextOfKinFamilyName)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinFamilyName", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinFamilyName);
+            }
+            if (StringUtils.isNotBlank(nextOfKinGender)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinGender", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinGender);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressStreet)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressStreet", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressStreet);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressCity)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressCity", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressCity);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressPostalCode)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressPostalCode", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressPostalCode);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressCountry)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressCountry", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressCountry);
+            }
+            if (nextOfKinBirthDate != null) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinBirthDate", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                nextOfKinGivenNameElement.addTextNode(dateFormat.format(nextOfKinBirthDate));
             }
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
@@ -296,7 +251,7 @@ public class NextOfKinAssertionRequest {
                 throw new Exception("TRC Assertion is missing from the RSTRC body");
             }
             SOAPElement assertion = (SOAPElement) body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").item(0);
-            Document assertDoc = builder.newDocument();
+            Document assertDoc = getDocumentBuilder().newDocument();
 
             Node dupBody = assertDoc.importNode(assertion, true);
             assertDoc.appendChild(dupBody);
@@ -319,30 +274,6 @@ public class NextOfKinAssertionRequest {
         }
     }
 
-    public SSLSocketFactory getSSLSocketFactory() {
-
-        SSLContext sslContext;
-        try {
-            KeyStoreManager keyStoreManager = new DefaultKeyStoreManager();
-            String sigKeystorePassword = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
-
-            sslContext = SSLContext.getInstance("TLSv1.2");
-
-            var keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-            keyManagerFactory.init(keyStoreManager.getKeyStore(), sigKeystorePassword.toCharArray());
-
-            var trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
-            trustManagerFactory.init(keyStoreManager.getTrustStore());
-
-            sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
-            return sslContext.getSocketFactory();
-
-        } catch (KeyManagementException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
-            LOGGER.error("Exception: '{}'", e.getMessage(), e);
-            return null;
-        }
-    }
-
     /**
      * The Builder class is responsible for the creation of the final TRCAssertionRequest Object.
      * It is used to incrementally create the TRCAssertionRequest and then when calling #build returns the final immutable object
@@ -355,14 +286,14 @@ public class NextOfKinAssertionRequest {
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
         private String nextOfKinId;
-        private String nextOfKinSurname;
-        private String nextOfKinGivenName;
+        private String nextOfKinFirstName;
+        private String nextOfKinFamilyName;
         private String nextOfKinAdministrativeGender;
         private Date nextOfKinBirthdate;
-        private String nextOfKinStreet;
-        private String nextOfKinPostCode;
-        private String nextOfKinCity;
-        private String nextOfKinCountry;
+        private String nextOfKinAddressStreet;
+        private String nextOfKinAddressPostalCode;
+        private String nextOfKinAddressCity;
+        private String nextOfKinAddressCountry;
         private URL location = null;
 
         /**
@@ -389,15 +320,15 @@ public class NextOfKinAssertionRequest {
             return this;
         }
 
-        public Builder nextOfKinSurname(String nextOfKinSurname) {
+        public Builder nextOfKinFirstName(String nextOfKinFirstName) {
 
-            this.nextOfKinSurname = nextOfKinSurname;
+            this.nextOfKinFirstName = nextOfKinFirstName;
             return this;
         }
 
-        public Builder nextOfKinGivenName(String nextOfKinGivenName) {
+        public Builder nextOfKinFamilyName(String nextOfKinFamilyName) {
 
-            this.nextOfKinGivenName = nextOfKinGivenName;
+            this.nextOfKinFamilyName = nextOfKinFamilyName;
             return this;
         }
 
@@ -413,27 +344,27 @@ public class NextOfKinAssertionRequest {
             return this;
         }
 
-        public Builder nextOfKinStreet(String nextOfKinStreet) {
+        public Builder nextOfKinAddressStreet(String nextOfKinAddressStreet) {
 
-            this.nextOfKinStreet = nextOfKinStreet;
+            this.nextOfKinAddressStreet = nextOfKinAddressStreet;
             return this;
         }
 
-        public Builder nextOfKinPostCode(String nextOfKinPostCode) {
+        public Builder nextOfKinAddressPostalCode(String nextOfKinAddressPostalCode) {
 
-            this.nextOfKinPostCode = nextOfKinPostCode;
+            this.nextOfKinAddressPostalCode = nextOfKinAddressPostalCode;
             return this;
         }
 
-        public Builder nextOfKinCity(String nextOfKinCity) {
+        public Builder nextOfKinAddressCity(String nextOfKinAddressCity) {
 
-            this.nextOfKinCity = nextOfKinCity;
+            this.nextOfKinAddressCity = nextOfKinAddressCity;
             return this;
         }
 
-        public Builder nextOfKinCountry(String nextOfKinCountry) {
+        public Builder nextOfKinAddressCountry(String nextOfKinAddressCountry) {
 
-            this.nextOfKinCountry = nextOfKinCountry;
+            this.nextOfKinAddressCountry = nextOfKinAddressCountry;
             return this;
         }
 

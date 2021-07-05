@@ -9,6 +9,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.openncp.securitymanager.SamlIssuerHelper;
 import eu.europa.ec.sante.openncp.securitymanager.SamlNextOfKinIssuer;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -30,6 +31,7 @@ import javax.xml.soap.*;
 import javax.xml.ws.*;
 import javax.xml.ws.handler.MessageContext;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -123,7 +125,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
             log(response);
             return response;
-        } catch (ParserConfigurationException | WSTrustException | SMgrException | SOAPException | MarshallingException e) {
+        } catch (ParserConfigurationException | WSTrustException | SMgrException | SOAPException | MarshallingException | ParseException e) {
             throw new WebServiceException(e);
         }
     }
@@ -141,7 +143,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         } catch (DatatypeConfigurationException ex) {
             logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
-        String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+        String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url"));
         String sourceGateway = getClientIP();
         logger.info("STS Client IP: '{}'", sourceGateway);
         var messageContext = context.getMessageContext();
@@ -163,9 +165,46 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
     private List<Attribute> buildNextOfKinAttributes(NextOfKinDetail nextOfKinDetail) {
 
         List<Attribute> attributeList = new ArrayList<>();
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getGivenName(), "NextOfKinGivenName", Attribute.URI_REFERENCE,
-                        "urn:oasis:names:tc:xspa:1.0:subject:nextofkin:givenname"));
+        if (StringUtils.isNotBlank(nextOfKinDetail.getFirstName())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:firstname"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getFamilyName())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getFamilyName(), "NextOfKinFamilyName", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:familyname"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getGender())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getGender(), "NextOfKinGender", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:gender"));
+        }
+        if (nextOfKinDetail.getBirthDate() != null) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getBirthDate().toString(), "NextOfKinBirthDate", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:birthdate"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressStreet())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressStreet(), "NextOfKinAddressStreet", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:street"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressCity())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressCity(), "NextOfKinAddressCity", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:city"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressPostalCode())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressPostalCode(), "NextOfKinPostalCode", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:postalcode"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressCountry())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressCountry(), "NextOfKinAddressCountry", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:country"));
+        }
         return attributeList;
     }
 }

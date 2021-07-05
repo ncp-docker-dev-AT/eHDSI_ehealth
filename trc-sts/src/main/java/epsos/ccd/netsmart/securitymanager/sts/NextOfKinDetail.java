@@ -9,19 +9,19 @@ public class NextOfKinDetail {
 
     private List<String> livingSubjectIds;
 
-    private String givenName;
+    private String firstName;
 
-    private String surname;
+    private String familyName;
 
     private String gender;
 
-    private Date birthdate;
+    private Date birthDate;
 
     private String addressStreet;
 
     private String addressCity;
 
-    private String addressPostCode;
+    private String addressPostalCode;
 
     private String addressCountry;
 
@@ -36,20 +36,20 @@ public class NextOfKinDetail {
         this.livingSubjectIds = livingSubjectIds;
     }
 
-    public String getGivenName() {
-        return givenName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setGivenName(String givenName) {
-        this.givenName = givenName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getFamilyName() {
+        return familyName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
     public String getGender() {
@@ -60,12 +60,12 @@ public class NextOfKinDetail {
         this.gender = gender;
     }
 
-    public Date getBirthdate() {
-        return birthdate;
+    public Date getBirthDate() {
+        return birthDate;
     }
 
-    public void setBirthdate(Date birthdate) {
-        this.birthdate = birthdate;
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getAddressStreet() {
@@ -84,12 +84,12 @@ public class NextOfKinDetail {
         this.addressCity = addressCity;
     }
 
-    public String getAddressPostCode() {
-        return addressPostCode;
+    public String getAddressPostalCode() {
+        return addressPostalCode;
     }
 
-    public void setAddressPostCode(String addressPostCode) {
-        this.addressPostCode = addressPostCode;
+    public void setAddressPostalCode(String addressPostalCode) {
+        this.addressPostalCode = addressPostalCode;
     }
 
     public String getAddressCountry() {
@@ -104,13 +104,13 @@ public class NextOfKinDetail {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("livingSubjectIds", livingSubjectIds)
-                .append("givenName", givenName)
-                .append("surname", surname)
+                .append("firstName", firstName)
+                .append("FamilyName", familyName)
                 .append("gender", gender)
-                .append("birthdate", birthdate)
+                .append("birthDate", birthDate)
                 .append("addressStreet", addressStreet)
                 .append("addressCity", addressCity)
-                .append("addressPostCode", addressPostCode)
+                .append("addressPostalCode", addressPostalCode)
                 .append("addressCountry", addressCountry)
                 .toString();
     }
