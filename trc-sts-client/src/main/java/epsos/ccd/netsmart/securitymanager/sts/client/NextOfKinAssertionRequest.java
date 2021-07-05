@@ -19,6 +19,8 @@ import javax.xml.soap.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -145,6 +147,42 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
                 var nextOfKinIdName = soapFactory.createName("NextOfKinFirstName", "trc", TRC_NS);
                 SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
                 nextOfKinGivenNameElement.addTextNode(nextOfKinFirstName);
+            }
+            if (StringUtils.isNotBlank(nextOfKinFamilyName)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinFamilyName", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinFamilyName);
+            }
+            if (StringUtils.isNotBlank(nextOfKinGender)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinGender", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinGender);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressStreet)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressStreet", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressStreet);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressCity)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressCity", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressCity);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressPostalCode)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressPostalCode", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressPostalCode);
+            }
+            if (StringUtils.isNotBlank(nextOfKinAddressCountry)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinAddressCountry", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinAddressCountry);
+            }
+            if (nextOfKinBirthDate != null) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinBirthDate", "trc", TRC_NS);
+                SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                nextOfKinGivenNameElement.addTextNode(dateFormat.format(nextOfKinBirthDate));
             }
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
