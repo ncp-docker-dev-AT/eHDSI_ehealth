@@ -29,7 +29,11 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 
 /**
  *
@@ -46,10 +50,6 @@ public class STSUtils {
     private STSUtils() {
     }
 
-    /**
-     * @param body
-     * @return
-     */
     public static String getDispensationPinCode(SOAPElement body) {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -64,26 +64,42 @@ public class STSUtils {
         return trcDetails.getElementsByTagNameNS(TRC_NS, "DispensationPinCode").item(0).getTextContent();
     }
 
-    public static NextOfKinDetail getNextOfKinDetails(SOAPElement body) {
+    public static NextOfKinDetail getNextOfKinDetails(SOAPElement body) throws ParseException {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
         var nextOfKinDetail = new NextOfKinDetail();
         SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGivenName").item(0) != null) {
-            nextOfKinDetail.setGivenName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGivenName").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0) != null) {
+            nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinSurname").item(0) != null) {
-            nextOfKinDetail.setSurname(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinSurname").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0) != null) {
+            nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGender").item(0) != null) {
+            nextOfKinDetail.setGender(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGender").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0) != null) {
+            var formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+            Date birthDate = formatter.parse(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0).getTextContent());
+            nextOfKinDetail.setBirthDate(birthDate);
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressStreet").item(0) != null) {
+            nextOfKinDetail.setAddressStreet(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressStreet").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCity").item(0) != null) {
+            nextOfKinDetail.setAddressCity(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCity").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinPostalCode").item(0) != null) {
+            nextOfKinDetail.setAddressPostalCode(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinPostalCode").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0) != null) {
+            nextOfKinDetail.setAddressCountry(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0).getTextContent());
         }
         return nextOfKinDetail;
     }
 
-    /**
-     * @param body
-     * @return
-     */
     public static String getPrescriptionId(SOAPElement body) {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -98,10 +114,6 @@ public class STSUtils {
         return trcDetails.getElementsByTagNameNS(TRC_NS, "PrescriptionId").item(0).getTextContent();
     }
 
-    /**
-     * @param body
-     * @return
-     */
     public static String getPurposeOfUse(SOAPElement body) {
 
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
@@ -120,10 +132,6 @@ public class STSUtils {
         return purposeOfUse;
     }
 
-    /**
-     * @param assertion
-     * @return
-     */
     public static Document createRSTRC(Document assertion) {
 
         try {
@@ -150,7 +158,7 @@ public class STSUtils {
             Element lifeTimeElem = respBody.createElementNS(WS_TRUST_NS, "wst:LifeTime");
             rstrElem.appendChild(lifeTimeElem);
 
-            DateTime now = new DateTime();
+            var now = new DateTime();
 
             Element ltCreated = respBody.createElementNS(WS_SEC_UTIL_NS, "wsu:Created");
             ltCreated.setTextContent(now.toDateTime(DateTimeZone.UTC).toString());
@@ -168,33 +176,25 @@ public class STSUtils {
         }
     }
 
-    /**
-     * @param element
-     * @return
-     */
     public static String domElementToString(Element element) {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             Transformer transformer = transformerFactory.newTransformer();
-            StringWriter sw = new StringWriter();
-            transformer.transform(new DOMSource(element), new StreamResult(sw));
-            return sw.toString();
+            var stringWriter = new StringWriter();
+            transformer.transform(new DOMSource(element), new StreamResult(stringWriter));
+            return stringWriter.toString();
         } catch (TransformerException ex) {
             LOGGER.error(null, ex);
             throw new WebServiceException("Error Creating audit message");
         }
     }
 
-    /**
-     * @return
-     */
     public static String getSTSServerIP() {
 
         try {
-            URL url = new URL(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
-
-            InetAddress inetAddress = InetAddress.getByName(url.getHost());
+            var url = new URL(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+            var inetAddress = InetAddress.getByName(url.getHost());
             if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress()
                     && (inetAddress instanceof Inet4Address)) {
                 return inetAddress.getHostAddress();
@@ -215,7 +215,7 @@ public class STSUtils {
      */
     public static String getSSLCertPeer(MessageContext messageContext) {
 
-        ServletRequest servletRequest = (ServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
+        var servletRequest = (ServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST);
         Enumeration<String> servletAttributes = servletRequest.getAttributeNames();
         while (servletAttributes.hasMoreElements()) {
             String attribute = servletAttributes.nextElement();
@@ -224,7 +224,7 @@ public class STSUtils {
         if (servletRequest instanceof HttpServletRequest && servletRequest.isSecure()) {
 
             LOGGER.info("Secured Channel used for ServletRequest");
-            HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+            var httpServletRequest = (HttpServletRequest) servletRequest;
             X509Certificate[] peerCert = (X509Certificate[]) httpServletRequest.getAttribute("javax.servlet.request.X509Certificate");
             if (peerCert != null) {
                 return peerCert[0].getSubjectDN().getName();

@@ -30,6 +30,7 @@ import javax.xml.soap.*;
 import javax.xml.ws.*;
 import javax.xml.ws.handler.MessageContext;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -123,7 +124,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
             log(response);
             return response;
-        } catch (ParserConfigurationException | WSTrustException | SMgrException | SOAPException | MarshallingException e) {
+        } catch (ParserConfigurationException | WSTrustException | SMgrException | SOAPException | MarshallingException | ParseException e) {
             throw new WebServiceException(e);
         }
     }
@@ -141,7 +142,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         } catch (DatatypeConfigurationException ex) {
             logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
         }
-        String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url"));
+        String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url"));
         String sourceGateway = getClientIP();
         logger.info("STS Client IP: '{}'", sourceGateway);
         var messageContext = context.getMessageContext();
@@ -164,8 +165,29 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
         List<Attribute> attributeList = new ArrayList<>();
         attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getGivenName(), "NextOfKinGivenName", Attribute.URI_REFERENCE,
-                        "urn:oasis:names:tc:xspa:1.0:subject:nextofkin:givenname"));
+                .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:firstname"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getFamilyName(), "NextOfKinFamilyName", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:familyname"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getGender(), "NextOfKinGender", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:gender"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getBirthDate().toString(), "NextOfKinBirthDate", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:birthdate"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getAddressStreet(), "NextOfKinAddressStreet", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:address:street"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getAddressCity(), "NextOfKinAddressCity", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:address:city"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getAddressPostalCode(), "NextOfKinPostalCode", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:address:postalcode"));
+        attributeList.add(SamlIssuerHelper
+                .createAttribute(nextOfKinDetail.getAddressCountry(), "NextOfKinAddressCountry", Attribute.URI_REFERENCE,
+                        "urn:ehdsi:names:subject:nextofkin:address:country"));
         return attributeList;
     }
 }
