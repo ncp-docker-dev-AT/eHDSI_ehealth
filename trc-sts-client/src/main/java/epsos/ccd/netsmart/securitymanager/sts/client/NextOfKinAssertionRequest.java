@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.QName;
@@ -21,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
@@ -64,12 +62,12 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
     private final String purposeOfUse;
     private final String patientId;
     private final String nextOfKinId;
-    private final String nextOfKinSurname;
-    private final String nextOfKinGivenName;
+    private final String nextOfKinFamilyName;
+    private final String nextOfKinFirstName;
     private final Date nextOfKinBirthDate;
     private final String nextOfKinGender;
     private final String nextOfKinAddressStreet;
-    private final String nextOfKinAddressPostCode;
+    private final String nextOfKinAddressPostalCode;
     private final String nextOfKinAddressCity;
     private final String nextOfKinAddressCountry;
     private final SOAPMessage rstMsg;
@@ -89,14 +87,14 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
         this.patientId = builder.patientId;
         this.nextOfKinId = builder.nextOfKinId;
         this.purposeOfUse = builder.purposeOfUse;
-        this.nextOfKinAddressCity = builder.nextOfKinCity;
-        this.nextOfKinAddressCountry = builder.nextOfKinCountry;
-        this.nextOfKinAddressPostCode = builder.nextOfKinPostCode;
-        this.nextOfKinGender = builder.nextOfKinAdministrativeGender;
-        this.nextOfKinGivenName = builder.nextOfKinGivenName;
-        this.nextOfKinSurname = builder.nextOfKinSurname;
-        this.nextOfKinAddressStreet = builder.nextOfKinStreet;
+        this.nextOfKinFamilyName = builder.nextOfKinFamilyName;
+        this.nextOfKinFirstName = builder.nextOfKinFirstName;
         this.nextOfKinBirthDate = builder.nextOfKinBirthdate;
+        this.nextOfKinGender = builder.nextOfKinAdministrativeGender;
+        this.nextOfKinAddressStreet = builder.nextOfKinAddressStreet;
+        this.nextOfKinAddressCity = builder.nextOfKinAddressCity;
+        this.nextOfKinAddressCountry = builder.nextOfKinAddressCountry;
+        this.nextOfKinAddressPostalCode = builder.nextOfKinAddressPostalCode;
         this.location = builder.location;
         this.messageId = createMessageId();
 
@@ -143,10 +141,10 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
                 SOAPElement dispensationPinCodeElement = trcParamsElem.addChildElement(nextOfKinIdName);
                 dispensationPinCodeElement.addTextNode(nextOfKinId);
             }
-            if (StringUtils.isNotBlank(nextOfKinGivenName)) {
-                var nextOfKinIdName = soapFactory.createName("NextOfKinGivenName", "trc", TRC_NS);
+            if (StringUtils.isNotBlank(nextOfKinFirstName)) {
+                var nextOfKinIdName = soapFactory.createName("NextOfKinFirstName", "trc", TRC_NS);
                 SOAPElement nextOfKinGivenNameElement = trcParamsElem.addChildElement(nextOfKinIdName);
-                nextOfKinGivenNameElement.addTextNode(nextOfKinGivenName);
+                nextOfKinGivenNameElement.addTextNode(nextOfKinFirstName);
             }
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
@@ -250,14 +248,14 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
         private String nextOfKinId;
-        private String nextOfKinSurname;
-        private String nextOfKinGivenName;
+        private String nextOfKinFirstName;
+        private String nextOfKinFamilyName;
         private String nextOfKinAdministrativeGender;
         private Date nextOfKinBirthdate;
-        private String nextOfKinStreet;
-        private String nextOfKinPostCode;
-        private String nextOfKinCity;
-        private String nextOfKinCountry;
+        private String nextOfKinAddressStreet;
+        private String nextOfKinAddressPostalCode;
+        private String nextOfKinAddressCity;
+        private String nextOfKinAddressCountry;
         private URL location = null;
 
         /**
@@ -284,15 +282,15 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             return this;
         }
 
-        public Builder nextOfKinSurname(String nextOfKinSurname) {
+        public Builder nextOfKinFirstName(String nextOfKinFirstName) {
 
-            this.nextOfKinSurname = nextOfKinSurname;
+            this.nextOfKinFirstName = nextOfKinFirstName;
             return this;
         }
 
-        public Builder nextOfKinGivenName(String nextOfKinGivenName) {
+        public Builder nextOfKinFamilyName(String nextOfKinFamilyName) {
 
-            this.nextOfKinGivenName = nextOfKinGivenName;
+            this.nextOfKinFamilyName = nextOfKinFamilyName;
             return this;
         }
 
@@ -308,27 +306,27 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             return this;
         }
 
-        public Builder nextOfKinStreet(String nextOfKinStreet) {
+        public Builder nextOfKinAddressStreet(String nextOfKinAddressStreet) {
 
-            this.nextOfKinStreet = nextOfKinStreet;
+            this.nextOfKinAddressStreet = nextOfKinAddressStreet;
             return this;
         }
 
-        public Builder nextOfKinPostCode(String nextOfKinPostCode) {
+        public Builder nextOfKinAddressPostalCode(String nextOfKinAddressPostalCode) {
 
-            this.nextOfKinPostCode = nextOfKinPostCode;
+            this.nextOfKinAddressPostalCode = nextOfKinAddressPostalCode;
             return this;
         }
 
-        public Builder nextOfKinCity(String nextOfKinCity) {
+        public Builder nextOfKinAddressCity(String nextOfKinAddressCity) {
 
-            this.nextOfKinCity = nextOfKinCity;
+            this.nextOfKinAddressCity = nextOfKinAddressCity;
             return this;
         }
 
-        public Builder nextOfKinCountry(String nextOfKinCountry) {
+        public Builder nextOfKinAddressCountry(String nextOfKinAddressCountry) {
 
-            this.nextOfKinCountry = nextOfKinCountry;
+            this.nextOfKinAddressCountry = nextOfKinAddressCountry;
             return this;
         }
 
