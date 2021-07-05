@@ -31,7 +31,6 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -66,6 +65,7 @@ public class STSUtils {
 
     public static NextOfKinDetail getNextOfKinDetails(SOAPElement body) throws ParseException {
 
+        LOGGER.info("Processing Next Of Kin details from STS SOAP Request");
         if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
             throw new WebServiceException("No TRC Parameters in RST");
         }
@@ -82,7 +82,7 @@ public class STSUtils {
         }
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0) != null) {
             var formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-            Date birthDate = formatter.parse(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0).getTextContent());
+            var birthDate = formatter.parse(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0).getTextContent());
             nextOfKinDetail.setBirthDate(birthDate);
         }
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressStreet").item(0) != null) {
@@ -97,6 +97,7 @@ public class STSUtils {
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0) != null) {
             nextOfKinDetail.setAddressCountry(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0).getTextContent());
         }
+        LOGGER.info("Next Of Kin details:\n'{}'", nextOfKinDetail);
         return nextOfKinDetail;
     }
 
