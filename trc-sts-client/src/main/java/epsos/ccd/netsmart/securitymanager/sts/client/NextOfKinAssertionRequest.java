@@ -61,11 +61,10 @@ public class NextOfKinAssertionRequest {
         } catch (InitializationException e) {
             LOGGER.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
         }
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url").length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.nextOfKin.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
-        DEFAULT_STS_URL = "https://s-sante-zbook-eu:8443/TRC-STS/NextOfKinService";
-        //DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url");
+        DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url");
 
         if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname").length() == 0) {
             ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.checkHostname", "false");
