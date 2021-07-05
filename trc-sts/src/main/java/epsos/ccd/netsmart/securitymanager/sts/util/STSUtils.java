@@ -38,7 +38,6 @@ public class STSUtils {
 
     public static final String NO_CLIENT_CERTIFICATE = "Unknown (No Client Certificate)";
     private static final Logger LOGGER = LoggerFactory.getLogger(STSUtils.class);
-    // TRC Parameters Namespace
     private static final String TRC_NS = "https://ehdsi.eu/trc";
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";

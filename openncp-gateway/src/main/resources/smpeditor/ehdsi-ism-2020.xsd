@@ -107,7 +107,7 @@
 
     <!-- Patient element - LivingSubjectGender -->
     <xs:complexType name="administrativeGender">
-        <xs:attribute name="label" fixed="label.ism.sex" use="required"/>
+        <xs:attribute name="label" fixed="label.ism.gender" use="required"/>
         <xs:attribute name="format" type="xs:string" use="required"/>
         <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
@@ -209,7 +209,7 @@
             <xs:enumeration value="label.ism.passportNumber"/>
             <xs:enumeration value="label.ism.regionalPatientIdentifier"/>
             <xs:enumeration value="label.ism.regionIdentifier"/>
-            <xs:enumeration value="label.ism.sex"/>
+            <xs:enumeration value="label.ism.gender"/>
         </xs:restriction>
     </xs:simpleType>
 
