@@ -9,6 +9,7 @@ import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.openncp.securitymanager.SamlIssuerHelper;
 import eu.europa.ec.sante.openncp.securitymanager.SamlNextOfKinIssuer;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -164,30 +165,46 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
     private List<Attribute> buildNextOfKinAttributes(NextOfKinDetail nextOfKinDetail) {
 
         List<Attribute> attributeList = new ArrayList<>();
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:firstname"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getFamilyName(), "NextOfKinFamilyName", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:familyname"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getGender(), "NextOfKinGender", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:gender"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getBirthDate().toString(), "NextOfKinBirthDate", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:birthdate"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getAddressStreet(), "NextOfKinAddressStreet", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:address:street"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getAddressCity(), "NextOfKinAddressCity", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:address:city"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getAddressPostalCode(), "NextOfKinPostalCode", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:address:postalcode"));
-        attributeList.add(SamlIssuerHelper
-                .createAttribute(nextOfKinDetail.getAddressCountry(), "NextOfKinAddressCountry", Attribute.URI_REFERENCE,
-                        "urn:ehdsi:names:subject:nextofkin:address:country"));
+        if (StringUtils.isNotBlank(nextOfKinDetail.getFirstName())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:firstname"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getFamilyName())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getFamilyName(), "NextOfKinFamilyName", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:familyname"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getGender())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getGender(), "NextOfKinGender", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:gender"));
+        }
+        if (nextOfKinDetail.getBirthDate() != null) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getBirthDate().toString(), "NextOfKinBirthDate", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:birthdate"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressStreet())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressStreet(), "NextOfKinAddressStreet", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:street"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressCity())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressCity(), "NextOfKinAddressCity", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:city"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressPostalCode())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressPostalCode(), "NextOfKinPostalCode", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:postalcode"));
+        }
+        if (StringUtils.isNotBlank(nextOfKinDetail.getAddressCountry())) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getAddressCountry(), "NextOfKinAddressCountry", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:address:country"));
+        }
         return attributeList;
     }
 }
