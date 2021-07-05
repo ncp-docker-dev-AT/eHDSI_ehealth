@@ -181,7 +181,7 @@
 
     <xs:simpleType name="labelGenericTrait">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="label.ism.addressStreetLine"/>
+            <xs:enumeration value="label.ism.addressStreet"/>
             <xs:enumeration value="label.ism.addressPostalCode"/>
             <xs:enumeration value="label.ism.addressCity"/>
             <xs:enumeration value="label.ism.addressCountry"/>
@@ -192,7 +192,7 @@
 
     <xs:simpleType name="labelList">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="label.ism.addressStreetLine"/>
+            <xs:enumeration value="label.ism.addressStreet"/>
             <xs:enumeration value="label.ism.addressPostalCode"/>
             <xs:enumeration value="label.ism.addressCity"/>
             <xs:enumeration value="label.ism.addressCountry"/>
