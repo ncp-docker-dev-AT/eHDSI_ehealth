@@ -5,6 +5,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Map;
 
 public class DispensationService {
 
@@ -57,16 +59,15 @@ public class DispensationService {
      *
      * @param document     document to be submitted
      * @param patient      patient's demographic data
-     * @param hcpAssertion HCP Assertion
-     * @param trcAssertion TRC Assertion
+     * @param assertionMap HCP Assertion
      * @throws ParseException
      */
     public static XdrResponse initialize(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                         final Assertion hcpAssertion, final Assertion trcAssertion) throws XDRException, ParseException {
+                                         final Map<AssertionEnum, Assertion> assertionMap) throws XDRException, ParseException {
 
         LOGGER.info("[CC] Dispense Service: Initialize");
-        XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
-        return XdrDocumentSource.initialize(request, countryCode);
+        XdrRequest request = XdrRequestDts.newInstance(document, patient);
+        return XdrDocumentSource.initialize(request, countryCode, assertionMap);
     }
 
     /**
@@ -83,7 +84,7 @@ public class DispensationService {
      * <dd>eDispensations are not rolled back automatically by the country of affiliation </dl>
      */
     public static XdrResponse discard(final EpsosDocument1 document, final PatientDemographics patient, final String countryCode,
-                                      final Assertion hcpAssertion, final Assertion trcAssertion) throws XDRException, ParseException {
+                                      final Map<AssertionEnum, Assertion> assertionMap) throws XDRException, ParseException {
 
         LOGGER.info("[CC] Dispense Service: DISCARD");
         try {
@@ -105,7 +106,7 @@ public class DispensationService {
         } catch (ParserConfigurationException | SAXException | IOException | TransformerException e) {
             LOGGER.error("Exception: '{}'", e.getMessage());
         }
-        XdrRequest request = XdrRequestDts.newInstance(document, patient, hcpAssertion, trcAssertion);
-        return XdrDocumentSource.discard(request, countryCode);
+        XdrRequest request = XdrRequestDts.newInstance(document, patient);
+        return XdrDocumentSource.discard(request, countryCode, assertionMap);
     }
 }

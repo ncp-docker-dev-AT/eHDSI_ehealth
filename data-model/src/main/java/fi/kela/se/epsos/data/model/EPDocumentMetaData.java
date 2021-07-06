@@ -23,7 +23,9 @@ public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
     String getSubstitution();
 
     interface ProductMetadata {
+
         String getProductCode();
+
         String getProductName();
     }
 }

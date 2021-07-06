@@ -7,10 +7,10 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
@@ -19,13 +19,11 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
-import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.OidUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -71,7 +69,7 @@ public class EadcUtilWrapper {
                                   Direction direction, ServiceType serviceType) {
 
         new Thread(() -> {
-            StopWatch watch = new StopWatch();
+            var watch = new StopWatch();
             watch.start();
             try {
                 EadcUtil.invokeEadc(requestMsgCtx, responseMsgCtx, cda, buildTransactionInfo(requestMsgCtx, responseMsgCtx,
@@ -104,21 +102,21 @@ public class EadcUtilWrapper {
                                                         ServiceClient serviceClient, Direction direction, Date startTime,
                                                         Date endTime, String countryCodeA, ServiceType serviceType) throws Exception {
 
-        TransactionInfo result = new ObjectFactory().createComplexTypeTransactionInfo();
-        result.setAuthenticationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
-        result.setDirection(direction != null ? direction.toString() : null);
-        result.setStartTime(startTime != null ? getDateAsRFC822String(startTime) : null);
-        result.setEndTime(endTime != null ? getDateAsRFC822String(endTime) : null);
-        result.setDuration(endTime != null && startTime != null ? String.valueOf(endTime.getTime() - startTime.getTime()) : null);
-        result.setHomeAddress(EventLogClientUtil.getSourceGatewayIdentifier());
+        var transactionInfo = new ObjectFactory().createComplexTypeTransactionInfo();
+        transactionInfo.setAuthenticationLevel(reqMsgContext != null ? extractAuthenticationMethodFromAssertion(getAssertion(reqMsgContext)) : null);
+        transactionInfo.setDirection(direction != null ? direction.toString() : null);
+        transactionInfo.setStartTime(startTime != null ? getDateAsRFC822String(startTime) : null);
+        transactionInfo.setEndTime(endTime != null ? getDateAsRFC822String(endTime) : null);
+        transactionInfo.setDuration(endTime != null && startTime != null ? String.valueOf(endTime.getTime() - startTime.getTime()) : null);
+        transactionInfo.setHomeAddress(EventLogClientUtil.getSourceGatewayIdentifier());
         String sndIso = reqMsgContext != null ? extractSendingCountryIsoFromAssertion(getAssertion(reqMsgContext)) : null;
-        result.setSndISO(sndIso);
-        result.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
+        transactionInfo.setSndISO(sndIso);
+        transactionInfo.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
 
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null
                 && reqMsgContext.getOptions().getFrom().getAddress() != null) {
 
-            result.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
+            transactionInfo.setHomeHost(reqMsgContext.getOptions().getFrom().getAddress());
         }
 
         /*
@@ -128,41 +126,41 @@ public class EadcUtilWrapper {
             from the message itself, be sure to compare it with the correct WSA headers, there are duplicated ones,
             although belonging to different namespaces (the correct one is xmlns = http://www.w3.org/2005/08/addressing)
         */
-        result.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
-        result.setHomeHCID("");
-        result.setHomeISO(Constants.COUNTRY_CODE);
-        result.setHomeNCPOID(Constants.HOME_COMM_ID);
+        transactionInfo.setSndMsgID(reqMsgContext != null ? getMessageID(reqMsgContext.getEnvelope()) : null);
+        transactionInfo.setHomeHCID("");
+        transactionInfo.setHomeISO(Constants.COUNTRY_CODE);
+        transactionInfo.setHomeNCPOID(Constants.HOME_COMM_ID);
 
         //  TODO: Clarify values for this field according specifications and GDPR, current value set to "N/A GDPR"
-        result.setHumanRequestor("N/A GDPR");
-        result.setUserId("N/A GDPR");
-        result.setPOC(reqMsgContext != null ?
+        transactionInfo.setHumanRequestor("N/A GDPR");
+        transactionInfo.setUserId("N/A GDPR");
+        transactionInfo.setPOC(reqMsgContext != null ?
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
                         extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
-        result.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
-        result.setReceivingISO(countryCodeA);
-        result.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
+        transactionInfo.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
+        transactionInfo.setReceivingISO(countryCodeA);
+        transactionInfo.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
 
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {
-            result.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
-            result.setReceivingAddr(EventLogClientUtil.getTargetGatewayIdentifier(serviceClient.getOptions().getTo().getAddress()));
+            transactionInfo.setReceivingHost(serviceClient.getOptions().getTo().getAddress());
+            transactionInfo.setReceivingAddr(EventLogClientUtil.getTargetGatewayIdentifier(serviceClient.getOptions().getTo().getAddress()));
         }
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getAction() != null) {
-            result.setRequestAction(reqMsgContext.getOptions().getAction());
+            transactionInfo.setRequestAction(reqMsgContext.getOptions().getAction());
         }
         if (rspMsgContext != null && rspMsgContext.getOptions() != null && rspMsgContext.getOptions().getAction() != null) {
-            result.setResponseAction(rspMsgContext.getOptions().getAction());
+            transactionInfo.setResponseAction(rspMsgContext.getOptions().getAction());
         }
         if (reqMsgContext != null && reqMsgContext.getOperationContext() != null && reqMsgContext.getOperationContext().getServiceName() != null) {
-            result.setServiceName(reqMsgContext.getOperationContext().getServiceName());
+            transactionInfo.setServiceName(reqMsgContext.getOperationContext().getServiceName());
         }
 
-        result.setReceivingMsgID(rspMsgContext != null ? rspMsgContext.getOptions().getMessageId() : null);
-        result.setServiceType(serviceType.getDescription());
-        result.setTransactionCounter("");
-        result.setTransactionPK(UUID.randomUUID().toString());
+        transactionInfo.setReceivingMsgID(rspMsgContext != null ? rspMsgContext.getOptions().getMessageId() : null);
+        transactionInfo.setServiceType(serviceType.getDescription());
+        transactionInfo.setTransactionCounter("");
+        transactionInfo.setTransactionPK(UUID.randomUUID().toString());
 
-        return result;
+        return transactionInfo;
     }
 
     /**
@@ -174,7 +172,7 @@ public class EadcUtilWrapper {
      */
     private static Assertion getAssertion(MessageContext requestMessageContext) throws Exception {
 
-        SOAPHeader soapHeader = requestMessageContext.getEnvelope().getHeader();
+        var soapHeader = requestMessageContext.getEnvelope().getHeader();
         Element soapHeaderElement = XMLUtils.toDOM(soapHeader);
         return Helper.getHCPAssertion(soapHeaderElement);
     }
@@ -222,8 +220,8 @@ public class EadcUtilWrapper {
      */
     private static String getDateAsRFC822String(Date date) {
 
-        TimeZone timeZone = TimeZone.getTimeZone("UTC");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z");
+        var timeZone = TimeZone.getTimeZone("UTC");
+        var dateFormat = new SimpleDateFormat("EEE', 'dd' 'MMM' 'yyyy' 'HH:mm:ss' 'Z");
         dateFormat.setTimeZone(timeZone);
 
         return dateFormat.format(date);
@@ -260,8 +258,8 @@ public class EadcUtilWrapper {
     private static String extractAuthenticationMethodFromAssertion(Assertion idAssertion) {
 
         if (!idAssertion.getAuthnStatements().isEmpty()) {
-            AuthnStatement authnStatement = idAssertion.getAuthnStatements().get(0);
-            String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
+            var authnStatement = idAssertion.getAuthnStatements().get(0);
+            String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getURI();
             return authnContextClassRef.substring(authnContextClassRef.lastIndexOf(':') + 1);
         } else {
             return null;
@@ -281,7 +279,7 @@ public class EadcUtilWrapper {
     /**
      * Extracts the sending country ISO code from Issuer of the given Assertion.
      * E.g., for this issuer:
-     * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer> it will extract "PT"
+     * <saml2:Issuer NameQualifier="urn:ehdsi:assertions:hcp">urn:idp:PT:countryB</saml2:Issuer> it will extract "PT"
      *
      * @param idAssertion
      * @return String containing the assertion issuer's ISO country code

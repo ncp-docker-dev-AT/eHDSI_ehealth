@@ -60,7 +60,7 @@ public class XDRConstants {
 
     public static class EXTRINSIC_OBJECT {
 
-        public static final String DATE_FORMAT = "yyyyMMddHHmmss.SSSZZZZ";
+        public static final String DATE_FORMAT = "yyyyMMddhhmmss";
         public static final String CREATION_TIME = "creationTime";
         /* Language Code */
         public static final String LANGUAGE_CODE_STR = "languageCode";

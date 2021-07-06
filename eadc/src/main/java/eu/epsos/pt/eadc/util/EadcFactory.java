@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import javax.naming.NamingException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public enum EadcFactory {
@@ -35,7 +36,8 @@ public enum EadcFactory {
     /**
      * Returns the EadcReceiver used for processing the EadcEntry
      */
-    public EadcReceiver getReceiver() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public EadcReceiver getReceiver() throws InstantiationException, IllegalAccessException, ClassNotFoundException,
+            InvocationTargetException, NoSuchMethodException {
         return initReceiver(EadcReceiverImpl.class.getName());
     }
 
@@ -45,7 +47,7 @@ public enum EadcFactory {
      * can be used in one classPath!
      */
     public EadcReceiver getReceiver(String implClass) throws InstantiationException, IllegalAccessException,
-            ClassNotFoundException {
+            ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
         return initReceiver(implClass);
     }
 
@@ -53,7 +55,7 @@ public enum EadcFactory {
      * Returns the default EadcEntry
      */
     public EadcEntry getEntry(String dsName, Document data, Document soapRqData, Document soapRspData)
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
         return initEntry(EadcEntryImpl.class.getName(), dsName, data, soapRqData, soapRspData);
     }
 
@@ -62,7 +64,7 @@ public enum EadcFactory {
      * if no entry impl is configured at the NCP the default EadcEntryImpl is used.
      */
     public EadcEntry getEntry(String implClass, String dsName, Document data, Document soapRqData, Document soapRspData)
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
         return initEntry(implClass, dsName, data, soapRqData, soapRspData);
     }
 
@@ -71,11 +73,11 @@ public enum EadcFactory {
      * functionality during the data collection from the EadcEntry to the Database tables.
      */
     private synchronized EadcReceiver initReceiver(String implClass) throws InstantiationException, IllegalAccessException,
-            ClassNotFoundException {
+            ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 
         if (receiver == null) {
             LOGGER.debug("initReceiver - instantiate new : '{}'", implClass);
-            receiver = (EadcReceiver) Class.forName(implClass).newInstance();
+            receiver = (EadcReceiver) Class.forName(implClass).getDeclaredConstructor().newInstance();
         } else {
             LOGGER.trace("initReceiver - use old singleton instance: '{}'", implClass);
         }
@@ -92,12 +94,12 @@ public enum EadcFactory {
      * the default EadcReceiverImpl is only using the data xml and not the soap request and response data
      */
     private synchronized EadcEntry initEntry(String implClass, String dsName, Document data, Document soapRqData,
-                                             Document soapRspData)
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+                                             Document soapRspData) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 
         if (entry == null) {
             LOGGER.debug("initEntry - instantiate new: '{}'", implClass);
-            entry = (EadcEntry) Class.forName(implClass).newInstance();
+            entry = (EadcEntry) Class.forName(implClass).getDeclaredConstructor().newInstance();
 
         } else {
             LOGGER.trace("initEntry - use old singleton instance: '{}'", implClass);

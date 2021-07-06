@@ -45,6 +45,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
@@ -59,6 +60,9 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.ParseException;
+
+import java.time.Instant;
 import java.util.*;
 
 public class XCAServiceImpl implements XCAServiceInterface {
@@ -139,6 +143,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case Constants.MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
+                break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
                 break;
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
@@ -226,18 +237,37 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                             boolean documentReturned, OMElement registryErrorList, Element sh, String classCode) {
 
         logger.info("method prepareEventLogForRetrieve({})", classCode);
-        if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
+        if (classCode == null) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
             // Log this under Order Service
             eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
             eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
-        } else if (classCode.equals(Constants.PS_CLASSCODE)) {
-            eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
-            eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
-        } else if (classCode.equals(Constants.MRO_CLASSCODE)) {
-            eventLog.setEventType(EventType.MRO_RETRIEVE);
-            eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
+        } else {
+            switch (classCode) {
+                case Constants.EP_CLASSCODE:
+                    eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                    break;
+                case Constants.PS_CLASSCODE:
+                    eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
+                    break;
+                case Constants.MRO_CLASSCODE:
+                    eventLog.setEventType(EventType.MRO_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
+                    break;
+                default:
+                    break;
+            }
         }
+
         eventLog.setEI_EventActionCode(EventActionCode.READ);
         try {
             eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
@@ -286,18 +316,21 @@ public class XCAServiceImpl implements XCAServiceInterface {
      * @param request
      * @return
      */
-    private String getDocumentEntryClassCode(AdhocQueryRequest request) {
-
+    private List<String> getDocumentEntryClassCodes(AdhocQueryRequest request) {
+        List<String> classCodes = new ArrayList<>();
         for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
             if (sl.getName().equals("$XDSDocumentEntryClassCode")) {
-                String classCode = sl.getValueList().getValue().get(0);
+                String fullClassCodeString = sl.getValueList().getValue().get(0);
                 String pattern = "\\(?\\)?\\'?";
-                classCode = classCode.replaceAll(pattern, "");
-                classCode = classCode.substring(0, classCode.indexOf("^^"));
-                return classCode;
+                fullClassCodeString = fullClassCodeString.replaceAll(pattern, "");
+                String classCodeString[] = fullClassCodeString.split(",");
+                for (String classCode : classCodeString) {
+                    classCode = classCode.substring(0, classCode.indexOf("^^"));
+                    classCodes.add(classCode);
+                }
             }
         }
-        return null;
+        return classCodes;
     }
 
     /**
@@ -313,6 +346,28 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
         }
         return "$XDSDocumentEntryPatientId Not Found!";
+    }
+
+    private FilterParams getFilterParams(AdhocQueryRequest request) {
+
+        FilterParams filterParams = new FilterParams();
+
+        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
+            switch (sl.getName()) {
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME:
+                    filterParams.setCreatedAfter(Instant.parse(sl.getValueList().getValue().get(0)));
+                    break;
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME:
+                    filterParams.setCreatedBefore(Instant.parse(sl.getValueList().getValue().get(0)));
+                    break;
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME:
+                    filterParams.setMaximumSize(Long.parseLong(sl.getValueList().getValue().get(0)));
+                    break;
+                default:
+                    break;
+            }
+        }
+        return filterParams;
     }
 
     /**
@@ -357,6 +412,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         sl.setName(name);
         sl.setValueList(ofRim.createValueListType());
         sl.getValueList().getValue().add(value);
+        return sl;
+    }
+
+    private SlotType1 makeSlot(String name, List<String> values) {
+
+        SlotType1 sl = ofRim.createSlotType1();
+        sl.setName(name);
+        sl.setValueList(ofRim.createValueListType());
+        values.forEach(value -> sl.getValueList().getValue().add(value));
         return sl;
     }
 
@@ -436,7 +500,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId,
                                                   AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF,
-                                                  String documentId, SimpleConfidentiality confidentiality, String languageCode) {
+                                                  String documentId, String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         final String title;
         final String classCode;
@@ -512,7 +576,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Confidentiality Code
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
-                uuid, confidentiality.code(), "2.16.840.1.113883.5.25", confidentiality.name()));
+                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
@@ -532,6 +596,181 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+
+        // External Identifiers
+        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
+                uuid, getDocumentEntryPatientId(request), "XDSDocumentEntry.patientId"));
+
+        eot.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
+                uuid, documentId, XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
+
+        return uuid;
+    }
+
+    /**
+     * Method to build the Extrinsic object to be used for the XCA Query service for OrCD documents.
+     *
+     * @param docType
+     * @param effectiveTime
+     * @param serviceStartTime
+     * @param repositoryId
+     * @param request
+     * @param eot
+     * @param documentId
+     * @param confidentialityCode
+     * @param confidentialityDisplay
+     * @param languageCode
+     * @param classCode
+     * @param documentFileType
+     * @param size
+     * @param authors
+     * @param reasonOfHospitalisation
+     * @return
+     */
+    private String prepareExtrinsicObjectOrCD(DocumentType docType,
+                                              Date effectiveTime,
+                                              Date serviceStartTime,
+                                              String repositoryId,
+                                              AdhocQueryRequest request,
+                                              ExtrinsicObjectType eot,
+                                              String documentId,
+                                              String confidentialityCode,
+                                              String confidentialityDisplay,
+                                              String languageCode,
+                                              String classCode,
+                                              OrCDDocumentMetaData.DocumentFileType documentFileType,
+                                              long size,
+                                              List<OrCDDocumentMetaData.Author> authors,
+                                              OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        final String title;
+        final String nodeRepresentation;
+        final String displayName;
+
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                title = Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                title = Constants.ORCD_LABORATORY_RESULTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGES_TITLE;
+                switch (documentFileType) {
+                    case PNG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.DISPLAY_NAME;
+                        break;
+                    case JPEG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.DISPLAY_NAME;
+                        break;
+                    default:
+                        logger.error("Unsupported document file type '{}' for OrCD Medical Images", documentFileType);
+                        return "";
+                }
+                break;
+            default:
+                logger.error("Unsupported classCode for OrCD query in OpenNCP. Requested classCode: {}", classCode);
+                return "";
+
+        }
+
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
+        // Set Extrinsic Object
+        eot.setStatus(IheConstants.REGREP_STATUSTYPE_APPROVED);
+        eot.setHome(Constants.OID_PREFIX + Constants.HOME_COMM_ID);
+        eot.setId(uuid);
+        eot.setLid(uuid);
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
+
+        // MimeType
+        eot.setMimeType(MediaType.TEXT_XML_VALUE);
+
+        // Name
+        eot.setName(ofRim.createInternationalStringType());
+        eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
+        eot.getName().getLocalizedString().get(0).setValue(title);
+
+        // Description (optional)
+        eot.setDescription(ofRim.createInternationalStringType());
+        eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
+
+        // Version Info
+        eot.setVersionInfo(ofRim.createVersionInfoType());
+        eot.getVersionInfo().setVersionName("1.1");
+
+        // Creation Date (optional)
+        eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
+
+        // Service Start time (optional)
+        eot.getSlot().add(makeSlot("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", serviceStartTime)));
+
+        // Source Patient Id
+        eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+
+        // Size
+        eot.getSlot().add(makeSlot("size", String.valueOf(size)));
+
+        // LanguageCode (optional)
+        eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
+
+        // repositoryUniqueId (optional)
+        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+
+        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Type code (not written in 3.4.2)
+        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Confidentiality Code
+        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+        // FormatCode
+        eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+                uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
+
+        /*
+         * Healthcare facility code
+         * TODO: Get healthcare facility info from national implementation
+         */
+        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+                uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
+        // Reason of hospitalisation
+        if (reasonOfHospitalisation != null) {
+        eot.getClassification().add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                uuid, reasonOfHospitalisation.getCode(), reasonOfHospitalisation.getCodingScheme(), reasonOfHospitalisation.getText()));
+        }
+
+        // Practice Setting code
+        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+
+        for(OrCDDocumentMetaData.Author author : authors) {
+            ClassificationType classificationAuthor = makeClassification(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID,
+                    uuid, "");
+
+            if(author.getAuthorPerson() != null){
+                SlotType1 authorPersonSlot = makeSlot(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
+                classificationAuthor.getSlot().add(authorPersonSlot);
+            }
+
+            if(author.getAuthorSpeciality() != null && !author.getAuthorSpeciality().isEmpty()) {
+            SlotType1 authorSpecialtySlot = makeSlot(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
+            classificationAuthor.getSlot().add(authorSpecialtySlot);
+            }
+            eot.getClassification().add(classificationAuthor);
+        }
 
         // External Identifiers
         eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
@@ -611,46 +850,53 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Dispensable
         if (document.isDispensable()) {
             eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                            "urn:ihe:iti:xdw:2011:eventCode:open","1.3.6.1.4.1.19376.1.2.3","Open"));
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
         } else {
             eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                            "urn:ihe:iti:xdw:2011:eventCode:closed","1.3.6.1.4.1.19376.1.2.3","Closed"));
+                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
         }
 
         // ATC code (optional)
         ClassificationType atcCodeClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "ATC CODE");
+                "ATC CODE", "", "atcCode");
         atcCodeClassification.getSlot().add(makeSlot("atcCode", document.getAtcCode()));
         eot.getClassification().add(atcCodeClassification);
 
         // Dose Form Code
         ClassificationType doseFormClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "DOSE FORM CODE");
+                "DOSE FORM CODE", "", "doseFormCode");
         doseFormClassification.getSlot().add(makeSlot("doseFormCode", document.getDoseFormCode()));
         eot.getClassification().add(doseFormClassification);
 
         // Strength
         ClassificationType strengthClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "STRENGTH");
+                "STRENGTH", "", "strength");
         strengthClassification.getSlot().add(makeSlot("strength", document.getStrength()));
         eot.getClassification().add(strengthClassification);
 
         // Substitution
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "SUBSTITUTION");
+                "SUBSTITUTION", "", "substitution");
         substitutionClassification.getSlot().add(makeSlot("substitution", document.getSubstitution()));
         eot.getClassification().add(substitutionClassification);
 
         // Confidentiality Code
-        SimpleConfidentiality confidentiality = document.getConfidentiality() != null ? document.getConfidentiality() : SimpleConfidentiality.NORMAL;
+        String confidentialityCode = document.getConfidentiality() != null
+                && document.getConfidentiality().getConfidentialityCode() != null
+                ? document.getConfidentiality().getConfidentialityCode()
+                : "N";
+        String confidentialityDisplay = document.getConfidentiality() != null
+                && document.getConfidentiality().getConfidentialityDisplay() != null
+                ? document.getConfidentiality().getConfidentialityDisplay()
+                : "Normal";
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
-                uuid, document.getConfidentiality().code(), "2.16.840.1.113883.5.25", document.getConfidentiality().name()));
+                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
@@ -660,7 +906,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     uuid, "urn:epSOS:ep:pre:2010", "eHDSI formatCodes", "epSOS coded ePrescription"));
         }
         // Healthcare facility code
-        // TODO: Get healthcare facility info from national implementaition
+        // TODO: Get healthcare facility info from national implementation
 
         eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
@@ -670,8 +916,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Author Person
         ClassificationType authorClassification = makeClassification(
-                "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d", uuid, "");
-        authorClassification.getSlot().add(makeSlot("authorPerson", document.getAuthor()));
+                IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID, uuid, "");
+        authorClassification.getSlot().add(makeSlot(IheConstants.AUTHOR_PERSON_STR, document.getAuthor()));
         eot.getClassification().add(authorClassification);
 
         // External Identifiers
@@ -764,13 +1010,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
-    private void AdhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
+    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
                                            EventLog eventLog) throws Exception {
 
         String sigCountryCode = null;
         Element shElement = null;
         // What's being requested: eP or PS?
-        String classCodeValue = getDocumentEntryClassCode(request);
+        List<String> classCodeValues = getDocumentEntryClassCodes(request);
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         // Create Registry Object List
         response.setRegistryObjectList(ofRim.createRegistryObjectListType());
@@ -778,7 +1024,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         try {
             shElement = XMLUtils.toDOM(sh);
             documentSearchService.setSOAPHeader(shElement);
-            sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValue);
+            sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValues.get(0));
         } catch (InsufficientRightsException e) {
             logger.debug(e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
@@ -794,10 +1040,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
-            if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
+            if (classCodeValues.contains(Constants.EP_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
-            } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
+            } else if (classCodeValues.contains(Constants.PS_CLASSCODE)) {
                 rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+            } else if (classCodeValues.contains(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
+                rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
                 rel.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
@@ -830,7 +1081,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
 
-        if (classCodeValue == null) {
+        if (classCodeValues == null || classCodeValues.isEmpty()) {
             rel.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
         }
 
@@ -859,13 +1110,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         } else {
 
-            if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
-                    Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
+        }
 
-                logger.info("XCA Query Request for '{}' is valid.", classCodeValue);
-                // Document search for ePrescription service.
-                if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
-
+        for (String classCodeValue: classCodeValues) {
+            switch (classCodeValue) {
+                case Constants.EP_CLASSCODE:
                     List<DocumentAssociation<EPDocumentMetaData>> prescriptions = documentSearchService.getEPDocumentList(
                             DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
@@ -902,9 +1151,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             }
                         }
                     }
-                } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
-
-                    // Document search for Patient service.
+                    break;
+                case Constants.PS_CLASSCODE:
                     DocumentAssociation<PSDocumentMetaData> psDoc = documentSearchService.getPSDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
@@ -921,30 +1169,38 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         String xmlUUID = "";
                         if (docXml != null) {
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
-                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
+                            String confidentialityCode = docXml.getConfidentiality() == null
+                                    || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
+                                    : docXml.getConfidentiality().getConfidentialityCode();
+                            String confidentialityDisplay = docXml.getConfidentiality() == null
+                                    || docXml.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                                    : docXml.getConfidentiality().getConfidentialityDisplay();
                             String languageCode = docXml.getLanguage();
                             xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY,
                                     docXml.getEffectiveTime(), docXml.getRepositoryId(), request, eotXML, false,
-                                    docXml.getId(), confidentiality, languageCode);
+                                    docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
                         }
                         String pdfUUID = "";
                         if (docPdf != null) {
                             ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
-                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
+                            String confidentialityCode = docPdf.getConfidentiality() == null
+                                    || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
+                                    : docPdf.getConfidentiality().getConfidentialityCode();
+                            String confidentialityDisplay = docPdf.getConfidentiality() == null
+                                    || docPdf.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                                    : docPdf.getConfidentiality().getConfidentialityDisplay();
                             String languageCode = docPdf.getLanguage();
-                            pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY,
-                                    docPdf.getEffectiveTime(), docPdf.getRepositoryId(), request, eotPDF, true,
-                                    docPdf.getId(), confidentiality, languageCode);
+                            pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.PATIENT_SUMMARY, docPdf.getEffectiveTime(), docPdf.getRepositoryId(), request, eotPDF, true,
+                                    docPdf.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
                         }
                         if (!xmlUUID.equals("") && !pdfUUID.equals("")) {
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                         }
                     }
-                } else if (StringUtils.contains(classCodeValue, Constants.MRO_CLASSCODE)) {
-
-                    // Document search for MRO service.
+                    break;
+                case Constants.MRO_CLASSCODE:
                     DocumentAssociation<MroDocumentMetaData> mro = documentSearchService.getMroDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
@@ -962,87 +1218,135 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         String xmlUUID = "";
                         if (docXml != null) {
                             ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
-                            SimpleConfidentiality confidentiality = docXml.getConfidentiality() != null ? docXml.getConfidentiality() : SimpleConfidentiality.NORMAL;
+                            String confidentialityCode = docXml.getConfidentiality() == null
+                                    || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
+                                    : docXml.getConfidentiality().getConfidentialityCode();
+                            String confidentialityDisplay = docXml.getConfidentiality() == null
+                                    || docXml.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                                    : docXml.getConfidentiality().getConfidentialityDisplay();
                             String languageCode = docXml.getLanguage();
                             xmlUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.MRO, docXml.getEffectiveTime(),
-                                    docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentiality, languageCode);
+                                    docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
-
                         }
                         String pdfUUID = "";
                         if (docPdf != null) {
                             ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
-                            SimpleConfidentiality confidentiality = docPdf.getConfidentiality() != null ? docPdf.getConfidentiality() : SimpleConfidentiality.NORMAL;
+                            String confidentialityCode = docPdf.getConfidentiality() == null
+                                    || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
+                                    : docPdf.getConfidentiality().getConfidentialityCode();
+                            String confidentialityDisplay = docPdf.getConfidentiality() == null
+                                    || docPdf.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                                    : docPdf.getConfidentiality().getConfidentialityDisplay();
                             String languageCode = docPdf.getLanguage();
                             pdfUUID = prepareExtrinsicObjectEpsosDoc(DocumentType.MRO, docPdf.getEffectiveTime(),
-                                    docPdf.getRepositoryId(), request, eotPDF, true, docPdf.getId(), confidentiality, languageCode);
+                                    docPdf.getRepositoryId(), request, eotPDF, true, docPdf.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
                         }
                         if (!xmlUUID.equals("") && !pdfUUID.equals("")) {
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                         }
                     }
-                }
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    SearchCriteria searchCriteria = DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId);
+                    FilterParams filterParams = getFilterParams(request);
+                    if(filterParams.getMaximumSize() != null){
+                        searchCriteria.add(Criteria.MaximumSize, filterParams.getMaximumSize().toString());
+                    }
+                    if(filterParams.getCreatedBefore() != null){
+                        searchCriteria.add(Criteria.CreatedBefore, filterParams.getCreatedBefore().toString());
+                    }
+                    if(filterParams.getCreatedAfter() != null){
+                        searchCriteria.add(Criteria.CreatedAfter, filterParams.getCreatedAfter().toString());
+                    }
 
-                // Evidence Emitter processing for the response from NI for XCA List in case of success
+                    List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
 
-                    /*
-                    e-Sens: This should be NRR of NCPA receiving from NI.
-                    This was throwing errors because we were not passing a XML document.
-                    We're passing data like: "SearchCriteria: {patientId = 12445ASD}"
-                    So we provided a XML representation of such data. Still, evidence is generated based on request data,
-                    not response. This NRR is optional as per the CP. So we leave this commented
-                    */
+                    if (orCDDocumentMetaDataList == null || orCDDocumentMetaDataList.isEmpty()) {
+                        response = handleOrCDExceptionCases(response, rel, orCDDocumentMetaDataList);
+                    } else {
 
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            IHEEventType.epsosPatientServiceList.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                            "NI_XCA_LIST_RES",
-//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
-//                }
-            } else {
-                // Evidence for response from NI for XCA List in case of failure
-                /* Joao: This should be NRR of NCPA receiving from NI.
-                    This was throwing errors because we were not passing a XML document.
-                    We're passing data like:
-                    "SearchCriteria: {patientId = 12445ASD}"
-                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
-                    This NRR is optional as per the CP. So we leave this commented
-                */
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            IHEEventType.epsosPatientServiceList.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-//                            "NI_XCA_LIST_RES_FAIL",
-//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
-//                }
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDDocumentMetaDataList) {
+                            logger.debug("OrCD Document Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
+                            buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
+                        }
+                    }
+                    break;
 
-                rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
-                response.setRegistryErrorList(rel);
-                response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                default:
+                    rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
+                    response.setRegistryErrorList(rel);
+                    response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                    break;
+
+
+            }
+
+            try {
+                prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
+            } catch (Exception e) {
+                logger.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
+                // Is this fatal?
             }
         }
+    }
 
-        try {
-            prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
-        } catch (Exception e) {
-            logger.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
-            // Is this fatal?
+    private List<OrCDDocumentMetaData> getOrCDDocumentMetaDataList(String classCode, SearchCriteria searchCriteria) throws NIException, InsufficientRightsException {
+        List<OrCDDocumentMetaData> orCDDocumentMetaDataList = new ArrayList<>();
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDHospitalDischargeReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDLaboratoryResultsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagingReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagesDocumentList(searchCriteria);
+                break;
+        }
+
+        return orCDDocumentMetaDataList;
+    }
+
+    private void buildOrCDExtrinsicObject(AdhocQueryRequest request, AdhocQueryResponse response, OrCDDocumentMetaData orCDDocumentMetaData) {
+        ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
+        final String confidentialityCode = orCDDocumentMetaData.getConfidentiality() == null
+                || orCDDocumentMetaData.getConfidentiality().getConfidentialityCode() == null ? "N"
+                : orCDDocumentMetaData.getConfidentiality().getConfidentialityCode();
+        final String confidentialityDisplay = orCDDocumentMetaData.getConfidentiality() == null
+                || orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
+        final String languageCode = orCDDocumentMetaData.getLanguage();
+        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(), orCDDocumentMetaData.getServiceStartTime(),
+                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode,
+                orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getAuthors(), orCDDocumentMetaData.getReasonOfHospitalisation());
+        response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
+        if (!StringUtils.isEmpty(xmlUUID)) {
+            response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(xmlUUID, xmlUUID)));
         }
     }
+
+    private AdhocQueryResponse handleOrCDExceptionCases(AdhocQueryResponse response, RegistryErrorList rel, List<OrCDDocumentMetaData> orCDDocumentMetaDataList) {
+        if (orCDDocumentMetaDataList == null) {
+            rel.getRegistryError().add(createErrorMessage("4103", "orCD registry could not be accessed.", "", true));
+            response.setRegistryErrorList(rel);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
+        } else if (orCDDocumentMetaDataList.isEmpty()) {
+            rel.getRegistryError().add(createErrorMessage("1103", "There is no original clinical data of the requested type registered for the given patient.", "", true));
+            response.setRegistryErrorList(rel);
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        }
+        return response;
+    }
+
 
     /**
      * @param doc
@@ -1317,7 +1621,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
                     // Transcode to eHDSI Pivot
-                    doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    if(!Constants.getClassCodesOrCD().contains(classCodeValue)) {
+                        doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    }
                     if (!checkIfOnlyWarnings(registryErrorList)) {
 
                         // If the transformation process has raised at least one FATAL Error, we should determine which
@@ -1476,26 +1782,40 @@ public class XCAServiceImpl implements XCAServiceInterface {
         e.printStackTrace(printWriter);
         registryError.setLocation(result.toString().trim());
 
-        String classCode = getDocumentEntryClassCode(request);
+        List<String> classCodeValues = getDocumentEntryClassCodes(request);
 
-        if (Constants.EP_CLASSCODE.equals(classCode)) {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1101");
-            registryError.setValue("No ePrescriptions are registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
-        } else if (Constants.PS_CLASSCODE.equals(classCode)) {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1102");
-            registryError.setValue("No patient summary is registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
-        } else {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1100");
-            registryError.setValue("No documents are registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+        for (String classCodeValue: classCodeValues) {
+            switch (classCodeValue) {
+                case Constants.EP_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1101");
+                    registryError.setValue("No ePrescriptions are registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
+                    break;
+                case Constants.PS_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1102");
+                    registryError.setValue("No patient summary is registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1104");
+                    registryError.setValue("No original clinical document of the requested type is registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any OrCD of the requested type related to the current patient");
+                    break;
+                default:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1100");
+                    registryError.setValue("No documents are registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+                    break;
+            }
+            registryErrorList.getRegistryError().add(registryError);
         }
-
-        registryErrorList.getRegistryError().add(registryError);
         response.setRegistryErrorList(registryErrorList);
         // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
@@ -1512,7 +1832,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         AdhocQueryResponse result = ofQuery.createAdhocQueryResponse();
         try {
-            AdhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
+            adhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
         } catch (UnsupportedOperationException uoe) {
             result = handleUnsupportedOperationException(adhocQueryRequest, uoe);
         }
@@ -1533,6 +1853,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     /**
      * This auxiliary service returns the service name, based on a provided class code.
      */
+    @Deprecated(since = "5.2.0", forRemoval = true)
     private String getDocumentName(final String classCodeValue) {
 
         if (classCodeValue.contains(Constants.PS_CLASSCODE)) {

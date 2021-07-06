@@ -1,6 +1,10 @@
 package tr.com.srdc.epsos.data.model.xds;
 
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class encapsulates a set of properties related to a document, but not it's content.
@@ -11,12 +15,17 @@ public class XDSDocument {
     private String hcid;
     private String repositoryUniqueId;
     private String documentUniqueId;
+    private String mimeType;
     private String name;
+    private String size;
     private String description;
     private String creationTime;
+    private String eventTime;
     private String healthcareFacility;
-    private String authorPerson;
     private boolean isPDF;
+    private OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation;
+    private List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
+
     private GenericDocumentCode formatCode;
     private GenericDocumentCode classCode;
 
@@ -75,6 +84,7 @@ public class XDSDocument {
         Substitution = substitution;
     }
 
+
     /**
      * @return the hcid
      */
@@ -113,6 +123,10 @@ public class XDSDocument {
         this.name = name;
     }
 
+    public String getSize() { return size; }
+
+    public void setSize(String size) { this.size = size; }
+
     public String getDescription() {
         return description;
     }
@@ -128,6 +142,10 @@ public class XDSDocument {
     public void setCreationTime(String creationTime) {
         this.creationTime = creationTime;
     }
+
+    public String getEventTime() { return eventTime; }
+
+    public void setEventTime(String eventTime) { this.eventTime = eventTime; }
 
     public String getHealthcareFacility() {
         return healthcareFacility;
@@ -152,6 +170,18 @@ public class XDSDocument {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getMimeType() { return mimeType; }
+
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+
+    public OrCDDocumentMetaData.ReasonOfHospitalisation getReasonOfHospitalisation() { return reasonOfHospitalisation; }
+
+    public void setReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) { this.reasonOfHospitalisation = reasonOfHospitalisation; }
+
+    public List<OrCDDocumentMetaData.Author> getAuthors() { return authors; }
+
+    public void setAuthors(List<OrCDDocumentMetaData.Author> authors) { this.authors = authors; }
 
     /**
      * @return the formatCode
@@ -203,17 +233,4 @@ public class XDSDocument {
         this.classCode = documentCode;
     }
 
-    /**
-     * @return the authorPerson
-     */
-    public String getAuthorPerson() {
-        return authorPerson;
-    }
-
-    /**
-     * @param authorPerson the authorPerson to set
-     */
-    public void setAuthorPerson(String authorPerson) {
-        this.authorPerson = authorPerson;
-    }
 }

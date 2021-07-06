@@ -43,7 +43,7 @@ public class SyslogErrorLogger {
         } else {
             try {
                 if (logger.isErrorEnabled()) {
-                    logger.error("===>  SYSLOG EXCEPTION THROWN\nbytes are:\n{}", new String(bytes, StandardCharsets.UTF_8.name()));
+                    logger.error("===> SYSLOG EXCEPTION THROWN\nbytes are:\n{}", new String(bytes, StandardCharsets.UTF_8.name()));
                 }
             } catch (UnsupportedEncodingException e1) {
                 logger.error("Unsupported encoding exception occurred", e1);

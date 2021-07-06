@@ -97,7 +97,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             Date startTime = new Date();
             // get the implementation class for the Web Service
             Object serviceObject = getTheImplementationObject(msgContext);
-            XDR_ServiceSkeleton skel = (XDR_ServiceSkeleton) serviceObject;
+            XDR_ServiceSkeleton xdrServiceSkeleton = (XDR_ServiceSkeleton) serviceObject;
             // Out Envelop
             SOAPEnvelope envelope;
             // Find the axisOperation that has been set by the Dispatch phase.
@@ -142,7 +142,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    RegistryResponseType registryResponse = skel.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, soapHeader, eventLog);
+                    RegistryResponseType registryResponse = xdrServiceSkeleton.documentRecipient_ProvideAndRegisterDocumentSetB(wrappedParam, soapHeader, eventLog);
 
                     envelope = toEnvelope(getSOAPFactory(msgContext), registryResponse, false);
 

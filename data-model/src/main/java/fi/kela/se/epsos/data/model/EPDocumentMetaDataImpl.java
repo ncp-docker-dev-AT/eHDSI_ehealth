@@ -28,8 +28,8 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product, EpListParam epListParam) {
         super(metaData);
-        this.description = description;
         this.product = product;
+        this.description = description;
         this.dispensable = epListParam.isDispensable();
         this.atcCode = epListParam.getAtcCode();
         this.doseFormCode = epListParam.getDoseFormCode();
@@ -67,6 +67,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     public static class SimpleProductMetadata implements ProductMetadata {
 
         private String productCode;
+
         private String productName;
 
         public SimpleProductMetadata(String productCode, String productName) {
@@ -83,6 +84,5 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
         public String getProductName() {
             return productName;
         }
-
     }
 }

@@ -235,6 +235,12 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             case Constants.MRO_CLASSCODE:
                 XCAPermissionValidatorMro(assertion);
                 break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                XCAPermissionValidatorOrCD(assertion);
+                break;
             default:
                 String errorMsg = "Invalid document class code: " + documentClass;
                 logger.error(errorMsg);
@@ -248,10 +254,10 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorPS(Assertion assertion) throws InsufficientRightsException {
 
-        boolean medicalHistory = false;
-        boolean vitalSign = false;
-        boolean patientMedications = false;
-        boolean reviewProblem = false;
+        var medicalHistory = false;
+        var vitalSign = false;
+        var patientMedications = false;
+        var reviewProblem = false;
 
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
@@ -317,8 +323,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XCAPermissionValidatorEP(Assertion assertion) throws InsufficientRightsException {
 
-        boolean reviewExistingOrders = false;
-        boolean patientMedications = false;
+        var reviewExistingOrders = false;
+        var patientMedications = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
@@ -371,6 +377,17 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
+     * XCA validator for OrCD service.
+     *
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
+     */
+    private void XCAPermissionValidatorOrCD(Assertion assertion) throws InsufficientRightsException {
+        //TODO to be reviewed. For the moment, the same validation is used as for PS.
+        XCAPermissionValidatorPS(assertion);
+    }
+
+    /**
      * @param assertion     - SAML user assertion.
      * @param documentClass - Type of clinical document requested by the user (if available).
      * @throws MissingFieldException       - User's assertion attribute is missing.
@@ -382,7 +399,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         switch (documentClass) {
             //  eDispensation document
             case Constants.ED_CLASSCODE:
-                XDRPermissionValidatorDispense(assertion);
+            case Constants.EDD_CLASSCODE:
+                XDRPermissionValidatorSubmitDocument(assertion);
                 break;
             //  HCER is not supported currently in eHDSI project.
             case Constants.HCER_CLASSCODE:
@@ -399,15 +417,14 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
-     * XDR validation of dispensation service.
+     * XDR validation of Submit Document service (Dispense or Discard Medication).
      *
      * @param assertion - SAML user assertion.
      * @throws InsufficientRightsException - User doesn't have enough privileges.
      */
-    private void XDRPermissionValidatorDispense(Assertion assertion) throws InsufficientRightsException {
+    private void XDRPermissionValidatorSubmitDocument(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
-
+        var recordMedicationAdministrationRecord = false;
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;
         String functionalRole;
@@ -449,7 +466,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorEncounterReport(Assertion assertion) throws InsufficientRightsException {
 
-        XDRPermissionValidatorDispense(assertion);
+        XDRPermissionValidatorSubmitDocument(assertion);
     }
 
     /**
@@ -460,7 +477,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      */
     private void XDRPermissionValidatorConsent(Assertion assertion) throws InsufficientRightsException {
 
-        boolean recordMedicationAdministrationRecord = false;
+        var recordMedicationAdministrationRecord = false;
 
         List<XMLObject> permissions = AssertionHelper.getPermissionValuesFromAssertion(assertion);
         String role;

@@ -2,6 +2,7 @@ package eu.epsos.dts.xds;
 
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +65,9 @@ public final class AdhocQueryResponseConverter {
                     // Set name
                     document.setName(eo.getValue().getName().getLocalizedString().get(0).getValue());
 
+                    // Set mimeType
+                    document.setMimeType(eo.getValue().getMimeType());
+
                     // Set documentUniqueId
                     for (ExternalIdentifierType idenType : eo.getValue().getExternalIdentifier()) {
                         if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
@@ -71,17 +75,20 @@ public final class AdhocQueryResponseConverter {
                         }
                     }
 
-                    for (int j = 0; j < eo.getValue().getSlot().size(); j++) {
-                        str = eo.getValue().getSlot().get(j).getName();
-
-                        // Set creationTime
-                        if (str.equals("creationTime")) {
-                            document.setCreationTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
-
-                        // Set repositoryUniqueId
-                        if (str.equals("repositoryUniqueId")) {
-                            document.setRepositoryUniqueId(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
+                    for (SlotType1 slotType: eo.getValue().getSlot()) {
+                        switch (slotType.getName()) {
+                            case "creationTime" :
+                                document.setCreationTime(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "serviceStartTime" :
+                                document.setEventTime(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "size" :
+                                document.setSize(slotType.getValueList().getValue().get(0));
+                                break;
+                            case "repositoryUniqueId" :
+                                document.setRepositoryUniqueId(slotType.getValueList().getValue().get(0));
+                                break;
                         }
                     }
                     String documentClassCodeType = "";
@@ -110,12 +117,19 @@ public final class AdhocQueryResponseConverter {
                         }
 
                         // Set AuthorPerson
-                        if (str.equals("urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                        if (str.equals(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID) && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            OrCDDocumentMetaData.Author author = new OrCDDocumentMetaData.Author();
                             for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
-                                if (slot.getName().equals("authorPerson") && slot.getValueList().getValue().get(0) != null) {
-                                    document.setAuthorPerson(slot.getValueList().getValue().get(0));
+                                if (slot.getName().equals(IheConstants.AUTHOR_PERSON_STR) && slot.getValueList().getValue().get(0) != null) {
+                                    author.setAuthorPerson(slot.getValueList().getValue().get(0));
                                 }
                             }
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals(IheConstants.AUTHOR_SPECIALITY_STR) && !slot.getValueList().getValue().isEmpty()) {
+                                    author.setAuthorSpeciality(slot.getValueList().getValue());
+                                }
+                            }
+                            document.getAuthors().add(author);
                         }
 
                         // Set ATC Code
@@ -156,6 +170,19 @@ public final class AdhocQueryResponseConverter {
                             }
                         }
 
+                        // Set Reason of Hospitalisation
+                        if (str.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && eo.getValue().getClassification().get(j) != null) {
+                            String code = eo.getValue().getClassification().get(j).getNodeRepresentation();
+                            String text = eo.getValue().getClassification().get(j).getName().getLocalizedString().get(0).getValue();
+                            String codingScheme = null;
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("codingScheme") && slot.getValueList().getValue().get(0) != null) {
+                                    codingScheme = slot.getValueList().getValue().get(0);
+                                }
+                            }
+                            document.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
+                        }
+
                     }
 
                     // Set description
@@ -186,7 +213,6 @@ public final class AdhocQueryResponseConverter {
                             document.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
                         }
                     }
-
                     documents.add(document);
 
                 } else if ("AssociationType1".equals(declaredTypeName)) {
@@ -208,7 +234,11 @@ public final class AdhocQueryResponseConverter {
                 XDSDocument targetObject = null;
 
                 for (XDSDocument doc : documents) {
-                    if (doc.getId().matches(sourceObjectId)) {
+                    if(doc.getId().matches(targetObjectId) && doc.getId().matches(sourceObjectId)) {
+                        //OrCD
+                        sourceObject = doc;
+                        targetObject = doc;
+                    }else if (doc.getId().matches(sourceObjectId)) {
                         sourceObject = doc;
                     } else if (doc.getId().matches(targetObjectId)) {
                         targetObject = doc;
