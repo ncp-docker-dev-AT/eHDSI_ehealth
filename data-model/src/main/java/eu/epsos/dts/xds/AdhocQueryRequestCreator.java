@@ -82,7 +82,7 @@ public class AdhocQueryRequestCreator {
         //FilterParameters
 
         // Set XDSDocumentEntryFilterMaximumSize  Slot
-        if(filterParams.getMaximumSize() != null) {
+        if(filterParams != null && filterParams.getMaximumSize() != null) {
             SlotType1 entryFilterMaximumSize = new SlotType1();
             entryFilterMaximumSize.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME);
             ValueListType v4 = new ValueListType();
@@ -92,7 +92,7 @@ public class AdhocQueryRequestCreator {
         }
 
         // Set XDSDocumentEntryFilterMaximumSize  Slot
-        if(filterParams.getCreatedBefore() != null) {
+        if(filterParams != null && filterParams.getCreatedBefore() != null) {
             SlotType1 entryFilterCreatedBefore = new SlotType1();
             entryFilterCreatedBefore.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME);
             ValueListType v5 = new ValueListType();
@@ -102,7 +102,7 @@ public class AdhocQueryRequestCreator {
         }
 
         // Set XDSDocumentEntryFilterMaximumSize  Slot
-        if(filterParams.getCreatedAfter() != null) {
+        if(filterParams != null && filterParams.getCreatedAfter() != null) {
             SlotType1 entryFilterCreatedAfter = new SlotType1();
             entryFilterCreatedAfter.setName(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME);
             ValueListType v6 = new ValueListType();

@@ -50,7 +50,11 @@ public class DocumentDts {
         result.setFormatCode(GenericDocumentCodeDts.newInstance(document.getFormatCode()));
         result.setRepositoryId(document.getRepositoryUniqueId());
         result.setHcid(document.getHcid());
-        result.setSize(new BigInteger(document.getSize()));
+        if(document.getSize() != null) {
+            result.setSize(new BigInteger(document.getSize()));
+        } else {
+            result.setSize(BigInteger.ZERO);
+        }
         result.setMimeType(document.getMimeType());
         if (document.getAuthors() != null) {
             result.setAuthorsArray(convertAuthorList(document.getAuthors()));
@@ -97,7 +101,10 @@ public class DocumentDts {
         for (int i=0; i<authors.size();i++) {
             OrCDDocumentMetaData.Author author = authors.get(i);
             String authorPerson = author.getAuthorPerson();
-            String[] authorSpecialities = author.getAuthorSpeciality().toArray(new String[author.getAuthorSpeciality().size()]);
+            String[] authorSpecialities = null;
+            if(author.getAuthorSpeciality() != null) {
+                authorSpecialities = author.getAuthorSpeciality().toArray(new String[author.getAuthorSpeciality().size()]);
+            }
             Author convertedAuthor = Author.Factory.newInstance();
             convertedAuthor.setPerson(authorPerson);
             convertedAuthor.setSpecialtyArray(authorSpecialities);
@@ -183,10 +190,14 @@ public class DocumentDts {
         String pattern2 = "yyyyMMdd";
         String selectedPattern;
 
-        if (dateString.length() == pattern1.length()) {
-            selectedPattern = pattern1;
-        } else if (dateString.length() == pattern2.length()) {
-            selectedPattern = pattern2;
+        if(dateString != null) {
+            if (dateString.length() == pattern1.length()) {
+                selectedPattern = pattern1;
+            } else if (dateString.length() == pattern2.length()) {
+                selectedPattern = pattern2;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

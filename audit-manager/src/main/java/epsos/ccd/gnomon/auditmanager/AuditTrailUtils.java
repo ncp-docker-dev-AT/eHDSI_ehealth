@@ -1313,7 +1313,8 @@ public enum AuditTrailUtils {
     private void validateAuditMessage(EventLog eventLog, AuditMessage auditMessage) {
 
         LOGGER.debug("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
-                auditMessage.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
+                auditMessage.getEventIdentification() != null ? auditMessage.getEventIdentification().getEventActionCode() : "N/A",
+                eventLog.getPC_UserID());
         try {
             // Infer model according to NCP Side and EventCode
             NcpSide ncpSide = eventLog.getNcpSide();
