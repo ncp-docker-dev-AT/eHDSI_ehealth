@@ -101,16 +101,22 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 }
 
                 String description = getDescriptionFromDocument(xmlDoc);
+                String atcCode = getAtcCode(xmlDoc);
+                String doseFormCode = getDoseFormCode(xmlDoc);
+                String strength = getStrength(xmlDoc);
+                String substitution = getSubstitution(xmlDoc);
+
+                EpListParam epListParam = new EpListParam(true, atcCode, doseFormCode, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
                         getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
                         getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
@@ -676,6 +682,63 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         return description;
+    }
+
+    private String getAtcCode(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcCode = null;
+
+        try {
+            atcCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@code", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcCode;
+    }
+
+    private String getDoseFormCode(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormCode = null;
+
+        try {
+            //doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='formCode']/@displayName", doc);
+            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormCode;
+    }
+
+    private String getStrength(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String strength = null;
+
+        try {
+            strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='capacityQuantity']/@value", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return strength;
+    }
+
+    private String getSubstitution(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String substitution = null;
+
+        try {
+            substitution = path.evaluate("//*[local-name()='entryRelationship']/*[local-name()='observation']/*[local-name()='SubstanceAdminSubstitution']/@value", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return substitution;
     }
 
 }

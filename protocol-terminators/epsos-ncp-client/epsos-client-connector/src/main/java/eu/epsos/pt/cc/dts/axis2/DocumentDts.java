@@ -62,6 +62,11 @@ public class DocumentDts {
             result.setReasonOfHospitalisation(convertReasonOfHospitalisation(document.getReasonOfHospitalisation()));
         }
 
+        result.setAtcCode(document.getAtcCode());
+        result.setDoseFormCode(document.getDoseFormCode());
+        result.setStrength(document.getStrength());
+        result.setSubstitution(document.getSubstitution());
+
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
                 case Constants.PS_CLASSCODE:
