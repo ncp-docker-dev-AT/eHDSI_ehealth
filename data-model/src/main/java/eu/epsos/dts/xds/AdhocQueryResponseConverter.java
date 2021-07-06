@@ -132,6 +132,44 @@ public final class AdhocQueryResponseConverter {
                             document.getAuthors().add(author);
                         }
 
+                        // Set ATC Code
+                        if (str.equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("atcCode") && slot.getValueList().getValue().get(0) != null) {
+                                    document.setAtcCode(slot.getValueList().getValue().get(0));
+                                    document.setAtcText(slot.getValueList().getValue().get(0));
+                                }
+                            }
+                        }
+
+                        // Set Dose Form Code
+                        if (str.equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("doseFormCode") && slot.getValueList().getValue().get(0) != null) {
+                                    document.setDoseFormCode(slot.getValueList().getValue().get(0));
+                                    document.setDoseFormText(slot.getValueList().getValue().get(0));
+                                }
+                            }
+                        }
+
+                        // Set Strength
+                        if (str.equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("strength") && slot.getValueList().getValue().get(0) != null) {
+                                    document.setStrength(slot.getValueList().getValue().get(0));
+                                }
+                            }
+                        }
+
+                        // Set Substitution
+                        if (str.equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") && eo.getValue().getClassification().get(j).getSlot() != null) {
+                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
+                                if (slot.getName().equals("substitution") && slot.getValueList().getValue().get(0) != null) {
+                                    document.setSubstitution(slot.getValueList().getValue().get(0));
+                                }
+                            }
+                        }
+
                         // Set Reason of Hospitalisation
                         if (str.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && eo.getValue().getClassification().get(j) != null) {
                             String code = eo.getValue().getClassification().get(j).getNodeRepresentation();
@@ -144,6 +182,7 @@ public final class AdhocQueryResponseConverter {
                             }
                             document.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
                         }
+
                     }
 
                     // Set description

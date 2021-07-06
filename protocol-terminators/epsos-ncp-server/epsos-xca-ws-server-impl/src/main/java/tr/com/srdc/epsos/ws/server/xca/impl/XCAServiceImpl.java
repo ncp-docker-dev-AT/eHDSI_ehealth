@@ -858,6 +858,34 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
         }
 
+        // ATC code (optional)
+        ClassificationType atcCodeClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                "ATC CODE", "", "atcCode");
+        atcCodeClassification.getSlot().add(makeSlot("atcCode", document.getAtcCode()));
+        eot.getClassification().add(atcCodeClassification);
+
+        // Dose Form Code
+        ClassificationType doseFormClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                "DOSE FORM CODE", "", "doseFormCode");
+        doseFormClassification.getSlot().add(makeSlot("doseFormCode", document.getDoseFormCode()));
+        eot.getClassification().add(doseFormClassification);
+
+        // Strength
+        ClassificationType strengthClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                "STRENGTH", "", "strength");
+        strengthClassification.getSlot().add(makeSlot("strength", document.getStrength()));
+        eot.getClassification().add(strengthClassification);
+
+        // Substitution
+        ClassificationType substitutionClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                "SUBSTITUTION", "", "substitution");
+        substitutionClassification.getSlot().add(makeSlot("substitution", document.getSubstitution()));
+        eot.getClassification().add(substitutionClassification);
+
         // Confidentiality Code
         String confidentialityCode = document.getConfidentiality() != null
                 && document.getConfidentiality().getConfidentialityCode() != null
