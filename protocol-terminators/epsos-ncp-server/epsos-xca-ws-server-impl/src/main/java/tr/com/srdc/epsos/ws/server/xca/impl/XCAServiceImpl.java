@@ -1340,7 +1340,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             response.setRegistryErrorList(rel);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
         } else if (orCDDocumentMetaDataList.isEmpty()) {
-            rel.getRegistryError().add(createErrorMessage("1103", "There is no original clinical data of the requested type registered for the given patient.", "", true));
+            rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             response.setRegistryErrorList(rel);
             response.setStatus(AdhocQueryResponseStatus.SUCCESS);
         }
