@@ -5,6 +5,7 @@ import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.ReasonOfHospitalisation;
 import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 import tr.com.srdc.epsos.util.Constants;
@@ -50,10 +51,8 @@ public class DocumentDts {
         result.setFormatCode(GenericDocumentCodeDts.newInstance(document.getFormatCode()));
         result.setRepositoryId(document.getRepositoryUniqueId());
         result.setHcid(document.getHcid());
-        if(document.getSize() != null) {
+        if (!StringUtils.isEmpty(document.getSize())) {
             result.setSize(new BigInteger(document.getSize()));
-        } else {
-            result.setSize(BigInteger.ZERO);
         }
         result.setMimeType(document.getMimeType());
         if (document.getAuthors() != null) {
