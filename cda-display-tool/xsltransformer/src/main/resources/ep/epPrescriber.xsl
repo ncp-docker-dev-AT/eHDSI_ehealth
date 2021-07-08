@@ -109,7 +109,7 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="facilityId">
+                                                    <xsl:call-template name="showId">
                                                         <xsl:with-param name="id"
                                                                         select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:representedOrganization/n1:id"/>
                                                     </xsl:call-template>
@@ -133,8 +133,8 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="organization">
-                                                        <xsl:with-param name="name"
+                                                    <xsl:call-template name="showId">
+                                                        <xsl:with-param name="id"
                                                                         select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:scopingEntity[@classCode='ORG']/n1:id"/>
                                                     </xsl:call-template>
                                                 </td>
@@ -286,6 +286,21 @@
         </xsl:choose>
     </xsl:template>
 
+
+    <xsl:template name="showId">
+        <xsl:param name="id"/>
+        <xsl:choose>
+            <xsl:when test="$id/@nullFlavor">
+                <xsl:call-template name="show-eHDSINullFlavor">
+                    <xsl:with-param name="code" select="$id/@nullFlavor"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$id/@extension"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template name="telecom">
         <xsl:param name="telecomParam"/>
         <xsl:choose>
@@ -310,20 +325,6 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$name"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="facilityId">
-        <xsl:param name="id"/>
-        <xsl:choose>
-            <xsl:when test="$id/@nullFlavor">
-                <xsl:call-template name="show-eHDSINullFlavor">
-                    <xsl:with-param name="code" select="$id/@nullFlavor"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$id/@extension"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
