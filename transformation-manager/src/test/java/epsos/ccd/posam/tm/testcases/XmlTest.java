@@ -3,7 +3,6 @@ package epsos.ccd.posam.tm.testcases;
 import epsos.ccd.posam.tm.util.TMConstants;
 import epsos.ccd.posam.tm.util.XmlUtil;
 import junit.framework.TestCase;
-import org.jaxen.NamespaceContext;
 import org.jaxen.dom.DOMXPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -28,12 +28,14 @@ import java.util.List;
 public class XmlTest extends TestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlTest.class);
-    private String samplesDir = "./src/test/resources/samples/";
+    private final String samplesDir = "./src/test/resources/samples/";
 
     public void testNameSpace() {
 
         try {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            SAXParser parser = parserFactory.newSAXParser();
+            XMLReader reader = parser.getXMLReader();
             reader.setContentHandler(new DefaultHandler() {
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes) {
@@ -42,8 +44,8 @@ public class XmlTest extends TestCase {
             });
             reader.parse(new InputSource(new FileReader(samplesDir + "unstructuredCDANS.xml")));
 
-            Document doc = XmlUtil.getDocument(new File(samplesDir + "unstructuredCDANS.xml"), false);
-            printNode(doc);
+            Document document = XmlUtil.getDocument(new File(samplesDir + "unstructuredCDANS.xml"), false);
+            printNode(document);
         } catch (Exception e) {
             LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
         }
@@ -54,9 +56,7 @@ public class XmlTest extends TestCase {
         NodeList children = n.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-
-            }
+            child.getNodeType();
             if (child.hasChildNodes()) {
                 printNode(child);
             }
@@ -68,12 +68,7 @@ public class XmlTest extends TestCase {
         Document doc = XmlUtil.getDocument(new File(samplesDir + "unstructuredCDANS.xml"), true);
         try {
             DOMXPath xpath = new DOMXPath("/my:ClinicalDocument/my:code");
-            xpath.setNamespaceContext(new NamespaceContext() {
-
-                public String translateNamespacePrefixToUri(String arg0) {
-                    return "urn:hl7-org:v3";
-                }
-            });
+            xpath.setNamespaceContext(arg0 -> "urn:hl7-org:v3");
             List<Node> result = xpath.selectNodes(doc);
             assertTrue(result.size() > 0);
             for (Node node : result) {
@@ -121,8 +116,8 @@ public class XmlTest extends TestCase {
             elementPath = elementPath.replaceAll("\\w+:", "");
             Node node2 = XmlUtil.getNode(doc, elementPath);
             assertNotNull(elementPath + " je null", node2);
-            assertTrue(node.getLocalName().equals(node2.getLocalName()));
-            assertTrue(XmlUtil.getNodeList(doc, elementPath).size() == 1);
+            assertEquals(node.getLocalName(), node2.getLocalName());
+            assertEquals(1, XmlUtil.getNodeList(doc, elementPath).size());
         }
     }
 }

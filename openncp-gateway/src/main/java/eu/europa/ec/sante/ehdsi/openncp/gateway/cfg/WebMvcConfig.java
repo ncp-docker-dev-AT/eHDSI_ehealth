@@ -1,7 +1,10 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.cfg;
 
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.CacheControl;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -9,7 +12,7 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect;
 import org.thymeleaf.spring4.SpringTemplateEngine;
@@ -27,11 +30,9 @@ import java.util.concurrent.TimeUnit;
         "eu.europa.ec.sante.ehdsi.openncp.gateway.smpeditor",
         "eu.europa.ec.sante.ehdsi.openncp.gateway.web",
         "eu.europa.ec.sante.ehdsi.openncp.gateway.domain"})
-@PropertySources({
-        @PropertySource("messages/messages.properties"),
-        @PropertySource("WEB-INF/classes/smpeditor.properties")
-})
-public class WebMvcConfig extends WebMvcConfigurerAdapter {
+@PropertySource("messages/messages.properties")
+@PropertySource("WEB-INF/classes/smpeditor.properties")
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

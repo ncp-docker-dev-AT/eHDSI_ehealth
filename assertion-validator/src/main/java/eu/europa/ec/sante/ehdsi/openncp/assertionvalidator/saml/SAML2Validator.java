@@ -28,6 +28,7 @@ import java.util.ServiceLoader;
 public class SAML2Validator {
 
     private static final ServiceLoader<PolicyAssertionManager> serviceLoader = ServiceLoader.load(PolicyAssertionManager.class);
+    private static final String OASIS_WSSE_SCHEMA_LOC = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private static final Logger LOGGER = LoggerFactory.getLogger(SAML2Validator.class);
     private static PolicyAssertionManager policyManager;
 
@@ -44,22 +45,13 @@ public class SAML2Validator {
     private SAML2Validator() {
     }
 
-    /**
-     * @param soapHeader
-     * @return
-     * @throws MissingFieldException
-     * @throws InsufficientRightsException
-     * @throws InvalidFieldException
-     * @throws XSDValidationException
-     * @throws SMgrException
-     */
     public static String validateXCPDHeader(Element soapHeader) throws MissingFieldException, InsufficientRightsException,
             InvalidFieldException, XSDValidationException, SMgrException {
 
         LOGGER.debug("[SAML] Validating XCPD Header.");
         String sigCountryCode = null;
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(OASIS_WSSE_SCHEMA_LOC, "Security");
         Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
@@ -72,14 +64,14 @@ public class SAML2Validator {
         Assertion hcpAssertion = null;
         try {
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
-                    if (hcpAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(hcpAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         break;
                     }
                 }
@@ -100,15 +92,6 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    /**
-     * @param soapHeader
-     * @param classCode
-     * @return
-     * @throws InsufficientRightsException
-     * @throws MissingFieldException
-     * @throws InvalidFieldException
-     * @throws SMgrException
-     */
     public static String validateXCAHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
@@ -117,7 +100,7 @@ public class SAML2Validator {
 
         try {
             // Since the XCA Simulator sends this value wrong, we are trying it as follows for now
-            NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = soapHeader.getElementsByTagNameNS(OASIS_WSSE_SCHEMA_LOC, "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
@@ -131,7 +114,7 @@ public class SAML2Validator {
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
                     ass = (Element) assertionList.item(i);
                     if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
                         LOGGER.debug("ncname found!!!");
@@ -144,10 +127,10 @@ public class SAML2Validator {
                     }
 
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
-                    Assertion anAssertion = (Assertion) SAML.fromElement(ass);
-                    if (anAssertion.getAdvice() == null) {
+                    var anAssertion = (Assertion) SAML.fromElement(ass);
+                    if (org.apache.commons.lang.StringUtils.equals(anAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         hcpAssertion = (Assertion) SAML.fromElement(ass);
                     } else {
                         trcAssertion = (Assertion) SAML.fromElement(ass);
@@ -174,17 +157,6 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    /**
-     * Validates the contents of the XDR Header.
-     *
-     * @param soapHeader
-     * @param classCode
-     * @return
-     * @throws InsufficientRightsException
-     * @throws MissingFieldException
-     * @throws InvalidFieldException
-     * @throws SMgrException
-     */
     public static String validateXDRHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
@@ -192,7 +164,7 @@ public class SAML2Validator {
         String sigCountryCode;
 
         try {
-            NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = soapHeader.getElementsByTagNameNS(OASIS_WSSE_SCHEMA_LOC, "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
@@ -201,31 +173,31 @@ public class SAML2Validator {
             }
 
             NodeList assertionList = security.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion");
-            Element ass;
+            Element assertionElement;
             Assertion hcpAssertion = null;
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
-                    ass = (Element) assertionList.item(i);
-                    if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
+                    assertionElement = (Element) assertionList.item(i);
+                    if (assertionElement.getAttribute("ID").startsWith("urn:uuid:")) {
                         LOGGER.debug("ncname found!!!");
-                        ass.setAttribute("ID", "_" + ass.getAttribute("ID").substring(9));
+                        assertionElement.setAttribute("ID", "_" + assertionElement.getAttribute("ID").substring(9));
                     }
-                    if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
+                    if (assertionElement.getAttribute("ID").startsWith("urn:uuid:")) {
                         LOGGER.debug("ncname still exist!!!");
                     } else {
                         LOGGER.debug("ncname fixed!!!");
                     }
 
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
-                    Assertion anAssertion = (Assertion) SAML.fromElement(ass);
-                    if (anAssertion.getAdvice() == null) {
-                        hcpAssertion = (Assertion) SAML.fromElement(ass);
+                    var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(assertionElement));
+                    var anAssertion = (Assertion) SAML.fromElement(assertionElement);
+                    if (org.apache.commons.lang.StringUtils.equals(anAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
+                        hcpAssertion = (Assertion) SAML.fromElement(assertionElement);
                     } else {
-                        trcAssertion = (Assertion) SAML.fromElement(ass);
+                        trcAssertion = (Assertion) SAML.fromElement(assertionElement);
                     }
                 }
             }
@@ -248,15 +220,10 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    /**
-     * @param trcAssertion
-     * @param hcpAssertion
-     * @throws InsufficientRightsException
-     */
     private static void checkTRCAdviceIdReferenceAgainstHCPId(Assertion trcAssertion, Assertion hcpAssertion) throws InsufficientRightsException {
 
         try {
-            String trcFirstReferenceId = trcAssertion.getAdvice().getAssertionIDReferences().get(0).getAssertionID();
+            String trcFirstReferenceId = trcAssertion.getAdvice().getAssertionIDReferences().get(0).getValue();
 
             if (trcFirstReferenceId != null && trcFirstReferenceId.equals(hcpAssertion.getID())) {
                 LOGGER.info("Assertion id reference equals to id.");
@@ -283,19 +250,16 @@ public class SAML2Validator {
         return policyManager.isConsentGiven(patientId, countryId);
     }
 
-    /**
-     * @param soapHeader
-     * @return
-     */
     public static List<Assertion> getAssertions(Element soapHeader) {
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        LOGGER.info("Retrieving SAML tokens from SOAP Header");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(OASIS_WSSE_SCHEMA_LOC, "Security");
 
         Element security = (Element) securityList.item(0);
         NodeList assertionList = security.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion");
         List<Assertion> result = new ArrayList<>();
 
-        for (int i = 0; i < assertionList.getLength(); i++) {
+        for (var i = 0; i < assertionList.getLength(); i++) {
             Element ass = (Element) assertionList.item(i);
 
             if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
@@ -304,8 +268,8 @@ public class SAML2Validator {
 
             try {
                 // Validate Assertion according to SAML XSD
-                SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));    // Validate Assertion according to SAML XSD
+                var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
                 result.add((Assertion) SAML.fromElement(ass));
 
             } catch (UnmarshallingException | IOException | SAXException ex) {
@@ -315,15 +279,6 @@ public class SAML2Validator {
         return result;
     }
 
-    /**
-     * @param assertion
-     * @param classCode
-     * @return
-     * @throws MissingFieldException
-     * @throws InvalidFieldException
-     * @throws InsufficientRightsException
-     * @throws SMgrException
-     */
     private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException,
             InvalidFieldException, InsufficientRightsException, SMgrException {
 
@@ -369,21 +324,11 @@ public class SAML2Validator {
         // from the signature, but now in order not to change the security manager in Google Code repo, this is reverted back.
         // Konstantin: committed changes to security manager, in order to provide better support XCA and XDR implementations
         //TODO: Improve Exception management.
-        try {
-            sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
-        } catch (SMgrException e) {
-            throw e;
-        }
+        sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
 
         return sigCountryCode;
     }
 
-    /**
-     * @param assertion
-     * @param classCode
-     * @throws MissingFieldException
-     * @throws InvalidFieldException
-     */
     private static void checkTRCAssertion(Assertion assertion, String classCode) throws MissingFieldException,
             InvalidFieldException {
 
@@ -420,18 +365,11 @@ public class SAML2Validator {
         policyManager.XSPASubjectValidatorForTRC(assertion, classCode);
     }
 
-    /**
-     * @param soapHeader
-     * @return
-     * @throws MissingFieldException
-     * @throws XSDValidationException
-     * @throws SMgrException
-     */
     public static String getCountryCodeFromHCPAssertion(Element soapHeader) throws MissingFieldException, XSDValidationException, SMgrException {
 
         String sigCountryCode = null;
 
-        NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+        NodeList securityList = soapHeader.getElementsByTagNameNS(OASIS_WSSE_SCHEMA_LOC, "Security");
         Element security;
         if (securityList.getLength() > 0) {
             security = (Element) securityList.item(0);
@@ -444,14 +382,14 @@ public class SAML2Validator {
         Assertion hcpAssertion = null;
         try {
             if (assertionList.getLength() > 0) {
-                for (int i = 0; i < assertionList.getLength(); i++) {
+                for (var i = 0; i < assertionList.getLength(); i++) {
                     hcpAss = (Element) assertionList.item(i);
                     // Validate Assertion according to SAML XSD
-                    SAMLSchemaBuilder schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
+                    var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
                     schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(hcpAss));
 
                     hcpAssertion = (Assertion) SAML.fromElement(hcpAss);
-                    if (hcpAssertion.getAdvice() == null) {
+                    if (org.apache.commons.lang.StringUtils.equals(hcpAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
                         break;
                     }
                 }
@@ -462,11 +400,9 @@ public class SAML2Validator {
 
             sigCountryCode = new SignatureManager().verifySAMLAssertion(hcpAssertion);
 
-
         } catch (IOException | UnmarshallingException e) {
             LOGGER.error("{}: '{}'", e.getMessage(), e);
         } catch (SAXException e) {
-            LOGGER.error("SAXException: '{}'", e.getMessage(), e);
             throw new XSDValidationException(e.getMessage());
         }
 
