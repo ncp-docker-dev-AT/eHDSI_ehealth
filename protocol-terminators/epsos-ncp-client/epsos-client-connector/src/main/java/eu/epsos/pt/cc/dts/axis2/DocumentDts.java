@@ -14,7 +14,10 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * This is an Data Transformation Service providing functions to transform data into a Document object.
@@ -81,8 +84,9 @@ public class DocumentDts {
                 case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
                     break;
-                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:_CLASSCODE:
-                result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    _CLASSCODE:
+                    result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
                     break;
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE);
@@ -101,15 +105,16 @@ public class DocumentDts {
     }
 
     private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {
-        Author[] convertedAuthors = new Author[authors.size()];
-        for (int i=0; i<authors.size();i++) {
-            OrCDDocumentMetaData.Author author = authors.get(i);
+
+        var convertedAuthors = new Author[authors.size()];
+        for (var i = 0; i < authors.size(); i++) {
+            var author = authors.get(i);
             String authorPerson = author.getAuthorPerson();
             String[] authorSpecialities = null;
-            if(author.getAuthorSpeciality() != null) {
+            if (author.getAuthorSpeciality() != null) {
                 authorSpecialities = author.getAuthorSpeciality().toArray(new String[author.getAuthorSpeciality().size()]);
             }
-            Author convertedAuthor = Author.Factory.newInstance();
+            var convertedAuthor = Author.Factory.newInstance();
             convertedAuthor.setPerson(authorPerson);
             convertedAuthor.setSpecialtyArray(authorSpecialities);
             convertedAuthors[i] = convertedAuthor;
@@ -118,7 +123,8 @@ public class DocumentDts {
     }
 
     private static ReasonOfHospitalisation convertReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
-        ReasonOfHospitalisation convertedReasonOfHospitalisation = ReasonOfHospitalisation.Factory.newInstance();
+
+        var convertedReasonOfHospitalisation = ReasonOfHospitalisation.Factory.newInstance();
         convertedReasonOfHospitalisation.setCode(reasonOfHospitalisation.getCode());
         convertedReasonOfHospitalisation.setText(reasonOfHospitalisation.getText());
         return convertedReasonOfHospitalisation;
@@ -190,11 +196,11 @@ public class DocumentDts {
      */
     private static Calendar convertDate(String dateString) {
 
-        String pattern1 = "yyyyMMddHHmmss";
-        String pattern2 = "yyyyMMdd";
+        var pattern1 = "yyyyMMddHHmmss";
+        var pattern2 = "yyyyMMdd";
         String selectedPattern;
 
-        if(dateString != null) {
+        if (dateString != null) {
             if (dateString.length() == pattern1.length()) {
                 selectedPattern = pattern1;
             } else if (dateString.length() == pattern2.length()) {

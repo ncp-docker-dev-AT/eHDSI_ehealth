@@ -19,7 +19,9 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ClientConnectorServiceSkeleton java skeleton for the axisService.
@@ -100,14 +102,15 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         String countryCode = queryDocumentRequest.getCountryCode();
 
         List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
-        List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
+        List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes =
+                eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
-        FilterParams filterParamsReceived = queryDocumentRequest.getFilterParams();
+        var filterParamsReceived = queryDocumentRequest.getFilterParams();
         var patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(queryDocumentRequest.getPatientId());
 
-        tr.com.srdc.epsos.data.model.FilterParams filterParams = eu.epsos.pt.cc.dts.FilterParamsDts.newInstance(filterParamsReceived);
+        var filterParams = eu.epsos.pt.cc.dts.FilterParamsDts.newInstance(filterParamsReceived);
 
-        for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode: documentCodes) {
+        for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode : documentCodes) {
             if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
                 throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
             }
@@ -116,7 +119,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         //  Performing call to Web Service:
         try {
             QueryResponse response;
-            if (documentCodes.size()==1) {
+            if (documentCodes.size() == 1) {
                 switch (documentCodes.get(0).getValue()) {
                     case Constants.PS_CLASSCODE:
                         response = PatientService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
@@ -140,7 +143,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                 if (!documentCodes.contains(Constants.EP_CLASSCODE)
                         && !documentCodes.contains(Constants.PS_CLASSCODE)
                         && !documentCodes.contains(Constants.MRO_CLASSCODE)) {
-                response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, assertionMap);
+                    response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, assertionMap);
                 } else {
                     throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
                 }
@@ -216,10 +219,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                             assertionMap);
                     break;
                 case Constants.MRO_CLASSCODE:
-                    response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
-                            assertionMap);
-                    response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
-                            assertionMap);
+                    response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage, assertionMap);
                     break;
                 case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                 case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
