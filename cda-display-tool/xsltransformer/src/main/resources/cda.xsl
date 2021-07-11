@@ -39,6 +39,7 @@
         <html>
             <head>
                 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous"/>
+                <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'/>
                 <xsl:comment>Do NOT edit this HTML directly: it was generated via an XSLT transformation from a CDA
                     Release 2 XML document.
                 </xsl:comment>
