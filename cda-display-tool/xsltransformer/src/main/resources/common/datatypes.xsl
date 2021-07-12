@@ -111,22 +111,34 @@
                 </xsl:call-template>
                 <xsl:choose>
                     <xsl:when test="$low">
-                        <!--TODO add label to eHDSIDisplayLabel value set -->
-                        <xsl:text> from </xsl:text>
+                        <xsl:text> </xsl:text>
+                        <!-- From -->
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'147'"/>
+                        </xsl:call-template>
+                        <xsl:text> </xsl:text>
                         <xsl:call-template name="show-TS">
                             <xsl:with-param name="node" select="$low"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$high">
-                        <!--TODO add label to eHDSIDisplayLabel value set -->
-                        <xsl:text> until </xsl:text>
+                        <xsl:text> </xsl:text>
+                        <!-- Until -->
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'148'"/>
+                        </xsl:call-template>
+                        <xsl:text> </xsl:text>
                         <xsl:call-template name="show-TS">
                             <xsl:with-param name="node" select="$high"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="$center">
-                        <!--TODO add label to eHDSIDisplayLabel value set -->
-                        <xsl:text> around </xsl:text>
+                        <xsl:text> </xsl:text>
+                        <!-- Around -->
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'149'"/>
+                        </xsl:call-template>
+                        <xsl:text> </xsl:text>
                         <xsl:call-template name="show-TS">
                             <xsl:with-param name="node" select="$center"/>
                         </xsl:call-template>
@@ -134,27 +146,40 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:when test="$low and $high">
-                <!--TODO add label to eHDSIDisplayLabel value set -->
-                <xsl:text>from </xsl:text>
+                <!-- From -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'147'"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
                 </xsl:call-template>
-                <!--TODO add label to eHDSIDisplayLabel value set -->
-                <xsl:text> until </xsl:text>
+                <xsl:text> </xsl:text>
+                <!-- Until -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'148'"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$low">
-                <!--TODO add label to eHDSIDisplayLabel value set -->
-                <xsl:text>from </xsl:text>
+                <!-- From -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'147'"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$low"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:when test="$high">
-                <!--TODO add label to eHDSIDisplayLabel value set -->
-                <xsl:text>until </xsl:text>
+                <!-- Until -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'148'"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$high"/>
                 </xsl:call-template>

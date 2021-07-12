@@ -3,28 +3,12 @@
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <!--- BASIC HEADER ELEMENT -->
-    <xsl:variable name="familyName"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:family"/>
-    <xsl:variable name="givenName"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:given"/>
-    <xsl:variable name="prefix"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:prefix"/>
-    <xsl:variable name="primaryPatientId"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[1]"/>
-    <xsl:variable name="secondaryPatientId"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[2]"/>
-    <xsl:variable name="birthdate"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime"/>
-    <xsl:variable name="gender"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:administrativeGenderCode"/>
-    <xsl:variable name="creationDate"
-                  select="/n1:ClinicalDocument/n1:effectiveTime"/>
-    <xsl:variable name="lastUpdate"
-                  select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
-    <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode"/>
-
     <xsl:template name="basicCdaHeader">
+        <xsl:variable name="creationDate"
+                      select="/n1:ClinicalDocument/n1:effectiveTime"/>
+        <xsl:variable name="lastUpdate"
+                      select="/n1:ClinicalDocument/n1:documentationOf/n1:serviceEvent/n1:effectiveTime/n1:high"/>
+        <xsl:variable name="documentLanguageCode" select="/n1:ClinicalDocument/n1:languageCode"/>
         <table class="header_table">
             <tbody>
                 <tr class="td_creation_date">
@@ -65,7 +49,8 @@
             </tbody>
         </table>
     </xsl:template>
-    <xsl:template name="patientBlock">
+
+    <xsl:template match="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole" mode="PS">
         <table class="header_table">
             <tbody>
                 <tr>
@@ -92,9 +77,9 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td colspan="2"><xsl:value-of select="$prefix"/></td>
-                                <td colspan="2"><xsl:value-of select="$familyName"/></td>
-                                <td><xsl:value-of select="$givenName"/>&#160;</td>
+                                <td colspan="2"><xsl:apply-templates select="n1:patient/n1:name/n1:prefix"/></td>
+                                <td colspan="2"><xsl:apply-templates select="n1:patient/n1:name/n1:family"/></td>
+                                <td><xsl:apply-templates select="n1:patient/n1:name/n1:given"/></td>
                             </tr>
                             <tr>
                                 <th style="width:140px;">
@@ -105,10 +90,10 @@
                                 </th>
                                 <td>
                                     <xsl:call-template name="show-id">
-                                        <xsl:with-param name="id" select="$primaryPatientId"/>
+                                        <xsl:with-param name="id" select="n1:id[1]"/>
                                     </xsl:call-template>
                                 </td>
-                                <xsl:if test="$secondaryPatientId">
+                                <xsl:if test="n1:id[2]">
                                     <th style="width:140px;">
                                         <!-- Secondary Patient Identifier -->
                                         <xsl:call-template name="show-eHDSIDisplayLabel">
@@ -117,7 +102,7 @@
                                     </th>
                                     <td>
                                         <xsl:call-template name="show-id">
-                                            <xsl:with-param name="id" select="$secondaryPatientId"/>
+                                            <xsl:with-param name="id" select="n1:id[2]"/>
                                         </xsl:call-template>
                                     </td>
                                 </xsl:if>
@@ -130,7 +115,9 @@
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:value-of select="$gender/@displayName"/>
+                                    <xsl:call-template name="show-eHDSIAdministrativeGender">
+                                        <xsl:with-param name="node" select="n1:patient/n1:administrativeGenderCode"/>
+                                    </xsl:call-template>
                                 </td>
                                 <th style="width:140px;">
                                     <!-- Date Of Birth-->
@@ -140,8 +127,8 @@
                                 </th>
                                 <td>
                                     <xsl:call-template name="show-TS">
-                                        <xsl:with-param name="node" select="$birthdate"/>
-                                    </xsl:call-template>&#160;
+                                        <xsl:with-param name="node" select="n1:patient/n1:birthTime"/>
+                                    </xsl:call-template>
                                 </td>
                             </tr>
                         </tbody>
@@ -149,5 +136,17 @@
                 </tr>
             </tbody>
         </table>
+    </xsl:template>
+
+    <xsl:template match="n1:patient/n1:name/n1:prefix">
+        <xsl:value-of select="."/>&#160;
+    </xsl:template>
+
+    <xsl:template match="n1:patient/n1:name/n1:prefix">
+        <xsl:value-of select="."/>&#160;
+    </xsl:template>
+
+    <xsl:template match="n1:patient/n1:name/n1:prefix">
+        <xsl:value-of select="."/>&#160;
     </xsl:template>
 </xsl:stylesheet>
