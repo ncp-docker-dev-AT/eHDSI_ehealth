@@ -44,7 +44,6 @@ public class DocumentDts {
         if (document == null) {
             return null;
         }
-
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
         result.setUuid(document.getDocumentUniqueId());
         result.setDescription(document.getDescription());
@@ -85,7 +84,6 @@ public class DocumentDts {
                     result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
                     break;
                 case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                    _CLASSCODE:
                     result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
                     break;
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:

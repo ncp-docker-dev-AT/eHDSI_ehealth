@@ -148,7 +148,6 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
                 }
             }
-
             if (response.getDocumentAssociations() != null && !response.getDocumentAssociations().isEmpty()) {
                 queryDocumentsResponse.setReturnArray(DocumentDts.newInstance(response.getDocumentAssociations()));
             }
