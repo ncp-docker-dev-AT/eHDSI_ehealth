@@ -105,8 +105,9 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String doseFormCode = getDoseFormCode(xmlDoc);
                 String strength = getStrength(xmlDoc);
                 String substitution = getSubstitution(xmlDoc);
+                boolean dispensable = getDispensable(xmlDoc);
 
-                var epListParam = new EpListParam(true, atcCode, doseFormCode, strength, substitution);
+                var epListParam = new EpListParam(dispensable, atcCode, doseFormCode, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
@@ -727,4 +728,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return substitution;
     }
 
+    private boolean getDispensable(Document xmlDoc) {
+        return true;
+    }
 }

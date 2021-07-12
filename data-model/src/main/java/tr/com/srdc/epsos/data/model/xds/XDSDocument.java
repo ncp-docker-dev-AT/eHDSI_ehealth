@@ -34,7 +34,8 @@ public class XDSDocument {
     private String strength;
     private String doseFormCode;
     private String doseFormText;
-    private String Substitution;
+    private String substitution;
+    private boolean dispensable;
 
     public String getAtcCode() {
         return atcCode;
@@ -77,13 +78,20 @@ public class XDSDocument {
     }
 
     public String getSubstitution() {
-        return Substitution;
+        return substitution;
     }
 
     public void setSubstitution(String substitution) {
-        Substitution = substitution;
+        this.substitution = substitution;
     }
 
+    public boolean isDispensable() {
+        return dispensable;
+    }
+
+    public void setDispensable(boolean dispensable) {
+        this.dispensable = dispensable;
+    }
 
     /**
      * @return the hcid

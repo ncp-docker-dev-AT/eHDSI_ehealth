@@ -163,6 +163,26 @@ public final class AdhocQueryResponseConverter {
                             }
                         }
 
+                        // Set Dispensable
+                        if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
+                            boolean dispensable = false;
+                            if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)) {
+                                List<ClassificationType> classificationTypeList = eo.getValue().getClassification();
+                                for (ClassificationType classificationType : classificationTypeList) {
+                                    if (StringUtils.equals(classificationType.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")) {
+                                        if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")
+                                                && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+                                            dispensable = true;
+                                        } else if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:closed")
+                                                && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+                                            dispensable = false;
+                                        }
+                                    }
+                                }
+                            }
+                            xdsDocument.setDispensable(dispensable);
+                        }
+
                         // Set Reason of Hospitalisation
                         if (str.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && eo.getValue().getClassification().get(j) != null) {
                             String code = eo.getValue().getClassification().get(j).getNodeRepresentation();
@@ -178,10 +198,10 @@ public final class AdhocQueryResponseConverter {
                                 xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
                             }
                         }
-
                     }
 
                     // Set description
+                    /*
                     if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
 
                         if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)) {
@@ -209,6 +229,11 @@ public final class AdhocQueryResponseConverter {
                             xdsDocument.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
                         }
                     }
+                    */
+                    if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
+                        xdsDocument.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
+                    }
+
                     documents.add(xdsDocument);
 
                 } else if ("AssociationType1".equals(declaredTypeName)) {
