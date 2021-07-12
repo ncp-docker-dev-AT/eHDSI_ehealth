@@ -129,7 +129,7 @@
             </representedOrganization>
         </assignedEntity>
     </legalAuthenticator>
-    <relatedDocument typeCode="APND">
+    <relatedDocument typeCode="XFRM">
         <parentDocument>
             <id root="1.21.2002201772215.21982127.2"/>
         </parentDocument>

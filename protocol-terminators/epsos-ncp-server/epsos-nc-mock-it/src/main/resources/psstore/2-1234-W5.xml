@@ -385,6 +385,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <!-- Normal dosing -->
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <id root="2.999.1.1"/>
@@ -445,6 +446,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <!-- Normal dosing -->
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <id root="2.999.1.2"/>
@@ -511,6 +513,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <!-- Normal dosing -->
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <id root="2.999.1.3"/>
@@ -557,6 +560,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <!-- Normal dosing -->
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <id root="2.999.1.4"/>
@@ -620,6 +624,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="INT">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <!-- Normal dosing -->
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1"/>
                             <id root="2.999.1.5"/>
@@ -697,8 +702,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Allergies, adverse reactions, alerts -->
                 <section>
-                    <templateId root="2.16.840.1.113883.10.20.1.2"/>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.13"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.12"/>
                     <id root="2.999.2"/>
                     <code code="48765-2" displayName="Allergies, adverse reactions, alerts" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Allergies and adverse reactions</title>
@@ -719,9 +723,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <!-- Allergy and Intolerance Concern -->
                         <act classCode="ACT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.16"/>
                             <id root="2.999.2.1"/>
                             <code code="CONC" codeSystem="2.16.840.1.113883.5.6" codeSystemName="ActClass"/>
                             <!-- status of Concern -->
@@ -790,9 +792,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <!-- Allergy and Intolerance Concern -->
                         <act classCode="ACT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.16"/>
                             <id root="2.999.2.2"/>
                             <code code="CONC" codeSystem="2.16.840.1.113883.5.6" codeSystemName="ActClass"/>
                             <!-- status of Concern -->
@@ -860,9 +860,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <!-- Allergy and Intolerance Concern -->
                         <act classCode="ACT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.16"/>
                             <id root="2.999.2.3"/>
                             <code code="CONC" codeSystem="2.16.840.1.113883.5.6" codeSystemName="ActClass"/>
                             <!-- status of Concern -->
@@ -931,9 +929,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <!-- Allergy and Intolerance Concern -->
                         <act classCode="ACT" moodCode="EVN">
-                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.3"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.16"/>
                             <id root="2.999.2.4"/>
                             <!-- PS
                             <code nullFlavor="NA"/>
@@ -1011,8 +1007,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- History of Procedures -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.12"/>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.11"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.11"/>
                     <id root="2.999.3"/>
                     <code code="47519-4" displayName="History of Procedures" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of Procedures</title>
@@ -1023,7 +1018,7 @@ Although being real choices for the different diseases and conditions, the selec
                             section</content><br/></td><td>2012-04-14</td></tr><tr ID="pro-3a"><td><content ID="code-24" language="xx-XX">Thyroidectomy</content><br/></td><td>1997-06-05</td></tr></tbody></table></text>
                     <entry>
                         <procedure classCode="PROC" moodCode="EVN">
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.26"/>
                             <id root="2.999.3.1"/>
                             <code codeSystem="2.16.840.1.113883.6.96" code="64253000">
                                 <originalText><reference value="#code-22"/></originalText>
@@ -1035,7 +1030,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <procedure classCode="PROC" moodCode="EVN">
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.26"/>
                             <id root="2.999.3.2"/>
                             <code codeSystem="2.16.840.1.113883.6.96" code="11466000">
                                 <originalText><reference value="#code-23"/></originalText>
@@ -1047,7 +1042,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <procedure classCode="PROC" moodCode="EVN">
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.19"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.26"/>
                             <id root="2.999.3.3"/>
                             <code codeSystem="2.16.840.1.113883.6.96" code="13619001">
                                 <originalText><reference value="#code-24"/></originalText>
@@ -1062,7 +1057,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Problem list -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.6"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.9"/>
                     <templateId root="2.16.840.1.113883.10.20.1.11"/>
                     <id root="2.999.4"/>
                     <code code="11450-4" displayName="Problem list" codeSystem="2.16.840.1.113883.6.1"/>
@@ -1083,14 +1078,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.1"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-1"/></text>
                             <statusCode code="active"/>
                             <effectiveTime>
@@ -1142,14 +1133,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.2"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-2"/></text>
 
                             <statusCode code="active"/>
@@ -1177,14 +1164,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.3"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-3"/></text>
 
                             <statusCode code="active"/>
@@ -1212,14 +1195,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.5"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-4"/></text>
 
                             <statusCode code="active"/>
@@ -1246,14 +1225,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.6"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-5"/></text>
 
                             <statusCode code="active"/>
@@ -1293,14 +1268,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.4.7"/>
-                            <code nullFlavor="NA"/>
-                            <!-- IPS:
-                                <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            -->
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#pca-6"/></text>
 
                             <statusCode code="active"/>
@@ -1344,7 +1315,6 @@ Although being real choices for the different diseases and conditions, the selec
                 <section>
                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.4"/>
                     <templateId root="2.16.840.1.113883.10.20.1.7"/>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.5"/>
                     <id root="2.999.5"/>
                     <code code="46264-8" displayName="History of medical device use" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of medical device use </title>
@@ -1356,7 +1326,9 @@ Although being real choices for the different diseases and conditions, the selec
                         <supply classCode="SPLY" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.5"/>
                             <text><reference value="#sup-1"/></text>
-                            <effectiveTime value="20141020"/>
+                            <effectiveTime xsi:type="IVL_TS">
+                                <low value="20141020"/>
+                            </effectiveTime>
                             <participant typeCode="DEV">
                                 <participantRole classCode="MANU">
                                     <id root="2.999" extension="ABC-Device-ID"/>
@@ -1374,7 +1346,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- History of Past Illness -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.8"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.10"/>
                     <id root="2.999.6"/>
                     <code code="11348-0" displayName="History of past illness" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of Past illness</title>
@@ -1394,11 +1366,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </text>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.6.1"/>
-                            <code nullFlavor="NA"/>
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#prob-1"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
@@ -1442,11 +1413,10 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <act classCode="ACT" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
                             <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.1"/>
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.5.2"/>
                             <id root="2.999.6.3"/>
-                            <code nullFlavor="NA"/>
+                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
                             <text><reference value="#prob-2"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
@@ -1494,7 +1464,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Immunizations -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.23"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.15"/>
                     <templateId root="2.16.840.1.113883.10.20.1.6"/>
                     <id root="2.999.7"/>
                     <code code="11369-6" displayName="History of immunization" codeSystem="2.16.840.1.113883.6.1" />
@@ -1508,6 +1478,7 @@ Although being real choices for the different diseases and conditions, the selec
                             vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td/></tr></tbody></table></text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.19"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.1"/>
@@ -1517,7 +1488,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <effectiveTime value="19830102"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.18"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial>
                                         <code code="34689006" codeSystem="2.16.840.1.113883.6.96">
@@ -1531,6 +1502,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.19"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.2"/>
@@ -1540,7 +1512,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <effectiveTime value="19830102"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.18"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial>
                                         <code code="414005006" codeSystem="2.16.840.1.113883.6.96">
@@ -1554,6 +1526,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.19"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.3"/>
@@ -1563,7 +1536,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <effectiveTime value="19830102"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.18"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial>
                                         <code code="333680004" codeSystem="2.16.840.1.113883.6.96">
@@ -1577,6 +1550,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.19"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.12"/>
                             <templateId root="2.16.840.1.113883.10.20.1.24"/>
                             <id root="2.999.7.4"/>
@@ -1586,7 +1560,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <effectiveTime value="19940520"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
-                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.2"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.18"/>
                                     <templateId root="2.16.840.1.113883.10.20.1.53"/>
                                     <manufacturedMaterial>
                                         <code code="424519000" codeSystem="2.16.840.1.113883.6.96">
@@ -1603,7 +1577,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Pregnancy History -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.4"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.7"/>
                     <id root="2.999.8"/>
                     <code code="10162-6" displayName="History of pregnancies" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>History of pregnancies</title>
@@ -1613,6 +1587,8 @@ Although being real choices for the different diseases and conditions, the selec
                             estimated (clinical)</content><br/></td><td>2018-01-01</td><td>2017-04-15</td></tr></tbody></table></text>
                     <entry>
                         <observation classCode="OBS" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.24"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.5"/>
                             <id root="2.999.8.1"/>
@@ -1630,8 +1606,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Coded Social History -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.16.1"/>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.16"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.13"/>
                     <templateId root="2.16.840.1.113883.10.20.1.15"/>
                     <id root="2.999.9"/>
                     <code code="29762-2" displayName="Social history" codeSystem="2.16.840.1.113883.6.1"/>
@@ -1651,9 +1626,11 @@ Although being real choices for the different diseases and conditions, the selec
                     </text>
                     <entry>
                         <observation classCode="OBS" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.23"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
-                            <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <id root="2.999.9.1"/>
                             <code code="229819007" codeSystem="2.16.840.1.113883.6.96">
                                 <originalText><reference value="#code-61"/></originalText>
@@ -1668,9 +1645,11 @@ Although being real choices for the different diseases and conditions, the selec
                     </entry>
                     <entry>
                         <observation classCode="OBS" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.23"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
-                            <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.4"/>
+                            <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <id root="2.999.9.1"/>
                             <code code="160573003" codeSystem="2.16.840.1.113883.6.96">
                                 <originalText><reference value="#code-62"/></originalText>
@@ -1688,8 +1667,7 @@ Although being real choices for the different diseases and conditions, the selec
             <component>
                 <!-- Coded Vital Signs -->
                 <section>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.1.5.3.2"/>
-                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.3.25"/>
+                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.2.6"/>
                     <id root="2.999.10"/>
                     <code code="8716-3" displayName="Physical findings" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Physical findings</title>
@@ -1709,6 +1687,7 @@ Although being real choices for the different diseases and conditions, the selec
                     </text>
                     <entry>
                         <organizer classCode="CLUSTER" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.21"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.1"/>
                             <templateId root="2.16.840.1.113883.10.20.1.32"/>
                             <templateId root="2.16.840.1.113883.10.20.1.35"/>
@@ -1720,9 +1699,11 @@ Although being real choices for the different diseases and conditions, the selec
                             <effectiveTime value="20170506"/>
                             <component>
                                 <observation classCode="OBS" moodCode="EVN">
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.22"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
-                                    <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.2"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <id root="2.999"/>
                                     <code code="8462-4" codeSystem="2.16.840.1.113883.6.1">
                                         <originalText><reference value="#code-65"/></originalText>
@@ -1735,9 +1716,11 @@ Although being real choices for the different diseases and conditions, the selec
                             </component>
                             <component>
                                 <observation classCode="OBS" moodCode="EVN">
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.22"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
-                                    <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.2"/>
+                                    <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <id root="2.999"/>
                                     <code code="8480-6" codeSystem="2.16.840.1.113883.6.1">
                                         <originalText><reference value="#code-66"/></originalText>
@@ -1765,7 +1748,8 @@ Although being real choices for the different diseases and conditions, the selec
                     </text>
                     <entry>
                         <observation classCode="OBS" moodCode="EVN">
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.6"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.25"/>
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                             <id root="2.999"/>
                             <code code="34530-6" codeSystem="2.16.840.1.113883.6.1"/>
