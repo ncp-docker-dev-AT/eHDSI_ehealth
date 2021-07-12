@@ -3,6 +3,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.openncp.securitymanager.TwoFactorAuthentication;
 import org.apache.commons.lang.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -81,6 +82,9 @@ public class FieldValueValidators {
     public static void validateAuthnContextClassRefValueForHCP(Assertion assertion) throws InvalidFieldException {
         if (assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getURI() == null) {
             throw (new InvalidFieldException("AuthnContextClassRef should be filled."));
+        } else if (!TwoFactorAuthentication.getAuthTypeValues()
+                .contains(assertion.getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getURI())) {
+            throw (new InvalidFieldException("AuthnContextClassRef element must be a Two Factor Authentication token."));
         }
     }
 

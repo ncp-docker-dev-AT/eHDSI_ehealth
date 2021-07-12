@@ -6,6 +6,7 @@ import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.openncp.securitymanager.TwoFactorAuthentication;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObjectBuilder;
@@ -238,7 +239,15 @@ public class SamlTRCIssuer {
             logger.error("SecurityManagerException: '{}'", msg);
             throw new SMgrException(msg);
         }
-
+        String authnContextClassRef = hcpIdentityAssertion.getAuthnStatements().get(0).getAuthnContext()
+                .getAuthnContextClassRef().getURI();
+        if (!TwoFactorAuthentication.getAuthTypeValues().contains(authnContextClassRef)) {
+            String msg = "Identity Assertion with ID " + hcpIdentityAssertion.getID() + "has authnContextClassRef= " +
+                    authnContextClassRef + ". Instead authnContextClassRef must be one of " +
+                    TwoFactorAuthentication.getAuthTypeValues().toString();
+            logger.error("SecurityManagerException: '{}'", msg);
+            throw new SMgrException(msg);
+        }
         auditDataMap.put("hcpIdAssertionID", hcpIdentityAssertion.getID());
 
         // Create the assertion
