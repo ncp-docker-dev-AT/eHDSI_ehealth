@@ -118,7 +118,7 @@
                     <td>
                         <xsl:call-template name="show-TS">
                             <xsl:with-param name="node" select="n1:effectiveTime"/>
-                        </xsl:call-template>&#160;
+                        </xsl:call-template>
                     </td>
                     <td>
                         <xsl:call-template name="show-PQ">
