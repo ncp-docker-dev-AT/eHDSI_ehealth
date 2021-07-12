@@ -38,8 +38,8 @@
             <xsl:when test=" ($autonomySectionTitleCode='47420-5')">
 
                 <div class="wrap-collabsible">
-                    <input id="collapsible-social-history-section-original" class="toggle" type="checkbox" checked="true" />
-                    <label for="collapsible-social-history-section-original" class="lbl-toggle-title">
+                    <input id="collapsible-autonomy-section-original" class="toggle" type="checkbox" checked="true" />
+                    <label for="collapsible-autonomy-section-original" class="lbl-toggle-title">
                         <!-- Section title -->
                         <xsl:call-template name="show-eHDSISection">
                             <xsl:with-param name="code" select="'47420-5'"/>
@@ -50,8 +50,8 @@
                             <xsl:choose>
                                 <xsl:when test="$shownarrative='true'">
                                     <div class="wrap-collabsible">
-                                        <input id="collapsible-social-history-original" class="toggle" type="checkbox"/>
-                                        <label for="collapsible-social-history-original" class="lbl-toggle">
+                                        <input id="collapsible-autonomy-original" class="toggle" type="checkbox"/>
+                                        <label for="collapsible-autonomy-original" class="lbl-toggle">
                                             <xsl:value-of select="$originalNarrativeTableTitle"/>
                                         </label>
                                         <div class="collapsible-content">
