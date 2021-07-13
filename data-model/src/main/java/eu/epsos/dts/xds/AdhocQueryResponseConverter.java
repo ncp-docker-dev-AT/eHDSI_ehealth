@@ -31,26 +31,25 @@ public final class AdhocQueryResponseConverter {
     /**
      * Transforms a AdhocQueryResponse in a QueryResponse.
      *
-     * @param response - in AdhocQueryResponse format
+     * @param adhocQueryResponse - in AdhocQueryResponse format
      * @return a QueryResponse object.
      */
-    public static QueryResponse convertAdhocQueryResponse(AdhocQueryResponse response) {
+    public static QueryResponse convertAdhocQueryResponse(AdhocQueryResponse adhocQueryResponse) {
 
         var queryResponse = new QueryResponse();
 
-        if (response.getRegistryObjectList() != null) {
+        if (adhocQueryResponse.getRegistryObjectList() != null) {
             Map<String, String> documentAssociationsMap = new TreeMap<>();
             List<XDSDocument> documents = new ArrayList<>();
             String str;
 
-            for (var i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
-                JAXBElement<?> o = response.getRegistryObjectList().getIdentifiable().get(i);
+            for (var i = 0; i < adhocQueryResponse.getRegistryObjectList().getIdentifiable().size(); i++) {
+                JAXBElement<?> o = adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
                 String declaredTypeName = o.getDeclaredType().getSimpleName();
                 // TODO A.R. What should we do with Association?
                 if ("ExtrinsicObjectType".equals(declaredTypeName)) {
                     var xdsDocument = new XDSDocument();
-                    JAXBElement<ExtrinsicObjectType> eo;
-                    eo = (JAXBElement<ExtrinsicObjectType>) response.getRegistryObjectList().getIdentifiable().get(i);
+                    JAXBElement<ExtrinsicObjectType> eo = (JAXBElement<ExtrinsicObjectType>) adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
 
                     //Set id
                     xdsDocument.setId(eo.getValue().getId());
@@ -165,7 +164,7 @@ public final class AdhocQueryResponseConverter {
 
                         // Set Dispensable
                         if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
-                            boolean dispensable = false;
+                            var dispensable = false;
                             if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)) {
                                 List<ClassificationType> classificationTypeList = eo.getValue().getClassification();
                                 for (ClassificationType classificationType : classificationTypeList) {
@@ -194,7 +193,7 @@ public final class AdhocQueryResponseConverter {
                                 }
                             }
                             xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
-                            if (codingScheme.trim().equals("1.3.6.1.4.1.12559.11.10.1.3.1.44.2")) {
+                            if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), "1.3.6.1.4.1.12559.11.10.1.3.1.44.2")) {
                                 xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
                             }
                         }
@@ -238,7 +237,7 @@ public final class AdhocQueryResponseConverter {
 
                 } else if ("AssociationType1".equals(declaredTypeName)) {
                     JAXBElement<AssociationType1> eo;
-                    eo = (JAXBElement<AssociationType1>) response.getRegistryObjectList().getIdentifiable().get(i);
+                    eo = (JAXBElement<AssociationType1>) adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
                     if (eo.getValue().getAssociationType().equals("urn:ihe:iti:2007:AssociationType:XFRM")) {
                         documentAssociationsMap.put(eo.getValue().getSourceObject(), eo.getValue().getTargetObject());
                     }
@@ -292,7 +291,6 @@ public final class AdhocQueryResponseConverter {
 
                 documents.remove(sourceObject);
                 documents.remove(targetObject);
-
             }
 
             for (XDSDocument xdsDocument : documents) {
@@ -306,11 +304,11 @@ public final class AdhocQueryResponseConverter {
             queryResponse.setDocumentAssociations(documentAssociations);
         }
 
-        if (response.getRegistryErrorList() != null) {
-            List<String> errors = new ArrayList<>(response.getRegistryErrorList().getRegistryError().size());
+        if (adhocQueryResponse.getRegistryErrorList() != null) {
+            List<String> errors = new ArrayList<>(adhocQueryResponse.getRegistryErrorList().getRegistryError().size());
 
-            for (var i = 0; i < response.getRegistryErrorList().getRegistryError().size(); i++) {
-                errors.add(response.getRegistryErrorList().getRegistryError().get(i).getCodeContext());
+            for (var i = 0; i < adhocQueryResponse.getRegistryErrorList().getRegistryError().size(); i++) {
+                errors.add(adhocQueryResponse.getRegistryErrorList().getRegistryError().get(i).getCodeContext());
             }
 
             queryResponse.setFailureMessages(errors);
