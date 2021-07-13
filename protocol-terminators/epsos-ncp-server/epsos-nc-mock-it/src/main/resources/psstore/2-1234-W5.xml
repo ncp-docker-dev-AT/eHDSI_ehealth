@@ -251,7 +251,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <!-- History of medication use -->
                     <title>History of Medication use</title>
                     <text>
-                        <paragraph ID="sub-1">Eutirox : levothyroxine sodium 100 ug Tablet : 1 ACM since 1997-10-06 (Oral use)</paragraph><paragraph ID="sub-2">Triapin : ramipril 5 mg, felodipine 5 mg Prolonged-release tablet : 2 ACM since 2017-05-06</paragraph><paragraph ID="sub-3">Tresiba : insulin degludec [100 [iU] / mL] Solution for injection in pre-filled pen : 10 [iU] per day since 2012-04-30 (Subcutaneous use)</paragraph><paragraph ID="sub-4">Augmentin : amoxicillin 500 mg, clavulanic acid 125 mg Film-coated tablet : 1 every 8 h between 2017-05-07 and 2017-05-21</paragraph><paragraph ID="sub-5">Combivent Unidose : salbutamol [2.5 mg / 2.5 mL] ipratropium bromide [0.5 mg / 2.5 mL] Nebuliser solution [in Single-dose container, 2.5 mL] : 2.5 mL every 8 h since 2015-01-02</paragraph>
+                        <paragraph ID="sub-1">Eutirox : levothyroxine sodium 100 ug Tablet : 1 ACM since 1997-10-06 (Oral use)</paragraph><paragraph ID="sub-2">Triapin : ramipril 5 mg, felodipine 5 mg Prolonged-release tablet : 2 ACM since 2017-05-06</paragraph><paragraph ID="sub-3">Tresiba : insulin degludec [100 [IU] / mL] Solution for injection in pre-filled pen : 10 [IU] per day since 2012-04-30 (Subcutaneous use)</paragraph><paragraph ID="sub-4">Augmentin : amoxicillin 500 mg, clavulanic acid 125 mg Film-coated tablet : 1 every 8 h between 2017-05-07 and 2017-05-21</paragraph><paragraph ID="sub-5">Combivent Unidose : salbutamol [2.5 mg / 2.5 mL] ipratropium bromide [0.5 mg / 2.5 mL] Nebuliser solution [in Single-dose container, 2.5 mL] : 2.5 mL every 8 h since 2015-01-02</paragraph>
                         <table>
                             <colgroup>
                                 <col width="15%" />
@@ -320,11 +320,11 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr ID="sub-3a">
                                     <td valign="top">Tresiba</td>
                                     <td valign="top">
-                                        <content ID="ecode-5" language="xx-XX">insulin degludec</content> (100 [iU]/1 mL)</td>
+                                        <content ID="ecode-5" language="xx-XX">insulin degludec</content> (100 [IU]/1 mL)</td>
                                     <td valign="top">
                                         <content ID="form-3" language="xx-XX">Solution for injection in pre-filled pen</content>
                                     </td>
-                                    <td valign="top">10 [iU]</td>
+                                    <td valign="top">10 [IU]</td>
                                     <td valign="top">Period : 1 d</td>
                                     <td>since 2012-04-30</td>
                                     <td valign="top">
@@ -528,7 +528,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <routeCode code="20066000" codeSystem="0.4.0.127.0.16.1.1.2.1">
                                 <originalText><reference value="#route-2"/></originalText>
                             </routeCode>
-                            <doseQuantity value="10" unit="[iU]"/>
+                            <doseQuantity value="10" unit="[IU]"/>
                             <consumable>
                                 <manufacturedProduct>
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.1"/>
@@ -541,7 +541,7 @@ Although being real choices for the different diseases and conditions, the selec
                                         </epsos:formCode>
                                         <epsos:ingredient classCode="ACTI">
                                             <epsos:quantity>
-                                                <epsos:numerator xsi:type="epsos:PQ" value="100" unit="[iU]"/>
+                                                <epsos:numerator xsi:type="epsos:PQ" value="100" unit="[IU]"/>
                                                 <epsos:denominator xsi:type="epsos:PQ" value="1" unit="mL"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
