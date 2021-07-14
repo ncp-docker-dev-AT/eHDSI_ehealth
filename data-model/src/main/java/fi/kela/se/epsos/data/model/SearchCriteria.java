@@ -18,7 +18,10 @@ public interface SearchCriteria {
 	enum Criteria {
 		PatientId,
 		RepositoryId,
-		DocumentId
+		DocumentId,
+		MaximumSize,
+		CreatedBefore,
+		CreatedAfter,
 	}
 	
 	SearchCriteria add(Criteria c, String value);

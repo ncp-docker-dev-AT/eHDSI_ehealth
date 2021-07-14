@@ -4,48 +4,18 @@
                 xmlns:epsos="urn:epsos-org:ep:medication"
                 version="1.0">
 
-    <xsl:import href="epHeader.xsl"/>
+    <xsl:import href="epPatient.xsl"/>
+    <xsl:import href="epPrescriber.xsl"/>
     <xsl:import href="epPrescriptionItem.xsl"/>
-    <xsl:import href="epPrescriberDetails.xsl"/>
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
 
-    <xsl:variable name="givenName"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:given"/>
-
-    <xsl:variable name="familyName"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:family"/>
-
-    <xsl:variable name="patientPrefix"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:name/n1:prefix"/>
-
-    <xsl:variable name="primaryPatientID"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[1]/@extension"/>
-
-    <xsl:variable name="secondaryPatientID"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:id[2]/@extension"/>
-
     <xsl:variable name="dateOfDescription"
                   select="/n1:ClinicalDocument/n1:author/n1:time/@value"/>
 
-    <xsl:variable name="prescriptionID"
-                  select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:id/@extension"/>
-
     <xsl:variable name="prescriptionItemID"
                   select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:id/@extension"/>
-
-    <xsl:variable name="prescriberPrefix"
-                  select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:prefix"/>
-
-    <xsl:variable name="prescriberFamilyName"
-                  select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:family"/>
-
-    <xsl:variable name="prescriberGivenName"
-                  select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:given"/>
-
-    <xsl:variable name="birthDate"
-                  select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole/n1:patient/n1:birthTime"/>
 
     <xsl:variable name="entryNode"
                   select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]"/>
@@ -91,30 +61,6 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="authorName">
-        <xsl:param name="authorLocation"/>
-        <xsl:choose>
-            <xsl:when test="($authorLocation/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:prefix)">
-                <xsl:value-of
-                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:prefix"/>
-                &#160;
-            </xsl:when>
-        </xsl:choose>
-        <xsl:choose>
-            <xsl:when test="($authorLocation/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:given)">
-                <xsl:value-of
-                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:given"/>
-                &#160;
-            </xsl:when>
-        </xsl:choose>
-        <xsl:choose>
-            <xsl:when test="($authorLocation/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:family)">
-                <xsl:value-of
-                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:assignedPerson/n1:name/n1:family"/>
-            </xsl:when>
         </xsl:choose>
     </xsl:template>
 
@@ -171,31 +117,10 @@
     </xsl:template>
 
     <xsl:template name="epCda">
-        <xsl:call-template name="epPatientDetails"/>
-        <br/>
-        <xsl:call-template name="epPrescriberDetails"/>
-        <br/>
+        <xsl:apply-templates select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole"/>
+        <xsl:apply-templates select="/n1:ClinicalDocument/n1:author"/>
         <xsl:call-template name="epInformation"/>
-        <br/>
-        <xsl:call-template name="epPrescriptionItem"/>
-    </xsl:template>
-
-    <xsl:template name="epPatientDetails">
-        <div class="wrap-collabsible" >
-            <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
-            <label for="collapsible-patient-header" class="lbl-toggle-main">
-                <!-- Patient-->
-                <xsl:call-template name="show-eHDSIDisplayLabel">
-                    <xsl:with-param name="code" select="'51'"/>
-                </xsl:call-template>
-            </label>
-            <div class="collapsible-content-main">
-                <div class="content-inner-main">
-                    <xsl:call-template name="epHeader"/>
-                </div>
-            </div>
-            <br/>
-        </div>
+        <xsl:apply-templates select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:entry"/>
     </xsl:template>
 
     <xsl:template name="epInformation">
@@ -208,7 +133,7 @@
                         </xsl:call-template>
                     </th>
                     <td>
-                        <xsl:value-of select="$prescriptionID"/>
+                        <xsl:value-of select="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:id/@extension"/>
                     </td>
                     <th>
                         <xsl:call-template name="show-eHDSIDisplayLabel">
@@ -223,5 +148,6 @@
                 </tr>
             </tbody>
         </table>
+        <br/>
     </xsl:template>
 </xsl:stylesheet>

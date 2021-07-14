@@ -14,6 +14,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -40,7 +41,6 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -195,9 +195,8 @@ public class RespondingGateway_ServiceStub extends Stub {
      * @param adhocQueryRequest
      */
     public AdhocQueryResponse respondingGateway_CrossGatewayQuery(AdhocQueryRequest adhocQueryRequest,
-                                                                  Assertion idAssertion,
-                                                                  Assertion trcAssertion,
-                                                                  String classCode)
+                                                                  Map<AssertionEnum, Assertion> assertionMap,
+                                                                  List<String> classCodes)
             throws java.rmi.RemoteException {
 
         MessageContext _messageContext = null;
@@ -236,7 +235,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addAttribute(att1);
 
             SOAPHeaderBlock id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             SOAPHeaderBlock to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
@@ -261,12 +260,20 @@ public class RespondingGateway_ServiceStub extends Stub {
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
 
-            OMNamespace ns = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
-            SOAPHeaderBlock security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security", ns);
+            var omNamespace = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
+            var headerSecurity = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security", omNamespace);
+
             try {
-                security.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
-                security.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-                _serviceClient.addHeader(security);
+                if (assertionMap.containsKey(AssertionEnum.NEXT_OF_KIN)) {
+                    var assertionNextOfKin = assertionMap.get(AssertionEnum.NEXT_OF_KIN);
+                    headerSecurity.addChild(XMLUtils.toOM(assertionNextOfKin.getDOM()));
+                }
+                var assertionId = assertionMap.get(AssertionEnum.CLINICIAN);
+                headerSecurity.addChild(XMLUtils.toOM(assertionId.getDOM()));
+                var assertionTreatment = assertionMap.get(AssertionEnum.TREATMENT);
+                headerSecurity.addChild(XMLUtils.toOM(assertionTreatment.getDOM()));
+
+                _serviceClient.addHeader(headerSecurity);
             } catch (Exception ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
             }
@@ -337,20 +344,11 @@ public class RespondingGateway_ServiceStub extends Stub {
                 LOGGER.error("Axis Fault error: '{}'", e.getMessage());
                 LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
-                LOGGER.debug("ClassCode: '{}'", classCode);
+                LOGGER.debug("ClassCode: '{}'", Arrays.toString(classCodes.toArray()));
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
-                switch (classCode) {
-                    case Constants.PS_CLASSCODE:
+                RegisteredService registeredService = getRegisteredService(classCodes);
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
-                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
-                        break;
-                    case Constants.EP_CLASSCODE:
-                        endpoint = dynamicDiscoveryService.getEndpointUrl(
-                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
-                        break;
-                    default:
-                        break;
-                }
+                                this.countryCode.toLowerCase(Locale.ENGLISH), registeredService, true);
 
                 if (StringUtils.isNotEmpty(endpoint)) {
 
@@ -391,14 +389,14 @@ public class RespondingGateway_ServiceStub extends Stub {
                     _serviceClient.addHeader(action);
                     _serviceClient.addHeader(id);
                     _serviceClient.addHeader(replyTo);
-                    _serviceClient.addHeader(security);
+                    _serviceClient.addHeader(headerSecurity);
                     _serviceClient.addHeadersToEnvelope(newEnv);
 
                     /* we create a new Message Context with the new SOAP envelope */
                     MessageContext newMessageContext = new MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
-                    /* add the new message contxt to the new operation client */
+                    /* add the new message context to the new operation client */
                     newOperationClient.addMessageContext(newMessageContext);
                     /* we retry the request */
                     newOperationClient.execute(true);
@@ -494,9 +492,9 @@ public class RespondingGateway_ServiceStub extends Stub {
                     getEnvelopeNamespaces(_returnEnv));
             AdhocQueryResponse adhocQueryResponse = (AdhocQueryResponse) object;
             EventLog eventLog = createAndSendEventLogQuery(adhocQueryRequest, adhocQueryResponse,
-                    _messageContext, _returnEnv, env, idAssertion, trcAssertion,
+                    _messageContext, _returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN), assertionMap.get(AssertionEnum.TREATMENT),
                     this._getServiceClient().getOptions().getTo().getAddress(),
-                    classCode); // Audit
+                    Arrays.toString(classCodes.toArray())); // Audit
             // TMP
             // Audit end time
             end = System.currentTimeMillis();
@@ -514,16 +512,14 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                     //make the fault by reflection
                     try {
-                        java.lang.String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
-                        java.lang.Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                        java.lang.Exception ex
-                                = (java.lang.Exception) exceptionClass.newInstance();
+                        String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
+                        Class exceptionClass = java.lang.Class.forName(exceptionClassName);
+                        Exception ex = (java.lang.Exception) exceptionClass.getDeclaredConstructor().newInstance();
                         //message class
-                        java.lang.String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
-                        java.lang.Class messageClass = java.lang.Class.forName(messageClassName);
-                        java.lang.Object messageObject = fromOM(faultElt, messageClass, null);
-                        java.lang.reflect.Method m = exceptionClass.getMethod("setFaultMessage",
-                                messageClass);
+                        String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
+                        Class messageClass = java.lang.Class.forName(messageClassName);
+                        Object messageObject = fromOM(faultElt, messageClass, null);
+                        Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
                         m.invoke(ex, messageObject);
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
@@ -543,19 +539,52 @@ public class RespondingGateway_ServiceStub extends Stub {
         }
     }
 
+    private RegisteredService getRegisteredService(List<String> classCodes) {
+        RegisteredService registeredService = null;
+        for (String classCode: classCodes) {
+            switch (classCode) {
+                case Constants.EP_CLASSCODE:
+                    if (registeredService == null) {
+                        registeredService = RegisteredService.ORDER_SERVICE;
+                    } else {
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.EP_CLASSCODE);
+                    }
+                    break;
+                case Constants.PS_CLASSCODE:
+                    if (registeredService == null) {
+                        registeredService = RegisteredService.PATIENT_SERVICE;
+                    } else {
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.PS_CLASSCODE);
+                    }
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    if (registeredService == null || registeredService == RegisteredService.ORCD_SERVICE) {
+                        registeredService = RegisteredService.ORCD_SERVICE;
+                    } else {
+                        LOGGER.error("It is only allowed to pass OrCD classCodes when more than one classCode is passed.");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return registeredService;
+    }
+
     /**
      * Auto generated method signature
      *
      * @param retrieveDocumentSetRequest XCA request
-     * @param idAssertion                HCP identity Assertion
-     * @param trcAssertion               TRC Assertion
+     * @param assertionMap               HCP identity Assertion
      * @param classCode                  Class code of the document to be retrieved, needed for audit log preparation
      * @return RetrieveDocumentSetResponseType - Retrieve Document Response
      * @throws java.rmi.RemoteException
      */
     public RetrieveDocumentSetResponseType respondingGateway_CrossGatewayRetrieve(RetrieveDocumentSetRequestType retrieveDocumentSetRequest,
-                                                                                  Assertion idAssertion,
-                                                                                  Assertion trcAssertion,
+                                                                                  Map<AssertionEnum, Assertion> assertionMap,
                                                                                   String classCode)
             throws java.rmi.RemoteException {
         MessageContext _messageContext = null;
@@ -589,7 +618,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             action.addChild(node);
 
             OMElement id = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("MessageID", ns2);
-            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID().toString());
+            OMNode node2 = factory.createOMText(Constants.UUID_PREFIX + UUID.randomUUID());
             id.addChild(node2);
 
             OMElement to = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("To", ns2);
@@ -612,14 +641,20 @@ public class RespondingGateway_ServiceStub extends Stub {
             _serviceClient.addHeader(id);
             _serviceClient.addHeader(replyTo);
 
-            Element assertion1 = idAssertion.getDOM();
-            Element assertion2 = trcAssertion.getDOM();
+
             OMNamespace ns = factory.createOMNamespace(XCAConstants.SOAP_HEADERS.SECURITY_XSD, "wsse");
             OMElement security = OMAbstractFactory.getSOAP12Factory().createSOAPHeaderBlock("Security", ns);
 
             try {
-                security.addChild(XMLUtils.toOM(assertion2));
-                security.addChild(XMLUtils.toOM(assertion1));
+
+                if (assertionMap.containsKey(AssertionEnum.NEXT_OF_KIN)) {
+                    var assertionNextOfKin = assertionMap.get(AssertionEnum.NEXT_OF_KIN);
+                    security.addChild(XMLUtils.toOM(assertionNextOfKin.getDOM()));
+                }
+                var assertionId = assertionMap.get(AssertionEnum.CLINICIAN);
+                security.addChild(XMLUtils.toOM(assertionId.getDOM()));
+                var assertionTreatment = assertionMap.get(AssertionEnum.TREATMENT);
+                security.addChild(XMLUtils.toOM(assertionTreatment.getDOM()));
                 _serviceClient.addHeader(security);
             } catch (Exception ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -798,8 +833,8 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             //  Create Audit messages
             EventLog eventLog = createAndSendEventLogRetrieve(retrieveDocumentSetRequest, retrieveDocumentSetResponse,
-                    _messageContext, returnEnv, env, idAssertion, trcAssertion,
-                    this._getServiceClient().getOptions().getTo().getAddress(),
+                    _messageContext, returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN),
+                    assertionMap.get(AssertionEnum.TREATMENT), this._getServiceClient().getOptions().getTo().getAddress(),
                     classCode);
             LOGGER.info("[Audit Service] Event Log '{}' sent to ATNA server", eventLog.getEventType());
 
@@ -815,7 +850,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 try {
                     String exceptionClassName = (java.lang.String) faultExceptionClassNameMap.get(faultElt.getQName());
                     Class exceptionClass = java.lang.Class.forName(exceptionClassName);
-                    Exception ex = (Exception) exceptionClass.newInstance();
+                    Exception ex = (Exception) exceptionClass.getDeclaredConstructor().newInstance();
                     //message class
                     String messageClassName = (java.lang.String) faultMessageMap.get(faultElt.getQName());
                     Class messageClass = java.lang.Class.forName(messageClassName);

@@ -6,6 +6,7 @@ public enum XCAError {
     ERROR_1101("1101", false, "No Data for eP", ""),
     ERROR_1102("1102", false, "No Data for PS", ""),
     ERROR_1103("1103", true, "No Data for MRO", ""),
+    ERROR_1104("1104", true, "No Data for OrCD", ""),
     ERROR_4201("4201", true, "Unsupported Feature", ""),
     ERROR_4202("4202", true, "Unknown Signifier", ""),
     ERROR_4203("4203", true, "The requested encoding cannot be provided due to a transcoding error.", ""),

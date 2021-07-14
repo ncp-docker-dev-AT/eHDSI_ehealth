@@ -1,11 +1,16 @@
 package eu.epsos.pt.cc.dts.axis2;
 
+import epsos.openncp.protocolterminator.clientconnector.Author;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
+import epsos.openncp.protocolterminator.clientconnector.ReasonOfHospitalisation;
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
+import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,16 +44,30 @@ public class DocumentDts {
         if (document == null) {
             return null;
         }
-
         final EpsosDocument1 result = EpsosDocument1.Factory.newInstance();
         result.setUuid(document.getDocumentUniqueId());
         result.setDescription(document.getDescription());
         result.setCreationDate(convertDate(document.getCreationTime()));
+        result.setEventDate(convertDate(document.getEventTime()));
         result.setClassCode(GenericDocumentCodeDts.newInstance(document.getClassCode()));
         result.setFormatCode(GenericDocumentCodeDts.newInstance(document.getFormatCode()));
         result.setRepositoryId(document.getRepositoryUniqueId());
         result.setHcid(document.getHcid());
-        result.setAuthor(document.getAuthorPerson());
+        if (!StringUtils.isEmpty(document.getSize())) {
+            result.setSize(new BigInteger(document.getSize()));
+        }
+        result.setMimeType(document.getMimeType());
+        if (document.getAuthors() != null) {
+            result.setAuthorsArray(convertAuthorList(document.getAuthors()));
+        }
+        if (document.getReasonOfHospitalisation() != null) {
+            result.setReasonOfHospitalisation(convertReasonOfHospitalisation(document.getReasonOfHospitalisation()));
+        }
+
+        result.setAtcCode(document.getAtcCode());
+        result.setDoseFormCode(document.getDoseFormCode());
+        result.setStrength(document.getStrength());
+        result.setSubstitution(document.getSubstitution());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
@@ -61,6 +80,18 @@ public class DocumentDts {
                 case Constants.ED_CLASSCODE:
                     result.setTitle(Constants.ED_TITLE);
                     break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
+                    break;
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
+                    break;
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    result.setTitle(Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE);
+                    break;
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    result.setTitle(Constants.ORCD_MEDICAL_IMAGES_TITLE);
+                    break;
                 default:
                     // Document Type not supported
                     result.setTitle(Constants.UNKNOWN_TITLE);
@@ -69,6 +100,32 @@ public class DocumentDts {
         }
 
         return result;
+    }
+
+    private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {
+
+        var convertedAuthors = new Author[authors.size()];
+        for (var i = 0; i < authors.size(); i++) {
+            var author = authors.get(i);
+            String authorPerson = author.getAuthorPerson();
+            String[] authorSpecialities = null;
+            if (author.getAuthorSpeciality() != null) {
+                authorSpecialities = author.getAuthorSpeciality().toArray(new String[author.getAuthorSpeciality().size()]);
+            }
+            var convertedAuthor = Author.Factory.newInstance();
+            convertedAuthor.setPerson(authorPerson);
+            convertedAuthor.setSpecialtyArray(authorSpecialities);
+            convertedAuthors[i] = convertedAuthor;
+        }
+        return convertedAuthors;
+    }
+
+    private static ReasonOfHospitalisation convertReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        var convertedReasonOfHospitalisation = ReasonOfHospitalisation.Factory.newInstance();
+        convertedReasonOfHospitalisation.setCode(reasonOfHospitalisation.getCode());
+        convertedReasonOfHospitalisation.setText(reasonOfHospitalisation.getText());
+        return convertedReasonOfHospitalisation;
     }
 
     /**
@@ -137,14 +194,18 @@ public class DocumentDts {
      */
     private static Calendar convertDate(String dateString) {
 
-        String pattern1 = "yyyyMMddHHmmss";
-        String pattern2 = "yyyyMMdd";
+        var pattern1 = "yyyyMMddHHmmss";
+        var pattern2 = "yyyyMMdd";
         String selectedPattern;
 
-        if (dateString.length() == pattern1.length()) {
-            selectedPattern = pattern1;
-        } else if (dateString.length() == pattern2.length()) {
-            selectedPattern = pattern2;
+        if (dateString != null) {
+            if (dateString.length() == pattern1.length()) {
+                selectedPattern = pattern1;
+            } else if (dateString.length() == pattern2.length()) {
+                selectedPattern = pattern2;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

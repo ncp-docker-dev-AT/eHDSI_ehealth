@@ -2,10 +2,12 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.commons.lang3.StringUtils;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.XdrRequest;
@@ -15,6 +17,7 @@ import tr.com.srdc.epsos.ws.xdr.client.XDSbRepositoryServiceInvoker;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Document Source Actor, from the IHE XDR (Cross-enterprise Document Reliable Interchange) Profile.
@@ -38,9 +41,10 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse discard(final XdrRequest request, final String countryCode) throws XDRException {
+    public static XdrResponse discard(final XdrRequest request, final String countryCode,
+                                      final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
 
-        return provideAndRegisterDocSet(request, countryCode, Constants.EDD_CLASSCODE);
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.EDD_CLASSCODE);
     }
 
     /**
@@ -49,9 +53,10 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse initialize(final XdrRequest request, final String countryCode) throws XDRException {
+    public static XdrResponse initialize(final XdrRequest request, final String countryCode,
+                                         final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
 
-        return provideAndRegisterDocSet(request, countryCode, Constants.ED_CLASSCODE);
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.ED_CLASSCODE);
     }
 
     /**
@@ -60,14 +65,16 @@ public final class XdrDocumentSource {
      * @param request     - XDR request encapsulating the CDA and it's Metadata.
      * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode, String docClassCode) throws XDRException {
+    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode,
+                                                       final Map<AssertionEnum, Assertion> assertionMap, String docClassCode)
+            throws XDRException {
 
         RegistryResponseType response;
 
         try {
-            response = new XDSbRepositoryServiceInvoker().provideAndRegisterDocumentSet(request, countryCode, docClassCode);
+            response = new XDSbRepositoryServiceInvoker().provideAndRegisterDocumentSet(request, countryCode, assertionMap, docClassCode);
             if (response.getRegistryErrorList() != null) {
-                RegistryErrorList registryErrorList = response.getRegistryErrorList();
+                var registryErrorList = response.getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException e) {
@@ -92,8 +99,8 @@ public final class XdrDocumentSource {
             return;
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean hasError = false;
+        var stringBuilder = new StringBuilder();
+        var hasError = false;
 
         for (RegistryError error : errorList) {
             String errorCode = error.getErrorCode();

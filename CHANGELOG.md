@@ -2,6 +2,52 @@
 
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
+## [5.2.0] - 14-07-2021
+The OpenNCP 5.2.0 is the Wave 5 Initial release including the implementation of the Wave 5 Change Proposals.
+This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 5 from October 2021. 
+Based on the Member States feedback and further improvement items as decided by the OpenNCP Steering Work Group, 
+a new release is expected mid-September, in due time before the Preparatory PPT.
+
+Main changes in this release are:<br/>
+<ul>
+<li>Update to Java 11 and OpenSAML 4</li>
+<li>Implementation of Change Proposals: 39, 43, 46, 46 and 51
+<ul>- CP-039 - Patient Identification through Next of Kin</ul>
+<ul>- CP-043 - Error handling.</ul>
+<ul>- CP-046 - Two-Factor Authentication and NCP-A role based access control removed.</ul>
+<ul>- CP-047 - OrCD service implemented.</ul>
+<ul>- CP-051 - ePrescriptions list improvement (structured format).</ul>
+</li>
+<li>CDA Display Tool compliant with Wave 5 requirements.</li>
+</ul>
+
+### Story:
+- [EHNCP-1981] - Implement CP-eHealthDSI-039: Next of kin.
+- [EHNCP-1988] - Implement CP-eHealthDSI-047: Enable the exchange of original (unstructured) clinical documents.
+- [EHNCP-1989] - Implement CP-eHealthDSI-043: Error handling in NCP-B.
+- [EHNCP-2065] - Implement CP-eHealthDSI-046: Two-Factor Authentication and NCP-A role based access control removed.
+- [EHNCP-2070] - Implement CP-eHealthDSI-051: Improve ePrescription list.
+
+### Task:
+- [EHNCP-1990] - Analyze Technical impact on OpenNCP Reference Implementation.
+- [EHNCP-2053] - Implement Original Clinical Document service.
+- [EHNCP-2068] - OrCD exchange - Test activities.
+- [EHNCP-2092] - [CDA Display Tool] Refactor CDA Display Tool implementation.
+- [EHNCP-2116] - Create Mock CDA documents for OrCD Service.
+- [EHNCP-2124] - [CDA Display Tool] Implementation for Wave 5.
+- [EHNCP-2130] - [CP-046] Implementation activities - Two-factor authentication mechanism.
+- [EHNCP-2136] - Implement Original Clinical Document service in openncp-client-connector.
+- [EHNCP-2137] - Implement Original Clinical Document service in openncp-ws-server.
+- [EHNCP-2140] - Releasing OpenNCP 5.2.0 (Wave 5 Initial Release).
+- [EHNCP-2146] - [CDA Display Tool] Only SNOMED CT concepts are displayed from the eHDSIVaccine value set.
+- [EHNCP-2147] - [CDA Display Tool] collapsible panels share the same name.
+- [EHNCP-2148] - [CDA Display Tool] For different vital signs observations, the same date is displayed in the html.
+- [EHNCP-2149] - [CDA Display Tool] Organisation Id not correctly displayed in the eP Prescriber header.
+- [EHNCP-2150] - Update coded_element_list_ehdsi.xml with the updated OIDs.
+
+### Improvement
+- [EHNCP-2076] - Migration Java 8 to 11 (OpenJDK).
+- [EHNCP-2081] - Upgrade to OpenSAML 4.
 
 ## [5.1.6] - 03-06-2021
 The OpenNCP 5.1.6 is the Wave 4 Formal Second HotFix release including the Formal Test Event improvements, a bug fix of
