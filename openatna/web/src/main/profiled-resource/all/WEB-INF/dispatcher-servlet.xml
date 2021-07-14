@@ -16,13 +16,4 @@
         <property name="suffix" value=".jsp"/>
         <property name="exposeContextBeansAsAttributes" value="true"/>
     </bean>
-
-<!--    <bean name="/query.html" class="org.openhealthtools.openatna.web.MessageController">-->
-<!--        <property name="messageDao" ref="messageDao"/>-->
-<!--        <property name="auditLoggerPluginManager" ref="auditLoggerPluginManager"/>-->
-<!--    </bean>-->
-
-<!--    <bean name="/errors.html" class="org.openhealthtools.openatna.web.ErrorController">-->
-<!--        <property name="errorDao" ref="errorDao"/>-->
-<!--    </bean>-->
 </beans>
