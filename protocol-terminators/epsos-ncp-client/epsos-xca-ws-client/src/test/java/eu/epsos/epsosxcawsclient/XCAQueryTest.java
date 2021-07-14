@@ -18,6 +18,7 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
 import tr.com.srdc.epsos.util.Constants;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -71,7 +72,8 @@ public class XCAQueryTest {
         QueryResponse result = XcaInitGateway.crossGatewayQuery(
                 patientId,
                 PATIENT_COUNTRY,
-                genericDocumentCode,
+                Arrays.asList(genericDocumentCode),
+                null,
                 assertionMap, Constants.PatientService);
 
         printResult(result);

@@ -241,11 +241,9 @@ public class Helper {
             if (assertion == null) {
                 return null;
             }
-            logger.info("***********************************");
             for (Attribute attribute : assertion.getAttributeStatements().get(0).getAttributes()) {
-                logger.info("Attribute: '{}'", attribute.getName());
+
                 if (StringUtils.equals(attribute.getName(), attributeName)) {
-                    logger.info("Attribute: urn:oasis:names:tc:xacml:1.0:resource:resource-id");
                     String value = attribute.getAttributeValues().get(0).getDOM().getTextContent();
                     if (StringUtils.isNotBlank(value)) {
                         result = value;

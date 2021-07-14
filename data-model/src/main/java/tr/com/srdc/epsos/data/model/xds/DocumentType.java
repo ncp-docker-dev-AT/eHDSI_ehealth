@@ -10,6 +10,7 @@ public enum DocumentType {
     PATIENT_SUMMARY("Patient Summary"),
     EDISPENSATION("eDispensation"),
     EPRESCRIPTION("ePrescription"),
+    ORCD("Original Clinical Document"),
     MRO("Medication Summary"),
     HCER("Heatlhcare Encounter Report Summary");
     private final String displayName;

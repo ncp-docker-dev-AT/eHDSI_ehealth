@@ -109,18 +109,18 @@ public class SAML2Validator {
             }
 
             NodeList assertionList = security.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion");
-            Element ass;
+            Element assertionElement;
             Assertion hcpAssertion = null;
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
                 for (var i = 0; i < assertionList.getLength(); i++) {
-                    ass = (Element) assertionList.item(i);
-                    if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
+                    assertionElement = (Element) assertionList.item(i);
+                    if (assertionElement.getAttribute("ID").startsWith("urn:uuid:")) {
                         LOGGER.debug("ncname found!!!");
-                        ass.setAttribute("ID", "_" + ass.getAttribute("ID").substring(9));
+                        assertionElement.setAttribute("ID", "_" + assertionElement.getAttribute("ID").substring(9));
                     }
-                    if (ass.getAttribute("ID").startsWith("urn:uuid:")) {
+                    if (assertionElement.getAttribute("ID").startsWith("urn:uuid:")) {
                         LOGGER.debug("ncname still exist!!!");
                     } else {
                         LOGGER.debug("ncname fixed!!!");
@@ -128,12 +128,12 @@ public class SAML2Validator {
 
                     // Validate Assertion according to SAML XSD
                     var schemaBuilder = new SAMLSchemaBuilder(SAMLSchemaBuilder.SAML1Version.SAML_11);
-                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(ass));
-                    var anAssertion = (Assertion) SAML.fromElement(ass);
+                    schemaBuilder.getSAMLSchema().newValidator().validate(new DOMSource(assertionElement));
+                    var anAssertion = (Assertion) SAML.fromElement(assertionElement);
                     if (org.apache.commons.lang.StringUtils.equals(anAssertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp")) {
-                        hcpAssertion = (Assertion) SAML.fromElement(ass);
+                        hcpAssertion = (Assertion) SAML.fromElement(assertionElement);
                     } else {
-                        trcAssertion = (Assertion) SAML.fromElement(ass);
+                        trcAssertion = (Assertion) SAML.fromElement(assertionElement);
                     }
                 }
             }

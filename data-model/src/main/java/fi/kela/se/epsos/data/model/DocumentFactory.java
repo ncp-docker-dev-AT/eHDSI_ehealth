@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Factory class for Clinical Document container (metadatas and associations).
@@ -49,14 +50,19 @@ public class DocumentFactory {
      */
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String description) {
-
-        return createEPDocument(documentFormat, id, patientId, effectiveDate, repositoryId, title, author, description,
-                null, null, true, null, null, null);
+        EpListParam epListParam = new EpListParam(true, null, null, null, null);
+        return createEPDocument(documentFormat, id, patientId,
+                effectiveDate, repositoryId,
+                title, author, description,
+                null, null,
+                epListParam,
+                null, null, null);
     }
 
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String description,
-                                                       String productCode, String productName, boolean dispensable,
+                                                       String productCode, String productName,
+                                                       EpListParam epListParam,
                                                        String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         EPDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
@@ -68,9 +74,9 @@ public class DocumentFactory {
                 new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, Constants.EP_CLASSCODE, repositoryId, title, author,
                         confidentiality, languageCode);
         if (StringUtils.isNoneBlank(productCode, productName)) {
-            return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), epListParam);
         } else {
-            return new EPDocumentMetaDataImpl(metaData, description, dispensable);
+            return new EPDocumentMetaDataImpl(metaData, description, epListParam);
         }
     }
 
@@ -84,23 +90,28 @@ public class DocumentFactory {
                                                          String title, String author, String description, String productCode, String productName) {
 
         return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName,
-                true, null, null, null);
+                new EpListParam(true, null, null, null, null),
+                null,  null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, boolean dispensable) {
 
-        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, null, null,
-                dispensable, null, null, null);
+        return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description,
+                null, null,
+                new EpListParam(dispensable, null, null, null, null),
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode,
-                                                         String productName, boolean dispensable, String confidentialityCode,
+                                                         String productName,
+                                                         EpListParam epListParam,
+                                                         String confidentialityCode,
                                                          String confidentialityDisplay, String languageCode) {
 
         return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate,
-                repositoryId, title, author, description, productCode, productName, dispensable, confidentialityCode,
+                repositoryId, title, author, description, productCode, productName, epListParam, confidentialityCode,
                 confidentialityDisplay, languageCode);
     }
 
@@ -113,23 +124,26 @@ public class DocumentFactory {
                                                          String title, String author, String description, String productCode, String productName) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName,
-                true, null, null, null);
+                new EpListParam(true, null, null, null, null),
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, boolean dispensable) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null,
-                dispensable, null, null, null);
+                new EpListParam(dispensable, null, null, null, null),
+                null, null, null);
     }
 
     public static EPDocumentMetaData createEPDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                          String title, String author, String description, String productCode,
-                                                         String productName, boolean dispensable, String confidentialityCode,
-                                                         String confidentialityDisplay, String languageCode) {
+                                                         String productName,
+                                                         EpListParam epListParam,
+                                                         String confidentialityCode, String confidentialityDisplay, String languageCode) {
 
         return createEPDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
-                repositoryId, title, author, description, productCode, productName, dispensable, confidentialityCode,
+                repositoryId, title, author, description, productCode, productName, epListParam, confidentialityCode,
                 confidentialityDisplay, languageCode);
     }
 
@@ -163,6 +177,69 @@ public class DocumentFactory {
 
         return createPSDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate,
                 repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode);
+    }
+
+    /**
+     * OrCDDocument
+     */
+    private static OrCDDocumentMetaData createOrCDDocument(String orCDClassCode, int documentFormat, String id, String patientId, Date effectiveDate,
+                                                           Date serviceStartTime, String repositoryId, String title, String author, String confidentialityCode,
+                                                           String confidentialityDisplay, String languageCode,
+                                                           OrCDDocumentMetaData.DocumentFileType documentFileType,
+                                                           long size,
+                                                           List<OrCDDocumentMetaData.Author> authors,
+                                                           OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+        OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentiality = null;
+        if (StringUtils.isNoneBlank(confidentialityCode, confidentialityDisplay)) {
+            confidentiality = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentialityCode, confidentialityDisplay);
+        }
+        EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
+                orCDClassCode, repositoryId, title, author, confidentiality, languageCode);
+        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, size, serviceStartTime, authors, reasonOfHospitalisation);
+    }
+
+    /**
+     * Laboratory Results
+     */
+    public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                           String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode,
+                                                                           long size, List<OrCDDocumentMetaData.Author> authors){
+
+        return createOrCDDocument(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, null);
+    }
+
+    /**
+     * Hospital Discharge Reports
+     */
+    public static OrCDDocumentMetaData createOrCDHospitalDischargeReportsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                                  String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size,
+                                                                                  List<OrCDDocumentMetaData.Author> authors, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        return createOrCDDocument(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, reasonOfHospitalisation);
+    }
+
+    /**
+     * Medical Imaging Reports
+     */
+    public static OrCDDocumentMetaData createOrCDMedicalImagingReportsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, long size,
+                                                                               List<OrCDDocumentMetaData.Author> authors, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, reasonOfHospitalisation);
+    }
+
+    /**
+     * Medical Images
+     */
+    public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
+                                                                               String title, String author, String confidentialityCode, String confidentialityDisplay, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size,
+                                                                       List<OrCDDocumentMetaData.Author> authors, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        return createOrCDDocument(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
+                repositoryId, title, author, confidentialityCode, confidentialityDisplay, languageCode, documentFileType, size, authors, reasonOfHospitalisation);
     }
 
     /**

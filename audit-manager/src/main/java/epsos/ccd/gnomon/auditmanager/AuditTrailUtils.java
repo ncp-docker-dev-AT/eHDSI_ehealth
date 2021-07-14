@@ -65,7 +65,7 @@ public enum AuditTrailUtils {
         String auditMessage = "";
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
-            eventTypeCode = auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode();
+            eventTypeCode = auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
             LOGGER.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to log AuditMessageEventTypeCode.", e);
@@ -82,7 +82,7 @@ public enum AuditTrailUtils {
         boolean validated = false;
 
         try {
-            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification().getEventID().getCode());
+            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
             validated = Utils.validateSchema(auditMessage);
 
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public enum AuditTrailUtils {
 
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
-            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
+            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
             if (!forceWrite) {
                 auditMessage = "";
             }
@@ -99,28 +99,32 @@ public enum AuditTrailUtils {
         if (validated || forceWrite) {
 
             if (validated) {
-                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
             } else {
-                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
             }
 
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
-                        auditmessage.getEventIdentification().getEventID().getCode());
+                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
             }
 
             try {
                 // Validating XML according to XSD
-                LOGGER.debug("'{}' XML stuff: Create Dom From String", auditmessage.getEventIdentification().getEventID().getCode());
+                LOGGER.debug("'{}' XML stuff: Create Dom From String",
+                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
-                    LOGGER.debug("'{}' Audit Message signed", auditmessage.getEventIdentification().getEventID().getCode());
+                    LOGGER.debug("'{}' Audit Message signed",
+                            auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
                 }
             } catch (Exception e) {
                 auditMessage = "";
-                LOGGER.error("'{}' Error signing doc: '{}'", auditmessage.getEventIdentification().getEventID().getCode(), e.getMessage(), e);
+                LOGGER.error("'{}' Error signing doc: '{}'",
+                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)",
+                        e.getMessage(), e);
             }
         }
         return auditMessage;
@@ -1275,9 +1279,11 @@ public enum AuditTrailUtils {
 
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
-                Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
-                        .get(0).getDisplayName().split("::"))[0] + "-" +
-                        new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS").format(new Date(System.currentTimeMillis())) + ".xml");
+                if(auditmessage.getEventIdentification() != null) {
+                    Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
+                            .get(0).getDisplayName().split("::"))[0] + "-" +
+                            new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS").format(new Date(System.currentTimeMillis())) + ".xml");
+                }
             } catch (Exception e) {
                 LOGGER.error("Exception: '{}'", e.getMessage(), e);
                 try {
@@ -1313,7 +1319,8 @@ public enum AuditTrailUtils {
     private void validateAuditMessage(EventLog eventLog, AuditMessage auditMessage) {
 
         LOGGER.debug("validateAuditMessage(EventLog '{}', AuditMessage '{}', PC UserId: '{}')", eventLog.getEventType(),
-                auditMessage.getEventIdentification().getEventActionCode(), eventLog.getPC_UserID());
+                auditMessage.getEventIdentification() != null ? auditMessage.getEventIdentification().getEventActionCode() : "N/A",
+                eventLog.getPC_UserID());
         try {
             // Infer model according to NCP Side and EventCode
             NcpSide ncpSide = eventLog.getNcpSide();

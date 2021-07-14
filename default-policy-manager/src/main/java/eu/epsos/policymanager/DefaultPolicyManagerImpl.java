@@ -235,6 +235,12 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
             case Constants.MRO_CLASSCODE:
                 XCAPermissionValidatorMro(assertion);
                 break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                XCAPermissionValidatorOrCD(assertion);
+                break;
             default:
                 String errorMsg = "Invalid document class code: " + documentClass;
                 logger.error(errorMsg);
@@ -368,6 +374,17 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     private void XCAPermissionValidatorMro(Assertion assertion) throws InsufficientRightsException {
 
         XCAPermissionValidatorEP(assertion);
+    }
+
+    /**
+     * XCA validator for OrCD service.
+     *
+     * @param assertion - SAML user assertion.
+     * @throws InsufficientRightsException - User doesn't have enough privileges.
+     */
+    private void XCAPermissionValidatorOrCD(Assertion assertion) throws InsufficientRightsException {
+        //TODO to be reviewed. For the moment, the same validation is used as for PS.
+        XCAPermissionValidatorPS(assertion);
     }
 
     /**

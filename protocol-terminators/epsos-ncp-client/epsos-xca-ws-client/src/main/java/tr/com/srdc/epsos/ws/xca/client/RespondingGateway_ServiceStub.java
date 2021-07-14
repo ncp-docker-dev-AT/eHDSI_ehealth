@@ -196,7 +196,7 @@ public class RespondingGateway_ServiceStub extends Stub {
      */
     public AdhocQueryResponse respondingGateway_CrossGatewayQuery(AdhocQueryRequest adhocQueryRequest,
                                                                   Map<AssertionEnum, Assertion> assertionMap,
-                                                                  String classCode)
+                                                                  List<String> classCodes)
             throws java.rmi.RemoteException {
 
         MessageContext _messageContext = null;
@@ -344,20 +344,11 @@ public class RespondingGateway_ServiceStub extends Stub {
                 LOGGER.error("Axis Fault error: '{}'", e.getMessage());
                 LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
                 String endpoint = null;
-                LOGGER.debug("ClassCode: '{}'", classCode);
+                LOGGER.debug("ClassCode: '{}'", Arrays.toString(classCodes.toArray()));
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
-                switch (classCode) {
-                    case Constants.PS_CLASSCODE:
+                RegisteredService registeredService = getRegisteredService(classCodes);
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
-                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
-                        break;
-                    case Constants.EP_CLASSCODE:
-                        endpoint = dynamicDiscoveryService.getEndpointUrl(
-                                this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
-                        break;
-                    default:
-                        break;
-                }
+                                this.countryCode.toLowerCase(Locale.ENGLISH), registeredService, true);
 
                 if (StringUtils.isNotEmpty(endpoint)) {
 
@@ -405,7 +396,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     MessageContext newMessageContext = new MessageContext();
                     newMessageContext.setEnvelope(newEnv);
 
-                    /* add the new message contxt to the new operation client */
+                    /* add the new message context to the new operation client */
                     newOperationClient.addMessageContext(newMessageContext);
                     /* we retry the request */
                     newOperationClient.execute(true);
@@ -503,7 +494,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             EventLog eventLog = createAndSendEventLogQuery(adhocQueryRequest, adhocQueryResponse,
                     _messageContext, _returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN), assertionMap.get(AssertionEnum.TREATMENT),
                     this._getServiceClient().getOptions().getTo().getAddress(),
-                    classCode); // Audit
+                    Arrays.toString(classCodes.toArray())); // Audit
             // TMP
             // Audit end time
             end = System.currentTimeMillis();
@@ -546,6 +537,41 @@ public class RespondingGateway_ServiceStub extends Stub {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
             }
         }
+    }
+
+    private RegisteredService getRegisteredService(List<String> classCodes) {
+        RegisteredService registeredService = null;
+        for (String classCode: classCodes) {
+            switch (classCode) {
+                case Constants.EP_CLASSCODE:
+                    if (registeredService == null) {
+                        registeredService = RegisteredService.ORDER_SERVICE;
+                    } else {
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.EP_CLASSCODE);
+                    }
+                    break;
+                case Constants.PS_CLASSCODE:
+                    if (registeredService == null) {
+                        registeredService = RegisteredService.PATIENT_SERVICE;
+                    } else {
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.PS_CLASSCODE);
+                    }
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    if (registeredService == null || registeredService == RegisteredService.ORCD_SERVICE) {
+                        registeredService = RegisteredService.ORCD_SERVICE;
+                    } else {
+                        LOGGER.error("It is only allowed to pass OrCD classCodes when more than one classCode is passed.");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return registeredService;
     }
 
     /**

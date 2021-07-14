@@ -115,8 +115,9 @@ public class ClientConnectorConsumer {
         axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
     }
 
-    public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                               PatientId patientId, GenericDocumentCode classCode) {
+    public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
+                                               String countryCode, PatientId patientId,
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
@@ -127,9 +128,15 @@ public class ClientConnectorConsumer {
             var queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
-            queryDocumentRequest.setClassCode(classCode);
+            GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
+            for(int i = 0; i < classCodes.size(); i++) {
+                array[i] = classCodes.get(i);
+            }
+            queryDocumentRequest.setClassCodeArray(array);
+//            queryDocumentRequest.setClassCodeArray(classCodes.toArray(GenericDocumentCode[]::new));
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
+            queryDocumentRequest.setFilterParams(filterParams);
 
             QueryDocumentsResponseDocument queryDocumentsResponseDocument;
             queryDocumentsResponseDocument = clientConnectorServiceStub.queryDocuments(queryDocumentsDocument);

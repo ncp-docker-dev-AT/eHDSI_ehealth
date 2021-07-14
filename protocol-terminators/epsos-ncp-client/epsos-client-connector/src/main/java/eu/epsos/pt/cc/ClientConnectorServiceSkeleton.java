@@ -19,6 +19,7 @@ import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.util.Constants;
 
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             queryPatientResponseDocument.setQueryPatientResponse(queryPatientResponse);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
         LoggingSlf4j.end(logger, methodName);
@@ -100,39 +101,60 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         var queryDocumentRequest = queryDocuments.getArg0();
         String countryCode = queryDocumentRequest.getCountryCode();
 
-        var patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(queryDocumentRequest.getPatientId());
-        GenericDocumentCode tmpCode = queryDocumentRequest.getClassCode();
-        tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode = eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(tmpCode);
+        List<GenericDocumentCode> classCodes = Arrays.asList(queryDocumentRequest.getClassCodeArray());
+        List<tr.com.srdc.epsos.data.model.GenericDocumentCode> documentCodes =
+                eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(classCodes);
 
-        if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
-            throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
+        var filterParamsReceived = queryDocumentRequest.getFilterParams();
+        var patientId = eu.epsos.pt.cc.dts.PatientIdDts.newInstance(queryDocumentRequest.getPatientId());
+
+        var filterParams = eu.epsos.pt.cc.dts.FilterParamsDts.newInstance(filterParamsReceived);
+
+        for (tr.com.srdc.epsos.data.model.GenericDocumentCode documentCode : documentCodes) {
+            if (!documentCode.getSchema().equals(IheConstants.CLASSCODE_SCHEME)) {
+                throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_SCHEME_EXCEPTION + documentCode.getSchema());
+            }
         }
 
         //  Performing call to Web Service:
         try {
             QueryResponse response;
-
-            switch (documentCode.getValue()) {
-                case Constants.PS_CLASSCODE:
-                    response = PatientService.list(patientId, countryCode, documentCode, assertionMap);
-                    break;
-                case Constants.EP_CLASSCODE:
-                    response = OrderService.list(patientId, countryCode, documentCode, assertionMap);
-                    break;
-                case Constants.MRO_CLASSCODE:
-                    response = MroService.list(patientId, countryCode, documentCode, assertionMap);
-                    break;
-                default:
-                    throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + documentCode.getValue());
+            if (documentCodes.size() == 1) {
+                switch (documentCodes.get(0).getValue()) {
+                    case Constants.PS_CLASSCODE:
+                        response = PatientService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
+                        break;
+                    case Constants.EP_CLASSCODE:
+                        response = OrderService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
+                        break;
+                    case Constants.MRO_CLASSCODE:
+                        response = MroService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
+                        break;
+                    case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), filterParams, assertionMap);
+                        break;
+                    default:
+                        throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
+                }
+            } else {
+                if (!documentCodes.contains(Constants.EP_CLASSCODE)
+                        && !documentCodes.contains(Constants.PS_CLASSCODE)
+                        && !documentCodes.contains(Constants.MRO_CLASSCODE)) {
+                    response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, assertionMap);
+                } else {
+                    throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
+                }
             }
-
             if (response.getDocumentAssociations() != null && !response.getDocumentAssociations().isEmpty()) {
                 queryDocumentsResponse.setReturnArray(DocumentDts.newInstance(response.getDocumentAssociations()));
             }
 
-        } catch (RuntimeException e) {
-            LoggingSlf4j.error(logger, methodName);
-            throw e;
+        } catch (RuntimeException ex) {
+            LoggingSlf4j.error(logger, methodName, ex);
+            throw ex;
         }
 
         // create return wrapper
@@ -196,7 +218,13 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                             assertionMap);
                     break;
                 case Constants.MRO_CLASSCODE:
-                    response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
+                    response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage, assertionMap);
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    response = OrCDService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
                             assertionMap);
                     break;
                 default:
@@ -206,7 +234,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result = RetrieveDocumentResponseDTS.newInstance(response);
 
         } catch (ClientConnectorException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
 
@@ -281,7 +309,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             result.setSubmitDocumentResponse(SubmitDocumentResponseDts.newInstance(response));
 
         } catch (RuntimeException ex) {
-            LoggingSlf4j.error(logger, methodName);
+            LoggingSlf4j.error(logger, methodName, ex);
             throw ex;
         }
         LoggingSlf4j.end(logger, methodName);
