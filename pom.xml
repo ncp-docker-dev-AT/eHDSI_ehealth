@@ -135,9 +135,10 @@
         <saxon-he.version>9.5.1-8</saxon-he.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
-        <spring.version>5.3.7</spring.version>
-        <spring.data.jpa.version>2.3.6.RELEASE</spring.data.jpa.version>
+        <spring-boot.version>2.5.2</spring-boot.version>
+        <spring.version>5.3.8</spring.version>
+        <spring-tx.version>5.2.15.RELEASE</spring-tx.version>
+        <spring.data.jpa.version>2.3.9.RELEASE</spring.data.jpa.version>
         <xalan.version>2.7.2</xalan.version>
         <xerces.version>2.12.1</xerces.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
