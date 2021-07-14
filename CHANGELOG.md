@@ -15,7 +15,7 @@ Main changes in this release are:<br/>
 <ul>- CP-039 - Patient Identification through Next of Kin</ul>
 <ul>- CP-043 - Error handling.</ul>
 <ul>- CP-046 - Two-Factor Authentication and NCP-A role based access control removed.</ul>
-<ul>- CP-047 - OrCD service implementated.</ul>
+<ul>- CP-047 - OrCD service implemented.</ul>
 <ul>- CP-051 - ePrescriptions list improvement (structured format).</ul>
 </li>
 <li>CDA Display Tool compliant with Wave 5 requirements.</li>
