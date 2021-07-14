@@ -12,14 +12,21 @@ Main changes in this release are:<br/>
 <ul>
 <li>Update to Java 11 and OpenSAML 4</li>
 <li>Implementation of Change Proposals: 39, 43, 46, 46 and 51
-<ul>- CP-039 - Next of Kin</ul>
-<ul>- CP-043 - Error handling</ul>
-<ul>- CP-046 - Next of Kin</ul>
-<ul>- CP-047 - OrCD exchange</ul>
-<ul>- CP-051 - ePrescriptions list improvement (structured format)</ul>
+<ul>- CP-039 - Patient Identification through Next of Kin</ul>
+<ul>- CP-043 - Error handling.</ul>
+<ul>- CP-046 - Two-Factor Authentication and NCP-A role based access control removed.</ul>
+<ul>- CP-047 - OrCD service implementated.</ul>
+<ul>- CP-051 - ePrescriptions list improvement (structured format).</ul>
 </li>
 <li>CDA Display Tool compliant with Wave 5 requirements.</li>
 </ul>
+
+### Story:
+- [EHNCP-1981] - Implement CP-eHealthDSI-039: Next of kin.
+- [EHNCP-1988] - Implement CP-eHealthDSI-047: Enable the exchange of original (unstructured) clinical documents.
+- [EHNCP-1989] - Implement CP-eHealthDSI-043: Error handling in NCP-B.
+- [EHNCP-2065] - Implement CP-eHealthDSI-046: Two-Factor Authentication and NCP-A role based access control removed.
+- [EHNCP-2070] - Implement CP-eHealthDSI-051: Improve ePrescription list.
 
 ### Task:
 - [EHNCP-1990] - Analyze Technical impact on OpenNCP Reference Implementation.
@@ -37,13 +44,6 @@ Main changes in this release are:<br/>
 - [EHNCP-2148] - [CDA Display Tool] For different vital signs observations, the same date is displayed in the html.
 - [EHNCP-2149] - [CDA Display Tool] Organisation Id not correctly displayed in the eP Prescriber header.
 - [EHNCP-2150] - Update coded_element_list_ehdsi.xml with the updated OIDs.
-
-### Story:
-- [EHNCP-1981] - [Technical] Implement CP-eHealthDSI-039: Next of kin.
-- [EHNCP-1988] - [Technical] Implement CP-eHealthDSI-047: Enable the exchange of original (unstructured) clinical documents.
-- [EHNCP-1989] - [Technical] Implement CP-eHealthDSI-043: Error handling in NCP-B.
-- [EHNCP-2065] - [OpenNCP] Implement CP-046.
-- [EHNCP-2070] - Implement CP-eHealthDSI-051: Improve ePrescription list.
 
 ### Improvement
 - [EHNCP-2076] - Migration Java 8 to 11 (OpenJDK).
