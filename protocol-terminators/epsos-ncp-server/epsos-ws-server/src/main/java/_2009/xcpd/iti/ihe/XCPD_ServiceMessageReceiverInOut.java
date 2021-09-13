@@ -158,7 +158,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, null, startTime,
-                        new Date(), Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCPD, EadcUtil.Direction.INBOUND,
+                        new Date(), Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
                         ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {

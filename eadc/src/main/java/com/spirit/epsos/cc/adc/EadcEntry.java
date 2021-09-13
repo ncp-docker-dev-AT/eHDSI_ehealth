@@ -19,7 +19,10 @@ public interface EadcEntry {
      */
     enum DsTypes {
 
-        XCPD("jdbc/EADC_XCPD"), XCA("jdbc/EADC_XCA"), XDR("jdbc/EADC_XDR");
+        EADC("jdbc/EADC");
+
+        /*, _XCPD("jdbc/EADC_XCPD"), _XCA("jdbc/EADC_XCA"), _XDR("jdbc/EADC_XDR")*/
+
         private String value;
 
         DsTypes(final String value) {

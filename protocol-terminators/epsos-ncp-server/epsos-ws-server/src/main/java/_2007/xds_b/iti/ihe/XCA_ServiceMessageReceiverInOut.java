@@ -218,7 +218,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
                 Date endTime = new Date();
                 EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
-                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.XCA, EadcUtil.Direction.INBOUND, serviceType);
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType);
 
             }
         } catch (Exception e) {

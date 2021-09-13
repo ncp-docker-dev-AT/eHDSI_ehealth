@@ -474,7 +474,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     transactionStartTime, // Transaction Start Time
                     transactionEndTime, // Transaction End Time
                     this.countryCode, // Country A ISO Code
-                    EadcEntry.DsTypes.XCA, // Data source type
+                    EadcEntry.DsTypes.EADC, // Data source type
                     Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
 
             // eADC end time
@@ -828,7 +828,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
             }
             EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCA,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
                     Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
             //  Create Audit messages
