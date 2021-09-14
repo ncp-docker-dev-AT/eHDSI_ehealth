@@ -634,6 +634,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Description (optional)
         eot.setDescription(ofRim.createInternationalStringType());
         eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
+        eot.getDescription().getLocalizedString().get(0).setValue(title + " for patient " + getEpSOSPatientId(request));
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
