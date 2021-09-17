@@ -68,6 +68,16 @@ import java.util.*;
 
 public class XCAServiceImpl implements XCAServiceInterface {
 
+    private static final DatatypeFactory DATATYPE_FACTORY;
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private final ITransformationService transformationService;
@@ -143,11 +153,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 break;
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DataTypeConfigurationException: {}", e.getMessage(), e);
-        }
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
 
         if (response.getRegistryObjectList() != null) {
@@ -250,12 +256,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
-        }
-
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.getEventTargetParticipantObjectIds().add(request.getDocumentRequest().get(0).getDocumentUniqueId());
 
         if (!documentReturned) {
@@ -612,7 +613,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
             default:
                 logger.error("Unsupported classCode for OrCD query in OpenNCP. Requested classCode: {}", classCode);
                 return "";
-
         }
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
@@ -630,11 +630,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.setName(ofRim.createInternationalStringType());
         eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
         eot.getName().getLocalizedString().get(0).setValue(title);
-
-        // Description (optional)
-        eot.setDescription(ofRim.createInternationalStringType());
-        eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
-        eot.getDescription().getLocalizedString().get(0).setValue(title + " for patient " + getEpSOSPatientId(request));
 
         // Version Info
         eot.setVersionInfo(ofRim.createVersionInfoType());
@@ -774,21 +769,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Dispensable
         if (document.isDispensable()) {
-            /*
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
-                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
-            */
             ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open");
             dispensableClassification.getSlot().add(makeSlot("dispensable", "Open"));
             eot.getClassification().add(dispensableClassification);
         } else {
-            /*
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
-                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
-             */
             ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Closed");
             dispensableClassification.getSlot().add(makeSlot("dispensable", "Closed"));
@@ -844,9 +829,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
         // Healthcare facility code
         // TODO: Get healthcare facility info from national implementation
-
         eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
@@ -875,10 +860,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         association.setAssociationType("urn:ihe:iti:2007:AssociationType:XFRM");
         association.setSourceObject(source);
         association.setTargetObject(target);
-        /*
-         * Gazelle does not like this information when validating. Uncomment if
-         * really needed.
-         */
+        //  Gazelle does not like this information when validating. Uncomment if really needed.
         //        association.getClassification().add(makeClassification(
         //                "urn:uuid:abd807a3-4432-4053-87b4-fd82c643d1f3",
         //                uuid,
@@ -946,7 +928,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.debug(e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             throw e;
         }
@@ -1002,7 +983,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Evidence for call to NI for XCA List
         try {
             //  e-Sens: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not
-            //  passing a XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
+            //  passing an XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
             //  So we provided a XML representation of such data.
             Assertion assertionTRC = Helper.getTRCAssertion(shElement);
             String messageUUID = UUIDHelper.encodeAsURN(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
@@ -1021,8 +1002,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (!registryErrorList.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(registryErrorList);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
-
-        } else {
 
         }
 
@@ -1242,9 +1221,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 || orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
                 : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
         final String languageCode = orCDDocumentMetaData.getLanguage();
-        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(), orCDDocumentMetaData.getServiceStartTime(),
-                orCDDocumentMetaData.getRepositoryId(), request, eotXML, orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode,
-                orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(), orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getAuthors(), orCDDocumentMetaData.getReasonOfHospitalisation());
+        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
+                orCDDocumentMetaData.getServiceStartTime(), orCDDocumentMetaData.getRepositoryId(), request, eotXML,
+                orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode,
+                orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(),
+                orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getAuthors(),
+                orCDDocumentMetaData.getReasonOfHospitalisation());
         response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
         if (!StringUtils.isEmpty(xmlUUID)) {
             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(xmlUUID, xmlUUID)));
