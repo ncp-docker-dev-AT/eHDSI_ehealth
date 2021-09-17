@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:epsos="urn:epsos-org:ep:medication" version="1.0">
+                xmlns:epsos="urn:epsos-org:ep:medication" version="2.0">
 
     <xsl:variable name="medicationSummarySectionCode"
                   select="'10160-0'"/>
