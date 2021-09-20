@@ -113,8 +113,8 @@ public class EventLog {
      *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param sourceIp                     The IP Address of the source Gateway
+     * @param targetIp                     The IP Address of the target Gateway
      */
     public static EventLog createEventLogHCPIdentity(TransactionName eventIdentificationTransactionName, EventActionCode eventIdentificationActionCode,
                                                      XMLGregorianCalendar eventIdentificationTime, EventOutcomeIndicator eventIdentificationOutcomeIndicator,
@@ -235,7 +235,7 @@ public class EventLog {
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     processed the epsos operation
      * @param eventTargetObjectIdIn        The string encoded UUID of the source document
-     * @param ET_ObjectID_out              The string encoded UUID of the target document
+     * @param eventTargetObjectIdOut       The string encoded UUID of the target document
      * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
      *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
@@ -601,7 +601,7 @@ public class EventLog {
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
      * @param sourceIp                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param targetIp                     The IP Address of the target Gateway
      * @return the EventLog object
      */
     public static EventLog createEventLogTRCA(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
