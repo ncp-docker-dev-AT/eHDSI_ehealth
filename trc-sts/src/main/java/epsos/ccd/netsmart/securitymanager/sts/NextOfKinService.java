@@ -151,7 +151,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         String serverName = servletRequest.getServerName();
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
-        EventLog eventLogNOKA = EventLog.createEventLogTRCA(TransactionName.TRC_ASSERTION, EventActionCode.EXECUTE,
+        EventLog eventLogNOKA = EventLog.createEventLogTRCA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
                 humanRequestorRole, humanRequestorSubjectID, certificateCommonName, trcCommonName,
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
