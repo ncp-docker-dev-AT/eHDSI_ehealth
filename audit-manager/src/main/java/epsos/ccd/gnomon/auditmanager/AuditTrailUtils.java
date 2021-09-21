@@ -1200,8 +1200,8 @@ public enum AuditTrailUtils {
                     eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("6"), "User",
-                    "2", AuditConstant.RFC_3881, "Patient Number");
+            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("10"), "Guarantor",
+                    "7", AuditConstant.RFC_3881, "Guarantor Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
