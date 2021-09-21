@@ -192,7 +192,7 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
     /**
      * Sends the request to the TRC STS Service.
      *
-     * @return the TRC Assertion that was received from the STS, if the request was successful.
+     * @return the NoK Assertion that was received from the STS, if the request was successful.
      * @throws Exception if the request failed.
      */
     public Assertion request() throws Exception {
@@ -231,8 +231,8 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
                 var string = newFault.getFaultString();
                 throw new SOAPException("Code:" + code + ", Error String:" + string);
             }
-            var assertionNOK = extractTRCAssertionFromRSTC(response);
-            LOGGER.info("TRC Assertion: '{}'", assertionNOK != null ? assertionNOK.getID() : "TRC Assertion is NULL");
+            var assertionNOK = extractNoKAssertionFromRSTC(response);
+            LOGGER.info("NoK Assertion: '{}'", assertionNOK != null ? assertionNOK.getID() : "NoK Assertion is NULL");
             return assertionNOK;
 
         } catch (SOAPException ex) {
@@ -242,13 +242,13 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
         }
     }
 
-    private Assertion extractTRCAssertionFromRSTC(SOAPMessage response) throws Exception {
+    private Assertion extractNoKAssertionFromRSTC(SOAPMessage response) throws Exception {
 
         try {
             LOGGER.info("[TRC-STS Client] Extract NoK from RSTC");
             var body = response.getSOAPBody();
             if (body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").getLength() != 1) {
-                throw new Exception("TRC Assertion is missing from the RSTRC body");
+                throw new Exception("NoK Assertion is missing from the RSTC body");
             }
             SOAPElement assertion = (SOAPElement) body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").item(0);
             Document assertDoc = getDocumentBuilder().newDocument();
@@ -264,18 +264,17 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
 
             var nokAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
             if (OpenNCPValidation.isValidationEnable()) {
-
                 OpenNCPValidation.validateNoKAssertion(nokAssertion, NcpSide.NCP_B);
             }
             return nokAssertion;
 
         } catch (Exception ex) {
-            throw new Exception("Error while trying to extract the SAML TRC Assertion from RSTRC Body: " + ex.getMessage());
+            throw new Exception("Error while trying to extract the SAML NoK Assertion from RSTC Body: " + ex.getMessage());
         }
     }
 
     /**
-     * The Builder class is responsible for the creation of the final TRCAssertionRequest Object.
+     * The Builder class is responsible for the creation of the final NextOfKinAssertionRequest Object.
      * It is used to incrementally create the TRCAssertionRequest and then when calling #build returns the final immutable object
      */
     public static class Builder {

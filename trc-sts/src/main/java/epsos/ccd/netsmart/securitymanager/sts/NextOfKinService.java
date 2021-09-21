@@ -118,7 +118,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
             sslCommonName = HTTPUtil.getSubjectDN(false);
             sendNOKAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
-                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), "TODO patientID",
+                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), nextOfKinDetail.getLivingSubjectIds().get(0),
                     samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, mid,
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
@@ -131,7 +131,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
     }
 
     private void sendNOKAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
-                                     String humanRequestorRole, String patientID, String facilityType, String assertionId,
+                                     String humanRequestorRole, String nokID, String facilityType, String assertionId,
                                      String certificateCommonName, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         var auditService = AuditServiceFactory.getInstance();
@@ -151,11 +151,11 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         String serverName = servletRequest.getServerName();
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
-        EventLog eventLogNOKA = EventLog.createEventLogTRCA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
+        EventLog eventLogNOKA = EventLog.createEventLogNOKA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
                 humanRequestorRole, humanRequestorSubjectID, certificateCommonName, trcCommonName,
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
-                patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                nokID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
                 IPUtil.isLocalLoopbackIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIP(), NcpSide.NCP_B);
 
         eventLogNOKA.setEventType(EventType.NOK_ASSERTION);
