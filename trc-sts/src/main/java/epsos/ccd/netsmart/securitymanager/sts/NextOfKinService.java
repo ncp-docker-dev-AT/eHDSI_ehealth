@@ -167,8 +167,8 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         List<Attribute> attributeList = new ArrayList<>();
         if (nextOfKinDetail.getLivingSubjectIds() != null && StringUtils.isNotBlank(nextOfKinDetail.getLivingSubjectIds().get(0))) {
             attributeList.add(SamlIssuerHelper
-                    .createAttribute(nextOfKinDetail.getLivingSubjectIds().get(0), "NextOfKinLivingSubjectId", Attribute.URI_REFERENCE,
-                            "urn:ehdsi:names:subject:nextofkin:livingsubjectid"));
+                    .createAttribute(nextOfKinDetail.getLivingSubjectIds().get(0), "NextOfKinId", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:id"));
         }
         if (StringUtils.isNotBlank(nextOfKinDetail.getFirstName())) {
             attributeList.add(SamlIssuerHelper
