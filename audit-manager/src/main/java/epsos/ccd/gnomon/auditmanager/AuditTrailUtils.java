@@ -1181,7 +1181,31 @@ public enum AuditTrailUtils {
      * @return the created AuditMessage object
      */
     private AuditMessage createAuditTrailForNOKA(EventLog eventLog) {
-        return createAuditTrailForTRCA(eventLog);
+        AuditMessage message = null;
+        try {
+            ObjectFactory of = new ObjectFactory();
+            message = of.createAuditMessage();
+            // Audit Source
+            addAuditSource(message, eventLog.getAS_AuditSourceId());
+            // Event Identification
+            addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+            // Point Of Care
+            addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), true,
+                    "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
+            // Human Requestor
+            addHumanRequestor(message, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
+                    true);
+            addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Consumer",
+                    eventLog.getSourceip());
+            addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
+                    eventLog.getTargetip());
+            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("6"), "User",
+                    "2", AuditConstant.RFC_3881, "Patient Number");
+        } catch (Exception e) {
+            LOGGER.error(e.getLocalizedMessage(), e);
+        }
+        return message;
     }
 
     /**

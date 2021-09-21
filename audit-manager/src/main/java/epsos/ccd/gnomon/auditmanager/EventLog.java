@@ -666,7 +666,7 @@ public class EventLog {
      *                                     processed the epsos operation
      * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
      *                                     the audit source
-     * @param PT_ParticipantObjectID       Next of Kin Identifier in HL7 II format
+     * @param NOK_ParticipantObjectID       Next of Kin Identifier in HL7 II format
      * @param eventTargetObjectId          The string encoded UUID of the returned document
      * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
      *                                     message
@@ -684,7 +684,7 @@ public class EventLog {
                                               XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                               String PC_UserID, String PC_RoleID, String HR_UserID, String HR_RoleID,
                                               String HR_AlternativeUserID, String SC_UserID, String SP_UserID,
-                                              String AS_AuditSourceId, String PT_ParticipantObjectID, String eventTargetObjectId,
+                                              String AS_AuditSourceId, String NOK_ParticipantObjectID, String eventTargetObjectId,
                                               String ReqM_ParticipantObjectID, byte[] ReqM_ParticipantObjectDetail,
                                               String ResM_ParticipantObjectID, byte[] ResM_ParticipantObjectDetail,
                                               String sourceIp, String targetIp, NcpSide ncpSide) {
@@ -703,7 +703,7 @@ public class EventLog {
         eventLog.setSC_UserID(nullToEmptyString(SC_UserID));
         eventLog.setSP_UserID(nullToEmptyString(SP_UserID));
         eventLog.setAS_AuditSourceId(nullToEmptyString(AS_AuditSourceId));
-        eventLog.setPT_PatricipantObjectID(nullToEmptyString(PT_ParticipantObjectID));
+        eventLog.setPT_PatricipantObjectID(nullToEmptyString(NOK_ParticipantObjectID));
         eventLog.getEventTargetParticipantObjectIds().add(nullToEmptyString(eventTargetObjectId));
         //  TODO: Audit - Event Target
         eventLog.setReqM_ParticipantObjectID(nullToEmptyString(ReqM_ParticipantObjectID));
@@ -715,7 +715,7 @@ public class EventLog {
         eventLog.ncpSide = ncpSide;
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
         }
         return eventLog;
     }
