@@ -71,6 +71,12 @@ public class STSUtils {
         }
         var nextOfKinDetail = new NextOfKinDetail();
         SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinLivingSubjectId").item(0) != null) {
+            nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinLivingSubjectId").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0) != null) {
+            nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0).getTextContent());
+        }
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0) != null) {
             nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0).getTextContent());
         }

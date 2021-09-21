@@ -706,6 +706,9 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(operation, TransactionName.TRC_ASSERTION.getCode())) {
             return IHETransactionName.TRC_ASSERTION.getCode();
         }
+        if (StringUtils.equals(operation, TransactionName.NOK_ASSERTION.getCode())) {
+            return IHETransactionName.NOK_ASSERTION.getCode();
+        }
         if (StringUtils.equals(operation, TransactionName.SMP_QUERY.getCode())) {
             return IHETransactionName.SMP_QUERY.getCode();
         }
