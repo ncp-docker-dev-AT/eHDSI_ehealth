@@ -31,6 +31,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -72,7 +73,7 @@ public class STSUtils {
         var nextOfKinDetail = new NextOfKinDetail();
         SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinId").item(0) != null) {
-            nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinId").item(0).getTextContent());
+            nextOfKinDetail.setLivingSubjectIds(Collections.singletonList(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinId").item(0).getTextContent()));
         }
         if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0) != null) {
             nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0).getTextContent());
