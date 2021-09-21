@@ -65,7 +65,8 @@ public enum AuditTrailUtils {
         String auditMessage = "";
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
-            eventTypeCode = auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
+            eventTypeCode = auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
             LOGGER.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to log AuditMessageEventTypeCode.", e);
@@ -82,7 +83,8 @@ public enum AuditTrailUtils {
         boolean validated = false;
 
         try {
-            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             validated = Utils.validateSchema(auditMessage);
 
         } catch (Exception e) {
@@ -91,7 +93,8 @@ public enum AuditTrailUtils {
 
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
-            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             if (!forceWrite) {
                 auditMessage = "";
             }
@@ -99,31 +102,37 @@ public enum AuditTrailUtils {
         if (validated || forceWrite) {
 
             if (validated) {
-                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ?
+                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             } else {
-                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ?
+                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             try {
                 // Validating XML according to XSD
                 LOGGER.debug("'{}' XML stuff: Create Dom From String",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
                     LOGGER.debug("'{}' Audit Message signed",
-                            auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                            auditmessage.getEventIdentification() != null ?
+                                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 }
             } catch (Exception e) {
                 auditMessage = "";
                 LOGGER.error("'{}' Error signing doc: '{}'",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)",
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
                         e.getMessage(), e);
             }
         }
@@ -754,7 +763,7 @@ public enum AuditTrailUtils {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
-        if(StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
             eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
@@ -1311,7 +1320,7 @@ public enum AuditTrailUtils {
 
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
-                if(auditmessage.getEventIdentification() != null) {
+                if (auditmessage.getEventIdentification() != null) {
                     Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
                             .get(0).getDisplayName().split("::"))[0] + "-" +
                             new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS").format(new Date(System.currentTimeMillis())) + ".xml");

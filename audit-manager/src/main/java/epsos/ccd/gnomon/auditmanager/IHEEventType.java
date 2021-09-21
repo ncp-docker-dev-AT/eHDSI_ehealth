@@ -48,7 +48,7 @@ public enum IHEEventType {
     SMP_QUERY("EHDSI-193"),
     SMP_PUSH("EHDSI-194");
 
-    private String code;
+    private final String code;
 
     IHEEventType(String c) {
         code = c;

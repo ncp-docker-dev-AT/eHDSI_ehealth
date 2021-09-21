@@ -245,7 +245,7 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
     private Assertion extractTRCAssertionFromRSTC(SOAPMessage response) throws Exception {
 
         try {
-            LOGGER.info("[TRC-STS Client] Extract TRC from RSTC");
+            LOGGER.info("[TRC-STS Client] Extract NoK from RSTC");
             var body = response.getSOAPBody();
             if (body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").getLength() != 1) {
                 throw new Exception("TRC Assertion is missing from the RSTRC body");
@@ -262,12 +262,12 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             var unmarshallerFactory = XMLObjectProviderRegistrySupport.getUnmarshallerFactory();
             var unmarshaller = unmarshallerFactory.getUnmarshaller(assertion);
 
-            var trcAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
+            var nokAssertion = (Assertion) unmarshaller.unmarshall(assertDoc.getDocumentElement());
             if (OpenNCPValidation.isValidationEnable()) {
 
-                OpenNCPValidation.validateTRCAssertion(trcAssertion, NcpSide.NCP_B);
+                OpenNCPValidation.validateNoKAssertion(nokAssertion, NcpSide.NCP_B);
             }
-            return trcAssertion;
+            return nokAssertion;
 
         } catch (Exception ex) {
             throw new Exception("Error while trying to extract the SAML TRC Assertion from RSTRC Body: " + ex.getMessage());

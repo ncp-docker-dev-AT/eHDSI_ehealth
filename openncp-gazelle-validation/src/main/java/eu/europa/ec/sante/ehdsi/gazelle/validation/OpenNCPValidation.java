@@ -69,6 +69,16 @@ public class OpenNCPValidation {
      * @param assertion
      * @param ncpSide
      */
+    public static void validateNoKAssertion(Assertion assertion, NcpSide ncpSide) {
+
+        LOGGER.info("validate Next Of Kin Assertion...");
+        validateAssertion(assertion, ValidatorUtil.EHDSI_ASSERTION_NOK, ncpSide);
+    }
+
+    /**
+     * @param assertion
+     * @param ncpSide
+     */
     public static void validateTRCAssertion(Assertion assertion, NcpSide ncpSide) {
 
         LOGGER.info("validate TRC Assertion...");
