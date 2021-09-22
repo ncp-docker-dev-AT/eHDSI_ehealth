@@ -37,6 +37,7 @@ public enum IHEEventType {
     CONSENT_SERVICE_PIN("EHDSI-53"),
     HCP_AUTHENTICATION("ITI-40"),
     TRC_ASSERTION("EHDSI-92"),
+    NOK_ASSERTION("EHDSI-96"),
     NCP_TRUSTED_SERVICE_LIST("EHDSI-93"),
     PIVOT_TRANSLATION("EHDSI-94"),
     COMMUNICATION_FAILURE("EHDSI-CF"),
@@ -47,7 +48,7 @@ public enum IHEEventType {
     SMP_QUERY("EHDSI-193"),
     SMP_PUSH("EHDSI-194");
 
-    private String code;
+    private final String code;
 
     IHEEventType(String c) {
         code = c;

@@ -117,8 +117,8 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
             }
 
             sslCommonName = HTTPUtil.getSubjectDN(false);
-            sendTRCAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
-                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), "TODO patientID",
+            sendNOKAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
+                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), nextOfKinDetail.getLivingSubjectIds().get(0),
                     samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, mid,
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
@@ -130,8 +130,8 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         }
     }
 
-    private void sendTRCAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
-                                     String humanRequestorRole, String patientID, String facilityType, String assertionId,
+    private void sendNOKAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
+                                     String humanRequestorRole, String nokID, String facilityType, String assertionId,
                                      String certificateCommonName, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         var auditService = AuditServiceFactory.getInstance();
@@ -151,20 +151,25 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         String serverName = servletRequest.getServerName();
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
-        EventLog eventLogTRCA = EventLog.createEventLogTRCA(TransactionName.TRC_ASSERTION, EventActionCode.EXECUTE,
+        EventLog eventLogNOKA = EventLog.createEventLogNOKA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
                 date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
                 humanRequestorRole, humanRequestorSubjectID, certificateCommonName, trcCommonName,
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
-                patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                nokID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
                 IPUtil.isLocalLoopbackIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIP(), NcpSide.NCP_B);
 
-        eventLogTRCA.setEventType(EventType.TRC_ASSERTION);
-        auditService.write(eventLogTRCA, "13", "2");
+        eventLogNOKA.setEventType(EventType.NOK_ASSERTION);
+        auditService.write(eventLogNOKA, "13", "2");
     }
 
     private List<Attribute> buildNextOfKinAttributes(NextOfKinDetail nextOfKinDetail) {
 
         List<Attribute> attributeList = new ArrayList<>();
+        if (nextOfKinDetail.getLivingSubjectIds() != null && StringUtils.isNotBlank(nextOfKinDetail.getLivingSubjectIds().get(0))) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getLivingSubjectIds().get(0), "NextOfKinId", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:id"));
+        }
         if (StringUtils.isNotBlank(nextOfKinDetail.getFirstName())) {
             attributeList.add(SamlIssuerHelper
                     .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,
