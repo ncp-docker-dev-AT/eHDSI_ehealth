@@ -20,6 +20,10 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
+    <modules>
+        <module>openncp-gateway-backend</module>
+    </modules>
+
     <profiles>
         <profile>
             <id>monitoring</id>
