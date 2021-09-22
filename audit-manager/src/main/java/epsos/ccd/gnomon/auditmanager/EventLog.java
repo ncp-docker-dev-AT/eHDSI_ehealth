@@ -159,7 +159,7 @@ public class EventLog {
         eventLog.setNcpSide(ncpSide);
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog);
         }
         return eventLog;
     }
@@ -217,7 +217,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -273,7 +273,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -478,7 +478,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -639,7 +639,7 @@ public class EventLog {
         eventLog.ncpSide = ncpSide;
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
         }
         return eventLog;
     }
@@ -666,7 +666,7 @@ public class EventLog {
      *                                     processed the epsos operation
      * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
      *                                     the audit source
-     * @param NOK_ParticipantObjectID       Next of Kin Identifier in HL7 II format
+     * @param NOK_ParticipantObjectID      Next of Kin Identifier in HL7 II format
      * @param eventTargetObjectId          The string encoded UUID of the returned document
      * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
      *                                     message
@@ -799,7 +799,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -874,7 +874,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }

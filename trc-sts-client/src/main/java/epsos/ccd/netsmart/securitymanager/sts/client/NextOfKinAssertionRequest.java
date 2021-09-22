@@ -208,7 +208,7 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             httpConnection.setDoOutput(true);
 
             LOGGER.info("Checking SSL Hostname Verifier: '{}'", CHECK_FOR_HOSTNAME);
-            if (httpConnection instanceof HttpsURLConnection) {  // Going SSL
+            if (httpConnection instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getSSLSocketFactory());
                 if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
                     ((HttpsURLConnection) httpConnection).setHostnameVerifier(
