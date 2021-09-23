@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3"
                 xmlns:epsos="urn:epsos-org:ep:medication"
-                version="1.0">
+                version="2.0">
 
     <xsl:import href="epPatient.xsl"/>
     <xsl:import href="epPrescriber.xsl"/>

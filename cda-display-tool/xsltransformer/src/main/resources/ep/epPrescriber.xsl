@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3"
-                version="1.0">
+                version="2.0">
 
     <xsl:template match="/n1:ClinicalDocument/n1:author">
         <div class="wrap-collapsible">

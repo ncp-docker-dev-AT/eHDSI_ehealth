@@ -3,7 +3,7 @@
                 xmlns:n1="urn:hl7-org:v3"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:epsos="urn:epsos-org:ep:medication"
-                version="1.0">
+                version="2.0">
 
     <xsl:template match="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:entry/n1:substanceAdministration">
         <fieldset style="min-height:100px;">
@@ -26,15 +26,27 @@
         <xsl:value-of select="n1:name"/>
         <xsl:choose>
             <xsl:when test="epsos:asSpecializedKind">
-                <xsl:if test="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@codeSystem='2.16.840.1.113883.6.73'">
-                    (<span class="codeSystem">ATC</span>
-                    &#160;
-                    <span class="codeSystem">
-                        <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code/@code"/>
-                    </span>
-                    &#160;
-                    <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:name"/>)
-                </xsl:if>
+                <xsl:variable name="code" select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code"/>
+                <xsl:choose>
+                    <xsl:when test="not($code/@nullFlavor)">
+                        <xsl:if test="$code/@codeSystem='2.16.840.1.113883.6.73'">
+                            (<span class="codeSystem">ATC</span>
+                            &#160;
+                            <span class="codeSystem">
+                            <xsl:value-of select="$code/@code"/>
+                            </span>
+                            &#160;
+                            <xsl:call-template name="show-eHDSIActiveIngredient">
+                                <xsl:with-param name="node" select="$code"/>
+                            </xsl:call-template>
+                            )
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text> - </xsl:text>
+                        <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:name"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
         </xsl:choose>
         &#160;

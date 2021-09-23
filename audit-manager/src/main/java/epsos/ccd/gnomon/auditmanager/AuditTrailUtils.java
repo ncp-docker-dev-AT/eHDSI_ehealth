@@ -65,7 +65,8 @@ public enum AuditTrailUtils {
         String auditMessage = "";
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
-            eventTypeCode = auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
+            eventTypeCode = auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
             LOGGER.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to log AuditMessageEventTypeCode.", e);
@@ -82,7 +83,8 @@ public enum AuditTrailUtils {
         boolean validated = false;
 
         try {
-            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+            LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             validated = Utils.validateSchema(auditMessage);
 
         } catch (Exception e) {
@@ -91,7 +93,8 @@ public enum AuditTrailUtils {
 
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
-            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+            LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ?
+                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             if (!forceWrite) {
                 auditMessage = "";
             }
@@ -99,31 +102,37 @@ public enum AuditTrailUtils {
         if (validated || forceWrite) {
 
             if (validated) {
-                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ?
+                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             } else {
-                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ?
+                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             try {
                 // Validating XML according to XSD
                 LOGGER.debug("'{}' XML stuff: Create Dom From String",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
                     LOGGER.debug("'{}' Audit Message signed",
-                            auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)");
+                            auditmessage.getEventIdentification() != null ?
+                                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 }
             } catch (Exception e) {
                 auditMessage = "";
                 LOGGER.error("'{}' Error signing doc: '{}'",
-                        auditmessage.getEventIdentification() != null ? auditmessage.getEventIdentification().getEventID().getCode() :  "EventTypeCode(N/A)",
+                        auditmessage.getEventIdentification() != null ?
+                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
                         e.getMessage(), e);
             }
         }
@@ -192,6 +201,9 @@ public enum AuditTrailUtils {
         }
         if (StringUtils.equals(eventLog.getEventType(), EventType.TRC_ASSERTION.getCode())) {
             message = au.createAuditTrailTRCAssertion(eventLog);
+        }
+        if (StringUtils.equals(eventLog.getEventType(), EventType.NOK_ASSERTION.getCode())) {
+            message = au.createAuditTrailNOKAssertion(eventLog);
         }
         if (StringUtils.equals(eventLog.getEventType(), EventType.NCP_TRUSTED_SERVICE_LIST.getCode())) {
             message = au.createAuditTrailNCPTrustedServiceList(eventLog);
@@ -401,6 +413,22 @@ public enum AuditTrailUtils {
         if (message != null) {
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
                     "TrcA", AuditConstant.CODE_SYSTEM_EHDSI_SECURITY, "TRC Assertion");
+        }
+        return message;
+    }
+
+    /**
+     * Constructs an Audit Message for Next Of Kin Assertion
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage createAuditTrailNOKAssertion(EventLog eventLog) {
+
+        var message = createAuditTrailForNOKA(eventLog);
+        if (message != null) {
+            addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), null,
+                    "NokA", AuditConstant.CODE_SYSTEM_EHDSI_SECURITY, "NOK Assertion");
         }
         return message;
     }
@@ -617,6 +645,9 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(eventType, EventType.TRC_ASSERTION.getCode())) {
             return IHEEventType.TRC_ASSERTION.getCode();
         }
+        if (StringUtils.equals(eventType, EventType.NOK_ASSERTION.getCode())) {
+            return IHEEventType.NOK_ASSERTION.getCode();
+        }
         if (StringUtils.equals(eventType, EventType.MRO_LIST.getCode())) {
             return IHEEventType.MRO_LIST.getCode();
         }
@@ -675,6 +706,9 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(operation, TransactionName.TRC_ASSERTION.getCode())) {
             return IHETransactionName.TRC_ASSERTION.getCode();
         }
+        if (StringUtils.equals(operation, TransactionName.NOK_ASSERTION.getCode())) {
+            return IHETransactionName.NOK_ASSERTION.getCode();
+        }
         if (StringUtils.equals(operation, TransactionName.SMP_QUERY.getCode())) {
             return IHETransactionName.SMP_QUERY.getCode();
         }
@@ -732,7 +766,7 @@ public enum AuditTrailUtils {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
-        if(StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+        if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
             eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
@@ -1144,6 +1178,40 @@ public enum AuditTrailUtils {
     }
 
     /**
+     * Constructs an Audit Message for Issuance of a Next Of Kin Assertion
+     *
+     * @param eventLog the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage createAuditTrailForNOKA(EventLog eventLog) {
+        AuditMessage message = null;
+        try {
+            ObjectFactory of = new ObjectFactory();
+            message = of.createAuditMessage();
+            // Audit Source
+            addAuditSource(message, eventLog.getAS_AuditSourceId());
+            // Event Identification
+            addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+            // Point Of Care
+            addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), true,
+                    "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
+            // Human Requestor
+            addHumanRequestor(message, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
+                    true);
+            addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Consumer",
+                    eventLog.getSourceip());
+            addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
+                    eventLog.getTargetip());
+            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("10"), "Guarantor",
+                    "7", AuditConstant.RFC_3881, "Guarantor Number");
+        } catch (Exception e) {
+            LOGGER.error(e.getLocalizedMessage(), e);
+        }
+        return message;
+    }
+
+    /**
      * Constructs an Audit Message for NCP Trusted Service List
      *
      * @param eventLog the EventLog object
@@ -1279,7 +1347,7 @@ public enum AuditTrailUtils {
 
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
-                if(auditmessage.getEventIdentification() != null) {
+                if (auditmessage.getEventIdentification() != null) {
                     Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
                             .get(0).getDisplayName().split("::"))[0] + "-" +
                             new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS").format(new Date(System.currentTimeMillis())) + ".xml");
