@@ -190,6 +190,12 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(eventLog.getEventType(), EventType.ORDER_SERVICE_RETRIEVE.getCode())) {
             message = au.createAuditTrailForOrderService(eventLog);
         }
+        if (StringUtils.equals(eventLog.getEventType(), EventType.ORCD_SERVICE_LIST.getCode())) {
+            message = au.createAuditTrailForOrCDService(eventLog);
+        }
+        if (StringUtils.equals(eventLog.getEventType(), EventType.ORCD_SERVICE_RETRIEVE.getCode())) {
+            message = au.createAuditTrailForOrCDService(eventLog);
+        }
         if (StringUtils.equals(eventLog.getEventType(), EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
             message = au.createAuditTrailForDispensationService(eventLog, "Initialize");
         }
@@ -339,6 +345,23 @@ public enum AuditTrailUtils {
      * @return the created AuditMessage object
      */
     private AuditMessage createAuditTrailForOrderService(EventLog eventLog) {
+
+        AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
+        if (message != null) {
+
+            addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
+                    "12", "", Short.valueOf("0"));
+        }
+        return message;
+    }
+
+    /**
+     * Constructs an Audit Message for the eHDSI OrCD Service According schema is HCP Assurance.
+     *
+     * @param eventLog - the EventLog object
+     * @return the created AuditMessage object
+     */
+    private AuditMessage createAuditTrailForOrCDService(EventLog eventLog) {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
@@ -638,6 +661,12 @@ public enum AuditTrailUtils {
         }
         if (StringUtils.equals(eventType, EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
             return IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode();
+        }
+        if (StringUtils.equals(eventType, EventType.ORCD_SERVICE_LIST.getCode())) {
+            return IHEEventType.ORCD_SERVICE_LIST.getCode();
+        }
+        if (StringUtils.equals(eventType, EventType.ORCD_SERVICE_RETRIEVE.getCode())) {
+            return IHEEventType.ORCD_SERVICE_RETRIEVE.getCode();
         }
         if (StringUtils.equals(eventType, EventType.PIVOT_TRANSLATION.getCode())) {
             return IHEEventType.PIVOT_TRANSLATION.getCode();

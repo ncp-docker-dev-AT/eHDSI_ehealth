@@ -111,6 +111,13 @@ public class EventLogUtil {
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
+                break;
             case Constants.MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
@@ -193,6 +200,13 @@ public class EventLogUtil {
             case Constants.EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
                 break;
             case Constants.MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_RETRIEVE);

@@ -123,6 +123,7 @@ public class ValidatorUtil {
             }
             if (StringUtils.equals(eventType, "EHDSI-21") || StringUtils.equals(eventType, "EHDSI-22")
                     || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")
+                    || StringUtils.equals(eventType, "EHDSI-61") || StringUtils.equals(eventType, "EHDSI-62")
                     || StringUtils.equals(eventType, "EHDSI-96") || StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "EHDSI-95")) {
 
@@ -151,13 +152,14 @@ public class ValidatorUtil {
 
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
-            if (StringUtils.equals(eventType, "EHDSI-96") || StringUtils.equals(eventType, "ITI-38")
-                    || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "EHDSI-95")) {
+            if (StringUtils.equals(eventType, "EHDSI-95") || StringUtils.equals(eventType, "EHDSI-96")
+                    || StringUtils.equals(eventType, "ITI-38") || StringUtils.equals(eventType, "ITI-39")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE;
             }
             if (StringUtils.equals(eventType, "EHDSI-21") || StringUtils.equals(eventType, "EHDSI-22")
-                    || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")) {
+                    || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")
+                    || StringUtils.equals(eventType, "EHDSI-61") || StringUtils.equals(eventType, "EHDSI-62")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }
