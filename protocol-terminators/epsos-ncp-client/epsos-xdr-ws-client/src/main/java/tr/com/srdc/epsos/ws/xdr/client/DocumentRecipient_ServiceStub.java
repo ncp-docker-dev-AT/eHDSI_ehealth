@@ -356,7 +356,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 eDispenseCda = EadcUtilWrapper.toXmlDocument(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue());
             }
             EadcUtilWrapper.invokeEadc(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XDR,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
                     EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
             //  Log SOAP response message.

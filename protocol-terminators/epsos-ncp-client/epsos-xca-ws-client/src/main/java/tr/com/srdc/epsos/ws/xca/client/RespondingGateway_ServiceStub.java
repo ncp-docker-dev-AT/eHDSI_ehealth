@@ -343,11 +343,10 @@ public class RespondingGateway_ServiceStub extends Stub {
             } catch (AxisFault e) {
                 LOGGER.error("Axis Fault error: '{}'", e.getMessage());
                 LOGGER.error("Trying to automatically solve the problem by fetching configurations from the Central Services...");
-                String endpoint = null;
                 LOGGER.debug("ClassCode: '{}'", Arrays.toString(classCodes.toArray()));
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 RegisteredService registeredService = getRegisteredService(classCodes);
-                endpoint = dynamicDiscoveryService.getEndpointUrl(
+                String endpoint = dynamicDiscoveryService.getEndpointUrl(
                         this.countryCode.toLowerCase(Locale.ENGLISH), registeredService, true);
 
                 if (StringUtils.isNotEmpty(endpoint)) {
@@ -464,18 +463,10 @@ public class RespondingGateway_ServiceStub extends Stub {
 //                LOGGER.error(ExceptionUtils.getStackTrace(e));
 //            }
 
-            /*
-             * Invoque eADC
-             */
-            EadcUtilWrapper.invokeEadc(_messageContext, // Request message context
-                    _returnMessageContext, // Response message context
-                    this._getServiceClient(), //Service Client
-                    null, // CDA document
-                    transactionStartTime, // Transaction Start Time
-                    transactionEndTime, // Transaction End Time
-                    this.countryCode, // Country A ISO Code
-                    EadcEntry.DsTypes.XCA, // Data source type
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY); // Transaction direction
+            //  Invoke eADC
+            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
 
             // eADC end time
             end = System.currentTimeMillis();
@@ -543,7 +534,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
     private RegisteredService getRegisteredService(List<String> classCodes) {
         RegisteredService registeredService = null;
-        for (String classCode: classCodes) {
+        for (String classCode : classCodes) {
             switch (classCode) {
                 case Constants.EP_CLASSCODE:
                     if (registeredService == null) {
@@ -830,7 +821,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
             }
             EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCA,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
                     Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
             //  Create Audit messages
