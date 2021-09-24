@@ -110,6 +110,17 @@ public class XMLUtil {
         return writer.getBuffer().toString().replaceAll("\n|\r", "");
     }
 
+    public static String documentToString(Document doc, boolean omitXmlDeclaration) throws TransformerException {
+
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = factory.newTransformer();
+        StringWriter writer = new StringWriter();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration ? "yes" : "no");
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        return writer.getBuffer().toString().replaceAll("\n|\r", "");
+    }
+
     public static String prettyPrintForValidation(Node node) throws TransformerException, XPathExpressionException {
 
         XPath xPath = XPathFactory.newInstance().newXPath();

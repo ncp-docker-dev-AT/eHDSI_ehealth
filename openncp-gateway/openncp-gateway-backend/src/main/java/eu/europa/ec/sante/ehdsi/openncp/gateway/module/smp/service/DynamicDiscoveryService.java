@@ -112,6 +112,7 @@ public class DynamicDiscoveryService {
 
         try {
             String participantIdentifierValue = String.format(PARTICIPANT_IDENTIFIER_VALUE, countryCode);
+            String participantObjectID = "";
             LOGGER.info("[Gateway] Querying ISM for participant identifier {}", participantIdentifierValue);
             ParticipantIdentifier participantIdentifier = new ParticipantIdentifier(participantIdentifierValue, PARTICIPANT_IDENTIFIER_SCHEME);
             DocumentIdentifier documentIdentifier = new DocumentIdentifier(RegisteredService.EHEALTH_107.getUrn(), DOCUMENT_IDENTIFIER_SCHEME);
@@ -130,6 +131,9 @@ public class DynamicDiscoveryService {
                     if (!extensionTypes.isEmpty()) {
 
                         Document document = ((ElementNSImpl) extensionTypes.get(0).getAny()).getOwnerDocument();
+
+                        participantObjectID = XMLUtil.documentToString(document, true);
+
                         DOMSource source = new DOMSource(document.getElementsByTagNameNS(URN_EHDSI_ISM, "searchFields").item(0));
                         String outPath = APPLICATION_BASE_DIR + "InternationalSearch_" + StringUtils.upperCase(countryCode) + ".xml";
                         if (LOGGER.isDebugEnabled()) {
@@ -143,7 +147,8 @@ public class DynamicDiscoveryService {
             //  Audit variables
             URI smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
             URI serviceMetadataUri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifier);
-            byte[] encodedObjectID = Base64.encodeBase64(serviceMetadataUri.toASCIIString().getBytes());
+            byte[] encodedObjectID = participantObjectID.isEmpty() ? Base64.encodeBase64(serviceMetadataUri.toASCIIString().getBytes()) :
+                    Base64.encodeBase64(participantObjectID.getBytes());
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("[Gateway] SMP Query: '{}'", serviceMetadataUri.toASCIIString());
             }

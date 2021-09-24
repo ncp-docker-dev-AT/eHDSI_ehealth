@@ -482,10 +482,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     AdhocQueryResponse.class,
                     getEnvelopeNamespaces(_returnEnv));
             AdhocQueryResponse adhocQueryResponse = (AdhocQueryResponse) object;
-            EventLog eventLog = createAndSendEventLogQuery(adhocQueryRequest, adhocQueryResponse,
-                    _messageContext, _returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN), assertionMap.get(AssertionEnum.TREATMENT),
-                    this._getServiceClient().getOptions().getTo().getAddress(),
-                    Arrays.toString(classCodes.toArray())); // Audit
+            for (String classCode: classCodes) {
+                createAndSendEventLogQuery(adhocQueryRequest, adhocQueryResponse,
+                        _messageContext, _returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN), assertionMap.get(AssertionEnum.TREATMENT),
+                        this._getServiceClient().getOptions().getTo().getAddress(),
+                        classCode); // Audit
+            }
             // TMP
             // Audit end time
             end = System.currentTimeMillis();
