@@ -17,12 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,7 +34,6 @@ import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @ServiceMode(value = Service.Mode.MESSAGE)
@@ -135,14 +133,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
                                      String certificateCommonName, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         var auditService = AuditServiceFactory.getInstance();
-        var gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(new Date());
-        XMLGregorianCalendar date2 = null;
-        try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-        } catch (DatatypeConfigurationException ex) {
-            logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
-        }
+        XMLGregorianCalendar date = DateUtil.getDateAsXMLGregorian(new Date());
         String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url"));
         String sourceGateway = getClientIP();
         logger.info("STS Client IP: '{}'", sourceGateway);
@@ -152,7 +143,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
         EventLog eventLogNOKA = EventLog.createEventLogNOKA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
+                date, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
                 humanRequestorRole, humanRequestorSubjectID, certificateCommonName, trcCommonName,
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
                 nokID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,

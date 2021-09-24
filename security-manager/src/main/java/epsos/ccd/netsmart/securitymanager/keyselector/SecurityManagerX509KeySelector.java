@@ -10,17 +10,17 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 /**
- * A <code>KeySelector</code> that returns {@link PublicKey}s of trusted
- * {@link X509Certificate}s stored in a {@link KeyStore}.
+ * A <code>KeySelector</code> that returns {@link PublicKey}s of trusted {@link X509Certificate}s stored in a {@link KeyStore}.
  * <p>
  * <p>
  * This <code>KeySelector</code> uses the specified <code>KeyStore</code> to find a trusted <code>X509Certificate</code>
  * that matches information specified in the {@link KeyInfo} passed to the {@link #select} method.
- * The public key from the first match is returned. If no match, <code>null</code> is returned. See the <code>select</code> method for more information.
+ * The public key from the first match is returned. If no match, <code>null</code> is returned.
+ * See the <code>select</code> method for more information.
  *
  * @author Sean Mullan
  */
-public class SMgrX509KeySelector extends KeySelector {
+public class SecurityManagerX509KeySelector extends KeySelector {
 
     private static boolean algEquals(String algURI, String algName) {
 
@@ -31,13 +31,12 @@ public class SMgrX509KeySelector extends KeySelector {
     public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
                                     XMLCryptoContext context) throws KeySelectorException {
 
-        for (Object o1 : keyInfo.getContent()) {
+        for (XMLStructure xmlStructure : keyInfo.getContent()) {
 
-            XMLStructure info = (XMLStructure) o1;
-            if (!(info instanceof X509Data)) {
+            if (!(xmlStructure instanceof X509Data)) {
                 continue;
             }
-            X509Data x509Data = (X509Data) info;
+            X509Data x509Data = (X509Data) xmlStructure;
             for (Object o : x509Data.getContent()) {
 
                 if (!(o instanceof X509Certificate)) {
