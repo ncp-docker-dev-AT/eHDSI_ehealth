@@ -399,7 +399,7 @@ public class RespondingGateway_ServiceStub extends Stub {
              * Invoque eADC
              */
             EadcUtilWrapper.invokeEadc(messageContext, _returnMessageContext, this._getServiceClient(), null,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.XCPD,
+                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
                     EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY);
 
             // TMP

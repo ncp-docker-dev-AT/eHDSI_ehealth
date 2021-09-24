@@ -174,7 +174,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
                 EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
-                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.XDR, EadcUtil.Direction.INBOUND,
+                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
                         ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
         } catch (Exception e) {
