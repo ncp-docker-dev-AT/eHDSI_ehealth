@@ -25,6 +25,7 @@ public enum TransactionName {
     CONSENT_SERVICE_PIN("ConsentService::PIN"),
     HCP_AUTHENTICATION("identityProvider::HPAuthentication"),
     TRC_ASSERTION("ncp::TrcAssertion"),
+    NOK_ASSERTION("ncp::NokAssertion"),
     NCP_TRUSTED_SERVICE_LIST("ncpConfigurationManager::ImportNSL"),
     PIVOT_TRANSLATION("ncpTransformationMgr::Translate"),
     COMMUNICATION_FAILURE("CommunicationFailure"),

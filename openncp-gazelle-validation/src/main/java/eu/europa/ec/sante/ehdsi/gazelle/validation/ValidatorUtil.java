@@ -28,6 +28,7 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
     public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
     public static final String EHDSI_ASSERTION_HCP_IDENTITY;
+    public static final String EHDSI_ASSERTION_NOK;
     public static final String EHDSI_ASSERTION_TRC;
     public static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
     public static final String EHDSI_XDS_CS_PUT_REQUEST;
@@ -55,6 +56,7 @@ public class ValidatorUtil {
     static {
         try {
             EHDSI_ASSERTION_HCP_IDENTITY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_HCP_IDENTITY_ASSERTION");
+            EHDSI_ASSERTION_NOK = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_NOK_ASSERTION");
             EHDSI_ASSERTION_TRC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_TRC_ASSERTION");
 
             EHDSI_ID_SERVICE_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ID_SERVICE_REQUEST");

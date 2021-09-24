@@ -113,8 +113,8 @@ public class EventLog {
      *                                     message
      * @param ResM_PatricipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
-     * @param sourceip                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param sourceIp                     The IP Address of the source Gateway
+     * @param targetIp                     The IP Address of the target Gateway
      */
     public static EventLog createEventLogHCPIdentity(TransactionName eventIdentificationTransactionName, EventActionCode eventIdentificationActionCode,
                                                      XMLGregorianCalendar eventIdentificationTime, EventOutcomeIndicator eventIdentificationOutcomeIndicator,
@@ -159,7 +159,7 @@ public class EventLog {
         eventLog.setNcpSide(ncpSide);
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog);
         }
         return eventLog;
     }
@@ -217,7 +217,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -235,7 +235,7 @@ public class EventLog {
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     processed the epsos operation
      * @param eventTargetObjectIdIn        The string encoded UUID of the source document
-     * @param ET_ObjectID_out              The string encoded UUID of the target document
+     * @param eventTargetObjectIdOut       The string encoded UUID of the target document
      * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
      *                                     message
      * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
@@ -273,7 +273,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -478,7 +478,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -590,27 +590,27 @@ public class EventLog {
      *                                     processed the epsos operation
      * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
      *                                     the audit source
-     * @param PT_PatricipantObjectID       Patient Identifier in HL7 II format
+     * @param PT_ParticipantObjectID       Patient Identifier in HL7 II format
      * @param eventTargetObjectId          The string encoded UUID of the returned document
      * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
      *                                     message
-     * @param ReqM_PatricipantObjectDetail The value MUST contain the base64
+     * @param ReqM_ParticipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
      * @param ResM_ParticipantObjectID     String-encoded UUID of the response
      *                                     message
-     * @param ResM_PatricipantObjectDetail The value MUST contain the base64
+     * @param ResM_ParticipantObjectDetail The value MUST contain the base64
      *                                     encoded security header.
      * @param sourceIp                     The IP Address of the source Gateway
-     * @param targetip                     The IP Address of the target Gateway
+     * @param targetIp                     The IP Address of the target Gateway
      * @return the EventLog object
      */
     public static EventLog createEventLogTRCA(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
                                               XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
                                               String PC_UserID, String PC_RoleID, String HR_UserID, String HR_RoleID,
                                               String HR_AlternativeUserID, String SC_UserID, String SP_UserID,
-                                              String AS_AuditSourceId, String PT_PatricipantObjectID, String eventTargetObjectId,
-                                              String ReqM_ParticipantObjectID, byte[] ReqM_PatricipantObjectDetail,
-                                              String ResM_ParticipantObjectID, byte[] ResM_PatricipantObjectDetail,
+                                              String AS_AuditSourceId, String PT_ParticipantObjectID, String eventTargetObjectId,
+                                              String ReqM_ParticipantObjectID, byte[] ReqM_ParticipantObjectDetail,
+                                              String ResM_ParticipantObjectID, byte[] ResM_ParticipantObjectDetail,
                                               String sourceIp, String targetIp, NcpSide ncpSide) {
 
         LOGGER.info("Creating EventLog for TRC Assertions: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
@@ -627,19 +627,95 @@ public class EventLog {
         eventLog.setSC_UserID(nullToEmptyString(SC_UserID));
         eventLog.setSP_UserID(nullToEmptyString(SP_UserID));
         eventLog.setAS_AuditSourceId(nullToEmptyString(AS_AuditSourceId));
-        eventLog.setPT_PatricipantObjectID(nullToEmptyString(PT_PatricipantObjectID));
+        eventLog.setPT_PatricipantObjectID(nullToEmptyString(PT_ParticipantObjectID));
         eventLog.getEventTargetParticipantObjectIds().add(nullToEmptyString(eventTargetObjectId));
         //  TODO: Audit - Event Target
         eventLog.setReqM_ParticipantObjectID(nullToEmptyString(ReqM_ParticipantObjectID));
-        eventLog.setReqM_PatricipantObjectDetail(ReqM_PatricipantObjectDetail);
+        eventLog.setReqM_PatricipantObjectDetail(ReqM_ParticipantObjectDetail);
         eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
-        eventLog.setResM_PatricipantObjectDetail(ResM_PatricipantObjectDetail);
+        eventLog.setResM_PatricipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceIp));
         eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
+        }
+        return eventLog;
+    }
+
+    /**
+     * This method creates an EventLog object for use in Issuance of a Next of Kin Assertion.
+     *
+     * @param EI_EventActionCode           Possible values according to D4.5.6 are E,R,U,D
+     * @param EI_EventDateTime             The datetime the event occurred
+     * @param EI_EventOutcomeIndicator     <br>
+     *                                     0 for full success <br>
+     *                                     1 in case of partial delivery <br>
+     *                                     4 for temporal failures <br>
+     *                                     8 for permanent failure <br>
+     * @param PC_UserID                    Point of Care: Oid of the department
+     * @param PC_RoleID                    Role of the Point of Care: Oid of the department
+     * @param HR_UserID                    Identifier of the HCP initiated the event
+     * @param HR_RoleID                    Role of HCP initiated the event
+     * @param HR_AlternativeUserID         Human-readable name of the HCP as given in
+     *                                     the Subject-ID
+     * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     triggered the epsos operation
+     * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
+     *                                     processed the epsos operation
+     * @param AS_AuditSourceId             the iso3166-2 code of the country responsible for
+     *                                     the audit source
+     * @param NOK_ParticipantObjectID      Next of Kin Identifier in HL7 II format
+     * @param eventTargetObjectId          The string encoded UUID of the returned document
+     * @param ReqM_ParticipantObjectID     String-encoded UUID of the request
+     *                                     message
+     * @param ReqM_ParticipantObjectDetail The value MUST contain the base64
+     *                                     encoded security header.
+     * @param ResM_ParticipantObjectID     String-encoded UUID of the response
+     *                                     message
+     * @param ResM_ParticipantObjectDetail The value MUST contain the base64
+     *                                     encoded security header.
+     * @param sourceIp                     The IP Address of the source Gateway
+     * @param targetIp                     The IP Address of the target Gateway
+     * @return the EventLog object
+     */
+    public static EventLog createEventLogNOKA(TransactionName EI_TransactionName, EventActionCode EI_EventActionCode,
+                                              XMLGregorianCalendar EI_EventDateTime, EventOutcomeIndicator EI_EventOutcomeIndicator,
+                                              String PC_UserID, String PC_RoleID, String HR_UserID, String HR_RoleID,
+                                              String HR_AlternativeUserID, String SC_UserID, String SP_UserID,
+                                              String AS_AuditSourceId, String NOK_ParticipantObjectID, String eventTargetObjectId,
+                                              String ReqM_ParticipantObjectID, byte[] ReqM_ParticipantObjectDetail,
+                                              String ResM_ParticipantObjectID, byte[] ResM_ParticipantObjectDetail,
+                                              String sourceIp, String targetIp, NcpSide ncpSide) {
+
+        LOGGER.info("Creating EventLog for NOK Assertions: '{}'-'{}'", EI_TransactionName, EI_EventActionCode);
+        EventLog eventLog = new EventLog();
+        eventLog.setEI_TransactionName(EI_TransactionName);
+        eventLog.setEI_EventActionCode(EI_EventActionCode);
+        eventLog.setEI_EventDateTime(EI_EventDateTime);
+        eventLog.setEI_EventOutcomeIndicator(EI_EventOutcomeIndicator);
+        eventLog.setPC_UserID(nullToEmptyString(PC_UserID));
+        eventLog.setPC_RoleID(nullToEmptyString(PC_RoleID));
+        eventLog.setHR_UserID(nullToEmptyString(HR_UserID));
+        eventLog.setHR_RoleID(nullToEmptyString(HR_RoleID));
+        eventLog.setHR_AlternativeUserID(nullToEmptyString(HR_AlternativeUserID));
+        eventLog.setSC_UserID(nullToEmptyString(SC_UserID));
+        eventLog.setSP_UserID(nullToEmptyString(SP_UserID));
+        eventLog.setAS_AuditSourceId(nullToEmptyString(AS_AuditSourceId));
+        eventLog.setPT_PatricipantObjectID(nullToEmptyString(NOK_ParticipantObjectID));
+        eventLog.getEventTargetParticipantObjectIds().add(nullToEmptyString(eventTargetObjectId));
+        //  TODO: Audit - Event Target
+        eventLog.setReqM_ParticipantObjectID(nullToEmptyString(ReqM_ParticipantObjectID));
+        eventLog.setReqM_PatricipantObjectDetail(ReqM_ParticipantObjectDetail);
+        eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
+        eventLog.setResM_PatricipantObjectDetail(ResM_ParticipantObjectDetail);
+        eventLog.setSourceip(nullToEmptyString(sourceIp));
+        eventLog.setTargetip(nullToEmptyString(targetIp));
+        eventLog.ncpSide = ncpSide;
+
+        if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
+            LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
         }
         return eventLog;
     }
@@ -723,7 +799,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }
@@ -798,7 +874,7 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetip));
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
-            LOGGER_CLINICAL.debug("'{}'", eventLog.toString());
+            LOGGER_CLINICAL.debug("'{}'", eventLog);
         }
         return eventLog;
     }

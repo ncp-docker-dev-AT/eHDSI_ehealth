@@ -201,7 +201,7 @@ public class ReportBuilder {
         }
 
         fileName.append(FILE_EXTENSION);
-
+        LOGGER.info("[DEBUG] Report filename: '{}'", fileName);
         return fileName.toString();
     }
 
