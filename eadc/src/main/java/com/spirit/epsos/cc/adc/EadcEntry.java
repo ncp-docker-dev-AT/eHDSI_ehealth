@@ -5,25 +5,26 @@ import org.w3c.dom.Document;
 public interface EadcEntry {
 
     /**
-     * the data xml is including transaction information and the CDA L3 document
+     * XML Document is including transaction information and the CDA L3 document.
      */
     Document getData();
 
-    // The DataSetName
+    // DataSource name.
     String getDsName();
 
     EadcEntry newInstance(String dsName, Document data, Document soapRqData, Document soapRspData);
 
     /**
-     * This enum represents the three different transaction types data source names.
+     * This enum represents the different transaction types data source names.
      */
     enum DsTypes {
 
-        EADC("jdbc/EADC");
+        EADC("jdbc/EADC"),
+        @Deprecated XCPD("jdbc/EADC_XCPD"),
+        @Deprecated XCA("jdbc/EADC_XCA"),
+        @Deprecated XDR("jdbc/EADC_XDR");
 
-        /*, _XCPD("jdbc/EADC_XCPD"), _XCA("jdbc/EADC_XCA"), _XDR("jdbc/EADC_XDR")*/
-
-        private String value;
+        private final String value;
 
         DsTypes(final String value) {
             this.value = value;
