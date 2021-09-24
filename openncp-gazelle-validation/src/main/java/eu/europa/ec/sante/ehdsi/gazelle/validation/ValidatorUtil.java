@@ -21,6 +21,7 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_HCP_ASSURANCE;
     public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
     public static final String EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+    public static final String EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION;
     public static final String EHDSI_AUDIT_PIVOT_TRANSLATION;
     public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
     public static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
@@ -72,6 +73,7 @@ public class ValidatorUtil {
             EHDSI_AUDIT_HCP_ASSURANCE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_HCP_ASSURANCE_AUDIT");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SC");
             EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION");
+            EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION");
             EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
             EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
@@ -175,6 +177,10 @@ public class ValidatorUtil {
             if (StringUtils.equals(eventType, "EHDSI-92")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+            }
+            if (StringUtils.equals(eventType, "EHDSI-96")) {
+
+                model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION;
             }
             if (StringUtils.equals(eventType, "EHDSI-93")) {
 
