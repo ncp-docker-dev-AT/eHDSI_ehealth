@@ -1,0 +1,22 @@
+debug: false
+application:
+  security:
+    jwt:
+      secret: teststsjsdfjsdfksdfjsdkfs
+spring:
+  datasource:
+    default:
+      url: jdbc:mysql://127.0.0.1/ehealth_properties?useSSL=false
+      username: ehealth_openncp
+      password: MyOpenncpPwd
+      driver-class-name: com.mysql.jdbc.Driver
+    atna:
+      url: jdbc:mysql://127.0.0.1/ehealth_atna?useSSL=false
+      username: ehealth_openncp
+      password: MyOpenncpPwd
+      driver-class-name: com.mysql.jdbc.Driver
+    eadc:
+      url: jdbc:mysql://127.0.0.1/ehealth_eadc?useSSL=false
+      username: ehealth_openncp
+      password: MyOpenncpPwd
+      driver-class-name: com.mysql.jdbc.Driver
