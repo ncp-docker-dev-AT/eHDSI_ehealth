@@ -12,12 +12,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
-/**
- * @author Jerry Dimitriou jerouris at netsmart.gr
- */
 public class XMLUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TRCAssertionRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
 
     private XMLUtils() {
     }

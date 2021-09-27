@@ -14,8 +14,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.namespace.QName;
 import javax.xml.soap.*;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,13 +31,9 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NextOfKinAssertionRequest.class);
 
-    private static final QName MESSAGING_TO = new QName("http://www.w3.org/2005/08/addressing", "To");
-    private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What can be only requested from the STS
-    private static final String ACTION_URI = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue"; // Only Issuance is supported
-    private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; // WS-Trust Namespace
-    private static final String ADDRESSING_NS = "http://www.w3.org/2005/08/addressing"; // WSA Namespace
-    private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    private static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
+    private static final String ACTION_URI = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue";
+    private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
     private static final String DEFAULT_STS_URL;
     private static final String CHECK_FOR_HOSTNAME;
 
@@ -48,20 +44,20 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
         } catch (InitializationException e) {
             LOGGER.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
         }
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.nextOfKin.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.URL_WS_NOK).length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager()
+                    .setProperty(STSConstant.URL_WS_NOK, "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
         DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url");
 
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.checkHostname", "false");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.STS_CHECK_HOSTNAME).length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(STSConstant.STS_CHECK_HOSTNAME, "false");
         }
-        CHECK_FOR_HOSTNAME = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname");
+        CHECK_FOR_HOSTNAME = ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.STS_CHECK_HOSTNAME);
     }
 
     private final Assertion idAssert;
     private final String purposeOfUse;
-    private final String patientId;
     private final String nextOfKinId;
     private final String nextOfKinFamilyName;
     private final String nextOfKinFirstName;
@@ -78,14 +74,10 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
 
     /**
      * The builder is the only class that can call the constructor and for that, the following will be surely initialized.
-     *
-     * @param builder
-     * @throws Exception
      */
     private NextOfKinAssertionRequest(Builder builder) throws STSClientException {
 
         this.idAssert = builder.idAssert;
-        this.patientId = builder.patientId;
         this.nextOfKinId = builder.nextOfKinId;
         this.purposeOfUse = builder.purposeOfUse;
         this.nextOfKinFamilyName = builder.nextOfKinFamilyName;
@@ -132,10 +124,6 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             var purposeOfUseName = soapFactory.createName("PurposeOfUse", "nok", NOK_NS);
             SOAPElement purposeOfUseElem = assertionParamElement.addChildElement(purposeOfUseName);
             purposeOfUseElem.addTextNode(purposeOfUse);
-
-            var patientIdName = soapFactory.createName("PatientId", "nok", NOK_NS);
-            SOAPElement patientIdElem = assertionParamElement.addChildElement(patientIdName);
-            patientIdElem.addTextNode(patientId);
 
             if (StringUtils.isNotBlank(nextOfKinId)) {
                 var nextOfKinIdName = soapFactory.createName("NextOfKinId", "nok", NOK_NS);
@@ -192,9 +180,9 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
      * Sends the request to the STS Service.
      *
      * @return the NoK Assertion that was received from the STS, if the request was successful.
-     * @throws Exception if the request failed.
+     * @throws STSClientException if the request failed.
      */
-    public Assertion request() throws Exception {
+    public Assertion request() throws STSClientException {
 
         try {
             LOGGER.info("Next of Kin - STS client request Assertion: '{}'", DEFAULT_STS_URL);
@@ -205,8 +193,6 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             httpConnection.setRequestMethod("POST");
             httpConnection.setDoInput(true);
             httpConnection.setDoOutput(true);
-
-            LOGGER.info("Checking SSL Hostname Verifier: '{}'", CHECK_FOR_HOSTNAME);
             if (httpConnection instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) httpConnection).setSSLSocketFactory(getSSLSocketFactory());
                 if (StringUtils.equals(CHECK_FOR_HOSTNAME, "false"))
@@ -234,20 +220,22 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             LOGGER.info("NoK Assertion: '{}'", assertionNOK != null ? assertionNOK.getID() : "NoK Assertion is NULL");
             return assertionNOK;
 
-        } catch (SOAPException ex) {
-            throw new Exception("SOAP Exception: " + ex.getMessage());
-        } catch (UnsupportedOperationException ex) {
-            throw new Exception("Unsupported Operation: " + ex.getMessage());
+        } catch (SOAPException e) {
+            throw new STSClientException("SOAP Exception: " + e.getMessage());
+        } catch (UnsupportedOperationException e) {
+            throw new STSClientException("Unsupported Operation: " + e.getMessage());
+        } catch (IOException e) {
+            throw new STSClientException("IOException: " + e.getMessage());
         }
     }
 
-    private Assertion extractNoKAssertionFromRSTC(SOAPMessage response) throws Exception {
+    private Assertion extractNoKAssertionFromRSTC(SOAPMessage response) throws STSClientException {
 
         try {
             LOGGER.info("[STS Client] Extract NoK from Request Security Token");
             var body = response.getSOAPBody();
             if (body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").getLength() != 1) {
-                throw new Exception("NoK Assertion is missing from the RSTC body");
+                throw new STSClientException("NoK Assertion is missing from the Request Security Token body");
             }
             SOAPElement assertion = (SOAPElement) body.getElementsByTagNameNS(SAML20_TOKEN_URN, "Assertion").item(0);
             Document assertDoc = getDocumentBuilder().newDocument();
@@ -268,7 +256,7 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             return nokAssertion;
 
         } catch (Exception ex) {
-            throw new Exception("Error while trying to extract the SAML NoK Assertion from RSTC Body: " + ex.getMessage());
+            throw new STSClientException("Error while trying to extract the SAML NoK Assertion from Request Security Token Body: " + ex.getMessage());
         }
     }
 
@@ -280,7 +268,6 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
 
         //  Required attributes
         private final Assertion idAssert;
-        private final String patientId;
         //  Optional attributes
         private String purposeOfUse = "TREATMENT";
         private String nextOfKinId;
@@ -297,13 +284,11 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
         /**
          * The Builder class constructor. Its parameters are the required fields of the NextOfKinAssertionRequest Object.
          *
-         * @param idAssert  The OpenSAML Identity Assertion
-         * @param patientId the relevant patient id.
+         * @param idAssert The OpenSAML Identity Assertion
          */
-        public Builder(Assertion idAssert, String patientId) {
+        public Builder(Assertion idAssert) {
 
             this.idAssert = idAssert;
-            this.patientId = patientId;
             try {
 
                 this.location = new URL(DEFAULT_STS_URL);
@@ -395,7 +380,7 @@ public class NextOfKinAssertionRequest extends AssertionRequest {
             return this;
         }
 
-        public NextOfKinAssertionRequest build() throws Exception {
+        public NextOfKinAssertionRequest build() throws STSClientException {
 
             return new NextOfKinAssertionRequest(this);
         }

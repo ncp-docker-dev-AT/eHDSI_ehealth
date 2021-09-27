@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.namespace.QName;
@@ -21,19 +20,16 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
 /**
  * The TRC STS client. It can be used as a reference implementation for requesting a TRC Assertion from TRC-STS Service.
- * It uses the Builder Design Pattern to create the request, in order to create a immutable final object.
+ * It uses the Builder Design Pattern to create the request, in order to create an immutable final object.
  */
 public class TRCAssertionRequest extends AssertionRequest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TRCAssertionRequest.class);
 
     private static final QName MESSAGING_TO = new QName("http://www.w3.org/2005/08/addressing", "To");
-
-
     private static final String ADDRESSING_NS = "http://www.w3.org/2005/08/addressing"; // WSA Namespace
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
@@ -47,15 +43,16 @@ public class TRCAssertionRequest extends AssertionRequest {
         } catch (InitializationException e) {
             LOGGER.error("OpenSAML module cannot be initialized: '{}'", e.getMessage(), e);
         }
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.url", "https://localhost:8443/TRC-STS/SecurityTokenService");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.URL_WS_TRC).length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager()
+                    .setProperty(STSConstant.URL_WS_TRC, "https://localhost:8443/TRC-STS/SecurityTokenService");
         }
-        DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.url");
+        DEFAULT_STS_URL = ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.URL_WS_TRC);
 
-        if (ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname").length() == 0) {
-            ConfigurationManagerFactory.getConfigurationManager().setProperty("secman.sts.checkHostname", "false");
+        if (ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.STS_CHECK_HOSTNAME).length() == 0) {
+            ConfigurationManagerFactory.getConfigurationManager().setProperty(STSConstant.STS_CHECK_HOSTNAME, "false");
         }
-        CHECK_FOR_HOSTNAME = ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.sts.checkHostname");
+        CHECK_FOR_HOSTNAME = ConfigurationManagerFactory.getConfigurationManager().getProperty(STSConstant.STS_CHECK_HOSTNAME);
     }
 
     private final Assertion idAssert;
@@ -130,7 +127,7 @@ public class TRCAssertionRequest extends AssertionRequest {
      * Sends the request to the TRC STS Service.
      *
      * @return the TRC Assertion that was received from the STS, if the request was successful.
-     * @throws Exception if the request failed.
+     * @throws STSClientException if the request failed.
      */
     public Assertion request() throws STSClientException {
 
