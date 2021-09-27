@@ -75,15 +75,16 @@ public class EventLogUtil {
         }
         // Patient Source is not written, because HCP assurance audit does not include patient mapping information
         // Set Participant Object: Patient Target
-        String st2 = "";
-        if (!response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
+        String patientId = "";
+        if (!response.getControlActProcess().getSubject().isEmpty()) {
 
-            II instanceIdentifier = response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+            II instanceIdentifier = response.getControlActProcess().getSubject().get(0).getRegistrationEvent()
+                    .getSubject1().getPatient().getId().get(0);
             if (instanceIdentifier.getExtension() != null && instanceIdentifier.getRoot() != null) {
-                st2 = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
+                patientId = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
             }
         }
-        eventLog.setPT_ParticipantObjectID(st2);
+        eventLog.setPT_ParticipantObjectID(patientId);
 
         // Set Participant Object: Error Message
         if (!response.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {

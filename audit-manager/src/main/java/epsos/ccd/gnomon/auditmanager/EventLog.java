@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1122,19 +1123,34 @@ public class EventLog {
 
     @Override
     public String toString() {
-        return "EventLog{" +
-                "EI_TransactionNumber='" + EI_TransactionNumber + '\'' +
-                ", EI_TransactionName='" + EI_TransactionName + '\'' +
-                ", EI_EventDateTime=" + EI_EventDateTime +
-                ", EI_EventActionCode='" + EI_EventActionCode + '\'' +
-                ", EI_EventOutcomeIndicator=" + EI_EventOutcomeIndicator +
-                ", SC_UserID='" + SC_UserID + '\'' +
-                ", SP_UserID='" + SP_UserID + '\'' +
-                ", ReqM_ParticipantObjectID='" + ReqM_ParticipantObjectID + '\'' +
-                ", ResM_ParticipantObjectID='" + ResM_ParticipantObjectID + '\'' +
-                ", SourceIP='" + sourceip + '\'' +
-                ", TargetIP='" + targetip + '\'' +
-                ", EventType='" + EventType + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("ncpSide", ncpSide)
+                .append("EI_TransactionNumber", EI_TransactionNumber)
+                .append("EI_TransactionName", EI_TransactionName)
+                .append("EI_EventDateTime", EI_EventDateTime)
+                .append("EI_EventActionCode", EI_EventActionCode)
+                .append("EI_EventOutcomeIndicator", EI_EventOutcomeIndicator)
+                .append("EventType", EventType)
+                .append("PC_UserID", PC_UserID)
+                .append("PC_RoleID", PC_RoleID)
+                .append("HR_UserID", HR_UserID)
+                .append("HR_AlternativeUserID", HR_AlternativeUserID)
+                .append("HR_UserName", HR_UserName)
+                .append("HR_RoleID", HR_RoleID)
+                .append("SC_UserID", SC_UserID)
+                .append("SP_UserID", SP_UserID)
+                .append("AS_AuditSourceId", AS_AuditSourceId)
+                .append("PS_ParticipantObjectID", PS_ParticipantObjectID)
+                .append("PT_ParticipantObjectID", PT_ParticipantObjectID)
+                .append("EM_ParticipantObjectID", EM_ParticipantObjectID)
+                .append("EM_ParticipantObjectDetail", EM_ParticipantObjectDetail)
+                .append("MS_UserID", MS_UserID)
+                .append("eventTargetParticipantObjectIds", eventTargetParticipantObjectIds)
+                .append("eventTargetAdditionalObjectId", eventTargetAdditionalObjectId)
+                .append("ReqM_ParticipantObjectID", ReqM_ParticipantObjectID)
+                .append("ResM_ParticipantObjectID", ResM_ParticipantObjectID)
+                .append("sourceip", sourceip)
+                .append("targetip", targetip)
+                .toString();
     }
 }
