@@ -103,22 +103,19 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
 
             sourceII = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
-            //targetII = outputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
             targetII = outputMessage.getControlActProcess().getSubject().get(0).getRegistrationEvent().getSubject1()
                     .getPatient().getId().get(0);
-            logger.info("[DEBUG] Patient ID: '{}'", targetII.getRoot());
         } else {
             sourceII = new II();
             targetII = new II();
         }
-        logger.info("[DEBUG] Patient IDs: '{}'-'{}'", sourceII.getRoot(), targetII.getRoot());
-        logger.debug("[DEBUG] Patient ID: '{}'", getParticipantObjectID(targetII));
         eventLog.setPT_ParticipantObjectID(getParticipantObjectID(targetII));
 
-        // Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
-        // if (!sourceII.getRoot().equals(targetII.getRoot()) || !sourceII.getExtension().equals(targetII.getExtension())) {
-        //  eventLog.setPS_ParticipantObjectID(getParticipantObjectID(sourceII));
-        // }
+        // TODO: Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
+        if (!sourceII.getRoot().equals(targetII.getRoot()) || !sourceII.getExtension().equals(targetII.getExtension())) {
+            logger.warn("Patient Source and Target are different: Identifier has been mapped, Patient Mapping audit scheme might be used");
+            //  eventLog.setPS_ParticipantObjectID(getParticipantObjectID(sourceII));
+        }
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
         if (!outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
             String detail = outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
