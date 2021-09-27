@@ -10,7 +10,7 @@ Detailed installation manual is available here: https://webgate.ec.europa.eu/fpf
 
 Main changes in this release are:<br/>
 <ul>
-<li>OpenNCP Gateway refactoring (ATNA, eADC and SMP management), previous version removed</li>
+<li>OpenNCP Gateway refactoring (ATNA, eADC and SMP management through the SPA implemented with Vue.js), previous version removed</li>
 <li>Improvement of Change Proposals: 39, 47 and 51
 <ul>- CP-039 - Patient Identification through Next of Kin</ul>
 <ul>- CP-047 - OrCD service implemented.</ul>
