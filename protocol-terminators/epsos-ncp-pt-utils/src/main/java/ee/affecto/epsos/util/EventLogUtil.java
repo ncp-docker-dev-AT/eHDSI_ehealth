@@ -66,31 +66,32 @@ public class EventLogUtil {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
                 }
             } else {
-                eventLog.setEM_PatricipantObjectID("0");
+                eventLog.setEM_ParticipantObjectID("0");
                 eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
             }
-            eventLog.setEM_PatricipantObjectDetail(detail.getBytes());
+            eventLog.setEM_ParticipantObjectDetail(detail.getBytes());
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }
         // Patient Source is not written, because HCP assurance audit does not include patient mapping information
         // Set Participant Object: Patient Target
-        String st2 = "";
-        if (!response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
+        String patientId = "";
+        if (!response.getControlActProcess().getSubject().isEmpty()) {
 
-            II instanceIdentifier = response.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+            II instanceIdentifier = response.getControlActProcess().getSubject().get(0).getRegistrationEvent()
+                    .getSubject1().getPatient().getId().get(0);
             if (instanceIdentifier.getExtension() != null && instanceIdentifier.getRoot() != null) {
-                st2 = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
+                patientId = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
             }
         }
-        eventLog.setPT_PatricipantObjectID(st2);
+        eventLog.setPT_ParticipantObjectID(patientId);
 
         // Set Participant Object: Error Message
         if (!response.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
 
             String error = response.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
-            eventLog.setEM_PatricipantObjectID(error);
-            eventLog.setEM_PatricipantObjectDetail(error.getBytes());
+            eventLog.setEM_ParticipantObjectID(error);
+            eventLog.setEM_ParticipantObjectDetail(error.getBytes());
         }
     }
 
@@ -111,13 +112,20 @@ public class EventLogUtil {
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
+                break;
             case Constants.MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
         }
 
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setEI_EventActionCode(EventActionCode.READ);
 
         if (response.getRegistryObjectList() != null) {
@@ -172,8 +180,8 @@ public class EventLogUtil {
         if (response.getRegistryErrorList() != null) {
 
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext() == null ? null : re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext() == null ? null : re.getCodeContext().getBytes());
         }
     }
 
@@ -193,6 +201,13 @@ public class EventLogUtil {
             case Constants.EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
                 break;
             case Constants.MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_RETRIEVE);
@@ -218,11 +233,11 @@ public class EventLogUtil {
             RegistryError re = response.getRegistryResponse().getRegistryErrorList().getRegistryError().get(0);
             // TODO A.R. on TSAM errors currently errorCode=null, codeContext=null - maybe faulty XCA server implementation?
             // What exactly we should log on partial success? Originally was codeContext, but is value OK?
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
             if (re.getCodeContext() != null) {
-                eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+                eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
             } else if (re.getValue() != null) {
-                eventLog.setEM_PatricipantObjectDetail(re.getValue().getBytes());
+                eventLog.setEM_ParticipantObjectDetail(re.getValue().getBytes());
             }
         }
     }
@@ -324,8 +339,8 @@ public class EventLogUtil {
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
             RegistryError registryError = registryErrorList.getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(registryError.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(registryError.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(registryError.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(registryError.getCodeContext().getBytes());
         }
     }
 

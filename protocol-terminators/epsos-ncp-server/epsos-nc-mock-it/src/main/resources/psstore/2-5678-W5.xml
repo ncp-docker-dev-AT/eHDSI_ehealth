@@ -18,7 +18,7 @@
     <recordTarget>
         <patientRole>
             <!-- Primary Patient Identifier -->
-            <id extension="2-5678-W5" root="2.16.17.710.820.1000.990.1"/>
+            <id extension="2-5678-W5" root="2.16.17.710.850.1000.990.1.1000"/>
             <addr>
                 <streetAddressLine>155, Avenida da Liberdade</streetAddressLine>
                 <postalCode>1250-141</postalCode>

@@ -58,7 +58,7 @@ import java.util.List;
  */
 public class SignatureManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManager.class);
+    private final Logger logger = LoggerFactory.getLogger(SignatureManager.class);
     private final KeyStoreManager keyManager;
     private String signatureAlgorithm;
     private String digestAlgorithm;
@@ -109,7 +109,7 @@ public class SignatureManager {
             X509Certificate cert;
             List<X509Certificate> certificates = KeyInfoSupport.getCertificates(assertionSignature.getKeyInfo());
             for (X509Certificate certificate : certificates) {
-                LOGGER.debug("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
+                logger.debug("Certificate: '{}'", certificate.getIssuerX500Principal().getName());
             }
             if (certificates.size() == 1) {
                 cert = certificates.get(0);
@@ -133,7 +133,7 @@ public class SignatureManager {
             var certificateValidator = new CertificateValidator(keyManager.getTrustStore());
             certificateValidator.validateCertificate(cert);
         } catch (CertificateException ex) {
-            LOGGER.error(null, ex);
+            logger.error(null, ex);
         }
 
         return sigCountryCode;
@@ -287,7 +287,7 @@ public class SignatureManager {
                     null, null);
 
             var signedInfo = xmlSignatureFactory.newSignedInfo(xmlSignatureFactory.newCanonicalizationMethod(CryptographicConstant.ALGO_ID_C14N_EXCL_WITH_COMMENTS,
-                    (C14NMethodParameterSpec) null), xmlSignatureFactory.newSignatureMethod(signatureAlgorithm, null),
+                            (C14NMethodParameterSpec) null), xmlSignatureFactory.newSignatureMethod(signatureAlgorithm, null),
                     Collections.singletonList(reference));
 
             var keyInfoFactory = xmlSignatureFactory.getKeyInfoFactory();

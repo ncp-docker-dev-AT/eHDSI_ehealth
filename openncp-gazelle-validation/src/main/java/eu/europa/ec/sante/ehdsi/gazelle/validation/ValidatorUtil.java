@@ -21,6 +21,7 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_HCP_ASSURANCE;
     public static final String EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
     public static final String EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+    public static final String EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION;
     public static final String EHDSI_AUDIT_PIVOT_TRANSLATION;
     public static final String EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
     public static final String EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION;
@@ -28,6 +29,7 @@ public class ValidatorUtil {
     public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
     public static final String EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
     public static final String EHDSI_ASSERTION_HCP_IDENTITY;
+    public static final String EHDSI_ASSERTION_NOK;
     public static final String EHDSI_ASSERTION_TRC;
     public static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
     public static final String EHDSI_XDS_CS_PUT_REQUEST;
@@ -55,6 +57,7 @@ public class ValidatorUtil {
     static {
         try {
             EHDSI_ASSERTION_HCP_IDENTITY = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_HCP_IDENTITY_ASSERTION");
+            EHDSI_ASSERTION_NOK = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_NOK_ASSERTION");
             EHDSI_ASSERTION_TRC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_TRC_ASSERTION");
 
             EHDSI_ID_SERVICE_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_ID_SERVICE_REQUEST");
@@ -70,6 +73,7 @@ public class ValidatorUtil {
             EHDSI_AUDIT_HCP_ASSURANCE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_HCP_ASSURANCE_AUDIT");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SC = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SC");
             EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION");
+            EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION");
             EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP");
             EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_ISSUANCE_HCP_ASSERTION");
             EHDSI_AUDIT_FETCH_DOC_SERVICE_SP = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_AUDIT_FETCH_DOC_SERVICE_SP");
@@ -119,10 +123,16 @@ public class ValidatorUtil {
 
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
-            if (StringUtils.equals(eventType, "EHDSI-21") || StringUtils.equals(eventType, "EHDSI-22")
-                    || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")
-                    || StringUtils.equals(eventType, "EHDSI-96") || StringUtils.equals(eventType, "ITI-38")
-                    || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "EHDSI-95")) {
+            if (StringUtils.equals(eventType, "EHDSI-21")
+                    || StringUtils.equals(eventType, "EHDSI-22")
+                    || StringUtils.equals(eventType, "EHDSI-31")
+                    || StringUtils.equals(eventType, "EHDSI-32")
+                    || StringUtils.equals(eventType, "ITI-38")
+                    || StringUtils.equals(eventType, "ITI-39")
+                    || StringUtils.equals(eventType, "EHDSI-61")
+                    || StringUtils.equals(eventType, "EHDSI-62")
+                    || StringUtils.equals(eventType, "EHDSI-95")
+                    || StringUtils.equals(eventType, "EHDSI-97")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SP;
             }
@@ -149,13 +159,16 @@ public class ValidatorUtil {
 
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
-            if (StringUtils.equals(eventType, "EHDSI-96") || StringUtils.equals(eventType, "ITI-38")
-                    || StringUtils.equals(eventType, "ITI-39") || StringUtils.equals(eventType, "EHDSI-95")) {
+            if (StringUtils.equals(eventType, "ITI-38")
+                    || StringUtils.equals(eventType, "ITI-39")
+                    || StringUtils.equals(eventType, "EHDSI-95")
+                    || StringUtils.equals(eventType, "EHDSI-97")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE;
             }
             if (StringUtils.equals(eventType, "EHDSI-21") || StringUtils.equals(eventType, "EHDSI-22")
-                    || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")) {
+                    || StringUtils.equals(eventType, "EHDSI-31") || StringUtils.equals(eventType, "EHDSI-32")
+                    || StringUtils.equals(eventType, "EHDSI-61") || StringUtils.equals(eventType, "EHDSI-62")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_FETCH_DOC_SERVICE_SC;
             }
@@ -171,6 +184,10 @@ public class ValidatorUtil {
             if (StringUtils.equals(eventType, "EHDSI-92")) {
 
                 model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_TRC_ASSERTION;
+            }
+            if (StringUtils.equals(eventType, "EHDSI-96")) {
+
+                model = ValidatorUtil.EHDSI_AUDIT_ISSUANCE_NOK_ASSERTION;
             }
             if (StringUtils.equals(eventType, "EHDSI-93")) {
 

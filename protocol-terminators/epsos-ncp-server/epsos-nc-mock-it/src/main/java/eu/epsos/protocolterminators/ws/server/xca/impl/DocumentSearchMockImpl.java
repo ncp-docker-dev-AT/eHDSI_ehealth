@@ -10,6 +10,7 @@ import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xerces.dom.DeferredElementNSImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -706,7 +707,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         String strength = null;
 
         try {
-            strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='capacityQuantity']/@value", doc);
+            //strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='capacityQuantity']/@value", doc);
+            strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='desc']/text()", doc);
         } catch (XPathExpressionException e) {
             logger.error("XPath expression error", e);
         }
@@ -717,14 +719,28 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private String getSubstitution(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
-        String substitution = null;
+        String substitution;
 
-        try {
-            substitution = path.evaluate("//*[local-name()='entryRelationship']/*[local-name()='observation']/*[local-name()='SubstanceAdminSubstitution']/@value", doc);
-        } catch (XPathExpressionException e) {
-            logger.error("XPath expression error", e);
+        //substitution = path.evaluate("//*[local-name()='entryRelationship']/*[local-name()='observation']/*[local-name()='SubstanceAdminSubstitution']/@value", doc);
+        // Substitution is always allowed in Country B unless formally specified SUBST with code=N which means no substitution,
+        // all other cases (No SUBST element, code G=Generic or code TE=Therapeutic alternative means substitution is allowed
+        List<Node> nodeListCode = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/code[@code = 'SUBST']");
+        List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
+
+        substitution = "Yes"; // default value
+        if(nodeListCode != null && !nodeListCode.isEmpty()) {
+            for (Node node : nodeListValue) {
+                String valueAttr = node.getNodeName();
+                String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
+                logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
+                if(valueAttr.equals("value") && codeAttr.equals("N")) {
+                    substitution = "No";
+                } else {
+                    substitution = "Yes";
+                }
+                break;
+            }
         }
-
         return substitution;
     }
 

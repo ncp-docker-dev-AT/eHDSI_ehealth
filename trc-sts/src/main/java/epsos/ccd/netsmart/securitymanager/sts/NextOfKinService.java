@@ -17,12 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,7 +34,6 @@ import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @ServiceMode(value = Service.Mode.MESSAGE)
@@ -73,7 +71,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
         try {
             var nextOfKinDetail = STSUtils.getNextOfKinDetails(body);
-            String mid = getMessageIdFromHeader(header);
+            String messageId = getMessageIdFromHeader(header);
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
@@ -102,7 +100,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
-            createResponseHeader(response.getSOAPHeader(), mid);
+            createResponseHeader(response.getSOAPHeader(), messageId);
 
             var strRespHeader = STSUtils.domElementToString(response.getSOAPHeader());
             var strReqHeader = STSUtils.domElementToString(header);
@@ -117,9 +115,9 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
             }
 
             sslCommonName = HTTPUtil.getSubjectDN(false);
-            sendTRCAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
-                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), "TODO patientID",
-                    samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, mid,
+            sendNOKAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
+                    samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), nextOfKinDetail.getLivingSubjectIds().get(0),
+                    samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, messageId,
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
@@ -130,19 +128,12 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         }
     }
 
-    private void sendTRCAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
-                                     String humanRequestorRole, String patientID, String facilityType, String assertionId,
+    private void sendNOKAuditMessage(String pointOfCareID, String humanRequestorNameID, String humanRequestorSubjectID,
+                                     String humanRequestorRole, String nokID, String facilityType, String assertionId,
                                      String certificateCommonName, String reqMid, byte[] reqSecHeader, String resMid, byte[] resSecHeader) {
 
         var auditService = AuditServiceFactory.getInstance();
-        var gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(new Date());
-        XMLGregorianCalendar date2 = null;
-        try {
-            date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(gregorianCalendar);
-        } catch (DatatypeConfigurationException ex) {
-            logger.error("DatatypeConfigurationException: '{}'", ex.getMessage(), ex);
-        }
+        XMLGregorianCalendar date = DateUtil.getDateAsXMLGregorian(new Date());
         String trcCommonName = HTTPUtil.getTlsCertificateCommonName(ConfigurationManagerFactory.getConfigurationManager().getProperty("secman.nextOfKin.url"));
         String sourceGateway = getClientIP();
         logger.info("STS Client IP: '{}'", sourceGateway);
@@ -151,20 +142,25 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
         String serverName = servletRequest.getServerName();
 
         //TODO: Review Audit Trail specification - Identifying SC and SP as value of CN from TLS certificate.
-        EventLog eventLogTRCA = EventLog.createEventLogTRCA(TransactionName.TRC_ASSERTION, EventActionCode.EXECUTE,
-                date2, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
+        EventLog eventLogNOKA = EventLog.createEventLogNOKA(TransactionName.NOK_ASSERTION, EventActionCode.EXECUTE,
+                date, EventOutcomeIndicator.FULL_SUCCESS, pointOfCareID, facilityType, humanRequestorNameID,
                 humanRequestorRole, humanRequestorSubjectID, certificateCommonName, trcCommonName,
                 ConfigurationManagerFactory.getConfigurationManager().getProperty("COUNTRY_PRINCIPAL_SUBDIVISION"),
-                patientID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
+                nokID, Constants.UUID_PREFIX + assertionId, reqMid, reqSecHeader, resMid, resSecHeader,
                 IPUtil.isLocalLoopbackIp(sourceGateway) ? serverName : sourceGateway, STSUtils.getSTSServerIP(), NcpSide.NCP_B);
 
-        eventLogTRCA.setEventType(EventType.TRC_ASSERTION);
-        auditService.write(eventLogTRCA, "13", "2");
+        eventLogNOKA.setEventType(EventType.NOK_ASSERTION);
+        auditService.write(eventLogNOKA, "13", "2");
     }
 
     private List<Attribute> buildNextOfKinAttributes(NextOfKinDetail nextOfKinDetail) {
 
         List<Attribute> attributeList = new ArrayList<>();
+        if (nextOfKinDetail.getLivingSubjectIds() != null && StringUtils.isNotBlank(nextOfKinDetail.getLivingSubjectIds().get(0))) {
+            attributeList.add(SamlIssuerHelper
+                    .createAttribute(nextOfKinDetail.getLivingSubjectIds().get(0), "NextOfKinId", Attribute.URI_REFERENCE,
+                            "urn:ehdsi:names:subject:nextofkin:id"));
+        }
         if (StringUtils.isNotBlank(nextOfKinDetail.getFirstName())) {
             attributeList.add(SamlIssuerHelper
                     .createAttribute(nextOfKinDetail.getFirstName(), "NextOfKinFirstName", Attribute.URI_REFERENCE,

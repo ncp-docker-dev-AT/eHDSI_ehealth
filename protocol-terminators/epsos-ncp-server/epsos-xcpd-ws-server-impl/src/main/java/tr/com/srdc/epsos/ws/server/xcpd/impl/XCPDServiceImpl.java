@@ -47,6 +47,16 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
+    private static final DatatypeFactory DATATYPE_FACTORY;
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private final ObjectFactory objectFactory;
@@ -70,57 +80,58 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return id.getExtension() + "^^^&" + id.getRoot() + "&ISO";
     }
 
-    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
+    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element soapHeader) {
 
-        logger.info("prepareEventLog('{}')", eventLog.getEventType());
+        logger.info("[XCPD Service] Preparing Event Log: '{}'", eventLog.getEventType());
         eventLog.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_TransactionName(TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
-        }
-        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
-        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
-                + "@" + Helper.getAssertionsIssuer(sh) + ">");
-        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
+        String userIdAlias = Helper.getAssertionsSPProvidedId(soapHeader);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(soapHeader)
+                + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
+        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
         // Add point of care to the event log for assertion purposes
-        eventLog.setPC_UserID(Helper.getPointOfCareUserId(sh));
-        eventLog.setPC_RoleID(Helper.getPC_RoleID(sh));
+        eventLog.setPC_UserID(Helper.getPointOfCareUserId(soapHeader));
+        eventLog.setPC_RoleID(Helper.getPC_RoleID(soapHeader));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
 
+        //TODO: Update audit with Patient ID returned
         II sourceII;
         II targetII;
         if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
+
             sourceII = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
-            targetII = outputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+            targetII = outputMessage.getControlActProcess().getSubject().get(0).getRegistrationEvent().getSubject1()
+                    .getPatient().getId().get(0);
         } else {
             sourceII = new II();
             targetII = new II();
         }
-        eventLog.setPT_PatricipantObjectID(getParticipantObjectID(targetII));
-        // Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
+        eventLog.setPT_ParticipantObjectID(getParticipantObjectID(targetII));
+
+        // TODO: Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
         if (!sourceII.getRoot().equals(targetII.getRoot()) || !sourceII.getExtension().equals(targetII.getExtension())) {
-            eventLog.setPS_PatricipantObjectID(getParticipantObjectID(sourceII));
+            logger.warn("Patient Source and Target are different: Identifier has been mapped, Patient Mapping audit scheme might be used");
+            //  eventLog.setPS_ParticipantObjectID(getParticipantObjectID(sourceII));
         }
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
         if (!outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
             String detail = outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
             if (detail.startsWith("(")) {
                 var code = detail.substring(1, 5);
-                eventLog.setEM_PatricipantObjectID(code);
+                eventLog.setEM_ParticipantObjectID(code);
                 if (StringUtils.equals(code, "1102")) {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
                 } else {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
                 }
             } else {
-                eventLog.setEM_PatricipantObjectID("0");
+                eventLog.setEM_ParticipantObjectID("0");
                 eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
             }
-            eventLog.setEM_PatricipantObjectDetail(detail.getBytes());
+            eventLog.setEM_ParticipantObjectDetail(detail.getBytes());
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }

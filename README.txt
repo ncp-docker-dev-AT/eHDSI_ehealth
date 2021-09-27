@@ -4,29 +4,28 @@ It has been created from OpenNCP projects and restructured to a multi module pro
 
 Main Modules
 ------------
-configuration-manager
-e-sens-non-repudiation
-security-manager
-util
-data-model
-audit-manager
 assertion-validator
+audit-manager
 cda-display-tool
+configuration-manager
+consent-manager
+data-model
 default-policy-manager
+e-sens-non-repudiation
+eadc
+openatna
+openncp-common-components
+openncp-gateway
+openncp-gazelle-validation
+openstork
+protocol-terminators
+security-manager
+transformation-manager
 trc-sts
 trc-sts-client
 tsam
 tsam-sync
-transformation-manager
-eadc
-consent-manager
-protocol-terminators
-openatna
-openncp-portal
-openncp-web-portal
-openncp-common-components
-openstork
-openncp-gateway
+util
 
 Maven Configuration
 -------------------

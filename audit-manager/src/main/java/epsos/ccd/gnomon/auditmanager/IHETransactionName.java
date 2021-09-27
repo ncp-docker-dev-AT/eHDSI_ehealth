@@ -34,6 +34,7 @@ public enum IHETransactionName {
     CONSENT_SERVICE_PIN("epsosConsentService::PIN"),
     HCP_AUTHENTICATION("XUA::ProvideX-UserAssertion"),
     TRC_ASSERTION("ncp::TrcAssertion"),
+    NOK_ASSERTION("ncp::NokAssertion"),
     NCP_TRUSTED_SERVICE_LIST("ncpConfigurationManager::ImportNSL"),
     PIVOT_TRANSLATION("ncpTransformationMgr::Translate"),
     COMMUNICATION_FAILURE("epsosCommunicationFailure"),

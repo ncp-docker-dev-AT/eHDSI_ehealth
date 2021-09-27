@@ -12,7 +12,7 @@
     <languageCode code="el-GR"/>
     <recordTarget contextControlCode="OP" typeCode="RCT">
         <patientRole>
-            <id extension="1-5678-W5" root="1.10.1"/>
+            <id extension="1-5678-W5" root="2.16.17.710.850.1000.990.1.1000"/>
             <id extension="85" root="1.10.30.1"/>
             <id extension="Δικαιούχοι του Ν.4368/2016" root="1.10.30.2"/>
             <id extension="01059902062" root="1.10.2"/>

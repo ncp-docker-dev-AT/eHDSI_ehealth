@@ -106,12 +106,12 @@ public class EventLogClientUtil {
         // Set Participant Object: Request Message
         String reqMessageId = appendUrnUuid(EventLogUtil.getMessageID(msgContext.getEnvelope()));
         eventLog.setReqM_ParticipantObjectID(reqMessageId);
-        eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
+        eventLog.setReqM_ParticipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
 
         // Set Participant Object: ResponseMessage
         String rspMessageId = appendUrnUuid(EventLogUtil.getMessageID(soapEnvelope));
         eventLog.setResM_ParticipantObjectID(rspMessageId);
-        eventLog.setResM_PatricipantObjectDetail(soapEnvelope.getHeader().toString().getBytes());
+        eventLog.setResM_ParticipantObjectDetail(soapEnvelope.getHeader().toString().getBytes());
 
         return eventLog;
     }
@@ -147,7 +147,7 @@ public class EventLogClientUtil {
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id")) {
-                    eventLog.setPT_PatricipantObjectID(EventLogUtil.getAttributeValue(attribute));
+                    eventLog.setPT_ParticipantObjectID(EventLogUtil.getAttributeValue(attribute));
                     break;
                 }
             }

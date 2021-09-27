@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="2.0">
 
     <xsl:variable name="allergiesAndIntolerancesSectionCode"
                   select="'48765-2'"/>
@@ -181,6 +181,9 @@
     </xsl:template>
 
     <xsl:template match="n1:entryRelationship[@typeCode='MFST']/n1:observation" mode="clinicalManifestation">
+        <xsl:if test="position() > 1">
+            <xsl:text>, </xsl:text>
+        </xsl:if>
         <xsl:choose>
             <xsl:when test="not(n1:value/@nullFlavor)">
                 <xsl:call-template name="show-eHDSIReactionAllergy">

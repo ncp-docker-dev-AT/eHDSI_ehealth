@@ -31,6 +31,7 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -41,7 +42,8 @@ public class STSUtils {
 
     public static final String NO_CLIENT_CERTIFICATE = "Unknown (No Client Certificate)";
     private static final Logger LOGGER = LoggerFactory.getLogger(STSUtils.class);
-    private static final String TRC_NS = "https://ehdsi.eu/trc";
+    private static final String NOK_NS = "https://ehdsi.eu/assertion/nok";
+    private static final String TRC_NS = "https://ehdsi.eu/assertion/trc";
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
@@ -66,38 +68,43 @@ public class STSUtils {
     public static NextOfKinDetail getNextOfKinDetails(SOAPElement body) throws ParseException {
 
         LOGGER.info("Processing Next Of Kin details from STS SOAP Request");
-        if (body.getElementsByTagNameNS(TRC_NS, "TRCParameters").getLength() < 1) {
-            throw new WebServiceException("No TRC Parameters in RST");
+        if (body.getElementsByTagNameNS(NOK_NS, "NoKParameters").getLength() < 1) {
+            throw new WebServiceException("No NoK Parameters in RST");
         }
         var nextOfKinDetail = new NextOfKinDetail();
-        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(TRC_NS, "TRCParameters").item(0);
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0) != null) {
-            nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFirstName").item(0).getTextContent());
+        SOAPElement trcDetails = (SOAPElement) body.getElementsByTagNameNS(NOK_NS, "NoKParameters").item(0);
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinId").item(0) != null) {
+            nextOfKinDetail.setLivingSubjectIds(Collections.singletonList(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinId").item(0).getTextContent()));
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0) != null) {
-            nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinFamilyName").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFamilyName").item(0) != null) {
+            nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFamilyName").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGender").item(0) != null) {
-            nextOfKinDetail.setGender(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinGender").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFirstName").item(0) != null) {
+            nextOfKinDetail.setFirstName(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFirstName").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0) != null) {
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFamilyName").item(0) != null) {
+            nextOfKinDetail.setFamilyName(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinFamilyName").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinGender").item(0) != null) {
+            nextOfKinDetail.setGender(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinGender").item(0).getTextContent());
+        }
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinBirthDate").item(0) != null) {
             var formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-            var birthDate = formatter.parse(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinBirthDate").item(0).getTextContent());
+            var birthDate = formatter.parse(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinBirthDate").item(0).getTextContent());
             nextOfKinDetail.setBirthDate(birthDate);
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressStreet").item(0) != null) {
-            nextOfKinDetail.setAddressStreet(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressStreet").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressStreet").item(0) != null) {
+            nextOfKinDetail.setAddressStreet(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressStreet").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCity").item(0) != null) {
-            nextOfKinDetail.setAddressCity(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCity").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressCity").item(0) != null) {
+            nextOfKinDetail.setAddressCity(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressCity").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinPostalCode").item(0) != null) {
-            nextOfKinDetail.setAddressPostalCode(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinPostalCode").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinPostalCode").item(0) != null) {
+            nextOfKinDetail.setAddressPostalCode(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinPostalCode").item(0).getTextContent());
         }
-        if (trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0) != null) {
-            nextOfKinDetail.setAddressCountry(trcDetails.getElementsByTagNameNS(TRC_NS, "NextOfKinAddressCountry").item(0).getTextContent());
+        if (trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressCountry").item(0) != null) {
+            nextOfKinDetail.setAddressCountry(trcDetails.getElementsByTagNameNS(NOK_NS, "NextOfKinAddressCountry").item(0).getTextContent());
         }
-        LOGGER.info("Next Of Kin details:\n'{}'", nextOfKinDetail);
         return nextOfKinDetail;
     }
 
