@@ -154,7 +154,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
         eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
-        eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPS_ParticipantObjectID(getDocumentEntryPatientId(request));
 
         if (response.getRegistryObjectList() != null) {
             List<String> documentIds = new ArrayList<>();
@@ -181,13 +181,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
         }
     }
 
@@ -273,7 +273,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
+        eventLog.setPT_ParticipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (errorsDiscovered) {
@@ -288,8 +288,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         logger.debug("Exception: '{}'", e.getMessage(), e);
                     }
                 }
-                eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
-                eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
+                eventLog.setEM_ParticipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
+                eventLog.setEM_ParticipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
             }
         }
     }
@@ -1250,14 +1250,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                        boolean isTranscode, EventLog eventLog) {
 
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
-        if (eventLog.getReqM_PatricipantObjectDetail() != null) {
-            var requester = new String(eventLog.getReqM_PatricipantObjectDetail());
+        if (eventLog.getReqM_ParticipantObjectDetail() != null) {
+            var requester = new String(eventLog.getReqM_ParticipantObjectDetail());
             if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.debug("Participant Requester: '{}'", requester);
             }
         }
-        if (eventLog.getResM_PatricipantObjectDetail() != null) {
-            var responder = new String(eventLog.getResM_PatricipantObjectDetail());
+        if (eventLog.getResM_ParticipantObjectDetail() != null) {
+            var responder = new String(eventLog.getResM_ParticipantObjectDetail());
             if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.debug("Participant Responder: '{}'", responder);
             }

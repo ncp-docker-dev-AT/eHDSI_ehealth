@@ -121,7 +121,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
                 EventLog eventLog = new EventLog();
                 eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
-                eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
+                eventLog.setReqM_ParticipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
                 eventLog.setSC_UserID(clientCommonName);
                 eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
                 eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
@@ -147,7 +147,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     envelope = toEnvelope(getSOAPFactory(msgContext), registryResponse, false);
 
                     eventLog.setResM_ParticipantObjectID(randomUUID);
-                    eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
+                    eventLog.setResM_ParticipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");

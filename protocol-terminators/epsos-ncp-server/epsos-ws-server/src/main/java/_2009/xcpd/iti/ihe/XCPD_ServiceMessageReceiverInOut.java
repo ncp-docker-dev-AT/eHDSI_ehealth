@@ -95,7 +95,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             // Prepare EventLog for audit purpose.
             EventLog eventLog = new EventLog();
             eventLog.setReqM_ParticipantObjectID(getMessageID(msgContext.getEnvelope()));
-            eventLog.setReqM_PatricipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
+            eventLog.setReqM_ParticipantObjectDetail(msgContext.getEnvelope().getHeader().toString().getBytes());
             eventLog.setSC_UserID(clientCommonName);
             eventLog.setSourceip(EventLogUtil.getSourceGatewayIdentifier(msgContext));
             eventLog.setTargetip(EventLogUtil.getTargetGatewayIdentifier());
@@ -120,7 +120,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                         "should specified via the SOAP Action to use the RawXMLProvider");
             }
 
-            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID().toString();
+            String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
             String methodName;
 
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
@@ -140,7 +140,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                                 envelope.getBody().getFirstElement())), NcpSide.NCP_A);
                     }
                     eventLog.setResM_ParticipantObjectID(randomUUID);
-                    eventLog.setResM_PatricipantObjectDetail(envelope.getHeader().toString().getBytes());
+                    eventLog.setResM_ParticipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
@@ -285,11 +285,11 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
         /**
          * Namespace
          */
-        private String nsuri;
+        private final String nsuri;
         /**
          * Local name
          */
-        private String name;
+        private final String name;
 
         /**
          * Constructor from object and marshaller.

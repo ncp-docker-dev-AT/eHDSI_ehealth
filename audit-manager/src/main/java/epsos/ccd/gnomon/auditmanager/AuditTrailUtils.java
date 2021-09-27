@@ -231,8 +231,8 @@ public enum AuditTrailUtils {
                 && !StringUtils.equals(eventLog.getEventType(), EventType.SMP_PUSH.getCode())) {
 
             AuditTrailUtils.getInstance().addNonRepudiationSection(message, eventLog.getReqM_ParticipantObjectID(),
-                    eventLog.getReqM_PatricipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
-                    eventLog.getResM_PatricipantObjectDetail());
+                    eventLog.getReqM_ParticipantObjectDetail(), eventLog.getResM_ParticipantObjectID(),
+                    eventLog.getResM_ParticipantObjectDetail());
         }
 
         //TODO: Check if the Audit Message return with a null value shall be considered as fatal?
@@ -555,7 +555,7 @@ public enum AuditTrailUtils {
     private AuditMessage createAuditTrailForIdentificationService(EventLog eventLog) {
 
         // If patient id mapping has occurred (there is a patient source ID), use patient mapping audit scheme
-        if (eventLog.getPS_PatricipantObjectID() != null) {
+        if (eventLog.getPS_ParticipantObjectID() != null) {
             return createAuditTrailForPatientMapping(eventLog);
         } else {
             return createAuditTrailForHCPAssurance(eventLog);
@@ -1069,7 +1069,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI,
                     "Service Provider", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
-            addError(message, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+            addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1097,7 +1097,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
-            addError(message, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+            addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1129,9 +1129,9 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
+            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "Patient", "2", "RFC-3881", "Patient Number");
-            addError(message, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+            addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1161,9 +1161,9 @@ public enum AuditTrailUtils {
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Consumer", eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider", eventLog.getTargetip());
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
+            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "Patient", "2", AuditConstant.RFC_3881, "Patient Number");
-            addError(message, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+            addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1198,7 +1198,7 @@ public enum AuditTrailUtils {
                     eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
+            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
                     "2", AuditConstant.RFC_3881, "Patient Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1232,7 +1232,7 @@ public enum AuditTrailUtils {
                     eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("10"), "Guarantor",
+            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("10"), "Guarantor",
                     "7", AuditConstant.RFC_3881, "Guarantor Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
@@ -1349,11 +1349,11 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, "MasterPatientIndex", AuditConstant.CODE_SYSTEM_EHDSI,
                     "Master Patient Index", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
-            addParticipantObject(message, eventLog.getPS_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
+            addParticipantObject(message, eventLog.getPS_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "PatientSource", "2", AuditConstant.RFC_3881, "Patient Number");
-            addParticipantObject(message, eventLog.getPT_PatricipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
+            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
                     "PatientTarget", "2", AuditConstant.RFC_3881, "Patient Number");
-            addError(message, eventLog.getEM_PatricipantObjectID(), eventLog.getEM_PatricipantObjectDetail(), Short.valueOf("2"),
+            addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(message.toString());
