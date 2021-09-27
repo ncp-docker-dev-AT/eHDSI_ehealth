@@ -37,7 +37,8 @@ public class AssertionRequest {
     public static final String ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
     public static final String ACTION_URI = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue";
     public static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
-    public static final String TRC_NS = "https://ehdsi.eu/trc";
+    public static final String NOK_NS = "https://ehdsi.eu/assertion/nok";
+    public static final String TRC_NS = "https://ehdsi.eu/assertion/trc";
     public static final String WS_SEC_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     public static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
 

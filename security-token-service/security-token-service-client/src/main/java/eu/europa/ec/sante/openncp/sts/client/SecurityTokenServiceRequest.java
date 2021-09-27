@@ -41,7 +41,7 @@ public class SecurityTokenServiceRequest {
     private static final QName MESSAGING_TO = new QName("http://www.w3.org/2005/08/addressing", "To");
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion"; // What can be only requested from the STS
     private static final String ACTION_URI = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue"; // Only Issuance is supported
-    private static final String TRC_NS = "https://ehdsi.eu/trc"; //TRC Parameters Namespace
+    private static final String TRC_NS = "https://ehdsi.eu/assertion/trc"; //TRC Parameters Namespace
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512"; // WS-Trust Namespace
     private static final String ADDRESSING_NS = "http://www.w3.org/2005/08/addressing"; // WSA Namespace
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";

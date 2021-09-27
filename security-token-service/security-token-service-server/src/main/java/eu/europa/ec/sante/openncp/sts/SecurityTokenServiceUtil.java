@@ -15,7 +15,7 @@ public class SecurityTokenServiceUtil {
 
     public static final String NO_CLIENT_CERTIFICATE = "Unknown (No Client Certificate)";
     // Issuance is supported
-    private static final String TRC_NS = "https://ehdsi.eu/trc";
+    private static final String TRC_NS = "https://ehdsi.eu/assertion/trc";
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityTokenServiceUtil.class);
     // TRC Parameters Namespace
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";

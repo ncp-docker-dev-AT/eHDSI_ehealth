@@ -71,7 +71,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
         try {
             var nextOfKinDetail = STSUtils.getNextOfKinDetails(body);
-            String mid = getMessageIdFromHeader(header);
+            String messageId = getMessageIdFromHeader(header);
 
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
@@ -100,7 +100,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
 
             SOAPMessage response = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL).createMessage();
             response.getSOAPBody().addDocument(STSUtils.createRSTRC(signedDoc));
-            createResponseHeader(response.getSOAPHeader(), mid);
+            createResponseHeader(response.getSOAPHeader(), messageId);
 
             var strRespHeader = STSUtils.domElementToString(response.getSOAPHeader());
             var strReqHeader = STSUtils.domElementToString(header);
@@ -117,7 +117,7 @@ public class NextOfKinService extends SecurityTokenServiceWS implements Provider
             sslCommonName = HTTPUtil.getSubjectDN(false);
             sendNOKAuditMessage(samlNextOfKinIssuer.getPointOfCare(), samlNextOfKinIssuer.getHumanRequestorNameId(),
                     samlNextOfKinIssuer.getHumanRequestorSubjectId(), samlNextOfKinIssuer.getFunctionalRole(), nextOfKinDetail.getLivingSubjectIds().get(0),
-                    samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, mid,
+                    samlNextOfKinIssuer.getFacilityType(), nextOfKinAssertion.getID(), sslCommonName, messageId,
                     strReqHeader.getBytes(StandardCharsets.UTF_8), getMessageIdFromHeader(response.getSOAPHeader()),
                     strRespHeader.getBytes(StandardCharsets.UTF_8));
 
