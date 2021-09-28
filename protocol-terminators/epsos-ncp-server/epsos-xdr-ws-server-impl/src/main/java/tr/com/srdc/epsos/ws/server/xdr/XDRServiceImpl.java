@@ -155,13 +155,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
         }
     }
 
@@ -210,13 +210,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
         }
     }
 
@@ -268,13 +268,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
         }
     }
 

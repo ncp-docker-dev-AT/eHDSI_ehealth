@@ -186,7 +186,7 @@
             </trust:RequestType>
             <trust:TokenType>urn:oasis:names:tc:SAML:2.0:assertion
             </trust:TokenType>
-            <trc:TRCParameters xmlns:trc="https://ehdsi.eu/trc">
+            <trc:TRCParameters xmlns:trc="https://ehdsi.eu/assertion/trc">
                 <trc:PurposeOfUse>TREATMENT</trc:PurposeOfUse>
                 <trc:PatientId>123423423223452323321235t</trc:PatientId>
             </trc:TRCParameters>

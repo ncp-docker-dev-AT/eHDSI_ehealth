@@ -82,11 +82,13 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
         // Load Patient properties file.
         Properties properties = new Properties();
-        try {
+        try (FileInputStream inputStream = new FileInputStream(patientFile.toString())) {
             logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile);
-            properties.load(new FileInputStream(patientFile.toString()));
+            properties.load(inputStream);
 
             PatientDemographics patient = new PatientDemographics();
+            String newRoot = id.getRoot();
+            id.setRoot(newRoot + ".1000");
             patient.setIdList(Collections.singletonList(id));
             patient.setAdministrativeGender(Gender.parseGender(properties.getProperty(GENDER)));
             int year = Integer.parseInt(properties.getProperty(BIRTH_DATE_YEAR));

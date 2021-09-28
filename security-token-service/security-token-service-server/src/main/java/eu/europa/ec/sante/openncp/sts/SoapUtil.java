@@ -8,7 +8,7 @@ import javax.xml.ws.WebServiceException;
 public class SoapUtil {
 
     // TRC Parameters Namespace
-    private static final String TRC_NS = "https://ehdsi.eu/trc";
+    private static final String TRC_NS = "https://ehdsi.eu/assertion/trc";
     private static final String SAML20_TOKEN_URN = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String WS_SEC_UTIL_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";

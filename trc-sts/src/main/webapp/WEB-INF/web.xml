@@ -44,12 +44,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>STSServiceServiceEID</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>NextOfKinService</servlet-name>
         <url-pattern>/NextOfKinService</url-pattern>
@@ -58,11 +52,6 @@
     <servlet-mapping>
         <servlet-name>STSServiceService</servlet-name>
         <url-pattern>/STSServiceService</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>STSServiceServiceEID</servlet-name>
-        <url-pattern>/STSServiceServiceEID</url-pattern>
     </servlet-mapping>
 
     <session-config>
