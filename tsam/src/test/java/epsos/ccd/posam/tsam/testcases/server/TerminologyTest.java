@@ -8,6 +8,7 @@ import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
 import org.h2.tools.RunScript;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class TerminologyTest {
 
     private static final Logger log = LoggerFactory.getLogger(TerminologyTest.class);
