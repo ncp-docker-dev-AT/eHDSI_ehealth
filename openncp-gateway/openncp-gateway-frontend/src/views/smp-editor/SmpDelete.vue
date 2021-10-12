@@ -64,7 +64,7 @@ export default {
   mounted () {
     axios
       .get(process.env.VUE_APP_SERVER_URL + '/api/smpeditor/smpfileinfo', {
-        params: { countryName: 'EU' }
+        params: { countryName: this.$store.getters.country.toUpperCase() }
       })
       .then((response) => {
         this.files = response.data
@@ -103,7 +103,9 @@ export default {
             .get(
               process.env.VUE_APP_SERVER_URL + '/api/smpeditor/smpfileinfo',
               {
-                params: { countryName: 'EU' }
+                params: {
+                  countryName: this.$store.getters.country.toUpperCase()
+                }
               }
             )
             .then((response) => {
