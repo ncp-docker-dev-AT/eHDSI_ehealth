@@ -7,7 +7,6 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
@@ -371,7 +370,6 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
