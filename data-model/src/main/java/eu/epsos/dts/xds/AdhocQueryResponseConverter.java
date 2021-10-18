@@ -142,7 +142,7 @@ public final class AdhocQueryResponseConverter {
 
         for (SlotType1 slotType : extrinsicObjectType.getSlot()) {
             var valueList = slotType.getValueList().getValue();
-            if (!CollectionUtils.isEmpty(valueList)) {
+            if (CollectionUtils.isNotEmpty(valueList)) {
                 switch (slotType.getName()) {
                     case "creationTime":
                         xdsDocument.setCreationTime(valueList.get(0));
@@ -183,9 +183,9 @@ public final class AdhocQueryResponseConverter {
             var author = new OrCDDocumentMetaData.Author();
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_PERSON_STR) && !CollectionUtils.isEmpty(valueList)) {
+                if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_PERSON_STR) && CollectionUtils.isNotEmpty(valueList)) {
                     author.setAuthorPerson(valueList.get(0));
-                } else if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_SPECIALITY_STR) && !CollectionUtils.isEmpty(valueList)) {
+                } else if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_SPECIALITY_STR) && CollectionUtils.isNotEmpty(valueList)) {
                     author.setAuthorSpeciality(valueList);
                 }
             }
@@ -195,14 +195,14 @@ public final class AdhocQueryResponseConverter {
 
     private static void setClassCode(String documentClassCodeType, String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         var valueList = classificationType.getSlot().get(0).getValueList().getValue();
-        if (StringUtils.equals(classificationScheme, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME) && !CollectionUtils.isEmpty(valueList)) {
+        if (StringUtils.equals(classificationScheme, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
             xdsDocument.setClassCode(valueList.get(0), documentClassCodeType);
         }
     }
 
     private static void setDescription(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
         var descriptionList = extrinsicObjectType.getDescription().getLocalizedString();
-        if (extrinsicObjectType.getDescription() != null && !CollectionUtils.isEmpty(descriptionList)) {
+        if (extrinsicObjectType.getDescription() != null && CollectionUtils.isNotEmpty(descriptionList)) {
             xdsDocument.setDescription(descriptionList.get(0).getValue());
         }
     }
@@ -219,7 +219,7 @@ public final class AdhocQueryResponseConverter {
             for (ClassificationType type : classificationTypeList) {
                 var valueList = type.getSlot().get(0).getValueList().getValue();
                 if (StringUtils.equals(type.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")
-                        && !CollectionUtils.isEmpty(valueList)
+                        && CollectionUtils.isNotEmpty(valueList)
                         && StringUtils.equals(valueList.get(0), "1.3.6.1.4.1.19376.1.2.3")) {
                     if (StringUtils.equals(type.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")) {
                         dispensable = true;
@@ -236,7 +236,7 @@ public final class AdhocQueryResponseConverter {
 
         for (ExternalIdentifierType externalIdentifierType : extrinsicObjectType.getExternalIdentifier()) {
             var localizedStringList = externalIdentifierType.getName().getLocalizedString();
-            if (!CollectionUtils.isEmpty(localizedStringList) &&
+            if (CollectionUtils.isNotEmpty(localizedStringList) &&
                     StringUtils.equalsIgnoreCase(localizedStringList.get(0).getValue(),
                             XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
                 xdsDocument.setDocumentUniqueId(externalIdentifierType.getValue());
@@ -333,7 +333,7 @@ public final class AdhocQueryResponseConverter {
     private static void setHealthcareFacility(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         var localizedStringList = classificationType.getName().getLocalizedString();
         if (StringUtils.equals(classificationScheme, "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")
-                && !CollectionUtils.isEmpty(localizedStringList)) {
+                && CollectionUtils.isNotEmpty(localizedStringList)) {
             xdsDocument.setHealthcareFacility(localizedStringList.get(0).getValue());
         }
     }
@@ -343,7 +343,7 @@ public final class AdhocQueryResponseConverter {
             xdsDocument.setPDF(classificationType.getNodeRepresentation().equals("urn:ihe:iti:xds-sd:pdf:2008"));
             var valueList = classificationType.getSlot().get(0).getValueList().getValue();
             // Set FormatCode
-            if (!CollectionUtils.isEmpty(valueList)) {
+            if (CollectionUtils.isNotEmpty(valueList)) {
                 xdsDocument.setFormatCode(valueList.get(0), classificationType.getNodeRepresentation());
             }
         }
