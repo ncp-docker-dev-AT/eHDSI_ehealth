@@ -5,8 +5,8 @@ import eu.epsos.util.xdr.XDRConstants;
 import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
@@ -55,7 +55,7 @@ public final class AdhocQueryResponseConverter {
                     //Set id
                     xdsDocument.setId(eo.getValue().getId());
 
-                    //Set hcid
+                    //Set Home Community ID
                     xdsDocument.setHcid(eo.getValue().getHome());
 
                     // Set name
@@ -166,7 +166,7 @@ public final class AdhocQueryResponseConverter {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "atcCode") && !CollectionUtils.isEmpty(valueList)) {
+                if (StringUtils.equals(slot.getName(), "atcCode") && CollectionUtils.isNotEmpty(valueList)) {
                     xdsDocument.setAtcCode(valueList.get(0));
                     xdsDocument.setAtcText(valueList.get(0));
                 }
@@ -305,7 +305,7 @@ public final class AdhocQueryResponseConverter {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("doseFormCode") && !CollectionUtils.isEmpty(valueList)) {
+                if (slot.getName().equals("doseFormCode") && CollectionUtils.isNotEmpty(valueList)) {
                     xdsDocument.setDoseFormCode(valueList.get(0));
                     xdsDocument.setDoseFormText(valueList.get(0));
                 }
@@ -361,7 +361,7 @@ public final class AdhocQueryResponseConverter {
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "strength") && !CollectionUtils.isEmpty(valueList)) {
+                if (StringUtils.equals(slot.getName(), "strength") && CollectionUtils.isNotEmpty(valueList)) {
                     xdsDocument.setStrength(valueList.get(0));
                 }
             }
@@ -372,7 +372,7 @@ public final class AdhocQueryResponseConverter {
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "substitution") && !CollectionUtils.isEmpty(valueList)) {
+                if (StringUtils.equals(slot.getName(), "substitution") && CollectionUtils.isNotEmpty(valueList)) {
                     xdsDocument.setSubstitution(valueList.get(0));
                 }
             }
