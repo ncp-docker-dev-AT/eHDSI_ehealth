@@ -354,11 +354,11 @@ public final class AdhocQueryResponseConverter {
             final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
             var code = classificationType.getNodeRepresentation();
             var text = StringUtils.EMPTY;
-            if (!CollectionUtils.isEmpty(classificationType.getName().getLocalizedString())) {
+            if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
                 text = classificationType.getName().getLocalizedString().get(0).getValue();
             }
             for (SlotType1 slot : classificationType.getSlot()) {
-                if (StringUtils.equals(slot.getName(), "codingScheme") && !CollectionUtils.isEmpty(slot.getValueList().getValue())) {
+                if (StringUtils.equals(slot.getName(), "codingScheme") && CollectionUtils.isNotEmpty(slot.getValueList().getValue())) {
                     var codingScheme = slot.getValueList().getValue().get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ICD_10_CODE_SYSTEM_OID)) {
                         xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
