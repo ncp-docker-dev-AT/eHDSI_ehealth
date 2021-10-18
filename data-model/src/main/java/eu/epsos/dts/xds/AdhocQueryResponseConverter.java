@@ -6,6 +6,7 @@ import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
@@ -160,6 +161,19 @@ public final class AdhocQueryResponseConverter {
         }
     }
 
+    private static void setATCCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (StringUtils.equals(slot.getName(), "atcCode") && !CollectionUtils.isEmpty(valueList)) {
+                    xdsDocument.setAtcCode(valueList.get(0));
+                    xdsDocument.setAtcText(valueList.get(0));
+                }
+            }
+        }
+    }
+
     private static void setAuthorPerson(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
 
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID) && classificationType.getSlot() != null) {
@@ -286,50 +300,14 @@ public final class AdhocQueryResponseConverter {
         }
     }
 
-    private static void setATCCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            for (SlotType1 slot : classificationType.getSlot()) {
-                var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "atcCode") && !valueList.isEmpty()) {
-                    xdsDocument.setAtcCode(valueList.get(0));
-                    xdsDocument.setAtcText(valueList.get(0));
-                }
-            }
-        }
-    }
-
     private static void setDoseFormCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
 
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("doseFormCode") && !valueList.isEmpty()) {
+                if (slot.getName().equals("doseFormCode") && !CollectionUtils.isEmpty(valueList)) {
                     xdsDocument.setDoseFormCode(valueList.get(0));
                     xdsDocument.setDoseFormText(valueList.get(0));
-                }
-            }
-        }
-    }
-
-    private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            for (SlotType1 slot : classificationType.getSlot()) {
-                var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "strength") && !valueList.isEmpty()) {
-                    xdsDocument.setStrength(valueList.get(0));
-                }
-            }
-        }
-    }
-
-    private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            for (SlotType1 slot : classificationType.getSlot()) {
-                var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "substitution") && !valueList.isEmpty()) {
-                    xdsDocument.setSubstitution(valueList.get(0));
                 }
             }
         }
@@ -374,6 +352,29 @@ public final class AdhocQueryResponseConverter {
             xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
             if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), "1.3.6.1.4.1.12559.11.10.1.3.1.44.2")) {
                 xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
+            }
+        }
+    }
+
+    private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (StringUtils.equals(slot.getName(), "strength") && !CollectionUtils.isEmpty(valueList)) {
+                    xdsDocument.setStrength(valueList.get(0));
+                }
+            }
+        }
+    }
+
+    private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (StringUtils.equals(slot.getName(), "substitution") && !CollectionUtils.isEmpty(valueList)) {
+                    xdsDocument.setSubstitution(valueList.get(0));
+                }
             }
         }
     }
