@@ -351,23 +351,25 @@ public final class AdhocQueryResponseConverter {
 
     private static void setReasonOfHospitalisation(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType != null) {
-            String code = classificationType.getNodeRepresentation();
-            String text = classificationType.getName().getLocalizedString().get(0).getValue();
-            String codingScheme = null;
+            final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
+            var code = classificationType.getNodeRepresentation();
+            var text = StringUtils.EMPTY;
+            if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                text = classificationType.getName().getLocalizedString().get(0).getValue();
+            }
             for (SlotType1 slot : classificationType.getSlot()) {
-                if (StringUtils.equals(slot.getName(), "codingScheme") && slot.getValueList().getValue().get(0) != null) {
-                    codingScheme = slot.getValueList().getValue().get(0);
+                if (StringUtils.equals(slot.getName(), "codingScheme") && CollectionUtils.isNotEmpty(slot.getValueList().getValue())) {
+                    var codingScheme = slot.getValueList().getValue().get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ICD_10_CODE_SYSTEM_OID)) {
+                        xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
+                    }
                 }
             }
-            xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
-            if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), "1.3.6.1.4.1.12559.11.10.1.3.1.44.2")) {
-                xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
-            }
+
         }
     }
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
