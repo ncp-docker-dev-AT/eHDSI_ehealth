@@ -6,6 +6,7 @@ import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
@@ -338,18 +339,21 @@ public final class AdhocQueryResponseConverter {
 
     private static void setReasonOfHospitalisation(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType != null) {
-            String code = classificationType.getNodeRepresentation();
-            String text = classificationType.getName().getLocalizedString().get(0).getValue();
-            String codingScheme = null;
+            final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
+            var code = classificationType.getNodeRepresentation();
+            var text = StringUtils.EMPTY;
+            if (!CollectionUtils.isEmpty(classificationType.getName().getLocalizedString())) {
+                text = classificationType.getName().getLocalizedString().get(0).getValue();
+            }
             for (SlotType1 slot : classificationType.getSlot()) {
-                if (StringUtils.equals(slot.getName(), "codingScheme") && slot.getValueList().getValue().get(0) != null) {
-                    codingScheme = slot.getValueList().getValue().get(0);
+                if (StringUtils.equals(slot.getName(), "codingScheme") && !CollectionUtils.isEmpty(slot.getValueList().getValue())) {
+                    var codingScheme = slot.getValueList().getValue().get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ICD_10_CODE_SYSTEM_OID)) {
+                        xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
+                    }
                 }
             }
-            xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
-            if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), "1.3.6.1.4.1.12559.11.10.1.3.1.44.2")) {
-                xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
-            }
+
         }
     }
 
