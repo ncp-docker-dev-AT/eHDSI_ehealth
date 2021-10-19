@@ -331,10 +331,13 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setHealthcareFacility(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-        var localizedStringList = classificationType.getName().getLocalizedString();
         if (StringUtils.equals(classificationScheme, "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")
-                && CollectionUtils.isNotEmpty(localizedStringList)) {
-            xdsDocument.setHealthcareFacility(localizedStringList.get(0).getValue());
+                && classificationType != null
+                && classificationType.getName() != null) {
+            var localizedStringList = classificationType.getName().getLocalizedString();
+            if (CollectionUtils.isNotEmpty(localizedStringList)) {
+                xdsDocument.setHealthcareFacility(localizedStringList.get(0).getValue());
+            }
         }
     }
 
