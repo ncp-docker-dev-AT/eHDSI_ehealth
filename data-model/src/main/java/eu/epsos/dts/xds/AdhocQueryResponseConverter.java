@@ -193,7 +193,9 @@ public final class AdhocQueryResponseConverter {
         }
     }
 
-    private static void setClassCode(String documentClassCodeType, String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+    private static void setClassCode(String documentClassCodeType, String classificationScheme,
+                                     ClassificationType classificationType, XDSDocument xdsDocument) {
+
         var valueList = classificationType.getSlot().get(0).getValueList().getValue();
         if (StringUtils.equals(classificationScheme, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
             xdsDocument.setClassCode(valueList.get(0), documentClassCodeType);
@@ -201,6 +203,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setDescription(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
+
         var descriptionList = extrinsicObjectType.getDescription().getLocalizedString();
         if (extrinsicObjectType.getDescription() != null && CollectionUtils.isNotEmpty(descriptionList)) {
             xdsDocument.setDescription(descriptionList.get(0).getValue());
@@ -319,6 +322,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setFailureMessages(QueryResponse queryResponse, AdhocQueryResponse adhocQueryResponse) {
+
         if (adhocQueryResponse.getRegistryErrorList() != null) {
             List<String> errors = new ArrayList<>(adhocQueryResponse.getRegistryErrorList().getRegistryError().size());
 
@@ -331,6 +335,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setHealthcareFacility(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
         if (StringUtils.equals(classificationScheme, "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")
                 && classificationType != null
                 && classificationType.getName() != null) {
@@ -342,6 +347,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setIsPDF(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
         if (StringUtils.equals(classificationScheme, IheConstants.FORMAT_CODE_SCHEME)) {
             xdsDocument.setPDF(classificationType.getNodeRepresentation().equals("urn:ihe:iti:xds-sd:pdf:2008"));
             var valueList = classificationType.getSlot().get(0).getValueList().getValue();
@@ -353,6 +359,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setReasonOfHospitalisation(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType != null) {
             final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
             var code = classificationType.getNodeRepresentation();
@@ -373,6 +380,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
@@ -384,6 +392,7 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
         if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
