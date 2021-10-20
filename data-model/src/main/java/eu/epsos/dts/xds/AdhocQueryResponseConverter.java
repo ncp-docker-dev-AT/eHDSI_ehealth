@@ -86,7 +86,7 @@ public final class AdhocQueryResponseConverter {
                         // Set AuthorPerson
                         setAuthorPerson(classificationScheme, classificationType, xdsDocument);
 
-                        // Set ATC Code
+                        // Set ATC Code (ATC => Anatomical Therapeutic Chemical)
                         setATCCode(classificationScheme, classificationType, xdsDocument);
 
                         // Set Dose Form Code
@@ -167,11 +167,36 @@ public final class AdhocQueryResponseConverter {
     private static void setATCCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
 
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var ATC_CODE_SYSTEM_OID = "2.16.840.1.113883.6.73";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "atcCode") && CollectionUtils.isNotEmpty(valueList)) {
-                    xdsDocument.setAtcCode(valueList.get(0));
-                    xdsDocument.setAtcText(valueList.get(0));
+                if (StringUtils.equals(slot.getName(), "codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ATC_CODE_SYSTEM_OID)) {
+                        xdsDocument.setAtcCode(classificationType.getNodeRepresentation());
+                        if(CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                            xdsDocument.setAtcText(classificationType.getName().getLocalizedString().get(0).getValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setDoseFormCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EDQM_CODE_SYSTEM_OID = "0.4.0.127.0.16.1.1.2.1";
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EDQM_CODE_SYSTEM_OID)) {
+                        xdsDocument.setDoseFormCode(classificationType.getNodeRepresentation());
+                        if(CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                            xdsDocument.setDoseFormText(classificationType.getName().getLocalizedString().get(0).getValue());
+                        }
+                    }
                 }
             }
         }
@@ -305,19 +330,6 @@ public final class AdhocQueryResponseConverter {
             xdsDocumentAssociation.setCdaXML(xdsDocument.isPDF() ? null : xdsDocument);
 
             documentAssociations.add(xdsDocumentAssociation);
-        }
-    }
-
-    private static void setDoseFormCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            for (SlotType1 slot : classificationType.getSlot()) {
-                var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("doseFormCode") && CollectionUtils.isNotEmpty(valueList)) {
-                    xdsDocument.setDoseFormCode(valueList.get(0));
-                    xdsDocument.setDoseFormText(valueList.get(0));
-                }
-            }
         }
     }
 

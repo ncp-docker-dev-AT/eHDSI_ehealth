@@ -783,15 +783,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // ATC code (optional)
         ClassificationType atcCodeClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "ATC CODE", "", "atcCode");
-        atcCodeClassification.getSlot().add(makeSlot("atcCode", document.getAtcCode()));
+                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
         eot.getClassification().add(atcCodeClassification);
 
         // Dose Form Code
         ClassificationType doseFormClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "DOSE FORM CODE", "", "doseFormCode");
-        doseFormClassification.getSlot().add(makeSlot("doseFormCode", document.getDoseFormCode()));
+                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
         eot.getClassification().add(doseFormClassification);
 
         // Strength

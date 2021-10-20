@@ -103,12 +103,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 String description = getDescriptionFromDocument(xmlDoc);
                 String atcCode = getAtcCode(xmlDoc);
+                String atcName = getAtcName(xmlDoc);
                 String doseFormCode = getDoseFormCode(xmlDoc);
+                String doseFormName = getDoseFormName(xmlDoc);
                 String strength = getStrength(xmlDoc);
                 String substitution = getSubstitution(xmlDoc);
                 boolean dispensable = getDispensable(xmlDoc);
 
-                var epListParam = new EpListParam(dispensable, atcCode, doseFormCode, strength, substitution);
+                var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
@@ -687,18 +689,46 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return atcCode;
     }
 
+    private String getAtcName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcName = null;
+
+        try {
+            atcName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcName;
+    }
+
     private String getDoseFormCode(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
         String doseFormCode = null;
 
         try {
-            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@code", doc);
         } catch (XPathExpressionException e) {
             logger.error("XPath expression error", e);
         }
 
         return doseFormCode;
+    }
+
+    private String getDoseFormName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormName = null;
+
+        try {
+            doseFormName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormName;
     }
 
     private String getStrength(Document doc) {
