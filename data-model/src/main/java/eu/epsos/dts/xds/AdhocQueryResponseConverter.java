@@ -392,24 +392,30 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_Codesystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "strength") && CollectionUtils.isNotEmpty(valueList)) {
-                    xdsDocument.setStrength(valueList.get(0));
+                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_STRENGTH_CODE_SYSTEM_OID)) {
+                        xdsDocument.setStrength(classificationType.getNodeRepresentation());
+                    }
                 }
             }
         }
     }
 
     private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "eHDSI_Substitution_Codesystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "substitution") && CollectionUtils.isNotEmpty(valueList)) {
-                    xdsDocument.setSubstitution(valueList.get(0));
+                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_SUBSTITUTION_CODE_SYSTEM_OID)) {
+                        xdsDocument.setSubstitution(classificationType.getNodeRepresentation());
+                    }
                 }
             }
         }

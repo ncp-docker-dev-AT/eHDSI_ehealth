@@ -64,8 +64,9 @@ public class DocumentDts {
             result.setReasonOfHospitalisation(convertReasonOfHospitalisation(document.getReasonOfHospitalisation()));
         }
 
-        result.setAtcCode(composeCodeAndText(document.getAtcCode(), document.getAtcText()));
-        result.setDoseFormCode(composeCodeAndText(document.getDoseFormCode(), document.getDoseFormText()));
+        result.setAtcCode(document.getAtcCode());
+        //result.setDoseFormCode(document.getDoseFormCode());
+        result.setDoseFormCode(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
 
