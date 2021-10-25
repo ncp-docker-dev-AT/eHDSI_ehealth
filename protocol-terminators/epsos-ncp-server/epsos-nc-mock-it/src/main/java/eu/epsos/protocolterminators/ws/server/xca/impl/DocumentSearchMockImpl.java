@@ -350,6 +350,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 var prefix = new StringBuilder();
                 var suffix = new StringBuilder();
                 var given = new StringBuilder();
+                var givenAdditional = new StringBuilder();
                 var family = new StringBuilder();
                 for (var i = 0; i < nodeList1.getLength(); i++) {
                     Node node1 = nodeList1.item(i);
@@ -358,16 +359,32 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         logger.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
-                                prefix.append(node1.getTextContent()).append(" ");
+                                if(prefix.length() > 0) {
+                                    prefix.append(" ");
+                                }
+                                prefix.append(node1.getTextContent());
                                 break;
                             case "suffix":
-                                suffix.append(node1.getTextContent()).append(" ");
+                                if(suffix.length() > 0) {
+                                    suffix.append(" ");
+                                }
+                                suffix.append(node1.getTextContent());
                                 break;
                             case "given":
-                                given.append(node1.getTextContent()).append(" ");
+                                if(given.length() <= 0) {
+                                    given.append(node1.getTextContent());
+                                } else {
+                                    if(givenAdditional.length() > 0) {
+                                        givenAdditional.append(" ");
+                                    }
+                                    givenAdditional.append(node1.getTextContent());
+                                }
                                 break;
                             case "family":
-                                family.append(node1.getTextContent()).append(" ");
+                                if(family.length() > 0) {
+                                    family.append(" ");
+                                }
+                                family.append(node1.getTextContent());
                                 break;
                             default:
                                 logger.warn("No Author information to append...");
@@ -375,8 +392,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         }
                     }
                 }
-                author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
-                        StringUtils.trim(family.toString()), suffix);
+                /*
+                    From (https://hl7-definition.caristix.com/v2/HL7v2.5/DataTypes/XCN)
+                    XCN.1 - Id Number
+                    XCN.2 - Family Name
+                    XCN.3 - Given Name (FirstName)
+                    XCN.4 - Second And Further Given Names Or Initials
+                    XCN.5 - Suffix (e.g., Jr Or Iii)
+                    XCN.6 - Prefix (e.g., Dr)
+                    ...
+                */
+                String id = "";
+                author = String.format("%s^%s^%s^%s^%s^%s", id, family, given, givenAdditional, suffix, prefix);
             }
         }
         return StringUtils.trim(author);
