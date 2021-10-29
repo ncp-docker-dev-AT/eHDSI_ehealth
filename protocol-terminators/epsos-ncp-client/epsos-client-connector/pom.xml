@@ -139,6 +139,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-webapp</artifactId>
+            <version>${axis2.version}</version>
             <type>war</type>
             <exclusions>
                 <exclusion>
@@ -305,6 +306,13 @@
 <!--                            </includes>-->
 <!--                            <targetPath>META-INF</targetPath>-->
 <!--                        </resource>-->
+                        <resource>
+                            <directory>src/main/resources/servicedata</directory>
+                            <includes>
+                                <include>ServiceData.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF/services/META-INF</targetPath>
+                        </resource>
                         <resource>
                             <directory>target</directory>
                             <includes>

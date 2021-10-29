@@ -33,10 +33,11 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -123,11 +124,27 @@ public class RespondingGateway_ServiceStub extends Stub {
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 
+        /*
         var multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
         var httpConnectionManagerParams = new HttpConnectionManagerParams();
         httpConnectionManagerParams.setDefaultMaxConnectionsPerHost(20);
         multiThreadedHttpConnectionManager.setParams(httpConnectionManagerParams);
         var httpClient = new HttpClient(multiThreadedHttpConnectionManager);
+        */
+        var poolingHttpConnectionManager = new PoolingHttpClientConnectionManager();
+        poolingHttpConnectionManager.setMaxTotal(20);
+
+        // 1.
+        //HttpClients.custom().setConnectionManager(poolingHttpConnectionManager);
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        // 2.
+        //CloseableHttpClient httpClient2 = HttpClients.createMinimal(poolingHttpConnectionManager);
+
+        // 3.
+        //HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        //httpClientBuilder.setConnectionManager(poolingHttpConnectionManager);
+        //CloseableHttpClient httpClient3 = httpClientBuilder.build();
 
         this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
         this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
