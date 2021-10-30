@@ -480,8 +480,8 @@
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
-                        <artifactId>cargo-maven2-plugin</artifactId>
-                        <version>1.2.3</version>
+                        <artifactId>cargo-maven3-plugin</artifactId>
+                        <version>1.9.0</version>
                         <configuration>
                             <container>
                                 <containerId>tomcat7x</containerId>
@@ -517,7 +517,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>2.12.2</version>
+                        <version>2.22.2</version>
                         <configuration>
                             <encoding>${project.build.sourceEncoding}</encoding>
                         </configuration>
