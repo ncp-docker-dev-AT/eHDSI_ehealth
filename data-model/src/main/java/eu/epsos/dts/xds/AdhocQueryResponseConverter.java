@@ -203,10 +203,9 @@ public final class AdhocQueryResponseConverter {
     }
 
     private static void setDescription(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
-
-        var descriptionList = extrinsicObjectType.getDescription().getLocalizedString();
-        if (extrinsicObjectType.getDescription() != null && CollectionUtils.isNotEmpty(descriptionList)) {
-            xdsDocument.setDescription(descriptionList.get(0).getValue());
+        if (extrinsicObjectType.getDescription() != null
+                && CollectionUtils.isNotEmpty(extrinsicObjectType.getDescription().getLocalizedString())) {
+            xdsDocument.setDescription(extrinsicObjectType.getDescription().getLocalizedString().get(0).getValue());
         }
     }
 
@@ -214,8 +213,8 @@ public final class AdhocQueryResponseConverter {
                                        ClassificationType classificationType, XDSDocument xdsDocument) {
 
         if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)
-                && !extrinsicObjectType.getDescription().getLocalizedString().isEmpty()
-                && extrinsicObjectType.getDescription() != null) {
+                && extrinsicObjectType.getDescription() != null
+                && CollectionUtils.isNotEmpty(extrinsicObjectType.getDescription().getLocalizedString())) {
             var dispensable = false;
 
             List<ClassificationType> classificationTypeList = classificationType.getClassification();
@@ -364,7 +363,8 @@ public final class AdhocQueryResponseConverter {
             final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
             var code = classificationType.getNodeRepresentation();
             var text = StringUtils.EMPTY;
-            if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+            if (classificationType.getName() != null &&
+                    CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
                 text = classificationType.getName().getLocalizedString().get(0).getValue();
             }
             for (SlotType1 slot : classificationType.getSlot()) {
