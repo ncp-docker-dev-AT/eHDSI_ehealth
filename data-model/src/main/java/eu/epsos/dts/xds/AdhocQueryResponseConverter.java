@@ -23,6 +23,8 @@ import java.util.TreeMap;
  */
 public final class AdhocQueryResponseConverter {
 
+    private static final String RIM_CODING_SCHEME = "codingScheme";
+
     /**
      * Private constructor to avoid instantiation.
      */
@@ -170,11 +172,11 @@ public final class AdhocQueryResponseConverter {
             final var ATC_CODE_SYSTEM_OID = "2.16.840.1.113883.6.73";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (StringUtils.equals(slot.getName(), "codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                if (StringUtils.equals(slot.getName(), RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
                     var codingScheme = valueList.get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ATC_CODE_SYSTEM_OID)) {
                         xdsDocument.setAtcCode(classificationType.getNodeRepresentation());
-                        if(CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                        if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
                             xdsDocument.setAtcText(classificationType.getName().getLocalizedString().get(0).getValue());
                         }
                     }
@@ -189,11 +191,11 @@ public final class AdhocQueryResponseConverter {
             final var EDQM_CODE_SYSTEM_OID = "0.4.0.127.0.16.1.1.2.1";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
                     var codingScheme = valueList.get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EDQM_CODE_SYSTEM_OID)) {
                         xdsDocument.setDoseFormCode(classificationType.getNodeRepresentation());
-                        if(CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                        if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
                             xdsDocument.setDoseFormText(classificationType.getName().getLocalizedString().get(0).getValue());
                         }
                     }
@@ -380,7 +382,7 @@ public final class AdhocQueryResponseConverter {
                 text = classificationType.getName().getLocalizedString().get(0).getValue();
             }
             for (SlotType1 slot : classificationType.getSlot()) {
-                if (StringUtils.equals(slot.getName(), "codingScheme") && CollectionUtils.isNotEmpty(slot.getValueList().getValue())) {
+                if (StringUtils.equals(slot.getName(), RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(slot.getValueList().getValue())) {
                     var codingScheme = slot.getValueList().getValue().get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ICD_10_CODE_SYSTEM_OID)) {
                         xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
@@ -396,7 +398,7 @@ public final class AdhocQueryResponseConverter {
             final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_Codesystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
                     var codingScheme = valueList.get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_STRENGTH_CODE_SYSTEM_OID)) {
                         xdsDocument.setStrength(classificationType.getNodeRepresentation());
@@ -411,7 +413,7 @@ public final class AdhocQueryResponseConverter {
             final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "eHDSI_Substitution_Codesystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
-                if (slot.getName().equals("codingScheme") && CollectionUtils.isNotEmpty(valueList)) {
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
                     var codingScheme = valueList.get(0);
                     if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_SUBSTITUTION_CODE_SYSTEM_OID)) {
                         xdsDocument.setSubstitution(classificationType.getNodeRepresentation());
