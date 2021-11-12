@@ -190,19 +190,28 @@
             <artifactId>xmlbeans</artifactId>
             <version>4.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>2.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.saxon</groupId>
+            <artifactId>Saxon-HE</artifactId>
+            <version>${saxon-he.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <!--OpenNCP dependencies-->
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-configuration-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-audit-manager</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-util</artifactId>
@@ -218,7 +227,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -227,7 +235,7 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.12.0</version>
+            <version>${xerces.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
