@@ -2,7 +2,7 @@ debug: false
 application:
   security:
     jwt:
-      secret: teststsjsdfjsdfksdfjsdkfs
+      secret: cO8IGFVZa60tBFScaDotntDucC4FphuA
 spring:
   datasource:
     default:
