@@ -10,7 +10,9 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     private boolean dispensable;
 
     private String atcCode;
+    private String atcName;
     private String doseFormCode;
+    private String doseFormName;
     private String strength;
     private String substitution;
 
@@ -19,7 +21,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product) {
-        this(metaData, description, product, new EpListParam(false, null, null, null, null));
+        this(metaData, description, product, new EpListParam(false, null, null, null, null, null, null));
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, EpListParam epListParam) {
@@ -32,7 +34,9 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
         this.description = description;
         this.dispensable = epListParam.isDispensable();
         this.atcCode = epListParam.getAtcCode();
+        this.atcName = epListParam.getAtcName();
         this.doseFormCode = epListParam.getDoseFormCode();
+        this.doseFormName = epListParam.getDoseFormName();
         this.strength = epListParam.getStrength();
         this.substitution = epListParam.getSubstitution();
     }
@@ -56,7 +60,13 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     public String getAtcCode() { return atcCode; }
 
     @Override
+    public String getAtcName() { return atcName; }
+
+    @Override
     public String getDoseFormCode() { return doseFormCode; }
+
+    @Override
+    public String getDoseFormName() { return doseFormName; }
 
     @Override
     public String getStrength() { return strength; }

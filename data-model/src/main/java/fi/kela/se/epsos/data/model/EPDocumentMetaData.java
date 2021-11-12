@@ -18,7 +18,9 @@ public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
     boolean isDispensable();
 
     String getAtcCode();
+    String getAtcName();
     String getDoseFormCode();
+    String getDoseFormName();
     String getStrength();
     String getSubstitution();
 
