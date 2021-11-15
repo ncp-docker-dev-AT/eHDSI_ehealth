@@ -12,7 +12,7 @@ Main changes in this release are:<br/>
 <ul>
 <li>OpenNCP BugFix JAXB and Saxon HE libraries update (Gateway and Protocol Terminator).</li>
 <li>BugFix on ePrescription List metadata (CP-0051).</li>
-<li>BugFix on OrCD List metadata.</li>
+<li>BugFix on OrCD List metadata and Audit Messages.</li>
 <li>Minor fix on OpenNCP Gateway portal.</li>
 </ul>
 
@@ -25,6 +25,7 @@ Main changes in this release are:<br/>
     [EHNCP-2210] - JAXB libraries upgrade
     [EHNCP-2211] - Saxon-HE library is missing on Gateway module
     [EHNCP-2212] - OrCD list query return NullPointerException as Description is not available
+    [EHNCP-2214] - OrCD Audit message - transaction code for Query and Retrieve operations is not mapped
 
 ### Task:
     [EHNCP-2205] - Update Home Community ID for Member State
