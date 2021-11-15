@@ -65,7 +65,8 @@ public class DocumentDts {
         }
 
         result.setAtcCode(document.getAtcCode());
-        result.setDoseFormCode(document.getDoseFormCode());
+        //result.setDoseFormCode(document.getDoseFormCode());
+        result.setDoseFormCode(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
 
@@ -100,6 +101,15 @@ public class DocumentDts {
         }
 
         return result;
+    }
+
+    private static String composeCodeAndText(String code, String text)
+    {
+        String ret = code;
+        if(text != null && !text.isEmpty()) {
+            ret = "[" + code + "] " + text;
+        }
+        return ret;
     }
 
     private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {

@@ -759,15 +759,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
 
-        // Product
-        if (document.hasProduct()) {
-            EPDocumentMetaData.ProductMetadata product = document.getProduct();
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                            product.getProductCode(), "2.16.840.1.113883.6.73", product.getProductName()));
-        }
-
-        // Dispensable
+         // Dispensable
         if (document.isDispensable()) {
             ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open");
@@ -775,37 +767,33 @@ public class XCAServiceImpl implements XCAServiceInterface {
             eot.getClassification().add(dispensableClassification);
         } else {
             ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
-                    uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Closed");
+                    uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed");
             dispensableClassification.getSlot().add(makeSlot("dispensable", "Closed"));
             eot.getClassification().add(dispensableClassification);
         }
 
-        // ATC code (optional)
+        // ATC code (former Product element)
         ClassificationType atcCodeClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "ATC CODE", "", "atcCode");
-        atcCodeClassification.getSlot().add(makeSlot("atcCode", document.getAtcCode()));
+                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
         eot.getClassification().add(atcCodeClassification);
 
         // Dose Form Code
         ClassificationType doseFormClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "DOSE FORM CODE", "", "doseFormCode");
-        doseFormClassification.getSlot().add(makeSlot("doseFormCode", document.getDoseFormCode()));
+                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
         eot.getClassification().add(doseFormClassification);
 
         // Strength
         ClassificationType strengthClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "STRENGTH", "", "strength");
-        strengthClassification.getSlot().add(makeSlot("strength", document.getStrength()));
+                document.getStrength(), "eHDSI_Strength_Codesystem", "Strength of medication");
         eot.getClassification().add(strengthClassification);
 
         // Substitution
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                "SUBSTITUTION", "", "substitution");
-        substitutionClassification.getSlot().add(makeSlot("substitution", document.getSubstitution()));
+                document.getSubstitution(), "eHDSI_Substitution_Codesystem", "Subsitution availability");
         eot.getClassification().add(substitutionClassification);
 
         // Confidentiality Code
@@ -1206,6 +1194,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                 orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagesDocumentList(searchCriteria);
                 break;
+            default:
+                // eHDSI supports only 4 types of document.
+                break;
         }
 
         return orCDDocumentMetaDataList;
@@ -1402,7 +1393,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         .add(Criteria.PatientId, patientId)
                         .add(Criteria.RepositoryId, repositoryId));
                 //  TODO: EHNCP-2055 Inconsistency in handling patient id
-                //  logger.info("[WS-Server] National Document:\n'{}'", epsosDoc.toString());
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
                 registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
