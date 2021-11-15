@@ -717,6 +717,12 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(operation, TransactionName.NCP_TRUSTED_SERVICE_LIST.getCode())) {
             return IHETransactionName.NCP_TRUSTED_SERVICE_LIST.getCode();
         }
+        if (StringUtils.equals(operation, TransactionName.ORCD_SERVICE_LIST.getCode())) {
+            return IHETransactionName.ORCD_SERVICE_LIST.getCode();
+        }
+        if (StringUtils.equals(operation, TransactionName.ORCD_SERVICE_RETRIEVE.getCode())) {
+            return IHETransactionName.ORCD_SERVICE_RETRIEVE.getCode();
+        }
         if (StringUtils.equals(operation, TransactionName.ORDER_SERVICE_LIST.getCode())) {
             return IHETransactionName.ORDER_SERVICE_LIST.getCode();
         }
