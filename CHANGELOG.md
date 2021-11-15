@@ -3,6 +3,40 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.2.1] - 15-11-2021
+The OpenNCP 5.2.2 is the Wave 5 Preparatory Test Event HotFix release.
+This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP BugFix JAXB and Saxon HE libraries update (Gateway and Protocol Terminator).</li>
+<li>BugFix on ePrescription List metadata (CP-0051).</li>
+<li>BugFix on OrCD List metadata.</li>
+<li>Minor fix on OpenNCP Gateway portal.</li>
+</ul>
+
+### Bug:
+    [EHNCP-2199] - Deleting SMP files locked on European Commission jurisdiction
+    [EHNCP-2202] - ePrescription List throws index out of bounds exception when some metadatas are not available
+    [EHNCP-2203] - XCAServiceImpl - Dispensable event status not correct
+    [EHNCP-2206] - Missing XDS classification scheme into the eP List (CP-0051)
+    [EHNCP-2207] - OpenNCP Gateway Upload - Http code 200
+    [EHNCP-2210] - JAXB libraries upgrade
+    [EHNCP-2211] - Saxon-HE library is missing on Gateway module
+    [EHNCP-2212] - OrCD list query return NullPointerException as Description is not available
+
+### Task:
+    [EHNCP-2205] - Update Home Community ID for Member State
+
+### Issue:
+    [EHNCP-2201] - OrCD XDS metadata issue
+    [EHNCP-2204] - Hardcoded configurations of Gmail SMTP and email accounts
+
+### Support:
+    [EHNCP-2208] - Problem with initialization of Util Constants and configuration manager during XCPD transaction
+    [EHNCP-2209] - Problem with OpenNCP Gateway and Saxon Provider
+
 ## [5.2.1] - 27-09-2021
 The OpenNCP 5.2.1 is the Wave 5 Preparatory Test Event release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
