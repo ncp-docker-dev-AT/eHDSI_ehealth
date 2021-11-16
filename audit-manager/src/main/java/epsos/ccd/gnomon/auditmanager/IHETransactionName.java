@@ -25,6 +25,8 @@ public enum IHETransactionName {
     IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("XCPD::CrossGatewayPatientDiscovery"),
     PATIENT_SERVICE_LIST("XCA::CrossGatewayQuery"),
     PATIENT_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
+    ORCD_SERVICE_LIST("XCA::CrossGatewayQuery"),
+    ORCD_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
     ORDER_SERVICE_LIST("XCA::CrossGatewayQuery"),
     ORDER_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
     DISPENSATION_SERVICE_INITIALIZE("XDR::ProvideandRegisterDocumentSet-b"),

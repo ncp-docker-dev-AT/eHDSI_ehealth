@@ -103,12 +103,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 String description = getDescriptionFromDocument(xmlDoc);
                 String atcCode = getAtcCode(xmlDoc);
+                String atcName = getAtcName(xmlDoc);
                 String doseFormCode = getDoseFormCode(xmlDoc);
+                String doseFormName = getDoseFormName(xmlDoc);
                 String strength = getStrength(xmlDoc);
                 String substitution = getSubstitution(xmlDoc);
                 boolean dispensable = getDispensable(xmlDoc);
 
-                var epListParam = new EpListParam(dispensable, atcCode, doseFormCode, strength, substitution);
+                var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
@@ -348,6 +350,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 var prefix = new StringBuilder();
                 var suffix = new StringBuilder();
                 var given = new StringBuilder();
+                var givenAdditional = new StringBuilder();
                 var family = new StringBuilder();
                 for (var i = 0; i < nodeList1.getLength(); i++) {
                     Node node1 = nodeList1.item(i);
@@ -356,16 +359,32 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         logger.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
-                                prefix.append(node1.getTextContent()).append(" ");
+                                if(prefix.length() > 0) {
+                                    prefix.append(" ");
+                                }
+                                prefix.append(node1.getTextContent());
                                 break;
                             case "suffix":
-                                suffix.append(node1.getTextContent()).append(" ");
+                                if(suffix.length() > 0) {
+                                    suffix.append(" ");
+                                }
+                                suffix.append(node1.getTextContent());
                                 break;
                             case "given":
-                                given.append(node1.getTextContent()).append(" ");
+                                if(given.length() <= 0) {
+                                    given.append(node1.getTextContent());
+                                } else {
+                                    if(givenAdditional.length() > 0) {
+                                        givenAdditional.append(" ");
+                                    }
+                                    givenAdditional.append(node1.getTextContent());
+                                }
                                 break;
                             case "family":
-                                family.append(node1.getTextContent()).append(" ");
+                                if(family.length() > 0) {
+                                    family.append(" ");
+                                }
+                                family.append(node1.getTextContent());
                                 break;
                             default:
                                 logger.warn("No Author information to append...");
@@ -373,8 +392,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         }
                     }
                 }
-                author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
-                        StringUtils.trim(family.toString()), suffix);
+                /*
+                    From (https://hl7-definition.caristix.com/v2/HL7v2.5/DataTypes/XCN)
+                    XCN.1 - Id Number
+                    XCN.2 - Family Name
+                    XCN.3 - Given Name (FirstName)
+                    XCN.4 - Second And Further Given Names Or Initials
+                    XCN.5 - Suffix (e.g., Jr Or Iii)
+                    XCN.6 - Prefix (e.g., Dr)
+                    ...
+                */
+                String id = "";
+                author = String.format("%s^%s^%s^%s^%s^%s", id, family, given, givenAdditional, suffix, prefix);
             }
         }
         return StringUtils.trim(author);
@@ -687,18 +716,46 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return atcCode;
     }
 
+    private String getAtcName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcName = null;
+
+        try {
+            atcName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcName;
+    }
+
     private String getDoseFormCode(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
         String doseFormCode = null;
 
         try {
-            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@code", doc);
         } catch (XPathExpressionException e) {
             logger.error("XPath expression error", e);
         }
 
         return doseFormCode;
+    }
+
+    private String getDoseFormName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormName = null;
+
+        try {
+            doseFormName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormName;
     }
 
     private String getStrength(Document doc) {

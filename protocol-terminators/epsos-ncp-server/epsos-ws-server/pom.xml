@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-server</artifactId>
-        <version>5.2.2-SNAPSHOT</version>
+        <version>5.2.3-SNAPSHOT</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -264,8 +264,8 @@
                         WEB-INF/lib/axiom-dom-1.2.21.jar,
                         WEB-INF/lib/commons-codec-1.2.jar,
                         WEB-INF/lib/commons-io-2.1.jar,
-                        WEB-INF/lib/jaxb-api-2.1.jar,
-                        WEB-INF/lib/jaxb-impl-2.2.4-1.jar,
+                        WEB-INF/lib/jaxb-api-2.2.6.jar,
+                        WEB-INF/lib/jaxb-impl-2.2.6.jar,
                         WEB-INF/lib/log4j-1.2.15.jar,
                         WEB-INF/lib/mail-1.4.jar,
                         WEB-INF/lib/neethi-3.0.2.jar,

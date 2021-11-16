@@ -50,7 +50,7 @@ public class DocumentFactory {
      */
     private static EPDocumentMetaData createEPDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                        String repositoryId, String title, String author, String description) {
-        EpListParam epListParam = new EpListParam(true, null, null, null, null);
+        EpListParam epListParam = new EpListParam(true, null, null, null, null, null, null);
         return createEPDocument(documentFormat, id, patientId,
                 effectiveDate, repositoryId,
                 title, author, description,
@@ -90,7 +90,7 @@ public class DocumentFactory {
                                                          String title, String author, String description, String productCode, String productName) {
 
         return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName,
-                new EpListParam(true, null, null, null, null),
+                new EpListParam(true, null, null, null, null, null, null),
                 null,  null, null);
     }
 
@@ -99,7 +99,7 @@ public class DocumentFactory {
 
         return createEPDocumentPDF(id, patientId, effectiveDate, repositoryId, title, author, description,
                 null, null,
-                new EpListParam(dispensable, null, null, null, null),
+                new EpListParam(dispensable, null, null, null, null, null, null),
                 null, null, null);
     }
 
@@ -124,7 +124,7 @@ public class DocumentFactory {
                                                          String title, String author, String description, String productCode, String productName) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName,
-                new EpListParam(true, null, null, null, null),
+                new EpListParam(true, null, null, null,null,null, null),
                 null, null, null);
     }
 
@@ -132,7 +132,7 @@ public class DocumentFactory {
                                                          String title, String author, String description, boolean dispensable) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null,
-                new EpListParam(dispensable, null, null, null, null),
+                new EpListParam(dispensable, null, null, null, null,null, null),
                 null, null, null);
     }
 

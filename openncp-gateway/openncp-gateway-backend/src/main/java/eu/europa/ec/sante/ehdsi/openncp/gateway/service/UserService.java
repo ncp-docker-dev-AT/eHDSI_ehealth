@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.service;
 
 import com.querydsl.core.BooleanBuilder;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.config.ApplicationProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.config.SmtpProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.persistence.model.User;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.persistence.repository.UserRepository;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.security.SecurityUtils;
@@ -33,11 +34,14 @@ public class UserService {
 
     private final ApplicationProperties applicationProperties;
 
-    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder, ApplicationProperties applicationProperties) {
+    private final SmtpProperties smtpProperties;
+
+    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder, ApplicationProperties applicationProperties, SmtpProperties smtpProperties) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
         this.applicationProperties = applicationProperties;
+        this.smtpProperties = smtpProperties;
     }
 
     public List<User> findAll() {
@@ -70,19 +74,19 @@ public class UserService {
     private void sendPasswordResetMail(User user) throws MessagingException {
 
         Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.auth", smtpProperties.getAuth());
+        properties.put("mail.smtp.starttls.enable", smtpProperties.getStartTls().isEnabled());
+        properties.put("mail.smtp.host", smtpProperties.getHost());
+        properties.put("mail.smtp.port", smtpProperties.getPort());
 
         Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("xxxx@gmail.com", "xxxx");
+                return new PasswordAuthentication(smtpProperties.getUsername(), smtpProperties.getPassword());
             }
         });
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress("xxxx@gmail.com", false));
+        message.setFrom(new InternetAddress(applicationProperties.getMail().getFrom(), false));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
         message.setSubject("ehdsi gateway reset password");
         message.setContent("Here is your key for resetting the password : " + user.getResetKey(), "text/html");
@@ -139,8 +143,6 @@ public class UserService {
             user.get().setResetKey(null);
             user.get().setResetDate(null);
             userRepository.saveAndFlush(user.get());
-        } else {
-            // TODO: else return an error message: Password cannot be changed - Error handling
         }
     }
 

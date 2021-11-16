@@ -3,14 +3,18 @@ package fi.kela.se.epsos.data.model;
 public class EpListParam {
     private boolean dispensable;
     private String atcCode;
+    private String atcName;
     private String doseFormCode;
+    private String doseFormName;
     private String strength;
     private String substitution;
 
-    public EpListParam(boolean dispensable, String atcCode, String doseFormCode, String strength, String substitution) {
+    public EpListParam(boolean dispensable, String atcCode, String atcName, String doseFormCode, String doseFormName, String strength, String substitution) {
         this.dispensable = dispensable;
         this.atcCode = atcCode;
+        this.atcName = atcName;
         this.doseFormCode = doseFormCode;
+        this.doseFormName = doseFormName;
         this.strength = strength;
         this.substitution = substitution;
     }
@@ -35,8 +39,16 @@ public class EpListParam {
 
     public void setAtcCode(String atcCode) { this.atcCode = atcCode; }
 
+    public String getAtcName() {
+        return atcName;
+    }
+
     public void setDoseFormCode(String doseFormCode) {
         this.doseFormCode = doseFormCode;
+    }
+
+    public String getDoseFormName() {
+        return doseFormName;
     }
 
     public void setStrength(String strength) {
