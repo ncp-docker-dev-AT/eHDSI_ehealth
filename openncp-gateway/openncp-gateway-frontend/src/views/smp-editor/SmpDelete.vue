@@ -6,17 +6,21 @@
         v-for="item in files"
         :key="item.id"
         class="list-item"
-        @click="confirmDelete(item)"
       >
         <v-list-item-content>
-          <v-list-item-title>{{ item.smptype }}</v-list-item-title>
+          <v-list-item-title>{{ item.smpType }}</v-list-item-title>
           <v-list-item-subtitle>
-            <v-icon>mdi-delete</v-icon>
             <a
               :href="item.reference"
               target="_blank"
               @click="openFile(item, $event)"
-              >{{ item.smpType }}</a
+            >
+              <v-icon>mdi-eye</v-icon>
+              {{ item.smpType }}</a
+            >
+            <v-btn text color="primary" @click="confirmDelete(item)">
+              <v-icon>mdi-delete</v-icon>
+              Delete</v-btn
             >
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -118,7 +122,30 @@ export default {
 }
 </script>
 <style scoped>
+a {
+  text-decoration: none;
+}
+a i {
+  display: inline-block;
+  margin-right: 1rem;
+  color: #2196f3 !important;
+}
+a:hover {
+  color: white !important;
+  transition: color 0.25s;
+}
+a:hover i {
+  color: white !important;
+  transition: color 0.25s;
+}
 .list-item:hover {
   background: #555;
+}
+a:hover {
+  color: white !important;
+  transition: color 0.25s;
+}
+button {
+  float: right;
 }
 </style>
