@@ -5,12 +5,12 @@
 
     <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp</artifactId>
-    <version>5.2.2</version>
+    <version>5.2.3</version>
     <packaging>pom</packaging>
 
     <name>OpenNCP Reference Implementation</name>
     <description>eHealth Digital Service Infrastructure</description>
-    <url>https://ec.europa.eu/cefdigital/wiki/x/8CEZAg</url>
+    <url>https://webgate.ec.europa.eu/fpfis/wikis/x/nCJoNg</url>
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>European Commission - DG Health and Food Safety</name>

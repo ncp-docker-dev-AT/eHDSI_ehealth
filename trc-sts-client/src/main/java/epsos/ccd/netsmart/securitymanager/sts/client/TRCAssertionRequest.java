@@ -118,6 +118,16 @@ public class TRCAssertionRequest extends AssertionRequest {
             SOAPElement patientIdElem = trcParamsElem.addChildElement(patientIdName);
             patientIdElem.addTextNode(patientId);
 
+            if (StringUtils.isNotBlank(dispensationPinCode)) {
+                var dispensationPinCodeName = soapFactory.createName("DispensationPinCode", "trc", TRC_NS);
+                SOAPElement dispensationPinCodeElement = trcParamsElem.addChildElement(dispensationPinCodeName);
+                dispensationPinCodeElement.addTextNode(dispensationPinCode);
+            }
+            if (StringUtils.isNotBlank(prescriptionId)) {
+                var prescriptionIdName = soapFactory.createName("PrescriptionId", "trc", TRC_NS);
+                SOAPElement prescriptionIdElement = trcParamsElem.addChildElement(prescriptionIdName);
+                prescriptionIdElement.addTextNode(prescriptionId);
+            }
         } catch (SOAPException ex) {
             LOGGER.error(null, ex);
         }
