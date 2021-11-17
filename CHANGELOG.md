@@ -3,7 +3,24 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
-## [5.2.1] - 15-11-2021
+## [5.2.3] - 17-11-2021
+The OpenNCP 5.2.3 is the Wave 5 Preparatory Test Event HotFix release.
+This version is an emergency version planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021 as a replacement of version 5.2.2.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP BugFix related to the TRC SAML assertion extra parameters: prescription ID and dispense PIN Code.</li>
+<li>OpenNCP Gateway Portal navigation menu improvement (SMP List services).</li>
+</ul>
+
+### Bug:
+    [EHNCP-2219] - TRC SAML ePrescription ID and dispensePinCode are not processed
+
+### Improvement:
+    [EHNCP-2218] - Gateway Portal - List and delete SMP resources view
+
+## [5.2.2] - 15-11-2021
 The OpenNCP 5.2.2 is the Wave 5 Preparatory Test Event HotFix release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
 Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
