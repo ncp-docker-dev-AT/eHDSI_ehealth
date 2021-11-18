@@ -66,6 +66,7 @@ public class DocumentDts {
 
         result.setAtcCode(document.getAtcCode());
         //result.setDoseFormCode(document.getDoseFormCode());
+        result.setDispensable(document.isDispensable());
         result.setDoseFormCode(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
