@@ -86,7 +86,7 @@ export default {
               response.data
             )
             .then((response) => {
-              if (response.data.statusCode === 201) {
+              if (response.data.statusCode === 200) {
                 this.uploaded = true
                 this.success('Upload is done ')
               } else {

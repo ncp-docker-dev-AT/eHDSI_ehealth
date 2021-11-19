@@ -3,6 +3,7 @@ package eu.epsos.protocolterminators.ws.server.xca.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
+import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
@@ -10,7 +11,7 @@ import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xerces.dom.DeferredElementNSImpl;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -103,12 +104,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 String description = getDescriptionFromDocument(xmlDoc);
                 String atcCode = getAtcCode(xmlDoc);
+                String atcName = getAtcName(xmlDoc);
                 String doseFormCode = getDoseFormCode(xmlDoc);
+                String doseFormName = getDoseFormName(xmlDoc);
                 String strength = getStrength(xmlDoc);
                 String substitution = getSubstitution(xmlDoc);
                 boolean dispensable = getDispensable(xmlDoc);
 
-                var epListParam = new EpListParam(dispensable, atcCode, doseFormCode, strength, substitution);
+                var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
@@ -348,6 +351,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 var prefix = new StringBuilder();
                 var suffix = new StringBuilder();
                 var given = new StringBuilder();
+                var givenAdditional = new StringBuilder();
                 var family = new StringBuilder();
                 for (var i = 0; i < nodeList1.getLength(); i++) {
                     Node node1 = nodeList1.item(i);
@@ -356,16 +360,32 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         logger.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
-                                prefix.append(node1.getTextContent()).append(" ");
+                                if (prefix.length() > 0) {
+                                    prefix.append(" ");
+                                }
+                                prefix.append(node1.getTextContent());
                                 break;
                             case "suffix":
-                                suffix.append(node1.getTextContent()).append(" ");
+                                if (suffix.length() > 0) {
+                                    suffix.append(" ");
+                                }
+                                suffix.append(node1.getTextContent());
                                 break;
                             case "given":
-                                given.append(node1.getTextContent()).append(" ");
+                                if (given.length() <= 0) {
+                                    given.append(node1.getTextContent());
+                                } else {
+                                    if (givenAdditional.length() > 0) {
+                                        givenAdditional.append(" ");
+                                    }
+                                    givenAdditional.append(node1.getTextContent());
+                                }
                                 break;
                             case "family":
-                                family.append(node1.getTextContent()).append(" ");
+                                if (family.length() > 0) {
+                                    family.append(" ");
+                                }
+                                family.append(node1.getTextContent());
                                 break;
                             default:
                                 logger.warn("No Author information to append...");
@@ -373,8 +393,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         }
                     }
                 }
-                author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
-                        StringUtils.trim(family.toString()), suffix);
+                /*
+                    From (https://hl7-definition.caristix.com/v2/HL7v2.5/DataTypes/XCN)
+                    XCN.1 - Id Number
+                    XCN.2 - Family Name
+                    XCN.3 - Given Name (FirstName)
+                    XCN.4 - Second And Further Given Names Or Initials
+                    XCN.5 - Suffix (e.g., Jr Or Iii)
+                    XCN.6 - Prefix (e.g., Dr)
+                    ...
+                */
+                String id = "";
+                author = String.format("%s^%s^%s^%s^%s^%s", id, family, given, givenAdditional, suffix, prefix);
             }
         }
         return StringUtils.trim(author);
@@ -466,8 +496,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) {
 
         logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
-        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
+        Assertion assertion = NationalConnectorUtil.getTRCAssertionFromSOAPHeader(getSOAPHeader());
+        NationalConnectorUtil.logAssertionAsXml(assertion);
 
+        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
         for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
@@ -687,18 +719,46 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return atcCode;
     }
 
+    private String getAtcName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcName = null;
+
+        try {
+            atcName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcName;
+    }
+
     private String getDoseFormCode(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
         String doseFormCode = null;
 
         try {
-            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@code", doc);
         } catch (XPathExpressionException e) {
             logger.error("XPath expression error", e);
         }
 
         return doseFormCode;
+    }
+
+    private String getDoseFormName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormName = null;
+
+        try {
+            doseFormName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormName;
     }
 
     private String getStrength(Document doc) {
@@ -728,12 +788,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
 
         substitution = "Yes"; // default value
-        if(nodeListCode != null && !nodeListCode.isEmpty()) {
+        if (nodeListCode != null && !nodeListCode.isEmpty()) {
             for (Node node : nodeListValue) {
                 String valueAttr = node.getNodeName();
                 String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
                 logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
-                if(valueAttr.equals("value") && codeAttr.equals("N")) {
+                if (valueAttr.equals("value") && codeAttr.equals("N")) {
                     substitution = "No";
                 } else {
                     substitution = "Yes";

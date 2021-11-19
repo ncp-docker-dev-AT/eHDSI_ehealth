@@ -1,7 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.util;
 
 import org.apache.commons.lang3.RegExUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
