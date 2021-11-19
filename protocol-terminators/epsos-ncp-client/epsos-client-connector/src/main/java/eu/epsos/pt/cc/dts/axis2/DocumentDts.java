@@ -69,6 +69,7 @@ public class DocumentDts {
         result.setDoseFormCode(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
+        result.setDispensable(document.isDispensable());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
