@@ -117,7 +117,7 @@ public class ClientConnectorConsumer {
 
     public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
                                                String countryCode, PatientId patientId,
-                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
@@ -155,7 +155,7 @@ public class ClientConnectorConsumer {
      * @return List of patients found (only 1 patient is expected in eHDSI)
      */
     public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions,
-                                                  String countryCode, PatientDemographics patientDemographics) {
+                                                  String countryCode, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -182,7 +182,7 @@ public class ClientConnectorConsumer {
     /**
      * Default Webservice test method available mainly for configuration purpose.
      */
-    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) {
+    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: sayHello(name:'{}')", name);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -200,7 +200,7 @@ public class ClientConnectorConsumer {
 
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode,
-                                           String targetLanguage) {
+                                           String targetLanguage) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
                 countryCode, homeCommunityId, targetLanguage);
@@ -232,14 +232,14 @@ public class ClientConnectorConsumer {
      */
     @Deprecated(since = "2.5.0", forRemoval = true)
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
         return retrieveDocument(assertions, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
     public SubmitDocumentResponse submitDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics patientDemographics) {
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -267,7 +267,7 @@ public class ClientConnectorConsumer {
      *
      * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
      */
-    private ClientConnectorServiceStub initializeServiceStub() {
+    private ClientConnectorServiceStub initializeServiceStub() throws ClientConnectorConsumerException {
 
         try {
 
