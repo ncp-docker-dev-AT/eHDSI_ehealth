@@ -69,33 +69,6 @@ public class ClientConnectorConsumer {
         clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
     }
 
-//    private static void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub, Assertion idAssertion,
-//                                      Optional<Assertion> nokAssertion, Assertion trcAssertion) throws Exception {
-//
-//        if (AssertionHelper.isExpired(idAssertion)) {
-//            throw new ClientConnectorConsumerException("HCP Assertion expired");
-//        }
-//        var omFactory = OMAbstractFactory.getOMFactory();
-//        OMElement omSecurityElement = omFactory.createOMElement(
-//                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-//                        "Security", "wsse"), null);
-//        var assertion = nokAssertion.orElse(null);
-//        if (assertion != null) {
-//            if (AssertionHelper.isExpired(assertion)) {
-//                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-//        }
-//        if (trcAssertion != null) {
-//            if (AssertionHelper.isExpired(trcAssertion)) {
-//                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
-//        }
-//        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-//        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
-//    }
-
     private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
 
         // Adding custom phase for evidence emitter processing.
@@ -129,7 +102,7 @@ public class ClientConnectorConsumer {
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
             GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
-            for(int i = 0; i < classCodes.size(); i++) {
+            for (int i = 0; i < classCodes.size(); i++) {
                 array[i] = classCodes.get(i);
             }
             queryDocumentRequest.setClassCodeArray(array);
@@ -294,7 +267,7 @@ public class ClientConnectorConsumer {
     /**
      * Trims the Patient Demographics sent by the client and received by the Client Connector.
      *
-     * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
+     * @param patientDemographics Identity Traits to be trimmed and provided by the client
      */
     private void trimPatientDemographics(PatientDemographics patientDemographics) {
 
