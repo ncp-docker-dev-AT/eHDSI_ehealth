@@ -69,33 +69,6 @@ public class ClientConnectorConsumer {
         clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
     }
 
-//    private static void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub, Assertion idAssertion,
-//                                      Optional<Assertion> nokAssertion, Assertion trcAssertion) throws Exception {
-//
-//        if (AssertionHelper.isExpired(idAssertion)) {
-//            throw new ClientConnectorConsumerException("HCP Assertion expired");
-//        }
-//        var omFactory = OMAbstractFactory.getOMFactory();
-//        OMElement omSecurityElement = omFactory.createOMElement(
-//                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-//                        "Security", "wsse"), null);
-//        var assertion = nokAssertion.orElse(null);
-//        if (assertion != null) {
-//            if (AssertionHelper.isExpired(assertion)) {
-//                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-//        }
-//        if (trcAssertion != null) {
-//            if (AssertionHelper.isExpired(trcAssertion)) {
-//                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
-//        }
-//        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-//        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
-//    }
-
     private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
 
         // Adding custom phase for evidence emitter processing.
@@ -117,7 +90,7 @@ public class ClientConnectorConsumer {
 
     public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
                                                String countryCode, PatientId patientId,
-                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
@@ -129,7 +102,7 @@ public class ClientConnectorConsumer {
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
             GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
-            for(int i = 0; i < classCodes.size(); i++) {
+            for (int i = 0; i < classCodes.size(); i++) {
                 array[i] = classCodes.get(i);
             }
             queryDocumentRequest.setClassCodeArray(array);
@@ -155,7 +128,7 @@ public class ClientConnectorConsumer {
      * @return List of patients found (only 1 patient is expected in eHDSI)
      */
     public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions,
-                                                  String countryCode, PatientDemographics patientDemographics) {
+                                                  String countryCode, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -182,7 +155,7 @@ public class ClientConnectorConsumer {
     /**
      * Default Webservice test method available mainly for configuration purpose.
      */
-    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) {
+    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: sayHello(name:'{}')", name);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -200,7 +173,7 @@ public class ClientConnectorConsumer {
 
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode,
-                                           String targetLanguage) {
+                                           String targetLanguage) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
                 countryCode, homeCommunityId, targetLanguage);
@@ -232,14 +205,14 @@ public class ClientConnectorConsumer {
      */
     @Deprecated(since = "2.5.0", forRemoval = true)
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
         return retrieveDocument(assertions, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
     public SubmitDocumentResponse submitDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics patientDemographics) {
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -267,7 +240,7 @@ public class ClientConnectorConsumer {
      *
      * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
      */
-    private ClientConnectorServiceStub initializeServiceStub() {
+    private ClientConnectorServiceStub initializeServiceStub() throws ClientConnectorConsumerException {
 
         try {
 
@@ -294,7 +267,7 @@ public class ClientConnectorConsumer {
     /**
      * Trims the Patient Demographics sent by the client and received by the Client Connector.
      *
-     * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
+     * @param patientDemographics Identity Traits to be trimmed and provided by the client
      */
     private void trimPatientDemographics(PatientDemographics patientDemographics) {
 
