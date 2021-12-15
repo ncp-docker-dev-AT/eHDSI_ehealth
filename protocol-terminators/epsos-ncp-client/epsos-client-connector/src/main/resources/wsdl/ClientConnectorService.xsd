@@ -234,5 +234,4 @@
             <xs:element name="maximumSize" type="xs:integer" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
-
 </xs:schema>
