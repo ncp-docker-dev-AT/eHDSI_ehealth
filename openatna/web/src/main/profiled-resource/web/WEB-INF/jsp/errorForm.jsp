@@ -60,9 +60,9 @@
 <div class="main">
 <h1>OpenATNA Error Viewer</h1>
 
-<div class="nav"><a href="query.html">Message Viewer</a></div>
+<div class="nav"><a href="query">Message Viewer</a></div>
 
-<form:form action="errors.html" commandName="queryBean">
+<form:form action="errors" commandName="queryBean">
 <fieldset>
 <legend>Constraints</legend>
 <table>

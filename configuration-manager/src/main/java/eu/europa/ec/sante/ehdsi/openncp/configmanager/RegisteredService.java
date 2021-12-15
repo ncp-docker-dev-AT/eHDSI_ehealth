@@ -10,6 +10,7 @@ public enum RegisteredService {
     CONSENT_SERVICE("ConsentService", "urn:ehealth:ProvisioningOfData:BPPC-RegisterUpdate::XDR::ProvideandRegisterDocumentSet-b##ITI-41"),
     DISPENSATION_SERVICE("DispensationService", "urn:ehealth:ProvisioningOfData:Provide::XDR::ProvideandRegisterDocumentSet-b##ITI-41"),
     ORDER_SERVICE("OrderService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38"),
+    ORCD_SERVICE("OrCDService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38"),
     PATIENT_IDENTIFICATION_SERVICE("PatientIdentificationService", "urn:ehealth:PatientIdentificationAndAuthentication::XCPD::CrossGatewayPatientDiscovery##ITI-55"),
     PATIENT_SERVICE("PatientService", "urn:ehealth:RequestOfData::XCA::CrossGatewayQuery##ITI-38"),
     ITI_39("ITI-39", "urn:ehealth:RequestOfData::XCA::CrossGatewayRetrieve##ITI-39"),

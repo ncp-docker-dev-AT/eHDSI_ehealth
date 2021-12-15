@@ -2,11 +2,11 @@ package eu.epsos.dts.xds;
 
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
@@ -23,7 +23,7 @@ import java.util.TreeMap;
  */
 public final class AdhocQueryResponseConverter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdhocQueryResponseConverter.class);
+    private static final String RIM_CODING_SCHEME = "codingScheme";
 
     /**
      * Private constructor to avoid instantiation.
@@ -34,197 +34,392 @@ public final class AdhocQueryResponseConverter {
     /**
      * Transforms a AdhocQueryResponse in a QueryResponse.
      *
-     * @param response - in AdhocQueryResponse format
+     * @param adhocQueryResponse - in AdhocQueryResponse format
      * @return a QueryResponse object.
      */
-    public static QueryResponse convertAdhocQueryResponse(AdhocQueryResponse response) {
+    public static QueryResponse convertAdhocQueryResponse(AdhocQueryResponse adhocQueryResponse) {
 
-        QueryResponse queryResponse = new QueryResponse();
+        var queryResponse = new QueryResponse();
 
-        if (response.getRegistryObjectList() != null) {
+        if (adhocQueryResponse.getRegistryObjectList() != null) {
             Map<String, String> documentAssociationsMap = new TreeMap<>();
             List<XDSDocument> documents = new ArrayList<>();
-            String str;
+            String classificationScheme;
 
-            for (int i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
-                JAXBElement<?> o = response.getRegistryObjectList().getIdentifiable().get(i);
+            for (var i = 0; i < adhocQueryResponse.getRegistryObjectList().getIdentifiable().size(); i++) {
+                JAXBElement<?> o = adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
                 String declaredTypeName = o.getDeclaredType().getSimpleName();
-                // TODO A.R. What should we do with Association?
-                if ("ExtrinsicObjectType".equals(declaredTypeName)) {
-                    XDSDocument document = new XDSDocument();
-                    JAXBElement<ExtrinsicObjectType> eo;
-                    eo = (JAXBElement<ExtrinsicObjectType>) response.getRegistryObjectList().getIdentifiable().get(i);
+
+                if (StringUtils.equals("ExtrinsicObjectType", declaredTypeName)) {
+                    var xdsDocument = new XDSDocument();
+                    JAXBElement<ExtrinsicObjectType> eo = (JAXBElement<ExtrinsicObjectType>) adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
 
                     //Set id
-                    document.setId(eo.getValue().getId());
+                    xdsDocument.setId(eo.getValue().getId());
 
-                    //Set hcid
-                    document.setHcid(eo.getValue().getHome());
+                    //Set Home Community ID
+                    xdsDocument.setHcid(eo.getValue().getHome());
 
                     // Set name
-                    document.setName(eo.getValue().getName().getLocalizedString().get(0).getValue());
+                    xdsDocument.setName(eo.getValue().getName().getLocalizedString().get(0).getValue());
+
+                    // Set mimeType
+                    xdsDocument.setMimeType(eo.getValue().getMimeType());
 
                     // Set documentUniqueId
-                    for (ExternalIdentifierType idenType : eo.getValue().getExternalIdentifier()) {
-                        if (idenType.getName().getLocalizedString().get(0).getValue().equalsIgnoreCase(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
-                            document.setDocumentUniqueId(idenType.getValue());
-                        }
-                    }
+                    setDocumentUniqueId(eo.getValue(), xdsDocument);
 
-                    for (int j = 0; j < eo.getValue().getSlot().size(); j++) {
-                        str = eo.getValue().getSlot().get(j).getName();
+                    setAdministrativeXdsMetadata(eo.getValue(), xdsDocument);
 
-                        // Set creationTime
-                        if (str.equals("creationTime")) {
-                            document.setCreationTime(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
+                    for (var j = 0; j < eo.getValue().getClassification().size(); j++) {
 
-                        // Set repositoryUniqueId
-                        if (str.equals("repositoryUniqueId")) {
-                            document.setRepositoryUniqueId(eo.getValue().getSlot().get(j).getValueList().getValue().get(0));
-                        }
-                    }
-                    String documentClassCodeType = "";
-                    for (int j = 0; j < eo.getValue().getClassification().size(); j++) {
-                        str = eo.getValue().getClassification().get(j).getClassificationScheme();
+                        ClassificationType classificationType = eo.getValue().getClassification().get(j);
+                        var documentClassCodeType = classificationType.getNodeRepresentation();
+                        classificationScheme = classificationType.getClassificationScheme();
                         //Set isPDF
-                        if (StringUtils.equals(str, IheConstants.FORMAT_CODE_SCHEME)) {
-                            if (eo.getValue().getClassification().get(j).getNodeRepresentation().equals("urn:ihe:iti:xds-sd:pdf:2008")) {
-                                document.setPDF(true);
-                            } else {
-                                document.setPDF(false);
-                            }
-                            // Set FormatCode
-                            document.setFormatCode(eo.getValue().getClassification().get(j).getSlot().get(0).getValueList().getValue().get(0), eo.getValue().getClassification().get(j).getNodeRepresentation());
-                        }
+                        setIsPDF(classificationScheme, classificationType, xdsDocument);
 
                         // Set healthcareFacility
-                        if (str.equals("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")) {
-                            document.setHealthcareFacility(eo.getValue().getClassification().get(j).getName().getLocalizedString().get(0).getValue());
-                        }
+                        setHealthcareFacility(classificationScheme, classificationType, xdsDocument);
 
                         // Set ClassCode
-                        if (str.equals(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME)) {
-                            documentClassCodeType = eo.getValue().getClassification().get(j).getNodeRepresentation();
-                            document.setClassCode(eo.getValue().getClassification().get(j).getSlot().get(0).getValueList().getValue().get(0), documentClassCodeType);
-                        }
+                        setClassCode(documentClassCodeType, classificationScheme, classificationType, xdsDocument);
 
                         // Set AuthorPerson
-                        if (str.equals("urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d") && eo.getValue().getClassification().get(j).getSlot() != null) {
-                            for (SlotType1 slot : eo.getValue().getClassification().get(j).getSlot()) {
-                                if (slot.getName().equals("authorPerson") && slot.getValueList().getValue().get(0) != null) {
-                                    document.setAuthorPerson(slot.getValueList().getValue().get(0));
-                                }
-                            }
-                        }
+                        setAuthorPerson(classificationScheme, classificationType, xdsDocument);
+
+                        // Set ATC Code (ATC => Anatomical Therapeutic Chemical)
+                        setATCCode(classificationScheme, classificationType, xdsDocument);
+
+                        // Set Dose Form Code
+                        setDoseFormCode(classificationScheme, classificationType, xdsDocument);
+
+                        // Set Strength
+                        setStrength(classificationScheme, classificationType, xdsDocument);
+
+                        // Set Substitution
+                        setSubstitution(classificationScheme, classificationType, xdsDocument);
+
+                        // Set Dispensable
+                        setDispensable(documentClassCodeType, eo.getValue(), classificationType, xdsDocument);
+
+                        // Set Reason of Hospitalisation
+                        setReasonOfHospitalisation(classificationScheme, classificationType, xdsDocument);
                     }
 
-                    // Set description
-                    if (eo.getValue().getDescription() != null && !eo.getValue().getDescription().getLocalizedString().isEmpty()) {
+                    //  Set Description
+                    setDescription(eo.getValue(), xdsDocument);
 
-                        if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)) {
+                    //  Add XDS Document processed to the list of documents associated into the QueryResponse.
+                    documents.add(xdsDocument);
 
-                            String status = "N/A";
-                            String code = "N/A";
-                            List<ClassificationType> classificationTypeList = eo.getValue().getClassification();
-                            for (ClassificationType classificationType : classificationTypeList) {
+                } else if (StringUtils.equals("AssociationType1", declaredTypeName)) {
 
-                                if (StringUtils.equals(classificationType.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")) {
-
-                                    if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")
-                                            && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
-                                        status = "Dispensable";
-                                    } else if (StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:closed")
-                                            && StringUtils.equals(classificationType.getSlot().get(0).getValueList().getValue().get(0), "1.3.6.1.4.1.19376.1.2.3")) {
-                                        status = "Not Dispensable";
-                                    } else {
-                                        code = classificationType.getNodeRepresentation();
-                                    }
-                                }
-                            }
-                            document.setDescription("(ATC: " + code + ") - " + eo.getValue().getDescription().getLocalizedString().get(0).getValue() + " / " + status);
-                        } else {
-                            document.setDescription(eo.getValue().getDescription().getLocalizedString().get(0).getValue());
-                        }
-                    }
-                    documents.add(document);
-
-                } else if ("AssociationType1".equals(declaredTypeName)) {
-                    JAXBElement<AssociationType1> eo;
-                    eo = (JAXBElement<AssociationType1>) response.getRegistryObjectList().getIdentifiable().get(i);
-                    if (eo.getValue().getAssociationType().equals("urn:ihe:iti:2007:AssociationType:XFRM")) {
-                        documentAssociationsMap.put(eo.getValue().getSourceObject(), eo.getValue().getTargetObject());
-                    }
+                    JAXBElement<AssociationType1> associationType1JAXBElement = (JAXBElement<AssociationType1>) adhocQueryResponse.getRegistryObjectList().getIdentifiable().get(i);
+                    processDocumentAssociationMap(associationType1JAXBElement, documentAssociationsMap);
                 }
             }
 
+            //  Set Document Associations
             List<XDSDocumentAssociation> documentAssociations = new ArrayList<>();
-            for (Map.Entry<String, String> entry : documentAssociationsMap.entrySet()) {
+            setDocumentAssociations(documentAssociations, documentAssociationsMap, documents);
+            queryResponse.setDocumentAssociations(documentAssociations);
+        }
 
-                String sourceObjectId = entry.getKey();
-                String targetObjectId = entry.getValue();
+        //Set FailureMessages
+        setFailureMessages(queryResponse, adhocQueryResponse);
 
-                XDSDocument sourceObject = null;
-                XDSDocument targetObject = null;
+        return queryResponse;
+    }
 
-                for (XDSDocument doc : documents) {
-                    if (doc.getId().matches(sourceObjectId)) {
-                        sourceObject = doc;
-                    } else if (doc.getId().matches(targetObjectId)) {
-                        targetObject = doc;
-                    } else {
-                        continue;
-                    }
+    private static void processDocumentAssociationMap(JAXBElement<AssociationType1> jaxbElement,
+                                                      Map<String, String> documentAssociationsMap) {
 
-                    if (sourceObject != null && targetObject != null) {
+        if (StringUtils.equals(jaxbElement.getValue().getAssociationType(), "urn:ihe:iti:2007:AssociationType:XFRM")) {
+            documentAssociationsMap.put(jaxbElement.getValue().getSourceObject(), jaxbElement.getValue().getTargetObject());
+        }
+    }
+
+    private static void setAdministrativeXdsMetadata(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
+
+        for (SlotType1 slotType : extrinsicObjectType.getSlot()) {
+            var valueList = slotType.getValueList().getValue();
+            if (CollectionUtils.isNotEmpty(valueList)) {
+                switch (slotType.getName()) {
+                    case "creationTime":
+                        xdsDocument.setCreationTime(valueList.get(0));
                         break;
+                    case "serviceStartTime":
+                        xdsDocument.setEventTime(valueList.get(0));
+                        break;
+                    case "size":
+                        xdsDocument.setSize(valueList.get(0));
+                        break;
+                    case "repositoryUniqueId":
+                        xdsDocument.setRepositoryUniqueId(valueList.get(0));
+                        break;
+                    default:
+                        // No metadata to process.
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void setATCCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var ATC_CODE_SYSTEM_OID = "2.16.840.1.113883.6.73";
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (StringUtils.equals(slot.getName(), RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ATC_CODE_SYSTEM_OID)) {
+                        xdsDocument.setAtcCode(classificationType.getNodeRepresentation());
+                        if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                            xdsDocument.setAtcText(classificationType.getName().getLocalizedString().get(0).getValue());
+                        }
                     }
+                }
+            }
+        }
+    }
+
+    private static void setDoseFormCode(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EDQM_CODE_SYSTEM_OID = "0.4.0.127.0.16.1.1.2.1";
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EDQM_CODE_SYSTEM_OID)) {
+                        xdsDocument.setDoseFormCode(classificationType.getNodeRepresentation());
+                        if (CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                            xdsDocument.setDoseFormText(classificationType.getName().getLocalizedString().get(0).getValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setAuthorPerson(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (classificationScheme.equals(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID) && classificationType.getSlot() != null) {
+            var author = new OrCDDocumentMetaData.Author();
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_PERSON_STR) && CollectionUtils.isNotEmpty(valueList)) {
+                    author.setAuthorPerson(valueList.get(0));
+                } else if (StringUtils.equals(slot.getName(), IheConstants.AUTHOR_SPECIALITY_STR) && CollectionUtils.isNotEmpty(valueList)) {
+                    author.setAuthorSpeciality(valueList);
+                }
+            }
+            xdsDocument.getAuthors().add(author);
+        }
+    }
+
+    private static void setClassCode(String documentClassCodeType, String classificationScheme,
+                                     ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        var valueList = classificationType.getSlot().get(0).getValueList().getValue();
+        if (StringUtils.equals(classificationScheme, XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
+            xdsDocument.setClassCode(valueList.get(0), documentClassCodeType);
+        }
+    }
+
+    private static void setDescription(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
+        if (extrinsicObjectType.getDescription() != null
+                && CollectionUtils.isNotEmpty(extrinsicObjectType.getDescription().getLocalizedString())) {
+            xdsDocument.setDescription(extrinsicObjectType.getDescription().getLocalizedString().get(0).getValue());
+        }
+    }
+
+    private static void setDispensable(String documentClassCodeType, ExtrinsicObjectType extrinsicObjectType,
+                                       ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)
+                && extrinsicObjectType.getDescription() != null
+                && CollectionUtils.isNotEmpty(extrinsicObjectType.getDescription().getLocalizedString())) {
+            var dispensable = false;
+
+            List<ClassificationType> classificationTypeList = classificationType.getClassification();
+            for (ClassificationType type : classificationTypeList) {
+                var valueList = type.getSlot().get(0).getValueList().getValue();
+                if (StringUtils.equals(type.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")
+                        && CollectionUtils.isNotEmpty(valueList)
+                        && StringUtils.equals(valueList.get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+                    if (StringUtils.equals(type.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")) {
+                        dispensable = true;
+                    } else if (StringUtils.equals(type.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:closed")) {
+                        dispensable = false;
+                    }
+                }
+            }
+            xdsDocument.setDispensable(dispensable);
+        }
+    }
+
+    private static void setDocumentUniqueId(ExtrinsicObjectType extrinsicObjectType, XDSDocument xdsDocument) {
+
+        for (ExternalIdentifierType externalIdentifierType : extrinsicObjectType.getExternalIdentifier()) {
+            var localizedStringList = externalIdentifierType.getName().getLocalizedString();
+            if (CollectionUtils.isNotEmpty(localizedStringList) &&
+                    StringUtils.equalsIgnoreCase(localizedStringList.get(0).getValue(),
+                            XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR)) {
+                xdsDocument.setDocumentUniqueId(externalIdentifierType.getValue());
+            }
+        }
+    }
+
+    private static void setDocumentAssociations(List<XDSDocumentAssociation> documentAssociations,
+                                                Map<String, String> documentAssociationsMap, List<XDSDocument> documents) {
+
+        //TODO: 2021-10-13 Implementation of this method should be reviewed to reduce the cognitive complexity and the number of break continue into a loop
+        for (Map.Entry<String, String> entry : documentAssociationsMap.entrySet()) {
+
+            String sourceObjectId = entry.getKey();
+            String targetObjectId = entry.getValue();
+
+            XDSDocument sourceObject = null;
+            XDSDocument targetObject = null;
+
+            for (XDSDocument doc : documents) {
+                if (doc.getId().matches(targetObjectId) && doc.getId().matches(sourceObjectId)) {
+                    //OrCD
+                    sourceObject = doc;
+                    targetObject = doc;
+                } else if (doc.getId().matches(sourceObjectId)) {
+                    sourceObject = doc;
+                } else if (doc.getId().matches(targetObjectId)) {
+                    targetObject = doc;
+                } else {
+                    continue;
                 }
 
                 if (sourceObject != null && targetObject != null) {
-                    XDSDocumentAssociation xdsDocumentAssociation = new XDSDocumentAssociation();
-
-                    if (sourceObject.isPDF()) {
-                        xdsDocumentAssociation.setCdaPDF(sourceObject);
-                    } else {
-                        xdsDocumentAssociation.setCdaXML(sourceObject);
-                    }
-
-                    if (targetObject.isPDF()) {
-                        xdsDocumentAssociation.setCdaPDF(targetObject);
-                    } else {
-                        xdsDocumentAssociation.setCdaXML(targetObject);
-                    }
-
-                    documentAssociations.add(xdsDocumentAssociation);
+                    break;
                 }
-
-                documents.remove(sourceObject);
-                documents.remove(targetObject);
-
             }
 
-            for (XDSDocument doc : documents) {
-                XDSDocumentAssociation xdsDocumentAssociation = new XDSDocumentAssociation();
-                xdsDocumentAssociation.setCdaPDF(doc.isPDF() ? doc : null);
-                xdsDocumentAssociation.setCdaXML(doc.isPDF() ? null : doc);
+            if (sourceObject != null && targetObject != null) {
+                var xdsDocumentAssociation = new XDSDocumentAssociation();
+
+                if (sourceObject.isPDF()) {
+                    xdsDocumentAssociation.setCdaPDF(sourceObject);
+                } else {
+                    xdsDocumentAssociation.setCdaXML(sourceObject);
+                }
+
+                if (targetObject.isPDF()) {
+                    xdsDocumentAssociation.setCdaPDF(targetObject);
+                } else {
+                    xdsDocumentAssociation.setCdaXML(targetObject);
+                }
 
                 documentAssociations.add(xdsDocumentAssociation);
             }
 
-            queryResponse.setDocumentAssociations(documentAssociations);
+            documents.remove(sourceObject);
+            documents.remove(targetObject);
         }
 
-        if (response.getRegistryErrorList() != null) {
-            List<String> errors = new ArrayList<>(response.getRegistryErrorList().getRegistryError().size());
+        for (XDSDocument xdsDocument : documents) {
+            var xdsDocumentAssociation = new XDSDocumentAssociation();
+            xdsDocumentAssociation.setCdaPDF(xdsDocument.isPDF() ? xdsDocument : null);
+            xdsDocumentAssociation.setCdaXML(xdsDocument.isPDF() ? null : xdsDocument);
 
-            for (int i = 0; i < response.getRegistryErrorList().getRegistryError().size(); i++) {
-                errors.add(response.getRegistryErrorList().getRegistryError().get(i).getCodeContext());
+            documentAssociations.add(xdsDocumentAssociation);
+        }
+    }
+
+    private static void setFailureMessages(QueryResponse queryResponse, AdhocQueryResponse adhocQueryResponse) {
+
+        if (adhocQueryResponse.getRegistryErrorList() != null) {
+            List<String> errors = new ArrayList<>(adhocQueryResponse.getRegistryErrorList().getRegistryError().size());
+
+            for (var i = 0; i < adhocQueryResponse.getRegistryErrorList().getRegistryError().size(); i++) {
+                errors.add(adhocQueryResponse.getRegistryErrorList().getRegistryError().get(i).getCodeContext());
             }
 
             queryResponse.setFailureMessages(errors);
         }
+    }
 
-        return queryResponse;
+    private static void setHealthcareFacility(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, "urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1")
+                && classificationType != null
+                && classificationType.getName() != null) {
+            var localizedStringList = classificationType.getName().getLocalizedString();
+            if (CollectionUtils.isNotEmpty(localizedStringList)) {
+                xdsDocument.setHealthcareFacility(localizedStringList.get(0).getValue());
+            }
+        }
+    }
+
+    private static void setIsPDF(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (StringUtils.equals(classificationScheme, IheConstants.FORMAT_CODE_SCHEME)) {
+            xdsDocument.setPDF(classificationType.getNodeRepresentation().equals("urn:ihe:iti:xds-sd:pdf:2008"));
+            var valueList = classificationType.getSlot().get(0).getValueList().getValue();
+            // Set FormatCode
+            if (CollectionUtils.isNotEmpty(valueList)) {
+                xdsDocument.setFormatCode(valueList.get(0), classificationType.getNodeRepresentation());
+            }
+        }
+    }
+
+    private static void setReasonOfHospitalisation(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+
+        if (classificationScheme.equals(IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType != null) {
+            final var ICD_10_CODE_SYSTEM_OID = "1.3.6.1.4.1.12559.11.10.1.3.1.44.2";
+            var code = classificationType.getNodeRepresentation();
+            var text = StringUtils.EMPTY;
+            if (classificationType.getName() != null &&
+                    CollectionUtils.isNotEmpty(classificationType.getName().getLocalizedString())) {
+                text = classificationType.getName().getLocalizedString().get(0).getValue();
+            }
+            for (SlotType1 slot : classificationType.getSlot()) {
+                if (StringUtils.equals(slot.getName(), RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(slot.getValueList().getValue())) {
+                    var codingScheme = slot.getValueList().getValue().get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), ICD_10_CODE_SYSTEM_OID)) {
+                        xdsDocument.setReasonOfHospitalisation(new OrCDDocumentMetaData.ReasonOfHospitalisation(code, codingScheme, text));
+                    }
+                }
+            }
+
+        }
+    }
+
+    private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_Codesystem";
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_STRENGTH_CODE_SYSTEM_OID)) {
+                        xdsDocument.setStrength(classificationType.getNodeRepresentation());
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
+        if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
+            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "eHDSI_Substitution_Codesystem";
+            for (SlotType1 slot : classificationType.getSlot()) {
+                var valueList = slot.getValueList().getValue();
+                if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
+                    var codingScheme = valueList.get(0);
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_SUBSTITUTION_CODE_SYSTEM_OID)) {
+                        xdsDocument.setSubstitution(classificationType.getNodeRepresentation());
+                    }
+                }
+            }
+        }
     }
 }

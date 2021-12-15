@@ -1,6 +1,6 @@
 package epsos.openncp.protocolterminator;
 
-public class ClientConnectorConsumerException extends RuntimeException {
+public class ClientConnectorConsumerException extends Exception {
 
     public ClientConnectorConsumerException(String message) {
         super(message);

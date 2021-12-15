@@ -3,12 +3,15 @@ package eu.epsos.protocolterminators.ws.server.xca.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
+import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,8 +30,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -40,6 +48,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private static final String PATTERN_EP = "epstore.+\\.xml";
     private static final String PATTERN_PS = "psstore.+\\.xml";
     private static final String PATTERN_MRO = "mrostore.+\\.xml";
+    private static final String PATTERN_ORCD_LABORATORY_RESULTS = "orcdstore.11502-2.+\\.xml";
+    private static final String PATTERN_ORCD_HOSPITAL_DISCHARGE_REPORTS = "orcdstore.34105-7.+\\.xml";
+    private static final String PATTERN_ORCD_MEDICAL_IMAGING_REPORTS = "orcdstore.18748-4.+\\.xml";
+    private static final String PATTERN_ORCD_MEDICAL_IMAGES = "orcdstore.x-clinical-image.+\\.xml";
     private static final String CONSTANT_EXTENSION = "extension";
     private static final String EHDSI_HL7_NAMESPACE = "urn:hl7-org:v3";
     private static final String EHDSI_EPSOS_MEDICATION_NAMESPACE = "urn:epsos-org:ep:medication";
@@ -50,12 +62,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private final List<DocumentAssociation<EPDocumentMetaData>> epDocumentMetaDatas = new ArrayList<>();
     private final List<DocumentAssociation<PSDocumentMetaData>> psDocumentMetaDatas = new ArrayList<>();
     private final List<DocumentAssociation<MroDocumentMetaData>> mroDocumentMetaDatas = new ArrayList<>();
+    private final List<OrCDDocumentMetaData> orCDDocumentLaboratoryResultsMetaDatas = new ArrayList<>();
+    private final List<OrCDDocumentMetaData> orCDDocumentHospitalDischargeReportsMetaDatas = new ArrayList<>();
+    private final List<OrCDDocumentMetaData> orCDDocumentMedicalImagingReportsMetaDatas = new ArrayList<>();
+    private final List<OrCDDocumentMetaData> orCDDocumentMedicalImagesMetaDatas = new ArrayList<>();
     private final List<EPSOSDocument> documents = new ArrayList<>();
 
     public DocumentSearchMockImpl() {
 
         Collection<String> documentlist = ResourceList.getResources(Pattern.compile(PATTERN_EP));
-        ResourceLoader resourceLoader = new ResourceLoader();
+        var resourceLoader = new ResourceLoader();
 
         // Mocked ePrescription fill up
         for (String xmlFilename : documentlist) {
@@ -68,7 +84,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
 
             try {
-                String xmlDocString = resourceLoader.getResource(xmlFilename);
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 Document pdfDoc = XMLUtil.parseContent(xmlDocString);
@@ -87,16 +103,25 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 }
 
                 String description = getDescriptionFromDocument(xmlDoc);
+                String atcCode = getAtcCode(xmlDoc);
+                String atcName = getAtcName(xmlDoc);
+                String doseFormCode = getDoseFormCode(xmlDoc);
+                String doseFormName = getDoseFormName(xmlDoc);
+                String strength = getStrength(xmlDoc);
+                String substitution = getSubstitution(xmlDoc);
+                boolean dispensable = getDispensable(xmlDoc);
+
+                var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
                         getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, true,
+                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
                         getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
@@ -119,7 +144,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
 
             try {
-                String xmlDocString = resourceLoader.getResource(xmlFilename);
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 Document pdfDoc = XMLUtil.parseContent(xmlDocString);
@@ -148,6 +173,112 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
         }
 
+        // Mocked OrCDs fill up
+
+        var author = new OrCDDocumentMetaData.Author();
+        author.setAuthorPerson("AuthorPerson OrCD Test");
+        author.setAuthorSpeciality(Arrays.asList("Speciality 1", "Speciality 2", "Speciality 3"));
+
+        List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
+        authors.add(author);
+
+        var reasonOfHospitalisation = new OrCDDocumentMetaData.ReasonOfHospitalisation("K56.2", "1.3.6.1.4.1.12559.11.10.1.3.1.44.2", "Volvulus");
+
+        /* Hospital Discharge Reports */
+        documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_HOSPITAL_DISCHARGE_REPORTS));
+        for (String xmlFilename : documentlist) {
+            logger.debug("Reading file '{}", xmlFilename);
+            try {
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
+                Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                long size = getFileSize(xmlFilename);
+                addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
+                logger.debug("Parsing OrCD patient demographics");
+                PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+
+                OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDHospitalDischargeReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
+                        getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
+                orCDDocumentHospitalDischargeReportsMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
+
+            } catch (Exception e) {
+                logger.warn("Could not read file at " + xmlFilename, e);
+            }
+        }
+
+        /* Laboratory Results */
+        documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_LABORATORY_RESULTS));
+        for (String xmlFilename : documentlist) {
+            logger.debug("Reading file '{}", xmlFilename);
+            try {
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
+                Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                long size = getFileSize(xmlFilename);
+                addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
+                logger.debug("Parsing OrCD patient demographics");
+                PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+
+                OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDLaboratoryResultsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
+                        getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors);
+                documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
+                orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
+            } catch (Exception e) {
+                logger.warn("Could not read file at " + xmlFilename, e);
+            }
+        }
+
+        /* Medical Imaging Reports */
+        documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_MEDICAL_IMAGING_REPORTS));
+        for (String xmlFilename : documentlist) {
+            logger.debug("Reading file '{}", xmlFilename);
+            try {
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
+                Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                long size = getFileSize(xmlFilename);
+                addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
+                logger.debug("Parsing OrCD patient demographics");
+                PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+
+                OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagingReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
+                        getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
+
+                orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
+            } catch (Exception e) {
+                logger.warn("Could not read file at " + xmlFilename, e);
+            }
+        }
+
+        /* Medical Images */
+        documentlist = ResourceList.getResources(Pattern.compile(PATTERN_ORCD_MEDICAL_IMAGES));
+        for (String xmlFilename : documentlist) {
+            logger.debug("Reading file '{}'", xmlFilename);
+            try {
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
+                Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                long size = getFileSize(xmlFilename);
+                addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
+                logger.debug("Parsing OrCD patient demographics");
+                PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
+
+                OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagesDocument(getOIDFromDocument(xmlDoc), pd.getId(),
+                        getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size, authors, reasonOfHospitalisation);
+                documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
+
+                orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
+                logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
+            } catch (Exception e) {
+                logger.warn("Could not read file at " + xmlFilename, e);
+            }
+        }
+
         // Mocked MROs fill up
         documentlist = ResourceList.getResources(Pattern.compile(PATTERN_MRO));
 
@@ -160,7 +291,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
 
             try {
-                String xmlDocString = resourceLoader.getResource(xmlFilename);
+                var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = loadCDADocument(xmlDocString);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 Document pdfDoc = loadCDADocument(xmlDocString);
@@ -189,6 +320,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
     }
 
+    private long getFileSize(String xmlFilename) throws IOException {
+        var classLoader = getClass().getClassLoader();
+        InputStream is = classLoader.getResourceAsStream(xmlFilename);
+        var tempFile = new File("temp.xml");
+        FileUtils.copyInputStreamToFile(is, tempFile);
+        long bytes = tempFile.length();
+        tempFile.delete();
+        return bytes;
+    }
+
     private Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -202,32 +343,49 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private String getClinicalDocumentAuthor(Document doc) {
 
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/author/assignedAuthor/assignedPerson/name");
-        String author = "";
+        var author = "";
         for (Node node : nodeList) {
 
             NodeList nodeList1 = node.getChildNodes();
             if (nodeList1 != null) {
-                StringBuilder prefix = new StringBuilder();
-                StringBuilder suffix = new StringBuilder();
-                StringBuilder given = new StringBuilder();
-                StringBuilder family = new StringBuilder();
-                for (int i = 0; i < nodeList1.getLength(); i++) {
+                var prefix = new StringBuilder();
+                var suffix = new StringBuilder();
+                var given = new StringBuilder();
+                var givenAdditional = new StringBuilder();
+                var family = new StringBuilder();
+                for (var i = 0; i < nodeList1.getLength(); i++) {
                     Node node1 = nodeList1.item(i);
 
                     if (node1.getNodeType() == Node.ELEMENT_NODE) {
                         logger.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
-                                prefix.append(node1.getTextContent()).append(" ");
+                                if (prefix.length() > 0) {
+                                    prefix.append(" ");
+                                }
+                                prefix.append(node1.getTextContent());
                                 break;
                             case "suffix":
-                                suffix.append(node1.getTextContent()).append(" ");
+                                if (suffix.length() > 0) {
+                                    suffix.append(" ");
+                                }
+                                suffix.append(node1.getTextContent());
                                 break;
                             case "given":
-                                given.append(node1.getTextContent()).append(" ");
+                                if (given.length() <= 0) {
+                                    given.append(node1.getTextContent());
+                                } else {
+                                    if (givenAdditional.length() > 0) {
+                                        givenAdditional.append(" ");
+                                    }
+                                    givenAdditional.append(node1.getTextContent());
+                                }
                                 break;
                             case "family":
-                                family.append(node1.getTextContent()).append(" ");
+                                if (family.length() > 0) {
+                                    family.append(" ");
+                                }
+                                family.append(node1.getTextContent());
                                 break;
                             default:
                                 logger.warn("No Author information to append...");
@@ -235,8 +393,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         }
                     }
                 }
-                author = String.format("%s %s %s %s", StringUtils.trim(prefix.toString()), StringUtils.trim(given.toString()),
-                        StringUtils.trim(family.toString()), suffix);
+                /*
+                    From (https://hl7-definition.caristix.com/v2/HL7v2.5/DataTypes/XCN)
+                    XCN.1 - Id Number
+                    XCN.2 - Family Name
+                    XCN.3 - Given Name (FirstName)
+                    XCN.4 - Second And Further Given Names Or Initials
+                    XCN.5 - Suffix (e.g., Jr Or Iii)
+                    XCN.6 - Prefix (e.g., Dr)
+                    ...
+                */
+                String id = "";
+                author = String.format("%s^%s^%s^%s^%s^%s", id, family, given, givenAdditional, suffix, prefix);
             }
         }
         return StringUtils.trim(author);
@@ -244,7 +412,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     private String getClinicalDocumentConfidentialityDisplay(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
-        String display = "";
+        var display = "";
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("displayName") != null) {
                 display = node.getAttributes().getNamedItem("displayName").getTextContent();
@@ -254,9 +422,35 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return StringUtils.trim(display);
     }
 
+    private Date getCreationDateFromDocument(Document doc) throws ParseException {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/effectiveTime");
+        Date creationDate = null;
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("value") != null) {
+                var simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssZ");
+                creationDate = simpleDateFormat.parse(node.getAttributes().getNamedItem("value").getTextContent());
+                logger.debug("creationDate: '{}'", creationDate);
+            }
+        }
+        return creationDate;
+    }
+
+    private Date getServiceStartTimeFromDocument(Document doc) throws ParseException {
+        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/documentationOf/serviceEvent/effectiveTime/high");
+        Date serviceStartTime = null;
+        for (Node node : nodeList) {
+            if (node.getAttributes().getNamedItem("value") != null) {
+                var simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                serviceStartTime = simpleDateFormat.parse(node.getAttributes().getNamedItem("value").getTextContent());
+                logger.debug("serviceStartTime: '{}'", serviceStartTime);
+            }
+        }
+        return serviceStartTime;
+    }
+
     private String getClinicalDocumentConfidentialityCode(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
-        String code = "";
+        var code = "";
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("code") != null) {
                 code = node.getAttributes().getNamedItem("code").getTextContent();
@@ -268,22 +462,20 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
     private String getClinicalDocumentLanguage(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
-        String code = "";
+        var documentLanguage = "";
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("code") != null) {
-                code = node.getAttributes().getNamedItem("code").getTextContent();
-                logger.debug("confidentiality code: '{}'", code);
+                documentLanguage = node.getAttributes().getNamedItem("code").getTextContent();
+                logger.debug("clinical Document language: '{}'", documentLanguage);
             }
         }
-        return StringUtils.trim(code);
+        return StringUtils.trim(documentLanguage);
     }
 
     @Override
     public DocumentAssociation<PSDocumentMetaData> getPSDocumentList(SearchCriteria searchCriteria) {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("[National Infrastructure Mock] Get Patient Summary Document List: '{}'", searchCriteria.toString());
-        }
+        logger.info("[National Infrastructure Mock] Get Patient Summary Document List: '{}'", searchCriteria.toString());
         for (DocumentAssociation<PSDocumentMetaData> documentAssociation : psDocumentMetaDatas) {
 
             if (documentAssociation.getXMLDocumentMetaData() != null) {
@@ -293,9 +485,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
-                }
+                logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 return documentAssociation;
             }
         }
@@ -305,18 +495,72 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     @Override
     public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
-        }
-        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
+        logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
+        Assertion assertion = NationalConnectorUtil.getTRCAssertionFromSOAPHeader(getSOAPHeader());
+        NationalConnectorUtil.logAssertionAsXml(assertion);
 
+        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
         for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 metaDatas.add(documentAssociation);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
-                }
+                logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
+            }
+        }
+        return metaDatas;
+    }
+
+    @Override
+    public List<OrCDDocumentMetaData> getOrCDHospitalDischargeReportsDocumentList(SearchCriteria searchCriteria) {
+        logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Hospital Discharge Reports: '{}'", searchCriteria.toString());
+        return getOrCDDocumentList(searchCriteria, orCDDocumentHospitalDischargeReportsMetaDatas);
+    }
+
+    @Override
+    public List<OrCDDocumentMetaData> getOrCDLaboratoryResultsDocumentList(SearchCriteria searchCriteria) {
+        logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Laboratory results: '{}'", searchCriteria.toString());
+        return getOrCDDocumentList(searchCriteria, orCDDocumentLaboratoryResultsMetaDatas);
+    }
+
+    @Override
+    public List<OrCDDocumentMetaData> getOrCDMedicalImagingReportsDocumentList(SearchCriteria searchCriteria) {
+        logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Medical Imaging Reports: '{}'", searchCriteria.toString());
+        return getOrCDDocumentList(searchCriteria, orCDDocumentMedicalImagingReportsMetaDatas);
+    }
+
+    @Override
+    public List<OrCDDocumentMetaData> getOrCDMedicalImagesDocumentList(SearchCriteria searchCriteria) {
+        logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Medical Images: '{}'", searchCriteria.toString());
+        return getOrCDDocumentList(searchCriteria, orCDDocumentMedicalImagesMetaDatas);
+    }
+
+    private List<OrCDDocumentMetaData> getOrCDDocumentList(SearchCriteria searchCriteria, List<OrCDDocumentMetaData> orCDMetaDataList) {
+        List<OrCDDocumentMetaData> metaDatas = new ArrayList<>();
+
+        Long maximumSize = null;
+        var maximumSizeCriteriaString = searchCriteria.getCriteriaValue(Criteria.MaximumSize);
+        if (!StringUtils.isEmpty(maximumSizeCriteriaString)) {
+            maximumSize = Long.parseLong(maximumSizeCriteriaString);
+        }
+        Instant createdAfter = null;
+        var createdAfterCriteriaString = searchCriteria.getCriteriaValue(Criteria.CreatedAfter);
+        if (createdAfterCriteriaString != null) {
+            createdAfter = Instant.parse(createdAfterCriteriaString);
+        }
+        Instant createdBefore = null;
+        var createdBeforeCriteriaString = searchCriteria.getCriteriaValue(Criteria.CreatedBefore);
+        if (createdBeforeCriteriaString != null) {
+            createdBefore = Instant.parse(createdBeforeCriteriaString);
+        }
+
+        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMetaDataList) {
+            var creationInstant = orCDDocumentMetaData.getEffectiveTime().toInstant();
+            if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))
+                    && (maximumSize == null || orCDDocumentMetaData.getSize() <= maximumSize)
+                    && (createdBefore == null || (creationInstant.compareTo(createdBefore) <= 0))
+                    && (createdAfter == null || (createdAfter.compareTo(creationInstant) <= 0))) {
+                metaDatas.add(orCDDocumentMetaData);
+                logger.debug("getOrCDDocumentList(SearchCriteria searchCriteria): '{}'", orCDDocumentMetaData);
             }
         }
         return metaDatas;
@@ -329,9 +573,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 searchCriteria.getCriteriaValue(Criteria.PatientId), searchCriteria.getCriteriaValue(Criteria.RepositoryId));
         for (EPSOSDocument epsosDocument : documents) {
             if (epsosDocument.matchesCriteria(searchCriteria)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getDocument(SearchCriteria searchCriteria): '{}'", epsosDocument);
-                }
+                logger.debug("getDocument(SearchCriteria searchCriteria): '{}'", epsosDocument);
                 return epsosDocument;
             }
         }
@@ -342,16 +584,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     @Override
     public DocumentAssociation<MroDocumentMetaData> getMroDocumentList(SearchCriteria searchCriteria) {
 
-        if (logger.isInfoEnabled()) {
-            logger.info("[National Infrastructure Mock] Get Medication Related Overview Document List: '{}'", searchCriteria.toString());
-        }
+        logger.info("[National Infrastructure Mock] Get Medication Related Overview Document List: '{}'", searchCriteria.toString());
         for (DocumentAssociation<MroDocumentMetaData> documentAssociation : mroDocumentMetaDatas) {
 
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && documentAssociation.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PatientId))) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("getMroDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
-                }
+                logger.debug("getMroDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 return documentAssociation;
             }
         }
@@ -359,13 +597,9 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return null;
     }
 
-    /**
-     * @param document
-     * @return
-     */
     private String getOIDFromDocument(Document document) {
 
-        String oid = "";
+        var oid = "";
         if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
             Node id = document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").item(0);
             if (id.getAttributes().getNamedItem("root") != null) {
@@ -379,10 +613,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return oid;
     }
 
-    /**
-     * @param doc
-     * @return
-     */
     private String getTitleFromDocument(Document doc) {
 
         NodeList documentNames = doc.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "title");
@@ -395,7 +625,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return "Document Title Not Available";
     }
 
-
     private Element getProductFromPrescription(Document document) {
         NodeList elements = document.getElementsByTagNameNS(EHDSI_EPSOS_MEDICATION_NAMESPACE, "generalizedMedicineClass");
         if (elements.getLength() == 0) {
@@ -403,7 +632,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
         NodeList children = elements.item(0)
                 .getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
+        for (var i = 0; i < children.getLength(); i++) {
             Node node = children.item(i);
             if (Objects.equals(Node.ELEMENT_NODE, node.getNodeType()) &&
                     Objects.equals("code", node.getLocalName())) {
@@ -448,10 +677,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         logger.debug("PDF document added.");
     }
 
-    /**
-     * @param document
-     * @param format
-     */
     private void addFormatToOID(Document document, int format) {
 
         if (document.getElementsByTagNameNS(EHDSI_HL7_NAMESPACE, "id").getLength() > 0) {
@@ -478,5 +703,108 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         return description;
+    }
+
+    private String getAtcCode(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcCode = null;
+
+        try {
+            atcCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@code", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcCode;
+    }
+
+    private String getAtcName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String atcName = null;
+
+        try {
+            atcName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asSpecializedKind']/*[local-name()='generalizedMedicineClass']/*[local-name()='code']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return atcName;
+    }
+
+    private String getDoseFormCode(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormCode = null;
+
+        try {
+            doseFormCode = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@code", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormCode;
+    }
+
+    private String getDoseFormName(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String doseFormName = null;
+
+        try {
+            doseFormName = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='formCode']/@displayName", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return doseFormName;
+    }
+
+    private String getStrength(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String strength = null;
+
+        try {
+            //strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='asContent']/*[local-name()='containerPackagedMedicine']/*[local-name()='capacityQuantity']/@value", doc);
+            strength = path.evaluate("//*[local-name()='manufacturedMaterial']/*[local-name()='desc']/text()", doc);
+        } catch (XPathExpressionException e) {
+            logger.error("XPath expression error", e);
+        }
+
+        return strength;
+    }
+
+    private String getSubstitution(Document doc) {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath path = factory.newXPath();
+        String substitution;
+
+        //substitution = path.evaluate("//*[local-name()='entryRelationship']/*[local-name()='observation']/*[local-name()='SubstanceAdminSubstitution']/@value", doc);
+        // Substitution is always allowed in Country B unless formally specified SUBST with code=N which means no substitution,
+        // all other cases (No SUBST element, code G=Generic or code TE=Therapeutic alternative means substitution is allowed
+        List<Node> nodeListCode = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/code[@code = 'SUBST']");
+        List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
+
+        substitution = "Yes"; // default value
+        if (nodeListCode != null && !nodeListCode.isEmpty()) {
+            for (Node node : nodeListValue) {
+                String valueAttr = node.getNodeName();
+                String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
+                logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
+                if (valueAttr.equals("value") && codeAttr.equals("N")) {
+                    substitution = "No";
+                } else {
+                    substitution = "Yes";
+                }
+                break;
+            }
+        }
+        return substitution;
+    }
+
+    private boolean getDispensable(Document xmlDoc) {
+        return true;
     }
 }

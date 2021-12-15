@@ -5,12 +5,12 @@
 
     <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenNCP Reference Implementation</name>
     <description>eHealth Digital Service Infrastructure</description>
-    <url>https://ec.europa.eu/cefdigital/wiki/x/8CEZAg</url>
+    <url>https://webgate.ec.europa.eu/fpfis/wikis/x/nCJoNg</url>
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>European Commission - DG Health and Food Safety</name>
@@ -39,6 +39,7 @@
         <module>assertion-validator</module>
         <module>cda-display-tool</module>
         <module>default-policy-manager</module>
+        <module>security-token-service</module>
         <module>trc-sts</module>
         <module>trc-sts-client</module>
         <module>tsam</module>
@@ -97,9 +98,10 @@
         <commons-codec.version>1.15</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-configuration.version>1.10</commons-configuration.version>
+        <commons-configuration2.version>2.7</commons-configuration2.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
-        <commons-io.version>2.8.0</commons-io.version>
+        <commons-io.version>2.11.0</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-text.version>1.9</commons-text.version>
@@ -116,15 +118,17 @@
         <jasperreports.version>6.16.0</jasperreports.version>
         <javamelody.version>1.87.0</javamelody.version>
         <javassist.version>3.12.0.GA</javassist.version>
-        <jaxb-api.version>2.3.0</jaxb-api.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-core.version>2.3.0.1</jaxb-core.version>
+        <jaxb-impl.version>2.3.5</jaxb-impl.version>
         <joda-time.version>2.10.6</joda-time.version>
         <jsp-api.version>2.0</jsp-api.version>
         <jstl.version>1.2</jstl.version>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.13.2</junit.version>
         <logback.version>1.2.3</logback.version>
         <mail.version>1.6.2</mail.version>
-        <mariadb-connector.version>2.6.2</mariadb-connector.version>
-        <mysql-connector.version>8.0.25</mysql-connector.version>
+        <mariadb-connector.version>2.7.4</mariadb-connector.version>
+        <mysql-connector.version>8.0.27</mysql-connector.version>
         <naming-java.version>0.8</naming-java.version>
         <oracle-connector.version>12.2.0.1</oracle-connector.version>
         <opensaml.version>4.0.1</opensaml.version>
@@ -134,15 +138,16 @@
         <saxon-he.version>9.5.1-8</saxon-he.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
-        <spring.version>5.2.12.RELEASE</spring.version>
-        <spring.data.jpa.version>2.3.6.RELEASE</spring.data.jpa.version>
+        <spring-boot.version>2.5.2</spring-boot.version>
+        <spring.version>5.3.8</spring.version>
+        <spring-tx.version>5.2.15.RELEASE</spring-tx.version>
+        <spring.data.jpa.version>2.3.9.RELEASE</spring.data.jpa.version>
         <xalan.version>2.7.2</xalan.version>
-        <xerces.version>2.12.0</xerces.version>
+        <xerces.version>2.12.1</xerces.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
-        <xmlsec.version>2.1.5</xmlsec.version>
+        <xmlsec.version>2.1.7</xmlsec.version>
         <xml-apis.version>1.4.01</xml-apis.version>
-        <xstream.version>1.4.17</xstream.version>
+        <xstream.version>1.4.18</xstream.version>
     </properties>
 
     <dependencyManagement>
@@ -230,7 +235,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.7</version>
+                <version>${commons-configuration2.version}</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
@@ -314,12 +319,12 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>2.3.0</version>
+                <version>${jaxb-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>2.3.0</version>
+                <version>${jaxb-impl.version}</version>
             </dependency>
             <!-- Test Dependencies -->
             <dependency>
@@ -374,22 +379,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
@@ -401,17 +406,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.22.0</version>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -421,42 +426,42 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.10.0</version>
+                    <version>3.14.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.0</version>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.4.1.1168</version>
+                    <version>3.9.0.2155</version>
                 </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.1.6</version>
+                    <version>6.2.2</version>
                     <executions>
                         <execution>
                             <goals>
@@ -473,6 +478,28 @@
     <profiles>
         <profile>
             <id>national-build</id>
+        </profile>
+        <profile>
+            <id>security-check</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>6.2.2</version>
+                        <!--<configuration>
+                            <suppressionFiles>${basedir}/suppressed.xml</suppressionFiles>
+                        </configuration>-->
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

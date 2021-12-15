@@ -279,7 +279,7 @@ public class EadcUtilWrapper {
     /**
      * Extracts the sending country ISO code from Issuer of the given Assertion.
      * E.g., for this issuer:
-     * <saml2:Issuer NameQualifier="urn:epsos:wp34:assertions">urn:idp:PT:countryB</saml2:Issuer> it will extract "PT"
+     * <saml2:Issuer NameQualifier="urn:ehdsi:assertions:hcp">urn:idp:PT:countryB</saml2:Issuer> it will extract "PT"
      *
      * @param idAssertion
      * @return String containing the assertion issuer's ISO country code

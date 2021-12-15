@@ -4,6 +4,7 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceStub;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -11,6 +12,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -21,6 +23,7 @@ import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /*
  *  ClientConnectorConsumer
@@ -28,7 +31,7 @@ import java.util.List;
 public class ClientConnectorConsumer {
 
     // Default timeout set to Three minutes.
-    private static final long TIMEOUT = 180000;
+    private static final Integer TIMEOUT = 180000;
     private final Logger logger = LoggerFactory.getLogger(ClientConnectorConsumer.class);
     private final String endpointReference;
 
@@ -37,32 +40,43 @@ public class ClientConnectorConsumer {
         this.endpointReference = endpointReference;
     }
 
-    private static void addAssertions(ClientConnectorServiceStub stub, Assertion idAssertion, Assertion trcAssertion)
-            throws Exception {
+    private static void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub,
+                                      Map<AssertionEnum, Assertion> assertions) throws Exception {
 
-        if (AssertionHelper.isExpired(idAssertion)) {
+        if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
             throw new ClientConnectorConsumerException("HCP Assertion expired");
         }
         var omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                "Security", "wsse"), null);
-        if (trcAssertion != null) {
-            if (AssertionHelper.isExpired(trcAssertion)) {
-                throw new ClientConnectorConsumerException("TRC Assertion expired");
+        OMElement omSecurityElement = omFactory.createOMElement(
+                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                        "Security", "wsse"), null);
+        if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
+            var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
+            if (AssertionHelper.isExpired(assertion)) {
+                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
             }
-            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
+            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         }
-        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-        stub._getServiceClient().addHeader(omSecurityElement);
+        if (assertions.containsKey(AssertionEnum.TREATMENT)) {
+            var assertion = assertions.get(AssertionEnum.TREATMENT);
+            if (AssertionHelper.isExpired(assertion)) {
+                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
+            }
+            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
+        }
+        var assertion = assertions.get(AssertionEnum.CLINICIAN);
+        omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
+        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
     }
 
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceStub stub) {
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
 
         // Adding custom phase for evidence emitter processing.
-        logger.debug("Adding custom phase for outflow evidence emitter processing");
+        logger.debug("Adding custom phase for Outflow Evidence Emitter processing");
         var outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
         outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
-        var axisConfiguration = stub._getServiceClient().getServiceContext().getConfigurationContext().getAxisConfiguration();
+        var axisConfiguration = clientConnectorServiceStub._getServiceClient().getServiceContext()
+                .getConfigurationContext().getAxisConfiguration();
         List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
         var outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
         try {
@@ -71,29 +85,34 @@ public class ClientConnectorConsumer {
             logger.error("PhaseException: '{}'", ex.getMessage(), ex);
         }
         outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
-        logger.debug("Resetting global Out phases");
         axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
-        logger.debug("Ended phases restructuring");
     }
 
-    public List<EpsosDocument1> queryDocuments(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                               PatientId patientId, GenericDocumentCode classCode) {
+    public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
+                                               String countryCode, PatientId patientId,
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
-        ClientConnectorServiceStub stub = initializeServiceStub();
+        var clientConnectorServiceStub = initializeServiceStub();
 
         try {
-            addAssertions(stub, idAssertion, trcAssertion);
+            addAssertions(clientConnectorServiceStub, assertions);
 
             var queryDocumentsDocument = QueryDocumentsDocument.Factory.newInstance();
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
-            queryDocumentRequest.setClassCode(classCode);
+            GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
+            for (int i = 0; i < classCodes.size(); i++) {
+                array[i] = classCodes.get(i);
+            }
+            queryDocumentRequest.setClassCodeArray(array);
+//            queryDocumentRequest.setClassCodeArray(classCodes.toArray(GenericDocumentCode[]::new));
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
+            queryDocumentRequest.setFilterParams(filterParams);
 
             QueryDocumentsResponseDocument queryDocumentsResponseDocument;
-            queryDocumentsResponseDocument = stub.queryDocuments(queryDocumentsDocument);
+            queryDocumentsResponseDocument = clientConnectorServiceStub.queryDocuments(queryDocumentsDocument);
             EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
 
             return Arrays.asList(docArray);
@@ -103,19 +122,20 @@ public class ClientConnectorConsumer {
     }
 
     /**
-     * @param idAssertion         - HCP assertions
+     * @param assertions          - Map of assertions used to identify clinician and next of kin.
      * @param countryCode         - Country of treatment
      * @param patientDemographics - Identifiers of the requested patient
      * @return List of patients found (only 1 patient is expected in eHDSI)
      */
-    public List<PatientDemographics> queryPatient(Assertion idAssertion, String countryCode, PatientDemographics patientDemographics) {
+    public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions,
+                                                  String countryCode, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
-        ClientConnectorServiceStub stub = initializeServiceStub();
+        var clientConnectorServiceStub = initializeServiceStub();
 
         try {
             trimPatientDemographics(patientDemographics);
-            addAssertions(stub, idAssertion, null);
+            addAssertions(clientConnectorServiceStub, assertions);
             var queryPatientRequest = QueryPatientRequest.Factory.newInstance();
             queryPatientRequest.setPatientDemographics(patientDemographics);
             queryPatientRequest.setCountryCode(countryCode);
@@ -123,7 +143,8 @@ public class ClientConnectorConsumer {
             var queryPatientDocument = QueryPatientDocument.Factory.newInstance();
             queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
 
-            var queryPatientResponseDocument = stub.queryPatient(queryPatientDocument);
+            var queryPatientResponseDocument =
+                    clientConnectorServiceStub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (Exception ex) {
@@ -134,31 +155,32 @@ public class ClientConnectorConsumer {
     /**
      * Default Webservice test method available mainly for configuration purpose.
      */
-    public String sayHello(Assertion idAssertion, String name) {
+    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: sayHello(name:'{}')", name);
-        ClientConnectorServiceStub stub = initializeServiceStub();
+        var clientConnectorServiceStub = initializeServiceStub();
         try {
-            addAssertions(stub, idAssertion, null);
+            addAssertions(clientConnectorServiceStub, assertions);
             var sayHelloDocument = SayHelloDocument.Factory.newInstance();
             sayHelloDocument.addNewSayHello().setArg0(name);
 
-            var sayHelloResponseDocument = stub.sayHello(sayHelloDocument);
+            var sayHelloResponseDocument = clientConnectorServiceStub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
     }
 
-    public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode, DocumentId documentId,
-                                           String homeCommunityId, GenericDocumentCode classCode, String targetLanguage) {
+    public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode,
+                                           String targetLanguage) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
                 countryCode, homeCommunityId, targetLanguage);
-        ClientConnectorServiceStub clientConnectorStub = initializeServiceStub();
+        var clientConnectorServiceStub = initializeServiceStub();
 
         try {
-            addAssertions(clientConnectorStub, idAssertion, trcAssertion);
+            addAssertions(clientConnectorServiceStub, assertions);
             RetrieveDocumentDocument1 retrieveDocumentDocument = RetrieveDocumentDocument1.Factory.newInstance();
             RetrieveDocument1 retrieveDocument = retrieveDocumentDocument.addNewRetrieveDocument();
 
@@ -169,7 +191,8 @@ public class ClientConnectorConsumer {
             retrieveDocumentRequest.setClassCode(classCode);
             retrieveDocumentRequest.setTargetLanguage(targetLanguage);
 
-            var retrieveDocumentResponseDocument = clientConnectorStub.retrieveDocument(retrieveDocumentDocument);
+            var retrieveDocumentResponseDocument =
+                    clientConnectorServiceStub.retrieveDocument(retrieveDocumentDocument);
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
         } catch (Exception ex) {
@@ -181,33 +204,32 @@ public class ClientConnectorConsumer {
      * @deprecated Method has been deprecated in favor of the implementation of retrieveDocument() with language parameter.
      */
     @Deprecated(since = "2.5.0", forRemoval = true)
-    public EpsosDocument1 retrieveDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
+    public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
-        return retrieveDocument(idAssertion, trcAssertion, countryCode, documentId, homeCommunityId, classCode, null);
+        return retrieveDocument(assertions, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
-    public SubmitDocumentResponse submitDocument(Assertion idAssertion, Assertion trcAssertion, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics patientDemographics) {
+    public SubmitDocumentResponse submitDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
-        ClientConnectorServiceStub stub = initializeServiceStub();
+        var clientConnectorServiceStub = initializeServiceStub();
 
         try {
             trimPatientDemographics(patientDemographics);
-            addAssertions(stub, idAssertion, trcAssertion);
+            addAssertions(clientConnectorServiceStub, assertions);
             SubmitDocumentDocument1 submitDocumentDoc = SubmitDocumentDocument1.Factory.newInstance();
             SubmitDocument1 submitDocument = SubmitDocument1.Factory.newInstance();
             SubmitDocumentRequest submitDocRequest = SubmitDocumentRequest.Factory.newInstance();
-
             submitDocRequest.setPatientDemographics(patientDemographics);
             submitDocRequest.setDocument(document);
             submitDocRequest.setCountryCode(countryCode);
             submitDocument.setArg0(submitDocRequest);
             submitDocumentDoc.setSubmitDocument(submitDocument);
 
-            return stub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
+            return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -218,25 +240,34 @@ public class ClientConnectorConsumer {
      *
      * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
      */
-    private ClientConnectorServiceStub initializeServiceStub() {
+    private ClientConnectorServiceStub initializeServiceStub() throws ClientConnectorConsumerException {
 
         try {
-            logger.debug("Initializing Client Connector Stub Services");
+
+            logger.info("Initializing Client Connector Stub Services");
             var clientConnectorStub = new ClientConnectorServiceStub(endpointReference);
             clientConnectorStub._getServiceClient().getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
+            clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.SO_TIMEOUT, TIMEOUT);
+            clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CONNECTION_TIMEOUT, TIMEOUT);
             clientConnectorStub._getServiceClient().engageModule("addressing");
             this.registerEvidenceEmitterHandler(clientConnectorStub);
+            logger.debug("[Axis2 configuration] Default Timeout: '{}'",
+                    clientConnectorStub._getServiceClient().getOptions().getTimeOutInMilliSeconds());
+            logger.debug("[Axis2 configuration] HTTPConstants.SO_TIMEOUT: '{}'",
+                    clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.SO_TIMEOUT));
+            logger.debug("[Axis2 configuration] HTTPConstants.CONNECTION_TIMEOUT: '{}'",
+                    clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.CONNECTION_TIMEOUT));
             return clientConnectorStub;
-        } catch (AxisFault ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+        } catch (AxisFault e) {
+            throw new ClientConnectorConsumerException(e.getMessage(), e);
         }
     }
 
     /**
      * Trims the Patient Demographics sent by the client and received by the Client Connector.
      *
-     * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
+     * @param patientDemographics Identity Traits to be trimmed and provided by the client
      */
     private void trimPatientDemographics(PatientDemographics patientDemographics) {
 

@@ -47,6 +47,16 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
     private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
     private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
+    private static final DatatypeFactory DATATYPE_FACTORY;
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(XCPDServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private final ObjectFactory objectFactory;
@@ -70,79 +80,73 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return id.getExtension() + "^^^&" + id.getRoot() + "&ISO";
     }
 
-    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element sh) {
+    public void prepareEventLog(EventLog eventLog, PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, Element soapHeader) {
 
-        logger.info("prepareEventLog('{}')", eventLog.getEventType());
+        logger.info("[XCPD Service] Preparing Event Log: '{}'", eventLog.getEventType());
         eventLog.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_TransactionName(TransactionName.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
         eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
-        }
-        String userIdAlias = Helper.getAssertionsSPProvidedId(sh);
-        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(sh)
-                + "@" + Helper.getAssertionsIssuer(sh) + ">");
-        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
+        String userIdAlias = Helper.getAssertionsSPProvidedId(soapHeader);
+        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(soapHeader)
+                + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
+        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
+        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
         // Add point of care to the event log for assertion purposes
-        eventLog.setPC_UserID(Helper.getPointOfCareUserId(sh));
-        eventLog.setPC_RoleID(Helper.getPC_RoleID(sh));
+        eventLog.setPC_UserID(Helper.getPointOfCareUserId(soapHeader));
+        eventLog.setPC_RoleID(Helper.getPC_RoleID(soapHeader));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
 
-        II source_ii;
-        II target_ii;
+        //TODO: Update audit with Patient ID returned
+        II sourceII;
+        II targetII;
         if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
-            source_ii = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
-            target_ii = outputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+
+            sourceII = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
+            targetII = outputMessage.getControlActProcess().getSubject().get(0).getRegistrationEvent().getSubject1()
+                    .getPatient().getId().get(0);
         } else {
-            source_ii = new II();
-            target_ii = new II();
+            sourceII = new II();
+            targetII = new II();
         }
-        eventLog.setPT_PatricipantObjectID(getParticipantObjectID(target_ii));
-        // Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
-        if (!source_ii.getRoot().equals(target_ii.getRoot()) || !source_ii.getExtension().equals(target_ii.getExtension())) {
-            eventLog.setPS_PatricipantObjectID(getParticipantObjectID(source_ii));
+        eventLog.setPT_ParticipantObjectID(getParticipantObjectID(targetII));
+
+        // TODO: Check if patient id mapping has occurred, prepare event log for patient audit mapping in this case
+        if (!sourceII.getRoot().equals(targetII.getRoot()) || !sourceII.getExtension().equals(targetII.getExtension())) {
+            logger.warn("Patient Source and Target are different: Identifier has been mapped, Patient Mapping audit scheme might be used");
+            //  eventLog.setPS_ParticipantObjectID(getParticipantObjectID(sourceII));
         }
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
         if (!outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()) {
             String detail = outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
             if (detail.startsWith("(")) {
-                String code = detail.substring(1, 5);
-                eventLog.setEM_PatricipantObjectID(code);
+                var code = detail.substring(1, 5);
+                eventLog.setEM_ParticipantObjectID(code);
                 if (StringUtils.equals(code, "1102")) {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
                 } else {
                     eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
                 }
             } else {
-                eventLog.setEM_PatricipantObjectID("0");
+                eventLog.setEM_ParticipantObjectID("0");
                 eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
             }
-            eventLog.setEM_PatricipantObjectDetail(detail.getBytes());
+            eventLog.setEM_ParticipantObjectDetail(detail.getBytes());
         } else {
             eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
         }
     }
 
-    /**
-     * @param request
-     * @param soapHeader
-     * @param eventLog
-     * @return
-     * @throws Exception
-     */
     public PRPAIN201306UV02 queryPatient(PRPAIN201305UV02 request, SOAPHeader soapHeader, EventLog eventLog) throws Exception {
 
-        PRPAIN201306UV02 response = objectFactory.createPRPAIN201306UV02();
+        var response = objectFactory.createPRPAIN201306UV02();
         pRPAIN201306UV02Builder(request, response, soapHeader, eventLog);
         return response;
     }
 
-    private PRPAIN201306UV02MFMIMT700711UV01Subject1 getSubjectByPatientDemographic(PatientDemographics pd) {
+    private PRPAIN201306UV02MFMIMT700711UV01Subject1 getSubjectByPatientDemographic(PatientDemographics patientDemographics) {
 
-        PRPAIN201306UV02MFMIMT700711UV01Subject1 response = objectFactory.createPRPAIN201306UV02MFMIMT700711UV01Subject1();
+        var response = objectFactory.createPRPAIN201306UV02MFMIMT700711UV01Subject1();
         response.getTypeCode().add("SUBJ");
 
         // Set registrationEvent
@@ -168,38 +172,46 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
         // Set registrationEvent/Subject/Patient/id
         response.getRegistrationEvent().getSubject1().getPatient().getId().add(objectFactory.createII());
-        response.getRegistrationEvent().getSubject1().getPatient().getId().get(0).setRoot(pd.getIdList().get(0).getRoot());
-        response.getRegistrationEvent().getSubject1().getPatient().getId().get(0).setExtension(pd.getIdList().get(0).getExtension());
+        response.getRegistrationEvent().getSubject1().getPatient().getId().get(0).setRoot(patientDemographics.getIdList().get(0).getRoot());
+        response.getRegistrationEvent().getSubject1().getPatient().getId().get(0).setExtension(patientDemographics.getIdList().get(0).getExtension());
 
         // Set registrationEvent/Subject/Patient/statusCode
         response.getRegistrationEvent().getSubject1().getPatient().setStatusCode(objectFactory.createCS());
         response.getRegistrationEvent().getSubject1().getPatient().getStatusCode().setCode("active");
 
         // Set registrationEvent/Subject/Patient/patientPerson
-        PRPAMT201310UV02Person person = objectFactory.createPRPAMT201310UV02Person();
-        person.getClassCode().add("PSN");
-        person.setDeterminerCode("INSTANCE");
-        person.setAdministrativeGenderCode(getAdministrativeCode(pd));
-        person.setBirthTime(getBirthTime(pd));
-        person.getName().add(getName(pd));
-        person.getAddr().add(getAddress(pd));
-        response.getRegistrationEvent().getSubject1().getPatient().setPatientPerson(objectFactory.createPRPAMT201310UV02PatientPatientPerson(person));
+        var prpamt201310UV02Person = objectFactory.createPRPAMT201310UV02Person();
+        prpamt201310UV02Person.getClassCode().add("PSN");
+        prpamt201310UV02Person.setDeterminerCode("INSTANCE");
+        prpamt201310UV02Person.setAdministrativeGenderCode(getAdministrativeCode(patientDemographics));
+        prpamt201310UV02Person.setBirthTime(getBirthTime(patientDemographics));
+        prpamt201310UV02Person.getName().add(getName(patientDemographics));
+        prpamt201310UV02Person.getAddr().add(getAddress(patientDemographics));
+        response.getRegistrationEvent().getSubject1().getPatient().setPatientPerson(
+                objectFactory.createPRPAMT201310UV02PatientPatientPerson(prpamt201310UV02Person));
 
         // Set registrationEvent/Subject/Patient/subjectOf1
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().add(objectFactory.createPRPAMT201310UV02Subject());
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().add(
+                objectFactory.createPRPAMT201310UV02Subject());
 
         // Set registrationEvent/Subject/Patient/subjectOf1/queryMatchObservation
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).setQueryMatchObservation(objectFactory.createPRPAMT201310UV02QueryMatchObservation());
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().getClassCode().add("OBS");
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().getMoodCode().add("EVN");
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0)
+                .setQueryMatchObservation(objectFactory.createPRPAMT201310UV02QueryMatchObservation());
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .getClassCode().add("OBS");
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .getMoodCode().add("EVN");
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .setCode(objectFactory.createCD());
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .getCode().setCode("IHE_PDQ");
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .getCode().setCodeSystem("2.16.840.1.113883.1.11.19914");
 
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().setCode(objectFactory.createCD());
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().getCode().setCode("IHE_PDQ");
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().getCode().setCodeSystem("2.16.840.1.113883.1.11.19914");
-
-        INT matchInt = objectFactory.createINT();
+        var matchInt = objectFactory.createINT();
         matchInt.setValue(BigInteger.valueOf(100));
-        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation().setValue(matchInt);
+        response.getRegistrationEvent().getSubject1().getPatient().getSubjectOf1().get(0).getQueryMatchObservation()
+                .setValue(matchInt);
 
         // Set registrationEvent/custodian
         response.getRegistrationEvent().setCustodian(objectFactory.createMFMIMT700711UV01Custodian());
@@ -222,26 +234,26 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     private CE getAdministrativeCode(PatientDemographics pd) {
-        CE result = objectFactory.createCE();
+        var result = objectFactory.createCE();
         result.setCode(pd.getAdministrativeGender().toString());
         return result;
     }
 
     private TS getBirthTime(PatientDemographics pd) {
-        TS result = objectFactory.createTS();
-        Date date = pd.getBirthDate();
-        SimpleDateFormat dateformatYYYYMMDD = new SimpleDateFormat("yyyyMMdd");
-        result.setValue(dateformatYYYYMMDD.format(date));
+        var result = objectFactory.createTS();
+        var date = pd.getBirthDate();
+        var dateFormat = new SimpleDateFormat("yyyyMMdd");
+        result.setValue(dateFormat.format(date));
         return result;
     }
 
     private PN getName(PatientDemographics pd) {
-        PN result = objectFactory.createPN();
-        EnFamily enFamily = objectFactory.createEnFamily();
+        var result = objectFactory.createPN();
+        var enFamily = objectFactory.createEnFamily();
         enFamily.setContent(pd.getFamilyName());
         result.getContent().add(objectFactory.createENFamily(enFamily));
 
-        EnGiven enGiven = objectFactory.createEnGiven();
+        var enGiven = objectFactory.createEnGiven();
         enGiven.setContent(pd.getGivenName());
         result.getContent().add(objectFactory.createENGiven(enGiven));
         return result;
@@ -249,23 +261,23 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
     private AD getAddress(PatientDemographics pd) {
         // Adding the city
-        AD result = objectFactory.createAD();
-        AdxpCity city = objectFactory.createAdxpCity();
+        var result = objectFactory.createAD();
+        var city = objectFactory.createAdxpCity();
         city.setContent(pd.getCity());
         result.getContent().add(objectFactory.createADCity(city));
 
         // Adding the postal code
-        AdxpPostalCode postal = objectFactory.createAdxpPostalCode();
+        var postal = objectFactory.createAdxpPostalCode();
         postal.setContent(pd.getPostalCode());
         result.getContent().add(objectFactory.createADPostalCode(postal));
 
         // Adding the address street line
-        AdxpStreetAddressLine street = objectFactory.createAdxpStreetAddressLine();
+        var street = objectFactory.createAdxpStreetAddressLine();
         street.setContent(pd.getStreetAddress());
         result.getContent().add(objectFactory.createADStreetAddressLine(street));
 
         // Adding the country
-        AdxpCountry country = objectFactory.createAdxpCountry();
+        var country = objectFactory.createAdxpCountry();
         country.setContent(pd.getCountry());
         result.getContent().add(objectFactory.createADCountry(country));
 
@@ -274,70 +286,75 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
     /**
      * Prepares a reasonOf element according to error type
-     *
-     * @param errorType
-     * @return
      */
     private MFMIMT700711UV01Reason getReasonOfElement(String errorType) {
-        MFMIMT700711UV01Reason result = objectFactory.createMFMIMT700711UV01Reason();
-        result.setTypeCode("RSON");
+
+        var mfmimt700711UV01Reason = objectFactory.createMFMIMT700711UV01Reason();
+        mfmimt700711UV01Reason.setTypeCode("RSON");
 
         // Set detectedIssueEvent
-        result.setDetectedIssueEvent(objectFactory.createMCAIMT900001UV01DetectedIssueEvent());
-        result.getDetectedIssueEvent().getClassCode().add("ALRT");
-        result.getDetectedIssueEvent().getMoodCode().add("EVN");
+        mfmimt700711UV01Reason.setDetectedIssueEvent(objectFactory.createMCAIMT900001UV01DetectedIssueEvent());
+        mfmimt700711UV01Reason.getDetectedIssueEvent().getClassCode().add("ALRT");
+        mfmimt700711UV01Reason.getDetectedIssueEvent().getMoodCode().add("EVN");
 
         // Set detectedIssueEvent/code
-        result.getDetectedIssueEvent().setCode(objectFactory.createCD());
-        result.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
-        result.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
+        mfmimt700711UV01Reason.getDetectedIssueEvent().setCode(objectFactory.createCD());
+        mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
+        mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        if (errorType.equals(ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED)) {
-            // Set detectedIssueEvent/triggerFor
-            result.getDetectedIssueEvent().getTriggerFor().add(objectFactory.createMCAIMT900001UV01Requires());
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getTypeCode().add("TRIG");
+        switch (errorType) {
+            case ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED:
+                // Set detectedIssueEvent/triggerFor
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(objectFactory.createMCAIMT900001UV01Requires());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getTypeCode().add("TRIG");
 
-            // Set detectedIssueEvent/triggerFor/actOrRequired
-            result.getDetectedIssueEvent().getTriggerFor().get(0).setActOrderRequired(objectFactory.createMCAIMT900001UV01ActOrderRequired());
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getClassCode().add("ACT");
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getMoodCode().add("RQO");
+                // Set detectedIssueEvent/triggerFor/actOrRequired
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).setActOrderRequired(objectFactory.createMCAIMT900001UV01ActOrderRequired());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getClassCode().add("ACT");
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getMoodCode().add("RQO");
 
-            // Set detectedIssueEvent/triggerFor/actOrRequired/code
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().setCode(objectFactory.createCE());
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCode(ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
-            result.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
-        } else if (errorType.equals(ERROR_ANSWER_NOT_AVAILABLE)) {
-            // Set detectedIssueEvent/mitigatedBy
-            result.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
+                // Set detectedIssueEvent/triggerFor/actOrRequired/code
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().setCode(objectFactory.createCE());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCode(ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
+                break;
+            case ERROR_ANSWER_NOT_AVAILABLE:
+                // Set detectedIssueEvent/mitigatedBy
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
 
-            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
-            // TODO Could not set moodCode to RQO, set EVN instead
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
+                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
+                // TODO Could not set moodCode to RQO, set EVN instead
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
 
-            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_ANSWER_NOT_AVAILABLE);
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.19376.1.2.27.3");
-        } else if (errorType.equals(ERROR_INSUFFICIENT_RIGHTS)) {
-            // Set detectedIssueEvent/mitigatedBy
-            result.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
+                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_ANSWER_NOT_AVAILABLE);
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.19376.1.2.27.3");
+                break;
+            case ERROR_INSUFFICIENT_RIGHTS:
+                // Set detectedIssueEvent/mitigatedBy
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
 
-            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
-            // TODO Could not set moodCode to RQO, set EVN instead
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
+                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
+                // TODO Could not set moodCode to RQO, set EVN instead
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
 
-            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_INSUFFICIENT_RIGHTS);
-            result.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
+                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_INSUFFICIENT_RIGHTS);
+                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
+                break;
+            default:
+                //  No action expected
+                break;
         }
-        return result;
+        return mfmimt700711UV01Reason;
     }
 
     private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String detail, String reason) {
@@ -356,7 +373,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             logger.error(detail);
             // Set acknowledgement/acknowledgementDetail
             outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
+            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(
+                    objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(objectFactory.createED());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(detail);
         } else {
@@ -364,26 +382,22 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         }
     }
 
-    /**
-     * @param inputMessage
-     * @return
-     */
     private PatientDemographics parsePRPAIN201305UV02toPatientDemographics(PRPAIN201305UV02 inputMessage) {
 
-        PatientDemographics pd = new PatientDemographics();
+        var patientDemographics = new PatientDemographics();
         PRPAIN201305UV02QUQIMT021001UV01ControlActProcess cap = inputMessage.getControlActProcess();
 
         if (cap != null) {
-            PRPAMT201306UV02QueryByParameter qbp = cap.getQueryByParameter().getValue();
-            if (qbp != null) {
-                PRPAMT201306UV02ParameterList pl = qbp.getParameterList();
+            PRPAMT201306UV02QueryByParameter queryByParameter = cap.getQueryByParameter().getValue();
+            if (queryByParameter != null) {
+                PRPAMT201306UV02ParameterList pl = queryByParameter.getParameterList();
 
                 // Administrative gender
                 try {
                     List<PRPAMT201306UV02LivingSubjectAdministrativeGender> genders = pl.getLivingSubjectAdministrativeGender();
                     if (genders != null && !genders.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectAdministrativeGender gender = genders.get(0);
-                        pd.setAdministrativeGender(PatientDemographics.Gender.parseGender(gender.getValue().get(0).getCode()));
+                        patientDemographics.setAdministrativeGender(PatientDemographics.Gender.parseGender(gender.getValue().get(0).getCode()));
                     }
                 } catch (Exception e) {
                     logger.warn("Unable to parse administrative gender", e);
@@ -395,7 +409,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     if (bds != null && !bds.isEmpty()) {
                         PRPAMT201306UV02LivingSubjectBirthTime bd = bds.get(0);
                         String sbd = bd.getValue().get(0).getValue();
-                        pd.setBirthDate(DateUtil.parseDateFromString(sbd, "yyyyMMdd"));
+                        patientDemographics.setBirthDate(DateUtil.parseDateFromString(sbd, "yyyyMMdd"));
                     }
                 } catch (Exception e) {
                     logger.warn("Unable to parse birthDate", e);
@@ -413,16 +427,16 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                                 String eName = element.getName().getLocalPart();
                                 if (StringUtils.equals("city", eName)) {
                                     AdxpCity ac = (AdxpCity) element.getValue();
-                                    pd.setCity(ac.getContent());
+                                    patientDemographics.setCity(ac.getContent());
                                 } else if (StringUtils.equals("streetName", eName)) {
                                     AdxpStreetName asn = (AdxpStreetName) element.getValue();
-                                    pd.setStreetAddress(asn.getContent());
+                                    patientDemographics.setStreetAddress(asn.getContent());
                                 } else if (StringUtils.equals("country", eName)) {
                                     AdxpCountry ac = (AdxpCountry) element.getValue();
-                                    pd.setCountry(ac.getContent());
+                                    patientDemographics.setCountry(ac.getContent());
                                 } else if (StringUtils.equals("postalCode", eName)) {
                                     AdxpPostalCode apc = (AdxpPostalCode) element.getValue();
-                                    pd.setPostalCode(apc.getContent());
+                                    patientDemographics.setPostalCode(apc.getContent());
                                 }
                             }
                         }
@@ -443,10 +457,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                                 String eName = element.getName().getLocalPart();
                                 if (StringUtils.equals("given", eName)) {
                                     EnGiven eg = (EnGiven) element.getValue();
-                                    pd.setGivenName(eg.getContent());
+                                    patientDemographics.setGivenName(eg.getContent());
                                 } else if (StringUtils.equals("family", eName)) {
                                     EnFamily ef = (EnFamily) element.getValue();
-                                    pd.setFamilyName(ef.getContent());
+                                    patientDemographics.setFamilyName(ef.getContent());
                                 }
                             }
                         }
@@ -457,10 +471,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
                 // Id
                 try {
-                    List<PRPAMT201306UV02LivingSubjectId> ids = pl.getLivingSubjectId();
-                    if (ids != null && !ids.isEmpty()) {
-                        PRPAMT201306UV02LivingSubjectId id = ids.get(0);
-                        pd.setId(id.getValue().get(0).getExtension());
+                    List<PRPAMT201306UV02LivingSubjectId> livingSubjectIdList = pl.getLivingSubjectId();
+                    if (livingSubjectIdList != null && !livingSubjectIdList.isEmpty()) {
+                        PRPAMT201306UV02LivingSubjectId id = livingSubjectIdList.get(0);
+                        patientDemographics.setId(id.getValue().get(0).getExtension());
                     }
                 } catch (Exception e) {
                     logger.warn("Unable to parse patient id", e);
@@ -471,24 +485,18 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             }
         }
 
-        return pd;
+        return patientDemographics;
     }
 
-    /**
-     * @param inputMessage
-     * @param outputMessage
-     * @param sh
-     * @param eventLog
-     * @throws Exception
-     */
-    private void pRPAIN201306UV02Builder(PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, SOAPHeader sh, EventLog eventLog) throws Exception {
+    private void pRPAIN201306UV02Builder(PRPAIN201305UV02 inputMessage, PRPAIN201306UV02 outputMessage, SOAPHeader soapHeader,
+                                         EventLog eventLog) throws Exception {
 
         String sigCountryCode;
 
         if (patientSearchService instanceof PatientSearchInterfaceWithDemographics) {
-            PatientSearchInterfaceWithDemographics psiwd = (PatientSearchInterfaceWithDemographics) patientSearchService;
-            PatientDemographics pd = parsePRPAIN201305UV02toPatientDemographics(inputMessage);
-            psiwd.setPatientDemographics(pd);
+            var patientSearchInterfaceWithDemographics = (PatientSearchInterfaceWithDemographics) patientSearchService;
+            var patientDemographics = parsePRPAIN201305UV02toPatientDemographics(inputMessage);
+            patientSearchInterfaceWithDemographics.setPatientDemographics(patientDemographics);
         }
 
         // Set id of the message
@@ -496,10 +504,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getId().setRoot(UUID.randomUUID().toString());
 
         // Generate and Set random extension
-        Random generator = new Random();
-        StringBuilder extension = new StringBuilder();
-        for (int i = 0; i < 13; i++) {
-            int d = generator.nextInt(10);
+        var generator = new Random();
+        var extension = new StringBuilder();
+        for (var i = 0; i < 13; i++) {
+            var d = generator.nextInt(10);
             extension.append(d);
         }
         outputMessage.getId().setExtension(extension.toString());
@@ -566,7 +574,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
         Element shElement;
         try {
-            shElement = XMLUtils.toDOM(sh);
+            shElement = XMLUtils.toDOM(soapHeader);
         } catch (Exception e) {
             logger.error("SOAP header jaxb to dom failed.", e);
             throw e;
@@ -586,11 +594,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
                 fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
             } else if (!livingSubjectIds.isEmpty()) {
-                StringBuilder stringBuilderNRO = new StringBuilder();
+                var stringBuilderNRO = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
                 stringBuilderNRO.append("<patient>");
                 for (PRPAMT201306UV02LivingSubjectId livingSubjectId : livingSubjectIds) {
-                    PatientId patientId = new PatientId();
+                    var patientId = new PatientId();
                     patientId.setRoot(livingSubjectId.getValue().get(0).getRoot());
                     patientId.setExtension(livingSubjectId.getValue().get(0).getExtension());
                     stringBuilderNRO.append("<livingSubjectId>");
@@ -599,19 +607,22 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     stringBuilderNRO.append("</livingSubjectId>");
                     patientIdList.add(patientId);
                 }
-                List<PRPAMT201306UV02LivingSubjectAdministrativeGender> administrativeGenders = inputQBP.getParameterList().getLivingSubjectAdministrativeGender();
+                List<PRPAMT201306UV02LivingSubjectAdministrativeGender> administrativeGenders =
+                        inputQBP.getParameterList().getLivingSubjectAdministrativeGender();
                 if (!CollectionUtils.isEmpty(administrativeGenders)) {
                     stringBuilderNRO.append("<livingSubjectAdministrativeGender>").append(administrativeGenders
                             .get(0).getValue().get(0).getCode()).append("</livingSubjectAdministrativeGender>");
                 }
 
-                List<PRPAMT201306UV02LivingSubjectBirthTime> subjectBirthTimes = inputQBP.getParameterList().getLivingSubjectBirthTime();
+                List<PRPAMT201306UV02LivingSubjectBirthTime> subjectBirthTimes =
+                        inputQBP.getParameterList().getLivingSubjectBirthTime();
                 if (!CollectionUtils.isEmpty(subjectBirthTimes)) {
                     stringBuilderNRO.append("<livingSubjectBirthTime>").append(subjectBirthTimes.get(0).getValue()
                             .get(0).getValue()).append("</livingSubjectBirthTime>");
                 }
 
-                List<PRPAMT201306UV02LivingSubjectName> livingSubjectNames = inputQBP.getParameterList().getLivingSubjectName();
+                List<PRPAMT201306UV02LivingSubjectName> livingSubjectNames =
+                        inputQBP.getParameterList().getLivingSubjectName();
                 if (!CollectionUtils.isEmpty(livingSubjectNames)) {
                     // TODO: Implementation to be finalized.
                     logger.info("Patient Names must be added to the NRO message");
@@ -669,12 +680,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     fillOutputMessage(outputMessage, "No patient found.", ERROR_ANSWER_NOT_AVAILABLE, "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
                 } else {
-                    String countryCode = "";
-                    String DN = eventLog.getSC_UserID();
-                    int cIndex = DN.indexOf("C=");
+                    var countryCode = "";
+                    var distinguishName = eventLog.getSC_UserID();
+                    int cIndex = distinguishName.indexOf("C=");
 
                     if (cIndex > 0) {
-                        countryCode = DN.substring(cIndex + 2, cIndex + 4);
+                        countryCode = distinguishName.substring(cIndex + 2, cIndex + 4);
                     }
                     // TODO: Might be necessary to remove later, although it does no harm in reality!
                     // This part is added for handling consents when the call is not HTTPS.
@@ -694,7 +705,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                      *  TODO: Uncomment when PDP works. You may also need to pass the whole PatientID
                      *  (both the root and extension) to PDP, if required by PDP procedures.
                      */
-                    for (int i = 0; i < demographicsList.size(); i++) {
+                    for (var i = 0; i < demographicsList.size(); i++) {
                         if (!SAML2Validator.isConsentGiven(demographicsList.get(i).getIdList().get(0).getExtension(), countryCode)) {
                             // This patient data cannot be sent to Country B
                             demographicsList.remove(i);
@@ -728,42 +739,42 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             logger.error(e.getMessage(), e);
         }
         // Set queryByParameter
-        PRPAMT201306UV02QueryByParameter qbpValue = objectFactory.createPRPAMT201306UV02QueryByParameter();
-        qbpValue.setQueryId(inputQBP.getQueryId());
-        qbpValue.setStatusCode(inputQBP.getStatusCode());
-        qbpValue.setParameterList(inputQBP.getParameterList());
-        outputMessage.getControlActProcess().setQueryByParameter(objectFactory.createPRPAIN201306UV02MFMIMT700711UV01ControlActProcessQueryByParameter(qbpValue));
+        var prpamt201306UV02QueryByParameter = objectFactory.createPRPAMT201306UV02QueryByParameter();
+        prpamt201306UV02QueryByParameter.setQueryId(inputQBP.getQueryId());
+        prpamt201306UV02QueryByParameter.setStatusCode(inputQBP.getStatusCode());
+        prpamt201306UV02QueryByParameter.setParameterList(inputQBP.getParameterList());
+        outputMessage.getControlActProcess().setQueryByParameter(objectFactory.createPRPAIN201306UV02MFMIMT700711UV01ControlActProcessQueryByParameter(prpamt201306UV02QueryByParameter));
 
         // Set sender of the input to receiver of the output
-        MCCIMT000300UV01Receiver outReceiver = objectFactory.createMCCIMT000300UV01Receiver();
-        outReceiver.setTypeCode(CommunicationFunctionType.RCV);
-        outReceiver.setDevice(objectFactory.createMCCIMT000300UV01Device());
-        outReceiver.getDevice().setDeterminerCode("INSTANCE");
-        outReceiver.getDevice().setClassCode(EntityClassDevice.DEV);
-        outReceiver.getDevice().getId().add(inputMessage.getSender().getDevice().getId().get(0));
+        var mccimt000300UV01Receiver = objectFactory.createMCCIMT000300UV01Receiver();
+        mccimt000300UV01Receiver.setTypeCode(CommunicationFunctionType.RCV);
+        mccimt000300UV01Receiver.setDevice(objectFactory.createMCCIMT000300UV01Device());
+        mccimt000300UV01Receiver.getDevice().setDeterminerCode("INSTANCE");
+        mccimt000300UV01Receiver.getDevice().setClassCode(EntityClassDevice.DEV);
+        mccimt000300UV01Receiver.getDevice().getId().add(inputMessage.getSender().getDevice().getId().get(0));
         // Set asAgent
-        MCCIMT000300UV01Agent agent = objectFactory.createMCCIMT000300UV01Agent();
-        agent.getClassCode().add("AGNT");
+        var mccimt000300UV01Agent = objectFactory.createMCCIMT000300UV01Agent();
+        mccimt000300UV01Agent.getClassCode().add("AGNT");
 
-        MCCIMT000300UV01Organization organization = objectFactory.createMCCIMT000300UV01Organization();
+        var mccimt000300UV01Organization = objectFactory.createMCCIMT000300UV01Organization();
         MCCIMT000100UV01Organization inpOrganization = inputMessage.getSender().getDevice().getAsAgent().getValue().getRepresentedOrganization().getValue();
-        organization.setClassCode(inpOrganization.getClassCode());
-        organization.setDeterminerCode(inpOrganization.getDeterminerCode());
-        organization.getId().add(inpOrganization.getId().get(0));
+        mccimt000300UV01Organization.setClassCode(inpOrganization.getClassCode());
+        mccimt000300UV01Organization.setDeterminerCode(inpOrganization.getDeterminerCode());
+        mccimt000300UV01Organization.getId().add(inpOrganization.getId().get(0));
 
-        agent.setRepresentedOrganization(objectFactory.createMCCIMT000300UV01AgentRepresentedOrganization(organization));
-        outReceiver.getDevice().setAsAgent(objectFactory.createMCCIMT000300UV01DeviceAsAgent(agent));
-        outputMessage.getReceiver().add(outReceiver);
+        mccimt000300UV01Agent.setRepresentedOrganization(objectFactory.createMCCIMT000300UV01AgentRepresentedOrganization(mccimt000300UV01Organization));
+        mccimt000300UV01Receiver.getDevice().setAsAgent(objectFactory.createMCCIMT000300UV01DeviceAsAgent(mccimt000300UV01Agent));
+        outputMessage.getReceiver().add(mccimt000300UV01Receiver);
 
         // Set receiver of the input to sender of the output
-        MCCIMT000300UV01Sender outSender = objectFactory.createMCCIMT000300UV01Sender();
-        outSender.setTypeCode(CommunicationFunctionType.SND);
-        outSender.setDevice(objectFactory.createMCCIMT000300UV01Device());
-        outSender.getDevice().setDeterminerCode("INSTANCE");
-        outSender.getDevice().setClassCode(EntityClassDevice.DEV);
-        outSender.getDevice().getId().add(objectFactory.createII());
-        outSender.getDevice().getId().get(0).setRoot(Constants.HOME_COMM_ID);
-        outputMessage.setSender(outSender);
+        var mccimt000300UV01Sender = objectFactory.createMCCIMT000300UV01Sender();
+        mccimt000300UV01Sender.setTypeCode(CommunicationFunctionType.SND);
+        mccimt000300UV01Sender.setDevice(objectFactory.createMCCIMT000300UV01Device());
+        mccimt000300UV01Sender.getDevice().setDeterminerCode("INSTANCE");
+        mccimt000300UV01Sender.getDevice().setClassCode(EntityClassDevice.DEV);
+        mccimt000300UV01Sender.getDevice().getId().add(objectFactory.createII());
+        mccimt000300UV01Sender.getDevice().getId().get(0).setRoot(Constants.HOME_COMM_ID);
+        outputMessage.setSender(mccimt000300UV01Sender);
 
         // Prepare Audit Log
         try {

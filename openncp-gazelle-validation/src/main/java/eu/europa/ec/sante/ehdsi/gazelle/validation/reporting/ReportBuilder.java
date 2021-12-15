@@ -201,7 +201,6 @@ public class ReportBuilder {
         }
 
         fileName.append(FILE_EXTENSION);
-
         return fileName.toString();
     }
 

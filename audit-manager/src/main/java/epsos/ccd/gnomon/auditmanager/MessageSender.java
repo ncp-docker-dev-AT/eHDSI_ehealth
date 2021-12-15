@@ -59,7 +59,11 @@ public class MessageSender {
         this.severity = severity;
 
         try {
-            logger.info("Try to construct the Audit Message type: '{}'", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
+            if(auditmessage.getEventIdentification() != null && auditmessage.getEventIdentification().getEventTypeCode() != null) {
+                logger.info("Try to construct the Audit Message type: '{}'", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
+            } else {
+                logger.info("Try to construct the Audit Message type: '{}'", "N/A");
+            }
             String auditMessage = AuditTrailUtils.constructMessage(auditmessage, true);
 
             if (!Utils.isEmpty(auditMessage)) {

@@ -32,7 +32,10 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +48,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
@@ -59,9 +63,20 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.Instant;
 import java.util.*;
 
 public class XCAServiceImpl implements XCAServiceInterface {
+
+    private static final DatatypeFactory DATATYPE_FACTORY;
+
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new IllegalArgumentException();
+        }
+    }
 
     private final Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
@@ -96,17 +111,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         omFactory = OMAbstractFactory.getOMFactory();
 
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
+        var applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
-    /**
-     * @param message
-     * @return
-     */
     private boolean isUUIDValid(String message) {
         try {
-            UUID uuid = UUID.fromString(message);
+            var uuid = UUID.fromString(message);
             logger.debug("Valid UUID: '{}'", uuid);
             return true;
         } catch (IllegalArgumentException e) {
@@ -115,13 +126,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
     }
 
-    /**
-     * @param eventLog
-     * @param request
-     * @param response
-     * @param sh
-     * @param classCode
-     */
     private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response,
                                          Element sh, String classCode) {
 
@@ -140,25 +144,28 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
+                eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
+                break;
         }
         eventLog.setEI_EventActionCode(EventActionCode.READ);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DataTypeConfigurationException: {}", e.getMessage(), e);
-        }
-        eventLog.setPS_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
+        eventLog.setPS_ParticipantObjectID(getDocumentEntryPatientId(request));
 
         if (response.getRegistryObjectList() != null) {
             List<String> documentIds = new ArrayList<>();
-            for (int i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
+            for (var i = 0; i < response.getRegistryObjectList().getIdentifiable().size(); i++) {
                 if (!(response.getRegistryObjectList().getIdentifiable().get(i).getValue() instanceof ExtrinsicObjectType)) {
                     continue;
                 }
                 ExtrinsicObjectType eot = (ExtrinsicObjectType) response.getRegistryObjectList().getIdentifiable().get(i).getValue();
-                for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (eit.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
-                        documentIds.add(eit.getValue());
+                for (ExternalIdentifierType externalIdentifierType : eot.getExternalIdentifier()) {
+                    if (externalIdentifierType.getIdentificationScheme().equals(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
+                        documentIds.add(externalIdentifierType.getValue());
                     }
                 }
             }
@@ -174,13 +181,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(getDocumentEntryPatientId(request));
+        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (response.getRegistryErrorList() != null) {
             RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_PatricipantObjectID(re.getErrorCode());
-            eventLog.setEM_PatricipantObjectDetail(re.getCodeContext().getBytes());
+            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
+            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
         }
     }
 
@@ -213,38 +220,43 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
     }
 
-    /**
-     * @param eventLog
-     * @param request
-     * @param errorsDiscovered
-     * @param documentReturned
-     * @param registryErrorList
-     * @param sh
-     * @param classCode
-     */
     private void prepareEventLogForRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, boolean errorsDiscovered,
                                             boolean documentReturned, OMElement registryErrorList, Element sh, String classCode) {
 
         logger.info("method prepareEventLogForRetrieve({})", classCode);
-        if (classCode == null || classCode.equals(Constants.EP_CLASSCODE)) {
+        if (classCode == null) {
             // In case the document is not found, audit log cannot be properly filled, as we don't know the event type
             // Log this under Order Service
             eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
             eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
-        } else if (classCode.equals(Constants.PS_CLASSCODE)) {
-            eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
-            eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
-        } else if (classCode.equals(Constants.MRO_CLASSCODE)) {
-            eventLog.setEventType(EventType.MRO_RETRIEVE);
-            eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
-        }
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
-        try {
-            eventLog.setEI_EventDateTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
-        } catch (DatatypeConfigurationException e) {
-            logger.error("DatatypeConfigurationException: {}", e.getMessage(), e);
+        } else {
+            switch (classCode) {
+                case Constants.EP_CLASSCODE:
+                    eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                    break;
+                case Constants.PS_CLASSCODE:
+                    eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
+                    break;
+                case Constants.MRO_CLASSCODE:
+                    eventLog.setEventType(EventType.MRO_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
+                    eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
+                    break;
+                default:
+                    break;
+            }
         }
 
+        eventLog.setEI_EventActionCode(EventActionCode.READ);
+        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.getEventTargetParticipantObjectIds().add(request.getDocumentRequest().get(0).getDocumentUniqueId());
 
         if (!documentReturned) {
@@ -261,7 +273,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(sh));
         eventLog.setHR_RoleID(Helper.getFunctionalRoleID(sh));
         eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_PatricipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
+        eventLog.setPT_ParticipantObjectID(Helper.getDocumentEntryPatientIdFromTRCAssertion(sh));
         eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
 
         if (errorsDiscovered) {
@@ -276,28 +288,27 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         logger.debug("Exception: '{}'", e.getMessage(), e);
                     }
                 }
-                eventLog.setEM_PatricipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
-                eventLog.setEM_PatricipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
+                eventLog.setEM_ParticipantObjectID(error.getAttributeValue(new QName("", "errorCode")));
+                eventLog.setEM_ParticipantObjectDetail(error.getAttributeValue(new QName("", "codeContext")).getBytes());
             }
         }
     }
 
-    /**
-     * @param request
-     * @return
-     */
-    private String getDocumentEntryClassCode(AdhocQueryRequest request) {
-
-        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
-            if (sl.getName().equals("$XDSDocumentEntryClassCode")) {
-                String classCode = sl.getValueList().getValue().get(0);
-                String pattern = "\\(?\\)?\\'?";
-                classCode = classCode.replaceAll(pattern, "");
-                classCode = classCode.substring(0, classCode.indexOf("^^"));
-                return classCode;
+    private List<String> getDocumentEntryClassCodes(AdhocQueryRequest request) {
+        List<String> classCodes = new ArrayList<>();
+        for (SlotType1 slotType1 : request.getAdhocQuery().getSlot()) {
+            if (slotType1.getName().equals("$XDSDocumentEntryClassCode")) {
+                var fullClassCodeString = slotType1.getValueList().getValue().get(0);
+                var pattern = "\\(?\\)?\\'?";
+                fullClassCodeString = fullClassCodeString.replaceAll(pattern, "");
+                String[] classCodeString = fullClassCodeString.split(",");
+                for (String classCode : classCodeString) {
+                    classCode = classCode.substring(0, classCode.indexOf("^^"));
+                    classCodes.add(classCode);
+                }
             }
         }
-        return null;
+        return classCodes;
     }
 
     /**
@@ -313,6 +324,28 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
         }
         return "$XDSDocumentEntryPatientId Not Found!";
+    }
+
+    private FilterParams getFilterParams(AdhocQueryRequest request) {
+
+        var filterParams = new FilterParams();
+
+        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
+            switch (sl.getName()) {
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDAFTER_SLOT_NAME:
+                    filterParams.setCreatedAfter(Instant.parse(sl.getValueList().getValue().get(0)));
+                    break;
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERCREATEDBEFORE_SLOT_NAME:
+                    filterParams.setCreatedBefore(Instant.parse(sl.getValueList().getValue().get(0)));
+                    break;
+                case XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_FILTERMAXIMUMSIZE_SLOT_NAME:
+                    filterParams.setMaximumSize(Long.parseLong(sl.getValueList().getValue().get(0)));
+                    break;
+                default:
+                    break;
+            }
+        }
+        return filterParams;
     }
 
     /**
@@ -334,10 +367,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return request.getDocumentRequest().get(0).getRepositoryUniqueId();
     }
 
-    /**
-     * @param patientId
-     * @return
-     */
     private String trimDocumentEntryPatientId(String patientId) {
 
         if (patientId.contains("^^^")) {
@@ -346,97 +375,71 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return patientId;
     }
 
-    /**
-     * @param name
-     * @param value
-     * @return
-     */
     private SlotType1 makeSlot(String name, String value) {
 
-        SlotType1 sl = ofRim.createSlotType1();
-        sl.setName(name);
-        sl.setValueList(ofRim.createValueListType());
-        sl.getValueList().getValue().add(value);
-        return sl;
+        var slotType1 = ofRim.createSlotType1();
+        slotType1.setName(name);
+        slotType1.setValueList(ofRim.createValueListType());
+        slotType1.getValueList().getValue().add(value);
+        return slotType1;
     }
 
-    /**
-     * @param classificationScheme
-     * @param classifiedObject
-     * @param nodeRepresentation
-     * @param value
-     * @param name
-     * @return
-     */
+    private SlotType1 makeSlot(String name, List<String> values) {
+
+        var slotType1 = ofRim.createSlotType1();
+        slotType1.setName(name);
+        slotType1.setValueList(ofRim.createValueListType());
+        values.forEach(value -> slotType1.getValueList().getValue().add(value));
+        return slotType1;
+    }
+
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation, String value, String name) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        ClassificationType cl = ofRim.createClassificationType();
-        cl.setId(uuid);
-        cl.setNodeRepresentation(nodeRepresentation);
-        cl.setClassificationScheme(classificationScheme);
-        cl.setClassifiedObject(classifiedObject);
-        cl.getSlot().add(makeSlot("codingScheme", value));
+        var classificationType = ofRim.createClassificationType();
+        classificationType.setId(uuid);
+        classificationType.setNodeRepresentation(nodeRepresentation);
+        classificationType.setClassificationScheme(classificationScheme);
+        classificationType.setClassifiedObject(classifiedObject);
+        classificationType.getSlot().add(makeSlot("codingScheme", value));
 
-        cl.setName(ofRim.createInternationalStringType());
-        cl.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
-        cl.getName().getLocalizedString().get(0).setValue(name);
-        return cl;
+        classificationType.setName(ofRim.createInternationalStringType());
+        classificationType.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
+        classificationType.getName().getLocalizedString().get(0).setValue(name);
+        return classificationType;
     }
 
-    /**
-     * @param classificationScheme
-     * @param classifiedObject
-     * @param nodeRepresentation
-     * @return
-     */
     private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        ClassificationType cl = ofRim.createClassificationType();
-        cl.setId(uuid);
-        cl.setNodeRepresentation(nodeRepresentation);
-        cl.setClassificationScheme(classificationScheme);
-        cl.setClassifiedObject(classifiedObject);
-        return cl;
+        var classificationType = ofRim.createClassificationType();
+        classificationType.setId(uuid);
+        classificationType.setNodeRepresentation(nodeRepresentation);
+        classificationType.setClassificationScheme(classificationScheme);
+        classificationType.setClassifiedObject(classifiedObject);
+        return classificationType;
     }
 
-    /**
-     * @param identificationScheme
-     * @param registryObject
-     * @param value
-     * @param name
-     * @return
-     */
     private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        ExternalIdentifierType ex = ofRim.createExternalIdentifierType();
-        ex.setId(uuid);
-        ex.setIdentificationScheme(identificationScheme);
-        ex.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier");
-        ex.setRegistryObject(registryObject);
-        ex.setValue(value);
+        var externalIdentifierType = ofRim.createExternalIdentifierType();
+        externalIdentifierType.setId(uuid);
+        externalIdentifierType.setIdentificationScheme(identificationScheme);
+        externalIdentifierType.setObjectType("urn:oasis:names:tc:ebxml-regrep:ObjectType:RegistryObject:ExternalIdentifier");
+        externalIdentifierType.setRegistryObject(registryObject);
+        externalIdentifierType.setValue(value);
 
-        ex.setName(ofRim.createInternationalStringType());
-        ex.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
-        ex.getName().getLocalizedString().get(0).setValue(name);
-        return ex;
+        externalIdentifierType.setName(ofRim.createInternationalStringType());
+        externalIdentifierType.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
+        externalIdentifierType.getName().getLocalizedString().get(0).setValue(name);
+        return externalIdentifierType;
     }
 
-    /**
-     * @param docType
-     * @param effectiveTime
-     * @param repositoryId
-     * @param request
-     * @param eot
-     * @param isPDF
-     * @param documentId
-     * @return
-     */
     private String prepareExtrinsicObjectEpsosDoc(DocumentType docType, Date effectiveTime, String repositoryId,
                                                   AdhocQueryRequest request, ExtrinsicObjectType eot, boolean isPDF,
-                                                  String documentId, String confidentialityCode, String confidentialityDisplay, String languageCode) {
+                                                  String documentId, String confidentialityCode,
+                                                  String confidentialityDisplay, String languageCode) {
 
         final String title;
         final String classCode;
@@ -544,14 +547,170 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
+     * Method to build the Extrinsic object to be used for the XCA Query service for OrCD documents.
+     *
+     * @param docType
+     * @param effectiveTime
+     * @param serviceStartTime
+     * @param repositoryId
      * @param request
      * @param eot
-     * @param document
+     * @param documentId
+     * @param confidentialityCode
+     * @param confidentialityDisplay
+     * @param languageCode
+     * @param classCode
+     * @param documentFileType
+     * @param size
+     * @param authors
+     * @param reasonOfHospitalisation
      * @return
      */
+    private String prepareExtrinsicObjectOrCD(DocumentType docType, Date effectiveTime, Date serviceStartTime,
+                                              String repositoryId, AdhocQueryRequest request, ExtrinsicObjectType eot,
+                                              String documentId, String confidentialityCode, String confidentialityDisplay,
+                                              String languageCode, String classCode,
+                                              OrCDDocumentMetaData.DocumentFileType documentFileType, long size,
+                                              List<OrCDDocumentMetaData.Author> authors,
+                                              OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) {
+
+        final String title;
+        final String nodeRepresentation;
+        final String displayName;
+
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                title = Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                title = Constants.ORCD_LABORATORY_RESULTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE;
+                nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.NODE_REPRESENTATION;
+                displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PdfSourceCoded.DISPLAY_NAME;
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                title = Constants.ORCD_MEDICAL_IMAGES_TITLE;
+                switch (documentFileType) {
+                    case PNG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.PngSourceCoded.DISPLAY_NAME;
+                        break;
+                    case JPEG:
+                        nodeRepresentation = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.NODE_REPRESENTATION;
+                        displayName = XCAConstants.EXTRINSIC_OBJECT.FormatCode.OrCD.JpegSourceCoded.DISPLAY_NAME;
+                        break;
+                    default:
+                        logger.error("Unsupported document file type '{}' for OrCD Medical Images", documentFileType);
+                        return "";
+                }
+                break;
+            default:
+                logger.error("Unsupported classCode for OrCD query in OpenNCP. Requested classCode: {}", classCode);
+                return "";
+        }
+
+        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
+        // Set Extrinsic Object
+        eot.setStatus(IheConstants.REGREP_STATUSTYPE_APPROVED);
+        eot.setHome(Constants.OID_PREFIX + Constants.HOME_COMM_ID);
+        eot.setId(uuid);
+        eot.setLid(uuid);
+        eot.setObjectType(XCAConstants.XDS_DOC_ENTRY_CLASSIFICATION_NODE);
+
+        // MimeType
+        eot.setMimeType(MediaType.TEXT_XML_VALUE);
+
+        // Name
+        eot.setName(ofRim.createInternationalStringType());
+        eot.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
+        eot.getName().getLocalizedString().get(0).setValue(title);
+
+        // Version Info
+        eot.setVersionInfo(ofRim.createVersionInfoType());
+        eot.getVersionInfo().setVersionName("1.1");
+
+        // Creation Date (optional)
+        eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
+
+        // Service Start time (optional)
+        eot.getSlot().add(makeSlot("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", serviceStartTime)));
+
+        // Source Patient Id
+        eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+
+        // Size
+        eot.getSlot().add(makeSlot("size", String.valueOf(size)));
+
+        // LanguageCode (optional)
+        eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
+
+        // repositoryUniqueId (optional)
+        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+
+        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Type code (not written in 3.4.2)
+        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+                uuid, classCode, "2.16.840.1.113883.6.1", title));
+        // Confidentiality Code
+        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+                uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+        // FormatCode
+        eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+                uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
+
+        /*
+         * Healthcare facility code
+         * TODO: Get healthcare facility info from national implementation
+         */
+        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+                uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
+        // Reason of hospitalisation
+        if (reasonOfHospitalisation != null) {
+            eot.getClassification().add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                    uuid, reasonOfHospitalisation.getCode(), reasonOfHospitalisation.getCodingScheme(), reasonOfHospitalisation.getText()));
+        }
+
+        // Practice Setting code
+        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+                uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
+
+        for (OrCDDocumentMetaData.Author author : authors) {
+            ClassificationType classificationAuthor = makeClassification(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID,
+                    uuid, "");
+
+            if (author.getAuthorPerson() != null) {
+                SlotType1 authorPersonSlot = makeSlot(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
+                classificationAuthor.getSlot().add(authorPersonSlot);
+            }
+
+            if (author.getAuthorSpeciality() != null && !author.getAuthorSpeciality().isEmpty()) {
+                SlotType1 authorSpecialtySlot = makeSlot(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
+                classificationAuthor.getSlot().add(authorSpecialtySlot);
+            }
+            eot.getClassification().add(classificationAuthor);
+        }
+
+        // External Identifiers
+        eot.getExternalIdentifier().add(makeExternalIdentifier("urn:uuid:58a6f841-87b3-4a3e-92fd-a8ffeff98427",
+                uuid, getDocumentEntryPatientId(request), "XDSDocumentEntry.patientId"));
+
+        eot.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
+                uuid, documentId, XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
+
+        return uuid;
+    }
+
     private String prepareExtrinsicObjectEP(AdhocQueryRequest request, ExtrinsicObjectType eot, EPDocumentMetaData document) {
 
-        String name = "eHDSI - ePrescription";
+        var name = "eHDSI - ePrescription";
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
         boolean isPDF = document.getFormat() == EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF;
 
@@ -600,24 +759,42 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
 
-        // Product
-        if (document.hasProduct()) {
-            EPDocumentMetaData.ProductMetadata product = document.getProduct();
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                            product.getProductCode(), "2.16.840.1.113883.6.73", product.getProductName()));
+         // Dispensable
+        if (document.isDispensable()) {
+            ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                    uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open");
+            dispensableClassification.getSlot().add(makeSlot("dispensable", "Open"));
+            eot.getClassification().add(dispensableClassification);
+        } else {
+            ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+                    uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed");
+            dispensableClassification.getSlot().add(makeSlot("dispensable", "Closed"));
+            eot.getClassification().add(dispensableClassification);
         }
 
-        // Dispensable
-        if (document.isDispensable()) {
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
-                            uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open"));
-        } else {
-            eot.getClassification()
-                    .add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
-                            uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed"));
-        }
+        // ATC code (former Product element)
+        ClassificationType atcCodeClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
+        eot.getClassification().add(atcCodeClassification);
+
+        // Dose Form Code
+        ClassificationType doseFormClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
+        eot.getClassification().add(doseFormClassification);
+
+        // Strength
+        ClassificationType strengthClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                document.getStrength(), "eHDSI_Strength_Codesystem", "Strength of medication");
+        eot.getClassification().add(strengthClassification);
+
+        // Substitution
+        ClassificationType substitutionClassification = makeClassification(
+                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                document.getSubstitution(), "eHDSI_Substitution_Codesystem", "Subsitution availability");
+        eot.getClassification().add(substitutionClassification);
 
         // Confidentiality Code
         String confidentialityCode = document.getConfidentiality() != null
@@ -639,18 +816,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     uuid, "urn:epSOS:ep:pre:2010", "eHDSI formatCodes", "epSOS coded ePrescription"));
         }
         // Healthcare facility code
-        // TODO: Get healthcare facility info from national implementaition
-
+        // TODO: Get healthcare facility info from national implementation
         eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
+
         // Practice Setting code
         eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         // Author Person
         ClassificationType authorClassification = makeClassification(
-                "urn:uuid:93606bcf-9494-43ec-9b4e-a7748d1a838d", uuid, "");
-        authorClassification.getSlot().add(makeSlot("authorPerson", document.getAuthor()));
+                IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID, uuid, "");
+        authorClassification.getSlot().add(makeSlot(IheConstants.AUTHOR_PERSON_STR, document.getAuthor()));
         eot.getClassification().add(authorClassification);
 
         // External Identifiers
@@ -663,23 +840,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return uuid;
     }
 
-    /**
-     * @param source
-     * @param target
-     * @return
-     */
     private AssociationType1 makeAssociation(String source, String target) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        AssociationType1 association = ofRim.createAssociationType1();
+        var association = ofRim.createAssociationType1();
         association.setId(uuid);
         association.setAssociationType("urn:ihe:iti:2007:AssociationType:XFRM");
         association.setSourceObject(source);
         association.setTargetObject(target);
-        /*
-         * Gazelle does not like this information when validating. Uncomment if
-         * really needed.
-         */
+        //  Gazelle does not like this information when validating. Uncomment if really needed.
         //        association.getClassification().add(makeClassification(
         //                "urn:uuid:abd807a3-4432-4053-87b4-fd82c643d1f3",
         //                uuid,
@@ -689,9 +858,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return association;
     }
 
-    /**
-     * @return
-     */
     private String getLocation() {
 
         //String location = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
@@ -700,94 +866,83 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return Constants.OID_PREFIX + Constants.HOME_COMM_ID;
     }
 
-    /**
-     * @param errorCode
-     * @param codeContext
-     * @param value
-     * @param isWarning
-     * @return
-     */
     private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
 
-        RegistryError re = ofRs.createRegistryError();
-        re.setErrorCode(errorCode);
-        re.setLocation(getLocation());
-        re.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
-        re.setCodeContext(codeContext);
-        re.setValue(value);
-        return re;
+        var registryError = ofRs.createRegistryError();
+        registryError.setErrorCode(errorCode);
+        registryError.setLocation(getLocation());
+        registryError.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
+        registryError.setCodeContext(codeContext);
+        registryError.setValue(value);
+        return registryError;
     }
 
-    /**
-     * @param ons
-     * @param errorCode
-     * @param codeContext
-     * @param value
-     * @param isWarning
-     * @return
-     */
     private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String value, boolean isWarning) {
 
-        OMElement re = omFactory.createOMElement("RegistryError", ons);
-        re.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
-        re.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
+        var registryError = omFactory.createOMElement("RegistryError", ons);
+        registryError.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
+        registryError.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
         String aux = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error");
-        re.addAttribute(omFactory.createOMAttribute("severity", null, aux));
+        registryError.addAttribute(omFactory.createOMAttribute("severity", null, aux));
         // EHNCP-1131
-        re.addAttribute(omFactory.createOMAttribute("location", null, getLocation()));
-        re.setText(value);
+        registryError.addAttribute(omFactory.createOMAttribute("location", null, getLocation()));
+        registryError.setText(value);
 
-        return re;
+        return registryError;
     }
 
     /**
      * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
-    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader sh,
+    private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader soapHeader,
                                            EventLog eventLog) throws Exception {
 
         String sigCountryCode = null;
         Element shElement = null;
         // What's being requested: eP or PS?
-        String classCodeValue = getDocumentEntryClassCode(request);
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
+        List<String> classCodeValues = getDocumentEntryClassCodes(request);
+        var registryErrorList = ofRs.createRegistryErrorList();
         // Create Registry Object List
         response.setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         try {
-            shElement = XMLUtils.toDOM(sh);
+            shElement = XMLUtils.toDOM(soapHeader);
             documentSearchService.setSOAPHeader(shElement);
-            sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValue);
+            sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValues.get(0));
         } catch (InsufficientRightsException e) {
             logger.debug(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.debug(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
             throw e;
         }
 
         String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
-            if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
-                rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
-            } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
-                rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+            if (classCodeValues.contains(Constants.EP_CLASSCODE)) {
+                registryErrorList.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
+            } else if (classCodeValues.contains(Constants.PS_CLASSCODE)) {
+                registryErrorList.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+            } else if (classCodeValues.contains(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
+                    || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
+                registryErrorList.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
-                rel.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
+                registryErrorList.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
         }
         String patientId = trimDocumentEntryPatientId(fullPatientId);
-        String countryCode = "";
-        String DN = eventLog.getSC_UserID();
-        int cIndex = DN.indexOf("C=");
+        var countryCode = "";
+        String distinguishedName = eventLog.getSC_UserID();
+        int cIndex = distinguishedName.indexOf("C=");
 
         if (cIndex > 0) {
-            countryCode = DN.substring(cIndex + 2, cIndex + 4);
+            countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
         } // Mustafa: This part is added for handling consents when the call is not https
         // In this case, we check the country code of the signature certificate that
         // ships within the HCP assertion
@@ -805,18 +960,18 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            InsufficientRightsException e = new InsufficientRightsException(4701);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            var insufficientRightsException = new InsufficientRightsException(4701);
+            registryErrorList.getRegistryError().add(createErrorMessage(insufficientRightsException.getCode(), insufficientRightsException.getMessage(), "", false));
         }
 
-        if (classCodeValue == null) {
-            rel.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
+        if (classCodeValues == null || classCodeValues.isEmpty()) {
+            registryErrorList.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
         }
 
         // Evidence for call to NI for XCA List
         try {
             //  e-Sens: we MUST generate NRO when NCPA sends to NI. This was throwing errors because we were not
-            //  passing a XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
+            //  passing an XML document. We're passing data like:"SearchCriteria: {patientId = 12445ASD}".
             //  So we provided a XML representation of such data.
             Assertion assertionTRC = Helper.getTRCAssertion(shElement);
             String messageUUID = UUIDHelper.encodeAsURN(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
@@ -832,31 +987,27 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // Handling of the Response Status message and Errors.
-        if (!rel.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(rel);
+        if (!registryErrorList.getRegistryError().isEmpty()) {
+            response.setRegistryErrorList(registryErrorList);
             response.setStatus(AdhocQueryResponseStatus.FAILURE);
 
-        } else {
+        }
 
-            if (StringUtils.equals(classCodeValue, Constants.EP_CLASSCODE) || StringUtils.equals(classCodeValue,
-                    Constants.PS_CLASSCODE) || StringUtils.equals(classCodeValue, Constants.MRO_CLASSCODE)) {
-
-                logger.info("XCA Query Request for '{}' is valid.", classCodeValue);
-                // Document search for ePrescription service.
-                if (StringUtils.contains(classCodeValue, Constants.EP_CLASSCODE)) {
-
+        for (String classCodeValue : classCodeValues) {
+            switch (classCodeValue) {
+                case Constants.EP_CLASSCODE:
                     List<DocumentAssociation<EPDocumentMetaData>> prescriptions = documentSearchService.getEPDocumentList(
                             DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (prescriptions == null) {
 
-                        rel.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("4103", "ePrescription registry could not be accessed.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     } else if (prescriptions.isEmpty()) {
 
-                        rel.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -866,12 +1017,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                             logger.debug("Prescription Repository ID: '{}'", prescription.getXMLDocumentMetaData().getRepositoryId());
                             String xmlUUID;
-                            ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
+                            var eotXML = ofRim.createExtrinsicObjectType();
                             xmlUUID = prepareExtrinsicObjectEP(request, eotXML, prescription.getXMLDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
 
                             String pdfUUID;
-                            ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
+                            var eotPDF = ofRim.createExtrinsicObjectType();
                             pdfUUID = prepareExtrinsicObjectEP(request, eotPDF, prescription.getPDFDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
 
@@ -881,15 +1032,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             }
                         }
                     }
-                } else if (StringUtils.contains(classCodeValue, Constants.PS_CLASSCODE)) {
-
-                    // Document search for Patient service.
+                    break;
+                case Constants.PS_CLASSCODE:
                     DocumentAssociation<PSDocumentMetaData> psDoc = documentSearchService.getPSDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
 
-                        rel.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -897,9 +1047,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         PSDocumentMetaData docXml = psDoc.getXMLDocumentMetaData();
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
-                        String xmlUUID = "";
+                        var xmlUUID = "";
                         if (docXml != null) {
-                            ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
+                            var eotXML = ofRim.createExtrinsicObjectType();
                             String confidentialityCode = docXml.getConfidentiality() == null
                                     || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
                                     : docXml.getConfidentiality().getConfidentialityCode();
@@ -912,9 +1062,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                     docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
                         }
-                        String pdfUUID = "";
+                        var pdfUUID = "";
                         if (docPdf != null) {
-                            ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
+                            var eotPDF = ofRim.createExtrinsicObjectType();
                             String confidentialityCode = docPdf.getConfidentiality() == null
                                     || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
                                     : docPdf.getConfidentiality().getConfidentialityCode();
@@ -930,15 +1080,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                         }
                     }
-                } else if (StringUtils.contains(classCodeValue, Constants.MRO_CLASSCODE)) {
-
-                    // Document search for MRO service.
+                    break;
+                case Constants.MRO_CLASSCODE:
                     DocumentAssociation<MroDocumentMetaData> mro = documentSearchService.getMroDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
 
-                        rel.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(rel);
+                        registryErrorList.getRegistryError().add(createErrorMessage("1100", "No MRO summary is registered for the given patient.", "", true));
+                        response.setRegistryErrorList(registryErrorList);
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
                     } else {
 
@@ -947,9 +1096,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                         response.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
-                        String xmlUUID = "";
+                        var xmlUUID = "";
                         if (docXml != null) {
-                            ExtrinsicObjectType eotXML = ofRim.createExtrinsicObjectType();
+                            var eotXML = ofRim.createExtrinsicObjectType();
                             String confidentialityCode = docXml.getConfidentiality() == null
                                     || docXml.getConfidentiality().getConfidentialityCode() == null ? "N"
                                     : docXml.getConfidentiality().getConfidentialityCode();
@@ -961,9 +1110,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                     docXml.getRepositoryId(), request, eotXML, false, docXml.getId(), confidentialityCode, confidentialityDisplay, languageCode);
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
                         }
-                        String pdfUUID = "";
+                        var pdfUUID = "";
                         if (docPdf != null) {
-                            ExtrinsicObjectType eotPDF = ofRim.createExtrinsicObjectType();
+                            var eotPDF = ofRim.createExtrinsicObjectType();
                             String confidentialityCode = docPdf.getConfidentiality() == null
                                     || docPdf.getConfidentiality().getConfidentialityCode() == null ? "N"
                                     : docPdf.getConfidentiality().getConfidentialityCode();
@@ -979,89 +1128,127 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(pdfUUID, xmlUUID)));
                         }
                     }
-                }
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    var searchCriteria = DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId);
+                    var filterParams = getFilterParams(request);
+                    if (filterParams.getMaximumSize() != null) {
+                        searchCriteria.add(Criteria.MaximumSize, filterParams.getMaximumSize().toString());
+                    }
+                    if (filterParams.getCreatedBefore() != null) {
+                        searchCriteria.add(Criteria.CreatedBefore, filterParams.getCreatedBefore().toString());
+                    }
+                    if (filterParams.getCreatedAfter() != null) {
+                        searchCriteria.add(Criteria.CreatedAfter, filterParams.getCreatedAfter().toString());
+                    }
 
-                // Evidence Emitter processing for the response from NI for XCA List in case of success
+                    List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
 
-                    /*
-                    e-Sens: This should be NRR of NCPA receiving from NI.
-                    This was throwing errors because we were not passing a XML document.
-                    We're passing data like: "SearchCriteria: {patientId = 12445ASD}"
-                    So we provided a XML representation of such data. Still, evidence is generated based on request data,
-                    not response. This NRR is optional as per the CP. So we leave this commented
-                    */
+                    if (orCDDocumentMetaDataList == null || orCDDocumentMetaDataList.isEmpty()) {
+                        response = handleOrCDExceptionCases(response, registryErrorList, orCDDocumentMetaDataList);
+                    } else {
 
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            IHEEventType.epsosPatientServiceList.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                            "NI_XCA_LIST_RES",
-//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
-//                }
-            } else {
-                // Evidence for response from NI for XCA List in case of failure
-                /* Joao: This should be NRR of NCPA receiving from NI.
-                    This was throwing errors because we were not passing a XML document.
-                    We're passing data like:
-                    "SearchCriteria: {patientId = 12445ASD}"
-                    So we provided a XML representation of such data. Still, evidence is generated based on request data, not response.
-                    This NRR is optional as per the CP. So we leave this commented
-                */
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            IHEEventType.epsosPatientServiceList.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString(),
-//                            "NI_XCA_LIST_RES_FAIL",
-//                            Helper.getTRCAssertion(shElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
-//                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
-//                }
+                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        for (OrCDDocumentMetaData orCDDocumentMetaData : orCDDocumentMetaDataList) {
+                            logger.debug("OrCD Document Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
+                            buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
+                        }
+                    }
+                    break;
 
-                rel.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
-                response.setRegistryErrorList(rel);
-                response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                default:
+                    registryErrorList.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
+                    response.setRegistryErrorList(registryErrorList);
+                    response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                    break;
+
+
             }
-        }
 
-        try {
-            prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
-        } catch (Exception e) {
-            logger.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
-            // Is this fatal?
+            try {
+                prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
+            } catch (Exception e) {
+                logger.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
+                // Is this fatal?
+            }
         }
     }
 
-    /**
-     * @param doc
-     * @param registryErrorList
-     * @param registryResponseElement
-     * @param isTranscode
-     * @param eventLog
-     * @return
-     * @throws Exception
-     */
+    private List<OrCDDocumentMetaData> getOrCDDocumentMetaDataList(String classCode, SearchCriteria searchCriteria)
+            throws NIException, InsufficientRightsException {
+
+        List<OrCDDocumentMetaData> orCDDocumentMetaDataList = new ArrayList<>();
+        switch (classCode) {
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDHospitalDischargeReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDLaboratoryResultsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagingReportsDocumentList(searchCriteria);
+                break;
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                orCDDocumentMetaDataList = documentSearchService.getOrCDMedicalImagesDocumentList(searchCriteria);
+                break;
+            default:
+                // eHDSI supports only 4 types of document.
+                break;
+        }
+
+        return orCDDocumentMetaDataList;
+    }
+
+    private void buildOrCDExtrinsicObject(AdhocQueryRequest request, AdhocQueryResponse response, OrCDDocumentMetaData orCDDocumentMetaData) {
+
+        var eotXML = ofRim.createExtrinsicObjectType();
+        final String confidentialityCode = orCDDocumentMetaData.getConfidentiality() == null
+                || orCDDocumentMetaData.getConfidentiality().getConfidentialityCode() == null ? "N"
+                : orCDDocumentMetaData.getConfidentiality().getConfidentialityCode();
+        final String confidentialityDisplay = orCDDocumentMetaData.getConfidentiality() == null
+                || orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay() == null ? "Normal"
+                : orCDDocumentMetaData.getConfidentiality().getConfidentialityDisplay();
+        final String languageCode = orCDDocumentMetaData.getLanguage();
+        String xmlUUID = prepareExtrinsicObjectOrCD(DocumentType.ORCD, orCDDocumentMetaData.getEffectiveTime(),
+                orCDDocumentMetaData.getServiceStartTime(), orCDDocumentMetaData.getRepositoryId(), request, eotXML,
+                orCDDocumentMetaData.getId(), confidentialityCode, confidentialityDisplay, languageCode,
+                orCDDocumentMetaData.getClassCode(), orCDDocumentMetaData.getDocumentFileType(),
+                orCDDocumentMetaData.getSize(), orCDDocumentMetaData.getAuthors(),
+                orCDDocumentMetaData.getReasonOfHospitalisation());
+        response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
+        if (!StringUtils.isEmpty(xmlUUID)) {
+            response.getRegistryObjectList().getIdentifiable().add(ofRim.createAssociation(makeAssociation(xmlUUID, xmlUUID)));
+        }
+    }
+
+    private AdhocQueryResponse handleOrCDExceptionCases(AdhocQueryResponse response, RegistryErrorList rel, List<OrCDDocumentMetaData> orCDDocumentMetaDataList) {
+        if (orCDDocumentMetaDataList == null) {
+            rel.getRegistryError().add(createErrorMessage("4103", "orCD registry could not be accessed.", "", true));
+            response.setRegistryErrorList(rel);
+            response.setStatus(AdhocQueryResponseStatus.FAILURE);
+        } else if (orCDDocumentMetaDataList.isEmpty()) {
+            rel.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
+            response.setRegistryErrorList(rel);
+            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        }
+        return response;
+    }
+
     private Document transformDocument(Document doc, OMElement registryErrorList, OMElement registryResponseElement,
                                        boolean isTranscode, EventLog eventLog) {
 
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
-        if (eventLog.getReqM_PatricipantObjectDetail() != null) {
-            String requester = new String(eventLog.getReqM_PatricipantObjectDetail());
+        if (eventLog.getReqM_ParticipantObjectDetail() != null) {
+            var requester = new String(eventLog.getReqM_ParticipantObjectDetail());
             if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.debug("Participant Requester: '{}'", requester);
             }
         }
-        if (eventLog.getResM_PatricipantObjectDetail() != null) {
-            String responder = new String(eventLog.getResM_PatricipantObjectDetail());
+        if (eventLog.getResM_ParticipantObjectDetail() != null) {
+            var responder = new String(eventLog.getResM_ParticipantObjectDetail());
             if (loggerClinical.isDebugEnabled() && !org.apache.commons.lang3.StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                 loggerClinical.debug("Participant Responder: '{}'", responder);
             }
@@ -1082,9 +1269,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
 
             OMNamespace ns = registryResponseElement.getNamespace();
-            OMNamespace ons = omFactory.createOMNamespace(ns.getNamespaceURI(), "a");
+            var ons = omFactory.createOMNamespace(ns.getNamespaceURI(), "a");
 
-            for (int i = 0; i < tmResponse.getErrors().size(); i++) {
+            for (var i = 0; i < tmResponse.getErrors().size(); i++) {
                 ITMTSAMEror error = tmResponse.getErrors().get(i);
 
                 registryErrorList.addChild(createErrorOMMessage(ons, error.getCode(), error.getDescription(),
@@ -1092,7 +1279,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         false));
             }
 
-            for (int i = 0; i < tmResponse.getWarnings().size(); i++) {
+            for (var i = 0; i < tmResponse.getWarnings().size(); i++) {
                 ITMTSAMEror error = tmResponse.getWarnings().get(i);
 
                 registryErrorList.addChild(createErrorOMMessage(ons, error.getCode(), error.getDescription(),
@@ -1111,24 +1298,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return returnDoc;
     }
 
-    /**
-     * @param request
-     * @param soapHeader
-     * @param eventLog
-     * @param omElement
-     * @throws Exception
-     */
     private void retrieveDocumentSetBuilder(RetrieveDocumentSetRequestType request, SOAPHeader soapHeader,
                                             EventLog eventLog, OMElement omElement) throws Exception {
 
-        OMNamespace ns = omFactory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
-        OMElement registryResponse = omFactory.createOMElement("RegistryResponse", ns);
-        OMElement registryErrorList = omFactory.createOMElement("RegistryErrorList", ns);
+        var omNamespace = omFactory.createOMNamespace("urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0", "");
+        var registryResponse = omFactory.createOMElement("RegistryResponse", omNamespace);
+        var registryErrorList = omFactory.createOMElement("RegistryErrorList", omNamespace);
         OMNamespace ns2 = omElement.getNamespace();
-        OMElement documentResponse = omFactory.createOMElement("DocumentResponse", ns2);
+        var documentResponse = omFactory.createOMElement("DocumentResponse", ns2);
 
-        boolean documentReturned = false;
-        boolean failure = false;
+        var documentReturned = false;
+        var failure = false;
 
         Element soapHeaderElement;
         String classCodeValue = null;
@@ -1171,8 +1351,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 if (countryCode != null) {
                     logger.info("Found the client country code via the signature certificate.");
                 } else {
-                    InsufficientRightsException e = new InsufficientRightsException();
-                    registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
+                    var insufficientRightsException = new InsufficientRightsException();
+                    registryErrorList.addChild(createErrorOMMessage(omNamespace, insufficientRightsException.getCode(),
+                            insufficientRightsException.getMessage(), "", false));
                     break processLabel;
                 }
             }
@@ -1181,8 +1362,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-                InsufficientRightsException e = new InsufficientRightsException(4701);
-                registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
+                var insufficientRightsException = new InsufficientRightsException(4701);
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, insufficientRightsException.getCode(),
+                        insufficientRightsException.getMessage(), "", false));
                 break processLabel;
             }
 
@@ -1211,10 +1393,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         .add(Criteria.PatientId, patientId)
                         .add(Criteria.RepositoryId, repositoryId));
                 //  TODO: EHNCP-2055 Inconsistency in handling patient id
-                //  logger.info("[WS-Server] National Document:\n'{}'", epsosDoc.toString());
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
                 break processLabel;
             }
 
@@ -1239,7 +1420,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
                 logger.error("[National Connector] No document returned by the National Infrastructure");
-                registryErrorList.addChild(createErrorOMMessage(ns, "XDSMissingDocument", "Requested document not found.", "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, "XDSMissingDocument", "Requested document not found.", "", false));
                 break processLabel;
             }
 
@@ -1270,36 +1451,36 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 SAML2Validator.validateXCAHeader(soapHeaderElement, classCodeValue);
             } catch (InsufficientRightsException e) {
                 logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
                 break processLabel;
             } catch (AssertionValidationException e) {
                 logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, e.getCode(), e.getMessage(), "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
                 break processLabel;
             } catch (SMgrException e) {
                 logger.error("SMgrException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, "", e.getMessage(), "", false));
                 break processLabel;
             }
 
             logger.info("XCA Retrieve Request is valid.");
-            OMElement homeCommunityId = omFactory.createOMElement("HomeCommunityId", ns2);
+            var homeCommunityId = omFactory.createOMElement("HomeCommunityId", ns2);
             homeCommunityId.setText(request.getDocumentRequest().get(0).getHomeCommunityId());
             documentResponse.addChild(homeCommunityId);
 
-            OMElement repositoryUniqueId = omFactory.createOMElement("RepositoryUniqueId", ns2);
+            var repositoryUniqueId = omFactory.createOMElement("RepositoryUniqueId", ns2);
             repositoryUniqueId.setText(request.getDocumentRequest().get(0).getRepositoryUniqueId());
             documentResponse.addChild(repositoryUniqueId);
 
-            OMElement documentUniqueId = omFactory.createOMElement("DocumentUniqueId", ns2);
+            var documentUniqueId = omFactory.createOMElement("DocumentUniqueId", ns2);
             documentUniqueId.setText(documentId);
             documentResponse.addChild(documentUniqueId);
 
-            OMElement mimeType = omFactory.createOMElement("mimeType", ns2);
+            var mimeType = omFactory.createOMElement("mimeType", ns2);
             mimeType.setText(MediaType.TEXT_XML_VALUE);
             documentResponse.addChild(mimeType);
 
-            OMElement document = omFactory.createOMElement("Document", omFactory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
+            var document = omFactory.createOMElement("Document", omFactory.createOMNamespace("urn:ihe:iti:xds-b:2007", ""));
             logger.info("XCA Retrieve Response has been created.");
             try {
                 Document doc = epsosDoc.getDocument();
@@ -1314,7 +1495,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 NcpSide.NCP_A, epsosDoc.getClassCode(), false);
                     }
                     // Transcode to eHDSI Pivot
-                    doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    if (!Constants.getClassCodesOrCD().contains(classCodeValue)) {
+                        doc = transformDocument(doc, registryErrorList, registryResponse, true, eventLog);
+                    }
                     if (!checkIfOnlyWarnings(registryErrorList)) {
 
                         // If the transformation process has raised at least one FATAL Error, we should determine which
@@ -1329,7 +1512,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                             if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
 
-                                registryErrorList.addChild(createErrorOMMessage(ns, XCAError.ERROR_4203.getCode(), XCAError.ERROR_4203.getMessage(), "", false));
+                                registryErrorList.addChild(createErrorOMMessage(omNamespace, XCAError.ERROR_4203.getCode(), XCAError.ERROR_4203.getMessage(), "", false));
                                 // If the error is FATAL flag failure has been set to true
                                 failure = true;
                                 break;
@@ -1351,8 +1534,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         dataSource = new ByteArrayDataSource(XMLUtils.toOM(doc.getDocumentElement()).toString().getBytes(),
                                 "text/xml;charset=UTF-8");
                     }
-                    DataHandler dataHandler = new DataHandler(dataSource);
-                    OMText textData = omFactory.createOMText(dataHandler, true);
+                    var dataHandler = new DataHandler(dataSource);
+                    var textData = omFactory.createOMText(dataHandler, true);
                     textData.setOptimize(true);
                     document.addChild(textData);
 
@@ -1363,7 +1546,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             } catch (Exception e) {
                 failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(ns, "", e.getMessage(), "", false));
+                registryErrorList.addChild(createErrorOMMessage(omNamespace, "", e.getMessage(), "", false));
             }
         }
 
@@ -1428,7 +1611,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private boolean checkIfOnlyWarnings(OMElement registryErrorList) {
 
-        boolean onlyWarnings = true;
+        var onlyWarnings = true;
         OMElement element;
         Iterator it = registryErrorList.getChildElements();
 
@@ -1461,43 +1644,57 @@ public class XCAServiceImpl implements XCAServiceInterface {
      */
     private AdhocQueryResponse handleUnsupportedOperationException(AdhocQueryRequest request, UnsupportedOperationException e) {
 
-        AdhocQueryResponse response = ofQuery.createAdhocQueryResponse();
-        RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
-        RegistryError registryError = ofRs.createRegistryError();
+        var adhocQueryResponse = ofQuery.createAdhocQueryResponse();
+        var registryErrorList = ofRs.createRegistryErrorList();
+        var registryError = ofRs.createRegistryError();
 
         // Create Registry Object List
-        response.setRegistryObjectList(ofRim.createRegistryObjectListType());
+        adhocQueryResponse.setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         Writer result = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(result);
+        var printWriter = new PrintWriter(result);
         e.printStackTrace(printWriter);
         registryError.setLocation(result.toString().trim());
 
-        String classCode = getDocumentEntryClassCode(request);
+        List<String> classCodeValues = getDocumentEntryClassCodes(request);
 
-        if (Constants.EP_CLASSCODE.equals(classCode)) {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1101");
-            registryError.setValue("No ePrescriptions are registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
-        } else if (Constants.PS_CLASSCODE.equals(classCode)) {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1102");
-            registryError.setValue("No patient summary is registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
-        } else {
-            registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-            registryError.setErrorCode("1100");
-            registryError.setValue("No documents are registered for the given patient.");
-            registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+        for (String classCodeValue : classCodeValues) {
+            switch (classCodeValue) {
+                case Constants.EP_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1101");
+                    registryError.setValue("No ePrescriptions are registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
+                    break;
+                case Constants.PS_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1102");
+                    registryError.setValue("No patient summary is registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
+                    break;
+                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1104");
+                    registryError.setValue("No original clinical document of the requested type is registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any OrCD of the requested type related to the current patient");
+                    break;
+                default:
+                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    registryError.setErrorCode("1100");
+                    registryError.setValue("No documents are registered for the given patient.");
+                    registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+                    break;
+            }
+            registryErrorList.getRegistryError().add(registryError);
         }
-
-        registryErrorList.getRegistryError().add(registryError);
-        response.setRegistryErrorList(registryErrorList);
+        adhocQueryResponse.setRegistryErrorList(registryErrorList);
         // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
-        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+        adhocQueryResponse.setStatus(AdhocQueryResponseStatus.SUCCESS);
 
-        return response;
+        return adhocQueryResponse;
     }
 
     /**
@@ -1507,13 +1704,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
     public AdhocQueryResponse queryDocument(AdhocQueryRequest adhocQueryRequest, SOAPHeader sh, EventLog eventLog)
             throws Exception {
 
-        AdhocQueryResponse result = ofQuery.createAdhocQueryResponse();
+        var adhocQueryResponse = ofQuery.createAdhocQueryResponse();
         try {
-            adhocQueryResponseBuilder(adhocQueryRequest, result, sh, eventLog);
+            adhocQueryResponseBuilder(adhocQueryRequest, adhocQueryResponse, sh, eventLog);
         } catch (UnsupportedOperationException uoe) {
-            result = handleUnsupportedOperationException(adhocQueryRequest, uoe);
+            adhocQueryResponse = handleUnsupportedOperationException(adhocQueryRequest, uoe);
         }
-        return result;
+        return adhocQueryResponse;
     }
 
     /**
@@ -1529,7 +1726,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     /**
      * This auxiliary service returns the service name, based on a provided class code.
+     *
+     * @deprecated
      */
+    @Deprecated(since = "5.2.0", forRemoval = true)
     private String getDocumentName(final String classCodeValue) {
 
         if (classCodeValue.contains(Constants.PS_CLASSCODE)) {
