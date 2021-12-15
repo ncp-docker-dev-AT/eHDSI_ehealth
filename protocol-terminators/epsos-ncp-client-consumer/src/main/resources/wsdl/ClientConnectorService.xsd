@@ -127,7 +127,9 @@
             <xs:element name="associatedDocuments" type="tns:epsosDocument" nillable="true" minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element name="atcCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="atcText" type="xs:string" minOccurs="0"/>
             <xs:element name="doseFormCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="doseFormText" type="xs:string" minOccurs="0"/>
             <xs:element name="strength" type="xs:string" minOccurs="0"/>
             <xs:element name="substitution" type="xs:string" minOccurs="0"/>
             <xs:element name="dispensable" type="xs:boolean" default="false"/>
@@ -219,17 +221,17 @@
         </xs:complexContent>
     </xs:complexType>
 
+    <xs:complexType name="queryDocumentsResponse">
+        <xs:sequence>
+            <xs:element name="return" type="tns:epsosDocument" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="filterParams">
         <xs:sequence>
             <xs:element name="createdBefore" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="createdAfter" type="xs:dateTime" minOccurs="0"/>
             <xs:element name="maximumSize" type="xs:integer" minOccurs="0"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="queryDocumentsResponse">
-        <xs:sequence>
-            <xs:element name="return" type="tns:epsosDocument" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
