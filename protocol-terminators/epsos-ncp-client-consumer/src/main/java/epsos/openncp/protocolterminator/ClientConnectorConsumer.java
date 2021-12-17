@@ -122,6 +122,8 @@ public class ClientConnectorConsumer {
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
 
+       // clientConnectorServiceStub._getXmlOptions()
+        //clientConnectorServiceStub._getServiceClient()
         try {
             addAssertions(clientConnectorServiceStub, assertions);
 
@@ -170,8 +172,7 @@ public class ClientConnectorConsumer {
             var queryPatientDocument = QueryPatientDocument.Factory.newInstance();
             queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
 
-            var queryPatientResponseDocument =
-                    clientConnectorServiceStub.queryPatient(queryPatientDocument);
+            QueryPatientResponseDocument queryPatientResponseDocument = clientConnectorServiceStub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (Exception ex) {
