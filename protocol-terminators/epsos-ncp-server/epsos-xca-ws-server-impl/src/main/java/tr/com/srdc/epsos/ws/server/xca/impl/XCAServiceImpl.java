@@ -794,11 +794,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
         String substitutionCode = document.getSubstitution() != null
                 && document.getSubstitution().getSubstitutionCode() != null
                 ? document.getSubstitution().getSubstitutionCode()
-                : "N";
+                : "G";
         String substitutionDisplay = document.getSubstitution() != null
-                && document.getSubstitution().getSubstitutionDisplay() != null
-                ? document.getSubstitution().getSubstitutionDisplay()
-                : "none";
+                && document.getSubstitution().getSubstitutionDisplayName() != null
+                ? document.getSubstitution().getSubstitutionDisplayName()
+                : "Generic";
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
                 substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
