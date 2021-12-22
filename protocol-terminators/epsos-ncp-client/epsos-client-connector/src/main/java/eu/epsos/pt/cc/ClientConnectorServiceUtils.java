@@ -6,7 +6,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMDataSource;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;

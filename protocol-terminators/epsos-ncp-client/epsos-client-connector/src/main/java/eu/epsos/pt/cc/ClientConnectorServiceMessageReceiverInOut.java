@@ -1,6 +1,5 @@
 package eu.epsos.pt.cc;
 
-import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XDRException;
@@ -11,7 +10,6 @@ import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,21 +48,11 @@ import epsos.openncp.protocolterminator.clientconnector.SayHelloDocument;
 import epsos.openncp.protocolterminator.clientconnector.SayHelloResponseDocument;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1;
 import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponseDocument;
-import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
-import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
-import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.sax.SAXSource;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.*;
 import java.text.ParseException;
-import java.util.*;
 
 /**
  * ClientConnectorServiceServiceMessageReceiverInOut message receiver.
@@ -153,8 +141,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 newMsgContext.getOptions().setMessageId(randomUUID);
             }
         } catch (Exception e) {
-
-            throw AxisFault.makeFault(e);
+           throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -169,7 +156,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         try {
             return builder.getDocumentElement(true);
         } catch (java.lang.Exception e) {
-            throw AxisFault.makeFault(e);
+            throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -292,7 +279,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             }
 
         } catch (Exception e) {
-            throw AxisFault.makeFault(e);
+            throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
         return null;
     }
