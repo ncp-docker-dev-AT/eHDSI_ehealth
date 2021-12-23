@@ -8,6 +8,7 @@ import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
@@ -46,10 +47,12 @@ public class ClientConnectorConsumer {
         if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
             throw new ClientConnectorConsumerException("HCP Assertion expired");
         }
-        var omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(
-                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                        "Security", "wsse"), null);
+
+        var omFactory = OMAbstractFactory.getSOAP12Factory();
+        SOAPHeaderBlock omSecurityElement = omFactory.createSOAPHeaderBlock(
+                omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                "Security", "wsse"), null));
+
         if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
             var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
             if (AssertionHelper.isExpired(assertion)) {
@@ -122,8 +125,6 @@ public class ClientConnectorConsumer {
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
 
-       // clientConnectorServiceStub._getXmlOptions()
-        //clientConnectorServiceStub._getServiceClient()
         try {
             addAssertions(clientConnectorServiceStub, assertions);
 
