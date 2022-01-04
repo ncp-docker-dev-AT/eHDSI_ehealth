@@ -19,12 +19,14 @@ import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XDRException;
 
+
 public class ClientConnectorServiceUtils {
 	private static final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceUtils.class);
 	private static final String DEFAULT_ERROR_CODE = "1000";
-	private static final String NoPatientIdDiscovered = "4707";
-	private static final OMFactory OM_FACTORY = OMAbstractFactory.getOMFactory(); 
-	
+	private static final OMFactory OM_FACTORY = OMAbstractFactory.getOMFactory();
+	public static final String TASK_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
+	public static final String TASK_NAMESPACE_PREFIX = "soapenv";
+
 	public static AxisFault createGeneralFaultMessage(Throwable e) {
 		
 		if (e instanceof AxisFault) {
@@ -40,19 +42,19 @@ public class ClientConnectorServiceUtils {
 	    } else if (e instanceof UndeclaredThrowableException) {
 	        t = ((UndeclaredThrowableException) e).getCause();
 	    }else if(t instanceof NoPatientIdDiscoveredException) {
-	    	response = OM_FACTORY.createOMElement(TMSConstants.NO_PATIENT_ID_DISCOVERED);
-			errorCode = NoPatientIdDiscovered;
-			faultMessage = "There is no patient discovered having the ID specified!";
+	    	response = OM_FACTORY.createOMElement(new QName(TASK_NAMESPACE, "noPatientIdDiscoveredException", TASK_NAMESPACE_PREFIX));
+			errorCode = t.getMessage();
+			faultMessage = ((NoPatientIdDiscoveredException) t).getContext();
 			response.setText(faultMessage);
 		}else if(t instanceof XCAException) {
-	    	response = OM_FACTORY.createOMElement(TMSConstants.XCA_EXCEPTION);
+	    	response = OM_FACTORY.createOMElement(new QName(TASK_NAMESPACE, "xcaException", TASK_NAMESPACE_PREFIX));
 			errorCode = t.getMessage();
-			faultMessage = "XCA Exception";
+			faultMessage = ((XCAException) t).getContext();
 			response.setText(faultMessage);
 		}else if(t instanceof XDRException) {
-	    	response = OM_FACTORY.createOMElement(TMSConstants.XDR_EXCEPTION);
+	    	response = OM_FACTORY.createOMElement(new QName(TASK_NAMESPACE, "xdrException", TASK_NAMESPACE_PREFIX));
 			errorCode = t.getMessage();
-			faultMessage = "XDR Exception";
+			faultMessage = ((XDRException) t).getContext();
 			response.setText(faultMessage);
 		}else { //
 			errorCode = t.getMessage();
@@ -72,23 +74,6 @@ public class ClientConnectorServiceUtils {
 		axisFault.setDetail(response);
 		
 		return axisFault;
-	}
-	
-	
-	interface TMSConstants { 
-		
-		public static final String TASK_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/"; 
-		public static final String TASK_NAMESPACE_PREFIX = "soapenv"; 
-		    
-		public static final QName NO_PATIENT_ID_DISCOVERED = new QName(TASK_NAMESPACE, "noPatientIdDiscovered", TASK_NAMESPACE_PREFIX); 
-		public static final QName XCA_EXCEPTION = new QName(TASK_NAMESPACE, "xcaException", TASK_NAMESPACE_PREFIX); 
-		public static final QName XDR_EXCEPTION  = new QName(TASK_NAMESPACE, "xdrException", TASK_NAMESPACE_PREFIX); 
-		
-	    public static final QName INVALID_INPUT_FORMAT = new QName(TASK_NAMESPACE, "invalidInputMessageFault", TASK_NAMESPACE_PREFIX); 
-	    public static final QName UNAVAILABLE_TASK = new QName(TASK_NAMESPACE, "unavailableTaskFault", TASK_NAMESPACE_PREFIX); 
-	    public static final QName UNAVAILABLE_ATTACHMENT = new QName(TASK_NAMESPACE, "unavailableAttachmentFault", TASK_NAMESPACE_PREFIX); 
-	    public static final QName INVALID_TOKEN = new QName(TASK_NAMESPACE, "invalidParticipantTokenFault", TASK_NAMESPACE_PREFIX); 
-	    public static final QName ACCESS_DENIED = new QName(TASK_NAMESPACE, "accessDeniedFault", TASK_NAMESPACE_PREFIX); 
 	}
 }
 

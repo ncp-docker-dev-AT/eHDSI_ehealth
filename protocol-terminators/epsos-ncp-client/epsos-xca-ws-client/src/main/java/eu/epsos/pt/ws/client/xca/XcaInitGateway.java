@@ -257,7 +257,7 @@ public class XcaInitGateway {
                         if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("Registry Errors: '{}'", msg);
                         }
-                        throw new XCAException(errorCode);
+                        throw new XCAException(errorCode, codeContext);
                     }
                 }
             }

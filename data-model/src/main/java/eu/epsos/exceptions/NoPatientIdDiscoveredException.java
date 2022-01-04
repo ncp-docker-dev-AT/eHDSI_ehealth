@@ -4,9 +4,7 @@ package eu.epsos.exceptions;
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
-public class NoPatientIdDiscoveredException extends Exception {
-
-    private static final long serialVersionUID = 1L;
+public class NoPatientIdDiscoveredException extends ExceptionWithContext {
 
     public NoPatientIdDiscoveredException(String message) {
         super(message);
@@ -19,4 +17,13 @@ public class NoPatientIdDiscoveredException extends Exception {
     public NoPatientIdDiscoveredException(Throwable cause) {
         super(cause);
     }
+
+    public NoPatientIdDiscoveredException(String message, String context) {
+        super(message, context);
+    }
+
+    public NoPatientIdDiscoveredException(String message, String context, Throwable cause) {
+        super(message, context, cause);
+    }
+
 }

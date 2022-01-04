@@ -116,6 +116,10 @@ public class ClientConnectorConsumer {
             EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
 
             return Arrays.asList(docArray);
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -147,6 +151,10 @@ public class ClientConnectorConsumer {
                     clientConnectorServiceStub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -166,6 +174,10 @@ public class ClientConnectorConsumer {
 
             var sayHelloResponseDocument = clientConnectorServiceStub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -195,6 +207,10 @@ public class ClientConnectorConsumer {
                     clientConnectorServiceStub.retrieveDocument(retrieveDocumentDocument);
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -230,6 +246,10 @@ public class ClientConnectorConsumer {
             submitDocumentDoc.setSubmitDocument(submitDocument);
 
             return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -259,8 +279,10 @@ public class ClientConnectorConsumer {
             logger.debug("[Axis2 configuration] HTTPConstants.CONNECTION_TIMEOUT: '{}'",
                     clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.CONNECTION_TIMEOUT));
             return clientConnectorStub;
-        } catch (AxisFault e) {
-            throw new ClientConnectorConsumerException(e.getMessage(), e);
+        } catch (AxisFault axisFault){
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null? axisFault.getDetail().getText() : null,
+                    axisFault);
         }
     }
 
