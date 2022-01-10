@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is an Data Transformation Service providing functions to transform data into a Document object.
+ * This is a Data Transformation Service providing functions to transform data into a Document object.
  *
  * @author Marcelo Fonseca - <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -65,7 +65,6 @@ public class DocumentDts {
         }
 
         result.setAtcCode(document.getAtcCode());
-        //result.setDoseFormCode(document.getDoseFormCode());
         result.setDoseFormCode(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
@@ -104,10 +103,9 @@ public class DocumentDts {
         return result;
     }
 
-    private static String composeCodeAndText(String code, String text)
-    {
+    private static String composeCodeAndText(String code, String text) {
         String ret = code;
-        if(text != null && !text.isEmpty()) {
+        if (text != null && !text.isEmpty()) {
             ret = "[" + code + "] " + text;
         }
         return ret;
