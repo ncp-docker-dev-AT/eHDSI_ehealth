@@ -34,9 +34,15 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +50,7 @@ import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -121,6 +128,18 @@ public class RespondingGateway_ServiceStub extends Stub {
         _serviceClient.getOptions().setTimeOutInMilliSeconds(180000);
         //Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+
+        SSLContext sslContext = SSLContexts.createDefault();
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+                sslContext,
+                new String[]{"TLSv1.2"},
+                null,
+                new NoopHostnameVerifier());
+
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+        //clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.MULTITHREAD_HTTP_CONNECTION_MANAGER, httpClient);
+        _serviceClient.getOptions().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+
     }
 
     /**
