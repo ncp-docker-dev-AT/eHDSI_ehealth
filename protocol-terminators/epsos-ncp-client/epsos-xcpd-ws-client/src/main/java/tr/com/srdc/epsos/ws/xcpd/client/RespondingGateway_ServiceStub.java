@@ -35,9 +35,12 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -131,12 +135,12 @@ public class RespondingGateway_ServiceStub extends Stub {
         multiThreadedHttpConnectionManager.setParams(httpConnectionManagerParams);
         var httpClient = new HttpClient(multiThreadedHttpConnectionManager);
         */
-        var poolingHttpConnectionManager = new PoolingHttpClientConnectionManager();
-        poolingHttpConnectionManager.setMaxTotal(20);
+        //var poolingHttpConnectionManager = new PoolingHttpClientConnectionManager();
+        //poolingHttpConnectionManager.setMaxTotal(20);
 
         // 1.
         //HttpClients.custom().setConnectionManager(poolingHttpConnectionManager);
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        //CloseableHttpClient httpClient = HttpClients.createDefault();
 
         // 2.
         //CloseableHttpClient httpClient2 = HttpClients.createMinimal(poolingHttpConnectionManager);
@@ -146,8 +150,17 @@ public class RespondingGateway_ServiceStub extends Stub {
         //httpClientBuilder.setConnectionManager(poolingHttpConnectionManager);
         //CloseableHttpClient httpClient3 = httpClientBuilder.build();
 
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
+        SSLContext sslContext = SSLContexts.createDefault();
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+                sslContext,
+                new String[]{"TLSv1.2"},
+                null,
+                new NoopHostnameVerifier());
+
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
         this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+
+        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
         this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.AUTO_RELEASE_CONNECTION, false);
     }
 
