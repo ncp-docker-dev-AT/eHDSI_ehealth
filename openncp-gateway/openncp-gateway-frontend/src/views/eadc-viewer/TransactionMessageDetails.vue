@@ -127,7 +127,7 @@
                   <v-text-field
                     label="Data Value"
                     outlined
-                    :value="item.dataValue"
+                    :value="item.dataValue.toString()"
                     disabled
                     hide-details="auto"
                   />
