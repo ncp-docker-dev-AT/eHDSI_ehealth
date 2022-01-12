@@ -8,7 +8,9 @@
       </v-breadcrumbs>
     </div>
     <v-tabs v-model="tab">
-      <v-tab href="#tab-transaction-identification">Transaction Identification</v-tab>
+      <v-tab href="#tab-transaction-identification"
+        >Transaction Identification</v-tab
+      >
       <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
     </v-tabs>
     <div v-if="message">
@@ -95,14 +97,14 @@
                 />
               </v-col>
             </v-row>
-            <div v-if="message.transactionData">
+            <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
-              <v-row>
+              <v-row v-for="(item, index) in message.transactionData">
                 <v-col>
                   <v-text-field
                     label="Type"
                     outlined
-                    :value="message.transactionData.dataType"
+                    :value="item.dataType"
                     disabled
                     hide-details="auto"
                   />
@@ -111,7 +113,7 @@
                   <v-text-field
                     label="Type Name"
                     outlined
-                    :value="message.transactionData.dataTypeName"
+                    :value="item.dataTypeName"
                     disabled
                     hide-details="auto"
                   />
@@ -122,7 +124,7 @@
                   <v-text-field
                     label="Data Value"
                     outlined
-                    :value="message.transactionData.dataValue"
+                    :value="item.dataValue"
                     disabled
                     hide-details="auto"
                   />
@@ -131,7 +133,7 @@
                   <v-text-field
                     label="Value Display"
                     outlined
-                    :value="message.transactionData.valueDisplay"
+                    :value="item.valueDisplay"
                     disabled
                     hide-details="auto"
                   />
