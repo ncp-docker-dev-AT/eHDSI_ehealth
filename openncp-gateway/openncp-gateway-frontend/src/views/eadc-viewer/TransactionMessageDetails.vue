@@ -8,10 +8,8 @@
       </v-breadcrumbs>
     </div>
     <v-tabs v-model="tab">
-      <v-tab href="#tab-transaction-identification"
-        >Transaction Identification</v-tab
-      >
-      <v-tab href="#tab-home-snd-recieving">Home / Sender / Receiver</v-tab>
+      <v-tab href="#tab-transaction-identification">Transaction Identification</v-tab>
+      <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
     </v-tabs>
     <div v-if="message">
       <v-tabs-items v-model="tab">
@@ -111,7 +109,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    label="Tyoe Name"
+                    label="Type Name"
                     outlined
                     :value="message.transactionData.dataTypeName"
                     disabled
@@ -142,7 +140,7 @@
             </div>
           </v-container>
         </v-tab-item>
-        <v-tab-item value="tab-home-snd-recieving">
+        <v-tab-item value="tab-home-snd-receiving">
           <v-row>
             <v-col><h2>Home</h2></v-col>
           </v-row>
@@ -307,7 +305,7 @@ export default {
           disabled: true
         },
         {
-          text: 'Transations list',
+          text: 'Transactions list',
           disabled: false,
           exact: true,
           to: { name: 'transactions' }
