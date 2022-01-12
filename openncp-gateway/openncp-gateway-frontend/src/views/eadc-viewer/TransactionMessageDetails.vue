@@ -99,7 +99,7 @@
             </v-row>
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
-              <v-row v-for="(item, index) in message.transactionData">
+              <v-row v-for="(item, index) in message.transactionData" :key="`transaction-data-${i}`>
                 <v-col>
                   <v-text-field
                     label="Type"
