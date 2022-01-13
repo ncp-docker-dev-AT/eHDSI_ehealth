@@ -25,10 +25,10 @@ public class MessageResource {
     }
 
     @GetMapping(path = "/messages")
-    public ResponseEntity<List<Message>> listMessages(@SortDefault(sort = "eventDateTime", direction = Sort.Direction.DESC)
+    public ResponseEntity<Page<Message>> listMessages(@SortDefault(sort = "eventDateTime", direction = Sort.Direction.DESC)
                                                               Pageable pageable) {
         Page<Message> page = messageService.findMessages(pageable);
-        return ResponseEntity.ok(page.getContent());
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping(path = "/messages/{id}")
