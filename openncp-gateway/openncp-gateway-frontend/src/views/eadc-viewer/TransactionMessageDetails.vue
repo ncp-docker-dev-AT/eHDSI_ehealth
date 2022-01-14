@@ -304,9 +304,7 @@ export default {
     //   })
 
     fetch(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-      .then((response) => {
-        response.json()
-      })
+      .then((response) => response.json())
       .then((data) => {
         this.message = data
         console.log(this.message)
