@@ -100,14 +100,14 @@
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
               <v-row
-                v-for="(item, i) in message.transactionData"
+                v-for="(element, i) in message.transactionData"
                 :key="`transaction-data-${i}`"
               >
                 <v-col>
                   <v-text-field
                     label="Type"
                     outlined
-                    :value="item.dataType"
+                    :value="element.dataType"
                     disabled
                     hide-details="auto"
                   />
@@ -116,7 +116,7 @@
                   <v-text-field
                     label="Type Name"
                     outlined
-                    :value="item.dataTypeName"
+                    :value="element.dataTypeName"
                     disabled
                     hide-details="auto"
                   />
@@ -127,7 +127,7 @@
                   <v-text-field
                     label="Data Value"
                     outlined
-                    :value="item.dataValue.toString()"
+                    :value="element.dataValue.toString()"
                     disabled
                     hide-details="auto"
                   />
@@ -136,7 +136,7 @@
                   <v-text-field
                     label="Value Display"
                     outlined
-                    :value="item.valueDisplay"
+                    :value="element.valueDisplay"
                     disabled
                     hide-details="auto"
                   />
@@ -297,6 +297,7 @@ export default {
       .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
       .then((response) => {
         this.message = response.data
+        console.log(this.message.transationData)
         this.loading = false
       })
   },
