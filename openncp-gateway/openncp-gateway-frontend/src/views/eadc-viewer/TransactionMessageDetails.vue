@@ -100,7 +100,7 @@
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
               <v-row
-                v-for="(element, i) in message.transactionData"
+                v-for="(element, i) in transactionData"
                 :key="`transaction-data-${i}`"
               >
                 <v-col>
@@ -288,7 +288,8 @@ export default {
     return {
       tab: 'tab-transaction-identification',
       loading: false,
-      message: null
+      message: {},
+      transactionData: []
     }
   },
   mounted () {
@@ -308,6 +309,8 @@ export default {
       .then((data) => {
         this.message = data
         console.log(this.message)
+        console.log(this.message.transationData)
+        this.transactionData = data.transactionData
         this.loading = false
       })
   },
