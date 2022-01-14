@@ -303,13 +303,15 @@ export default {
     //     this.loading = false
     //   })
 
-    fetch(
-      process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`
-    ).then((response) => {
-      this.message = response.json()
-      console.log(this.message)
-      this.loading = false
-    })
+    fetch(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+      .then((response) => {
+        response.json()
+      })
+      .then((data) => {
+        this.message = data
+        console.log(this.message)
+        this.loading = false
+      })
   },
   computed: {
     items () {
