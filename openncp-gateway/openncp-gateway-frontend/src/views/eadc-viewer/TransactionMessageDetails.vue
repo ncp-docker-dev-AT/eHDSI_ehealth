@@ -297,6 +297,7 @@ export default {
       .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
       .then((response) => {
         this.message = response.data
+        console.log(response)
         console.log(this.message)
         console.log(this.message.transactionData)
         this.loading = false
