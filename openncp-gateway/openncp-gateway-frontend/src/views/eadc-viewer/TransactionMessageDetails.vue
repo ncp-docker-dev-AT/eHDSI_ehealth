@@ -293,15 +293,23 @@ export default {
   },
   mounted () {
     this.loading = true
-    axios
-      .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-      .then((response) => {
-        this.message = response.data
-        console.log(response)
-        console.log(this.message)
-        console.log(this.message.transactionData)
-        this.loading = false
-      })
+    // axios
+    //   .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+    //   .then((response) => {
+    //     this.message = response.data
+    //     console.log(response)
+    //     console.log(this.message)
+    //     console.log(this.message.transactionData)
+    //     this.loading = false
+    //   })
+
+    fetch(
+      process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`
+    ).then((repsonse) => {
+      this.message = response.json()
+      console.log(this.message)
+      this.loading = false
+    })
   },
   computed: {
     items () {
