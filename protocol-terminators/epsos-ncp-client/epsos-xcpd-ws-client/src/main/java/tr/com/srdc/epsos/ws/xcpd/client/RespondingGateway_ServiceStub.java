@@ -11,6 +11,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.ClientSocketFactory;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -30,17 +31,9 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -49,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import javax.net.ssl.SSLContext;
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -128,40 +120,11 @@ public class RespondingGateway_ServiceStub extends Stub {
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 
-        /*
-        var multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
-        var httpConnectionManagerParams = new HttpConnectionManagerParams();
-        httpConnectionManagerParams.setDefaultMaxConnectionsPerHost(20);
-        multiThreadedHttpConnectionManager.setParams(httpConnectionManagerParams);
-        var httpClient = new HttpClient(multiThreadedHttpConnectionManager);
-        */
-        //var poolingHttpConnectionManager = new PoolingHttpClientConnectionManager();
-        //poolingHttpConnectionManager.setMaxTotal(20);
-
-        // 1.
-        //HttpClients.custom().setConnectionManager(poolingHttpConnectionManager);
-        //CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        // 2.
-        //CloseableHttpClient httpClient2 = HttpClients.createMinimal(poolingHttpConnectionManager);
-
-        // 3.
-        //HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        //httpClientBuilder.setConnectionManager(poolingHttpConnectionManager);
-        //CloseableHttpClient httpClient3 = httpClientBuilder.build();
-
-        SSLContext sslContext = SSLContexts.createDefault();
-        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
-                sslContext,
-                new String[]{"TLSv1.2"},
-                null,
-                new NoopHostnameVerifier());
-
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.AUTO_RELEASE_CONNECTION, false);
+        try {
+            ClientSocketFactory.setServiceClientConfig(_serviceClient, new String[]{"TLSv1.2"});
+        } catch (AxisFault e) {
+            LOGGER.error("Exception: '{}'", e.getMessage(), e);
+        }
     }
 
     /**
