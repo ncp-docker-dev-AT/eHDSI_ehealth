@@ -99,6 +99,7 @@
             </v-row>
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
+              <v-row>{{ transactionData }}</v-row>
               <v-row
                 v-for="(element, i) in transactionData"
                 :key="`transaction-data-${i}`"
