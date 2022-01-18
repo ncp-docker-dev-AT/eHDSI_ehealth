@@ -99,49 +99,51 @@
             </v-row>
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
-              <v-row
+              <div
                 v-for="item in message.transactionData"
                 :key="`transaction-data-${item.dataType}`"
               >
-                <v-col>
-                  <v-text-field
-                    label="Type"
-                    outlined
-                    :value="item.dataType"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    label="Type Name"
-                    outlined
-                    :value="item.dataTypeName"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    label="Data Value"
-                    outlined
-                    :value="item.dataValue"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    label="Value Display"
-                    outlined
-                    :value="item.valueDisplay"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      label="Type"
+                      outlined
+                      :value="item.dataType"
+                      disabled
+                      hide-details="auto"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      label="Type Name"
+                      outlined
+                      :value="item.dataTypeName"
+                      disabled
+                      hide-details="auto"
+                    />
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      label="Data Value"
+                      outlined
+                      :value="item.dataValue"
+                      disabled
+                      hide-details="auto"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      label="Value Display"
+                      outlined
+                      :value="item.valueDisplay"
+                      disabled
+                      hide-details="auto"
+                    />
+                  </v-col>
+                </v-row>
+              </div>
             </div>
           </v-container>
         </v-tab-item>
