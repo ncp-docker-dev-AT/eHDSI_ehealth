@@ -100,14 +100,14 @@
             <div v-if="message.transactionData" style="margin-top: 2rem">
               <v-row> Data </v-row>
               <v-row
-                v-for="(element, i) in message.transactionData"
-                :key="`transaction-data-${i}`"
+                v-for="item in message.transactionData"
+                :key="`transaction-data-${item.dataType}`"
               >
                 <v-col>
                   <v-text-field
                     label="Type"
                     outlined
-                    :value="element.dataType"
+                    :value="item.dataType"
                     disabled
                     hide-details="auto"
                   />
@@ -116,7 +116,7 @@
                   <v-text-field
                     label="Type Name"
                     outlined
-                    :value="element.dataTypeName"
+                    :value="item.dataTypeName"
                     disabled
                     hide-details="auto"
                   />
@@ -127,7 +127,7 @@
                   <v-text-field
                     label="Data Value"
                     outlined
-                    :value="element.dataValue.toString()"
+                    :value="item.dataValue"
                     disabled
                     hide-details="auto"
                   />
@@ -136,7 +136,7 @@
                   <v-text-field
                     label="Value Display"
                     outlined
-                    :value="element.valueDisplay"
+                    :value="item.valueDisplay"
                     disabled
                     hide-details="auto"
                   />
