@@ -241,7 +241,7 @@
           >
             <v-row>
               <v-col>
-                <h3>Details</h3>
+                <h2>Details</h2>
               </v-col>
             </v-row>
             <v-row>
@@ -284,7 +284,6 @@
                 />
               </v-col>
             </v-row>
-            <hr style="margin: 2rem 0" />
           </div>
         </v-tab-item>
       </v-tabs-items>
