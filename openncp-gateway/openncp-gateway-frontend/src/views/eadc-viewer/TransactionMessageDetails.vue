@@ -12,6 +12,11 @@
         >Transaction Identification</v-tab
       >
       <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
+      <v-tab
+        href="#transaction-details"
+        v-if="message.transactionData.length > 0"
+        >Transaction details</v-tab
+      >
     </v-tabs>
     <div v-if="message">
       <v-tabs-items v-model="tab">
@@ -97,54 +102,6 @@
                 />
               </v-col>
             </v-row>
-            <div v-if="message.transactionData" style="margin-top: 2rem">
-              <v-row> Data </v-row>
-              <div
-                v-for="item in message.transactionData"
-                :key="`transaction-data-${item.dataType}`"
-              >
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      label="Type"
-                      outlined
-                      :value="item.dataType"
-                      disabled
-                      hide-details="auto"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-text-field
-                      label="Type Name"
-                      outlined
-                      :value="item.dataTypeName"
-                      disabled
-                      hide-details="auto"
-                    />
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-col>
-                    <v-text-field
-                      label="Data Value"
-                      outlined
-                      :value="item.dataValue"
-                      disabled
-                      hide-details="auto"
-                    />
-                  </v-col>
-                  <v-col>
-                    <v-text-field
-                      label="Value Display"
-                      outlined
-                      :value="item.valueDisplay"
-                      disabled
-                      hide-details="auto"
-                    />
-                  </v-col>
-                </v-row>
-              </div>
-            </div>
           </v-container>
         </v-tab-item>
         <v-tab-item value="tab-home-snd-receiving">
@@ -275,6 +232,54 @@
               />
             </v-col>
           </v-row>
+        </v-tab-item>
+        <v-tab-item value="transaction-details">
+          <div
+            v-for="(item, i) in message.transactionData"
+            :key="`transaction-data-${i}`"
+          >
+            <v-row>
+              <v-col>
+                <v-text-field
+                  label="Type"
+                  outlined
+                  :value="item.dataType"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  label="Type Name"
+                  outlined
+                  :value="item.dataTypeName"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  label="Data Value"
+                  outlined
+                  :value="item.dataValue"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  label="Value Display"
+                  outlined
+                  :value="item.valueDisplay"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+          </div>
+          <hr />
         </v-tab-item>
       </v-tabs-items>
     </div>
