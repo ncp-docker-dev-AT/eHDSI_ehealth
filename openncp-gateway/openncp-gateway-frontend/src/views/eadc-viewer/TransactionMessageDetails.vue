@@ -237,6 +237,7 @@
           <div
             v-for="(item, i) in message.transactionData"
             :key="`transaction-data-${i}`"
+            style="margin-top: 2rem"
           >
             <v-row>
               <v-col>
@@ -279,7 +280,6 @@
               </v-col>
             </v-row>
           </div>
-          <hr />
         </v-tab-item>
       </v-tabs-items>
     </div>
