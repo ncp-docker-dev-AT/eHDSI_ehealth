@@ -59,7 +59,7 @@ export default {
       ],
       messages: [],
       totalMessages: 0,
-      options: {},
+      options: { page: 0 },
       search: '',
       loading: true,
       items: [
@@ -92,6 +92,7 @@ export default {
       this.apiCall().then((data) => {
         console.log('CONTENT ', data)
         this.messages = data.content
+        console.log('MESSAGES ', this.messages)
         this.totalMessages = data.totalElements
         this.options.page = this.number
         this.loading = false
