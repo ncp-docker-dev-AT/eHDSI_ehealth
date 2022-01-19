@@ -91,10 +91,10 @@ export default {
       this.loading = true
       this.apiCall().then((data) => {
         console.log('CONTENT ', data)
-        this.messages = data.content
+        this.messages = data.data.content
         console.log('MESSAGES ', this.messages)
-        this.totalMessages = data.totalElements
-        this.options.page = this.number
+        this.totalMessages = data.data.totalElements
+        this.options.page = data.data.number
         this.loading = false
       })
     },
