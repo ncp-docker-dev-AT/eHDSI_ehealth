@@ -16,7 +16,6 @@
           :footer-props="{
             'items-per-page-options': [10]
           }"
-          :items-per-page="itemsPerPage"
           :options.sync="options"
           :server-items-length="totalMessages"
           :loading="loading"
@@ -61,7 +60,6 @@ export default {
         { value: 'actions', sortable: false }
       ],
       messages: [],
-      itemsPerPage: 10,
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
       loading: true,
@@ -85,6 +83,8 @@ export default {
       handler () {
         this.getDataFromApi()
       },
+      page: 1,
+      itemsPerPage: 10,
       deep: true
     }
   },
@@ -101,7 +101,7 @@ export default {
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
-          pageNumber: this.options.page - 1,
+          pageNumber: this.options.page,
           size: this.options.itemsPerPage
         }
       })
