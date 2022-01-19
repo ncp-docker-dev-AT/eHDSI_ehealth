@@ -58,6 +58,7 @@ export default {
         { value: 'actions', sortable: false }
       ],
       messages: [],
+      totalMessages: 0,
       options: {},
       search: '',
       loading: true,
@@ -89,6 +90,7 @@ export default {
     getDataFromApi () {
       this.loading = true
       this.apiCall().then((data) => {
+        console.log('CONTENT ', data)
         this.messages = data.content
         this.totalMessages = data.totalElements
         this.options.page = this.number
@@ -97,7 +99,7 @@ export default {
     },
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
-        params: { pageable: { pageNumber: this.options.page, pageSize: 10 } }
+        params: { pageNumber: this.options.page, pageSize: 10 }
       })
     }
   }
