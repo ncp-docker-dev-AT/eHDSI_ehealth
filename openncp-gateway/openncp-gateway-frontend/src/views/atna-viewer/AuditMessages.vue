@@ -12,6 +12,7 @@
         <v-data-table
           :headers="headers"
           :items="messages"
+          :rowsPerPageItems="[10]"
           :items-per-page="itemsPerPage"
           :options.sync="options"
           :server-items-length="totalMessages"
