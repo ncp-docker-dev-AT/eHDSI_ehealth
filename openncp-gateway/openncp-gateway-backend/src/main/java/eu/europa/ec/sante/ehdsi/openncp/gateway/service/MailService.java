@@ -35,10 +35,16 @@ public class MailService implements MessageSourceAware {
         this.mailSender = mailSender;
     }
 
+    @Override
+    public void setMessageSource(@NonNull MessageSource messageSource) {
+        messages = new MessageSourceAccessor(messageSource);
+    }
+
     @Async
     public void sendMail(String to, String subject, String content, boolean multipart, boolean html) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
         try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, multipart, StandardCharsets.UTF_8.name());
             message.setTo(to);
             message.setFrom(applicationProperties.getMail().getFrom());
@@ -46,12 +52,12 @@ public class MailService implements MessageSourceAware {
             message.setText(content, html);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            logger.error("", e);
+            logger.error("MessagingException: '{}'", e.getMessage());
         }
     }
 
     @Async
-    public String sendMailFromTemplate(User user, String template, String titleKey) {
+    public String sendMailFromTemplate(User user, String titleKey) {
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         boolean mail = configurationManager.getBooleanProperty("GTW_MAIL_ENABLED");
         String content = "Change your password <a href='" +
@@ -68,11 +74,6 @@ public class MailService implements MessageSourceAware {
 
     @Async
     public String sendPasswordResetMail(User user) {
-        return sendMailFromTemplate(user, "mails/passwordResetMail", "Mail.PasswordReset.Title");
-    }
-
-    @Override
-    public void setMessageSource(@NonNull MessageSource messageSource) {
-        messages = new MessageSourceAccessor(messageSource);
+        return sendMailFromTemplate(user, "Mail.PasswordReset.Title");
     }
 }
