@@ -59,7 +59,7 @@ export default {
       ],
       messages: [],
       totalMessages: 0,
-      options: { page: 0 },
+      options: {},
       search: '',
       loading: true,
       items: [
