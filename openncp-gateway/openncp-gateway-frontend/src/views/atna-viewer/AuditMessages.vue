@@ -58,9 +58,7 @@ export default {
         { value: 'actions', sortable: false }
       ],
       messages: [],
-      itemsPerPage: 10,
-      page: 1,
-      pageCount: 0
+      options: {},
       search: '',
       loading: true,
       items: [
@@ -83,20 +81,22 @@ export default {
       handler () {
         this.getDataFromApi()
       },
-      deep: true
+      deep: true,
+      itemsPerPage: 10,
     }
   },
   methods: {
     getDataFromApi () {
       this.loading = true
       this.apiCall().then((data) => {
-        this.desserts = data.items
-        this.totalDesserts = data.total
+        this.messages = data.content
+        this.totalMessages = data.totalElements
+        this.options.page = this.number
         this.loading = false
       })
     },
     apiCall () {
-      return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages')
+      return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {params: {pageable: pageNumber: page, pageSize: 10}})
     }
   }
 }
