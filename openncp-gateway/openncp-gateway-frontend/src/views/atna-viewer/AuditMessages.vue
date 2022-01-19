@@ -90,14 +90,14 @@ export default {
       this.apiCall().then((data) => {
         this.messages = data.data.content
         this.totalMessages = data.data.totalElements
-        this.options.page = data.data.number
+        this.options.page = data.data.number + 1
         this.loading = false
       })
     },
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
-          pageNumber: this.options.page + 1,
+          pageNumber: this.options.page,
           size: this.options.itemsPerPage
         }
       })
