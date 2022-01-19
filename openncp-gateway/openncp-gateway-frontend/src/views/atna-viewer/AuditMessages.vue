@@ -59,7 +59,7 @@ export default {
       messages: [],
       itemsPerPage: 10,
       totalMessages: 0,
-      options: { page: 1, itemsPerPage: 10 },
+      options: { page: 0, itemsPerPage: 10 },
       loading: true,
       items: [
         {
@@ -97,8 +97,8 @@ export default {
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
-          pageNumber: this.options.page === 0 ? 0 : this.options.page - 1,
-          size: this.itemPerPage
+          pageNumber: this.options.page + 1,
+          size: this.options.itemsPerPage
         }
       })
     }
