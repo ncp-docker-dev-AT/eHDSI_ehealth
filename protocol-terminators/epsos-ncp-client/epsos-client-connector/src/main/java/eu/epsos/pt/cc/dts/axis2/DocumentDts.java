@@ -65,10 +65,12 @@ public class DocumentDts {
         }
 
         result.setAtcCode(document.getAtcCode());
-        //result.setDoseFormCode(document.getDoseFormCode());
-        result.setDoseFormCode(document.getDoseFormText());
+        result.setAtcText(document.getAtcText());
+        result.setDoseFormCode(document.getDoseFormCode());
+        result.setDoseFormText(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
+        result.setDispensable(document.isDispensable());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
