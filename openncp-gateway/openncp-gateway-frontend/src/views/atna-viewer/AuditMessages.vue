@@ -12,7 +12,10 @@
         <v-data-table
           :headers="headers"
           :items="messages"
-          :rowsPerPageItems="[10]"
+          :disable-items-per-page="true"
+          :footer-props="{
+            'items-per-page-options': [10]
+          }"
           :items-per-page="itemsPerPage"
           :options.sync="options"
           :server-items-length="totalMessages"
