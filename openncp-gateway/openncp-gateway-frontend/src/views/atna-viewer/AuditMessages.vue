@@ -90,7 +90,7 @@ export default {
       this.apiCall().then((data) => {
         this.messages = data.data.content
         this.totalMessages = data.data.totalElements
-        this.options.page = data.data.number + 1
+        this.options.page = data.data.number
         this.loading = false
       })
     },
