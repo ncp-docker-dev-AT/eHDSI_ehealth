@@ -82,7 +82,7 @@ export default {
         this.getDataFromApi()
       },
       deep: true,
-      itemsPerPage: 10
+      itemsPerPage: this.itemPerPage
     }
   },
   methods: {
@@ -97,7 +97,10 @@ export default {
     },
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
-        params: { pageNumber: this.options.page - 1, size: this.itemPerPage }
+        params: {
+          pageNumber: this.options.page === 0 ? 0 : this.options.page - 1,
+          size: this.itemPerPage
+        }
       })
     }
   }
