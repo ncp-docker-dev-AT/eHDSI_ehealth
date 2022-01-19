@@ -59,7 +59,7 @@ export default {
       messages: [],
       itemsPerPage: 10,
       totalMessages: 0,
-      options: { page: 1 },
+      options: { page: 1, itemsPerPage: 10 },
       loading: true,
       items: [
         {
@@ -81,8 +81,7 @@ export default {
       handler () {
         this.getDataFromApi()
       },
-      deep: true,
-      itemsPerPage: this.itemsPerPage
+      deep: true
     }
   },
   methods: {
