@@ -81,7 +81,8 @@ export default {
       handler () {
         this.getDataFromApi()
       },
-      deep: true
+      deep: true,
+      itemsPerPage: this.itemsPerPage
     }
   },
   methods: {
