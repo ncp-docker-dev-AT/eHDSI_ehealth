@@ -63,7 +63,7 @@ export default {
       messages: [],
       itemsPerPage: 10,
       totalMessages: 0,
-      options: { page: 0, itemsPerPage: 10 },
+      options: { page: 1, itemsPerPage: 10 },
       loading: true,
       items: [
         {
@@ -94,7 +94,7 @@ export default {
       this.apiCall().then((data) => {
         this.messages = data.data.content
         this.totalMessages = data.data.totalElements
-        this.options.page = data.data.number
+        this.options.page = data.data.number + 1
         this.loading = false
       })
     },
