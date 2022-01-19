@@ -90,7 +90,6 @@ export default {
     getDataFromApi () {
       this.loading = true
       this.apiCall().then((data) => {
-        console.log('CONTENT ', data)
         this.messages = data.data.content
         console.log('MESSAGES ', this.messages)
         this.totalMessages = data.data.totalElements
@@ -100,7 +99,7 @@ export default {
     },
     apiCall () {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
-        params: { pageNumber: this.options.page, pageSize: 10 }
+        params: { pageable: { pageNumber: this.options.page, pageSize: 10 } }
       })
     }
   }
