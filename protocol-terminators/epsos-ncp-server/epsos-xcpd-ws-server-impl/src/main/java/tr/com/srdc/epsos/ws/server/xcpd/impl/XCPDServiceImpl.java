@@ -102,9 +102,15 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         II targetII;
         if (!inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().isEmpty()) {
 
-            sourceII = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().get(0).getValue().get(0);
-            targetII = outputMessage.getControlActProcess().getSubject().get(0).getRegistrationEvent().getSubject1()
-                    .getPatient().getId().get(0);
+            sourceII = inputMessage.getControlActProcess().getQueryByParameter().getValue().getParameterList()
+                    .getLivingSubjectId().get(0).getValue().get(0);
+            if (!CollectionUtils.isEmpty(outputMessage.getControlActProcess().getSubject())) {
+                targetII = outputMessage.getControlActProcess().getSubject().get(0).getRegistrationEvent().getSubject1()
+                        .getPatient().getId().get(0);
+            } else {
+                // TODO: To be reviewed - No Patient details return then audit message is reporting Patient search criteria
+                targetII = sourceII;
+            }
         } else {
             sourceII = new II();
             targetII = new II();

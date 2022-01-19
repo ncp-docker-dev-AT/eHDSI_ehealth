@@ -127,7 +127,9 @@
             <xs:element name="associatedDocuments" type="tns:epsosDocument" nillable="true" minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element name="atcCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="atcText" type="xs:string" minOccurs="0"/>
             <xs:element name="doseFormCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="doseFormText" type="xs:string" minOccurs="0"/>
             <xs:element name="strength" type="xs:string" minOccurs="0"/>
             <xs:element name="substitution" type="xs:string" minOccurs="0"/>
             <xs:element name="dispensable" type="xs:boolean" default="false"/>
@@ -232,5 +234,4 @@
             <xs:element name="maximumSize" type="xs:integer" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
-
 </xs:schema>
