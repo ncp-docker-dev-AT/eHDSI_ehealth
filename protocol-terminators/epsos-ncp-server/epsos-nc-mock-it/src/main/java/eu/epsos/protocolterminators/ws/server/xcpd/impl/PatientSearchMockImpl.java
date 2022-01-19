@@ -1,7 +1,9 @@
 package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
+import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
@@ -47,7 +49,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     }
 
     @Override
-    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
+    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) throws NIException {
 
         if (logger.isInfoEnabled()) {
             logger.info("[National Infrastructure Mock] Get Patient Demographics: '{}'", getPatientDemographics().toString());
@@ -59,10 +61,14 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
         patientFile.append(Constants.EPSOS_PROPS_PATH).append("integration/");
         PatientId id = null;
 
-        // Building Path File.
+        // Building Path File.XCPDServiceImpl
         for (PatientId patientId : idList) {
             logger.info("[National Infrastructure Mock] Searching patients with ID: '{}' and Assigning Authority: '{}'", patientId.getExtension(), patientId.getRoot());
             File rootDir = new File(patientFile + patientId.getRoot());
+            //  Patient ID 999999 will throw an Exception from National Connector
+            if (StringUtils.equals(patientId.getExtension(), "999999")) {
+                throw new NIException("EU-0000", "Mocked Patient Repository not working");
+            }
 
             if (rootDir.exists()) {
                 File extensionFile = new File(patientFile + patientId.getRoot() + File.separator + patientId.getExtension() + ".properties");
