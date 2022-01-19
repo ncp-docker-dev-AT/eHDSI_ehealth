@@ -99,9 +99,10 @@ export default {
       })
     },
     apiCall () {
+      let opts = Object.assign({}, this.options)
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
-          pageNumber: this.options.page,
+          pageNumber: opts.page - 1,
           size: this.options.itemsPerPage
         }
       })
