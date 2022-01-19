@@ -22,8 +22,9 @@
         <v-data-table
           :headers="headers"
           :items="messages"
+          :options.sync="options"
+          :server-items-length="totalMessages"
           :loading="loading"
-          :search="search"
         >
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn
@@ -57,6 +58,9 @@ export default {
         { value: 'actions', sortable: false }
       ],
       messages: [],
+      itemsPerPage: 10,
+      page: 1,
+      pageCount: 0
       search: '',
       loading: true,
       items: [
@@ -72,12 +76,28 @@ export default {
     }
   },
   mounted () {
-    axios
-      .get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages')
-      .then((response) => {
-        this.messages = response.data
+    this.getDataFromApi()
+  },
+  watch: {
+    options: {
+      handler () {
+        this.getDataFromApi()
+      },
+      deep: true
+    }
+  },
+  methods: {
+    getDataFromApi () {
+      this.loading = true
+      this.apiCall().then((data) => {
+        this.desserts = data.items
+        this.totalDesserts = data.total
         this.loading = false
       })
+    },
+    apiCall () {
+      return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages')
+    }
   }
 }
 </script>
