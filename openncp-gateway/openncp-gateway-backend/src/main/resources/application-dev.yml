@@ -3,7 +3,7 @@ logging:
     org.hibernate: info
 server:
   servlet:
-    context-path: /openncp-gateway-server
+    context-path: /openncp-gateway-backend
   port: 8080
 spring:
   datasource:
