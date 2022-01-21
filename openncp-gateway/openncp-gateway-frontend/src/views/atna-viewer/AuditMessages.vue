@@ -161,9 +161,8 @@ export default {
   },
   methods: {
     convertDate (d) {
-      console.log(d, d.toUTCString().toISOString())
-      console.log(d, new Date().toUTCString().toISOString())
-      return d.toUTCString().toISOString()
+      console.log(new Date(d).toUTCString().toISOString())
+      return new Date(d).toUTCString().toISOString()
     },
     getDataFromApi () {
       this.loading = true
