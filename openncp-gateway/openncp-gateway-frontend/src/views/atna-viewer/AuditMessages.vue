@@ -19,21 +19,46 @@
             hide-details
           ></v-text-field>
           <v-spacer></v-spacer>
-          <v-text-field
-            v-model="searchEventDateTime"
-            append-icon="mdi-magnify"
-            label="Search Event Date Time"
-            single-line
-            hide-details
-          ></v-text-field>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="searchEventOutcome"
-            append-icon="mdi-magnify"
-            label="Search Event Outcome"
-            single-line
-            hide-details
-          ></v-text-field>
+          <v-menu
+            v-model="searchStartDateMenu"
+            :close-on-content-click="false"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                :value="convertStartDate"
+                clearable
+                label="Event Date"
+                v-bind="attrs"
+                v-on="on"
+                @click:clear="searchEventStartDate = null"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="searchEventStartDate"
+              @change="searchStartDateMenu = false"
+            ></v-date-picker>
+          </v-menu>
+          <v-menu
+            v-model="searchEndDateMenu"
+            :close-on-content-click="false"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                :value="convertEndDate"
+                clearable
+                label="Event Outcome"
+                v-bind="attrs"
+                v-on="on"
+                @click:clear="searchEventEndDate = null"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="searchEventEndDate"
+              @change="searchEndDateMenu = false"
+            ></v-date-picker>
+          </v-menu>
         </v-card-title>
         <v-data-table
           :headers="headers"
@@ -90,8 +115,10 @@ export default {
       options: { page: 1, itemsPerPage: 10 },
       loading: true,
       searchEventId: '',
-      searchEventDateTime: '',
-      searchEventOutcome: '',
+      searchEventStartDate: '',
+      searchEventEndDate: '',
+      searchStartDateMenu: false,
+      searchEndDateMenu: false,
       items: [
         {
           text: 'ATNA Viewer',
@@ -117,7 +144,22 @@ export default {
       deep: true
     }
   },
+  computed: {
+    convertStartDate () {
+      return this.searchEventStartDate
+        ? this.convertDate(this.searchEventStartDate)
+        : ''
+    },
+    convertEndDate () {
+      return this.searchEventEndDate
+        ? this.convertDate(this.searchEventEndDate)
+        : ''
+    }
+  },
   methods: {
+    convertDate (d) {
+      return d.toUTCString().toISOString()
+    },
     getDataFromApi () {
       this.loading = true
       this.apiCall().then((data) => {
