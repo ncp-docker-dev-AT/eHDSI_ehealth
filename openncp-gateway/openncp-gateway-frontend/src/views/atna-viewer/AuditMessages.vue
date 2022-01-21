@@ -39,6 +39,7 @@
                 </template>
                 <v-spacer></v-spacer>
                 <v-date-picker
+                  :max="searchEventEndDate"
                   v-model="searchEventStartDate"
                   @change="searchStartDateMenu = false"
                 ></v-date-picker>
