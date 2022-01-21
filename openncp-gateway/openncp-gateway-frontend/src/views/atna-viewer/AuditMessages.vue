@@ -162,7 +162,9 @@ export default {
   methods: {
     convertDate (d) {
       console.log(d)
-      return d
+      const dd = new Date(d)
+      console.log(dd)
+      return dd.toISOString()
     },
     getDataFromApi () {
       this.loading = true
