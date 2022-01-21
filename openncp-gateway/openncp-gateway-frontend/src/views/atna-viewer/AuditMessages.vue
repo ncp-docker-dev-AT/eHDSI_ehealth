@@ -164,8 +164,8 @@ export default {
       console.log(d)
       const dd = new Date(d)
       console.log(dd)
-      const ddd = new Date(dd.getTime()))
-  console.log(ddd);
+      const ddd = new Date(dd.getTime())
+      console.log(ddd)
       return ddd.toISOString()
     },
     getDataFromApi () {
