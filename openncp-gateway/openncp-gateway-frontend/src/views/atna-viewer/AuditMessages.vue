@@ -178,6 +178,7 @@ export default {
       })
     },
     apiCall () {
+      const endDate = new Date(this.searchEventEndDate)
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
           pageNumber: this.options.page - 1,
@@ -189,12 +190,10 @@ export default {
           searchEventEndDate:
             this.searchEventStartDate === this.searchEventEndDate
               ? this.searchEventEndDate
-                ? new Date(this.searchEventEndDate)
-                    .setHours(23, 59, 59, 999)
-                    .toISOString()
+                ? endDate.setHours(23, 59, 59, 999).toISOString()
                 : ''
               : this.searchEventEndDate
-              ? new Date(this.searchEventEndDate).toISOString()
+              ? endDate.toISOString()
               : ''
         }
       })
