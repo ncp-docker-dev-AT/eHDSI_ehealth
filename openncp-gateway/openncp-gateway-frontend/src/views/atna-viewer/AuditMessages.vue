@@ -31,7 +31,7 @@
                     clearable
                     readonly
                     :value="searchEventStartDate"
-                    label="Event Date"
+                    label="Start Date"
                     v-bind="attrs"
                     v-on="on"
                     @click:clear="searchEventStartDate = null"
@@ -55,7 +55,7 @@
                     :value="searchEventEndDate"
                     clearable
                     readonly
-                    label="Event Outcome"
+                    label="End Date"
                     v-bind="attrs"
                     v-on="on"
                     @click:clear="searchEventEndDate = null"
