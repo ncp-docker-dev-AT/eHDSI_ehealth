@@ -161,12 +161,15 @@ export default {
   },
   methods: {
     convertDate (d) {
-      console.log('d', d, typeof d)
-      const dd = new Date(d)
-      console.log('dd', dd)
-      const ddd = new Date(dd.getTime())
-      console.log('ddd', ddd)
-      return ddd
+      if (d) {
+        console.log('d', d, typeof d)
+        const dd = new Date(d)
+        console.log('dd', dd)
+        const ddd = new Date(dd.getTime())
+        console.log('ddd', ddd)
+        return ddd
+      }
+      return ''
     },
     getDataFromApi () {
       this.loading = true
