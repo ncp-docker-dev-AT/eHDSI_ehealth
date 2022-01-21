@@ -39,7 +39,6 @@
                 </template>
                 <v-spacer></v-spacer>
                 <v-date-picker
-                  :max="searchEventEndDate"
                   v-model="searchEventStartDate"
                   @change="searchStartDateMenu = false"
                 ></v-date-picker>
@@ -159,8 +158,13 @@ export default {
   },
   computed: {
     minDate () {
-      const d = new Date(this.searchEventStartDate)
-      return this.searchEventStartDate ? d.setHours(23, 59, 59, 999) : ''
+      console.log('typeof', typeof this.searchEventStartDate)
+      if (this.searchEventStartDate) {
+        const d = new Date(this.searchEventStartDate)
+        return d.setHours(23, 59, 59, 999)
+      } else {
+        return ''
+      }
     }
   },
   methods: {
