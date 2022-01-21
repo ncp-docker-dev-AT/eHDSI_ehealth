@@ -164,7 +164,9 @@ export default {
       console.log(d)
       const dd = new Date(d)
       console.log(dd)
-      return dd.toISOString()
+      const ddd = new Date(dd.getTime()))
+  console.log(ddd);
+      return ddd.toISOString()
     },
     getDataFromApi () {
       this.loading = true
