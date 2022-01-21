@@ -10,58 +10,66 @@
     <v-card>
       <v-card-text>
         <v-card-title>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="searchEventId"
-            append-icon="mdi-magnify"
-            label="Search Event ID"
-            single-line
-            hide-details
-          ></v-text-field>
-          <v-menu
-            v-model="searchStartDateMenu"
-            :close-on-content-click="false"
-            max-width="290"
-          >
-            <template v-slot:activator="{ on, attrs }">
+          <v-row>
+            <v-col>
               <v-text-field
-                clearable
-                readonly
-                label="Event Date"
-                v-bind="attrs"
-                v-on="on"
-                @click:clear="searchEventStartDate = null"
+                v-model="searchEventId"
+                append-icon="mdi-magnify"
+                label="Search Event ID"
+                single-line
+                hide-details
               ></v-text-field>
-            </template>
-            <v-spacer></v-spacer>
-            <v-date-picker
-              v-model="searchEventStartDate"
-              @change="searchStartDateMenu = false"
-            ></v-date-picker>
-          </v-menu>
-          <v-menu
-            v-model="searchEndDateMenu"
-            :close-on-content-click="false"
-            max-width="290"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                clearable
-                readonly
-                label="Event Outcome"
-                v-bind="attrs"
-                v-on="on"
-                @click:clear="searchEventEndDate = null"
-              ></v-text-field>
-            </template>
-            <v-spacer></v-spacer>
-            <v-date-picker
-              v-model="searchEventEndDate"
-              @change="searchEndDateMenu = false"
-            ></v-date-picker>
-          </v-menu>
-          <v-spacer></v-spacer>
-          <v-btn block @click="getDataFromApi"> Search </v-btn>
+            </v-col>
+            <v-col>
+              <v-menu
+                v-model="searchStartDateMenu"
+                :close-on-content-click="false"
+                max-width="290"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    clearable
+                    readonly
+                    :value="searchEventStartDate"
+                    label="Event Date"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click:clear="searchEventStartDate = null"
+                  ></v-text-field>
+                </template>
+                <v-spacer></v-spacer>
+                <v-date-picker
+                  v-model="searchEventStartDate"
+                  @change="searchStartDateMenu = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col>
+              <v-menu
+                v-model="searchEndDateMenu"
+                :close-on-content-click="false"
+                max-width="290"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :value="searchEventEndDate"
+                    clearable
+                    readonly
+                    label="Event Outcome"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click:clear="searchEventEndDate = null"
+                  ></v-text-field>
+                </template>
+                <v-spacer></v-spacer>
+                <v-date-picker
+                  v-model="searchEventEndDate"
+                  @change="searchEndDateMenu = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col><v-btn block @click="getDataFromApi"> Search </v-btn></v-col>
+          </v-row>
         </v-card-title>
         <v-data-table
           :headers="headers"
@@ -160,17 +168,6 @@ export default {
     // }
   },
   methods: {
-    convertDate (d) {
-      if (d) {
-        console.log('d', d, typeof d)
-        const dd = new Date(d)
-        console.log('dd', dd)
-        const ddd = new Date(dd.getTime())
-        console.log('ddd', ddd)
-        return ddd
-      }
-      return ''
-    },
     getDataFromApi () {
       this.loading = true
       this.apiCall().then((data) => {
@@ -186,8 +183,8 @@ export default {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
           searchEventId: this.searchEventId,
-          searchEventStartDate: this.convertDate(this.searchEventStartDate),
-          searchEventEndDate: this.convertDate(this.searchEventEndDate)
+          searchEventStartDate: this.searchEventStartDate,
+          searchEventEndDate: this.searchEventEndDate
         }
       })
     }
