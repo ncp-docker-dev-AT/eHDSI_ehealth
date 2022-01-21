@@ -159,11 +159,11 @@ export default {
   },
   computed: {
     minDate () {
-      return (
-        this.searchEventStartDate
-          ? new Date(this.searchEventStartDate).toISOString()
-          : ''
-      ).setHours(23, 59, 59, 999)
+      return this.searchEventStartDate
+        ? new Date(this.searchEventStartDate)
+            .toISOString()
+            .setHours(23, 59, 59, 999)
+        : ''
     }
     // convertStartDate () {
     //   return this.searchEventStartDate
