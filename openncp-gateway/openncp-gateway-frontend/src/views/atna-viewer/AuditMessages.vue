@@ -159,21 +159,11 @@ export default {
   },
   computed: {
     minDate () {
-      let d = new Date(this.searchEventStartDate)
+      const d = new Date(this.searchEventStartDate)
       return this.searchEventStartDate
         ? d.toISOString().setHours(23, 59, 59, 999)
         : ''
     }
-    // convertStartDate () {
-    //   return this.searchEventStartDate
-    //     ? this.convertDate(this.searchEventStartDate)
-    //     : ''
-    // },
-    // convertEndDate () {
-    //   return this.searchEventEndDate
-    //     ? this.convertDate(this.searchEventEndDate)
-    //     : ''
-    // }
   },
   methods: {
     getDataFromApi () {
