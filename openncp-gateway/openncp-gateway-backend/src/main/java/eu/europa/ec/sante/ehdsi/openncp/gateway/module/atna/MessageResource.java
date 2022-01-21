@@ -3,14 +3,12 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.MessageWrapper;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.old.Message;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,10 +23,10 @@ public class MessageResource {
     }
 
     @GetMapping(path = "/messages")
-    public ResponseEntity<List<Message>> listMessages(@SortDefault(sort = "eventDateTime", direction = Sort.Direction.DESC)
-                                                              Pageable pageable) {
-        Page<Message> page = messageService.findMessages(pageable);
-        return ResponseEntity.ok(page.getContent());
+    public ResponseEntity<Page<Message>> listMessages(@RequestParam(defaultValue = "0") int pageNumber,
+                                                      @RequestParam(defaultValue = "20") int size) {
+        Page<Message> page = messageService.findMessages(PageRequest.of(pageNumber, size, Sort.by("eventDateTime").descending()));
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping(path = "/messages/{id}")
