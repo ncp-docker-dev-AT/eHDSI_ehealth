@@ -12,8 +12,8 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.ClientSocketFactory;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
@@ -39,6 +39,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
@@ -55,10 +56,16 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.*;
 
 public class DocumentRecipient_ServiceStub extends Stub {
@@ -124,7 +131,16 @@ public class DocumentRecipient_ServiceStub extends Stub {
         _serviceClient.getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         _serviceClient.getOptions().setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
 
-        ClientSocketFactory.setServiceClientConfig(_serviceClient, new String[]{"TLSv1.2"});
+        // Enabling Axis2 - SSL 2 ways communication (not active by default).
+        try {
+            _serviceClient.getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.CACHED_HTTP_CLIENT, HttpsClientConfiguration.getSSLClient());
+            _serviceClient.getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException | CertificateException |
+                KeyStoreException | UnrecoverableKeyException e) {
+            throw new RuntimeException("SSL Context cannot be initialized");
+        }
     }
 
     /**
