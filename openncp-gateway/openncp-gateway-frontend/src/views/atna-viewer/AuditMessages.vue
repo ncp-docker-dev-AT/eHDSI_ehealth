@@ -18,7 +18,6 @@
             single-line
             hide-details
           ></v-text-field>
-          <v-spacer></v-spacer>
           <v-menu
             v-model="searchStartDateMenu"
             :close-on-content-click="false"
@@ -34,6 +33,7 @@
                 @click:clear="searchEventStartDate = null"
               ></v-text-field>
             </template>
+            <v-spacer></v-spacer>
             <v-date-picker
               v-model="searchEventStartDate"
               @change="searchStartDateMenu = false"
@@ -54,11 +54,14 @@
                 @click:clear="searchEventEndDate = null"
               ></v-text-field>
             </template>
+            <v-spacer></v-spacer>
             <v-date-picker
               v-model="searchEventEndDate"
               @change="searchEndDateMenu = false"
             ></v-date-picker>
           </v-menu>
+          <v-spacer></v-spacer>
+          <v-btn block @click="getDataFromApi"> Search </v-btn>
         </v-card-title>
         <v-data-table
           :headers="headers"
