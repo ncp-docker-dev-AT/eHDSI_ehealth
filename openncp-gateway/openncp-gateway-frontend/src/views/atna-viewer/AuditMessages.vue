@@ -161,12 +161,12 @@ export default {
   },
   methods: {
     convertDate (d) {
-      console.log(d)
+      console.log('d', d, typeof d)
       const dd = new Date(d)
-      console.log(dd)
+      console.log('dd', dd)
       const ddd = new Date(dd.getTime())
-      console.log(ddd)
-      return ddd.toISOString()
+      console.log('ddd', ddd)
+      return ddd
     },
     getDataFromApi () {
       this.loading = true
