@@ -183,8 +183,10 @@ export default {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
           searchEventId: this.searchEventId,
-          searchEventStartDate: this.searchEventStartDate,
-          searchEventEndDate: this.searchEventEndDate
+          searchEventStartDate: new Date(
+            this.searchEventStartDate
+          ).toISOString(),
+          searchEventEndDate: new Date(this.searchEventEndDate).toISOString()
         }
       })
     }
