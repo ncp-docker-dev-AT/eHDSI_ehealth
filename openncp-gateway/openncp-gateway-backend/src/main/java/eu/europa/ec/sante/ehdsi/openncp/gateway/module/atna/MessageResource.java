@@ -4,11 +4,14 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.MessageWrappe
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.old.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -26,8 +29,26 @@ public class MessageResource {
                                                       @RequestParam(value = "searchEventStartDate", required = false) Instant searchEventStartDate,
                                                       @RequestParam(value = "searchEventEndDate", required = false)  Instant searchEventEndDate,
                                                       @RequestParam(defaultValue = "0") int pageNumber,
-                                                      @RequestParam(defaultValue = "20") int size) {
-        Page<Message> page = messageService.findMessages(searchEventId, searchEventStartDate, searchEventEndDate, PageRequest.of(pageNumber, size, Sort.by("eventDateTime").descending()));
+                                                      @RequestParam(defaultValue = "20") int size,
+                                                      @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
+
+        List<Sort.Order> orders = new ArrayList<>();
+
+        if (sort[0].contains(",")) {
+            // will sort more than 2 fields
+            // sortOrder="field, direction"
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(Sort.Direction.fromString(_sort[1]), _sort[0]));
+            }
+        } else {
+            // sort=[field, direction]
+            orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
+        }
+
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(orders));
+
+        Page<Message> page = messageService.findMessages(searchEventId, searchEventStartDate, searchEventEndDate, pageable);
         return ResponseEntity.ok(page);
     }
 
