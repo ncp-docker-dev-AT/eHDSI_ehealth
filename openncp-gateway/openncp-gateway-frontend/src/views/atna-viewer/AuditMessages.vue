@@ -28,6 +28,7 @@
               <v-text-field
                 :value="convertStartDate"
                 clearable
+                readonly
                 label="Event Date"
                 v-bind="attrs"
                 v-on="on"
@@ -48,6 +49,7 @@
               <v-text-field
                 :value="convertEndDate"
                 clearable
+                readonly
                 label="Event Outcome"
                 v-bind="attrs"
                 v-on="on"
@@ -158,6 +160,8 @@ export default {
   },
   methods: {
     convertDate (d) {
+      console.log(d, d.toUTCString().toISOString())
+      console.log(d, new Date().toUTCString().toISOString())
       return d.toUTCString().toISOString()
     },
     getDataFromApi () {
