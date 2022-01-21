@@ -9,6 +9,32 @@
     </div>
     <v-card>
       <v-card-text>
+        <v-card-title>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="searchEventId"
+            append-icon="mdi-magnify"
+            label="Search Event ID"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="searchEventDateTime"
+            append-icon="mdi-magnify"
+            label="Search Event Date Time"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="searchEventOutcome"
+            append-icon="mdi-magnify"
+            label="Search Event Outcome"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-card-title>
         <v-data-table
           :headers="headers"
           :items="messages"
@@ -63,6 +89,9 @@ export default {
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
       loading: true,
+      searchEventId: '',
+      searchEventDateTime: '',
+      searchEventOutcome: '',
       items: [
         {
           text: 'ATNA Viewer',
@@ -102,7 +131,10 @@ export default {
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
           pageNumber: this.options.page - 1,
-          size: this.options.itemsPerPage
+          size: this.options.itemsPerPage,
+          searchEventId: this.searchEventId,
+          searchEventId: this.searchEventDateTime,
+          searchEventId: this.searchEventOutcome
         }
       })
     }
