@@ -180,11 +180,9 @@ export default {
     apiCall () {
       let endDate
       if (this.searchEventEndDate) {
-        endDate = new Date(this.searchEventEndDate)
-        endDate =
-          this.searchEventStartDate === this.searchEventEndDate
-            ? endDate.setHours(23, 59, 59, 999).toISOString()
-            : endDate.toISOString()
+        endDate = new Date(this.searchEventEndDate).setHours(23, 59, 59, 999)
+        endDate = new Date(endDate)
+        endDate = endDate.toISOString()
       } else {
         endDate = ''
       }
