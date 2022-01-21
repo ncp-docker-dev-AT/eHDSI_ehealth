@@ -26,7 +26,6 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                :value="convertStartDate"
                 clearable
                 readonly
                 label="Event Date"
@@ -47,7 +46,6 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                :value="convertEndDate"
                 clearable
                 readonly
                 label="Event Outcome"
@@ -147,16 +145,16 @@ export default {
     }
   },
   computed: {
-    convertStartDate () {
-      return this.searchEventStartDate
-        ? this.convertDate(this.searchEventStartDate)
-        : ''
-    },
-    convertEndDate () {
-      return this.searchEventEndDate
-        ? this.convertDate(this.searchEventEndDate)
-        : ''
-    }
+    // convertStartDate () {
+    //   return this.searchEventStartDate
+    //     ? this.convertDate(this.searchEventStartDate)
+    //     : ''
+    // },
+    // convertEndDate () {
+    //   return this.searchEventEndDate
+    //     ? this.convertDate(this.searchEventEndDate)
+    //     : ''
+    // }
   },
   methods: {
     convertDate (d) {
@@ -179,8 +177,8 @@ export default {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
           searchEventId: this.searchEventId,
-          searchEventStartDate: this.searchEventStartDate,
-          searchEventEndDate: this.searchEventEndDate
+          searchEventStartDate: this.convertDate(this.searchEventStartDate),
+          searchEventEndDate: this.convertDate(this.searchEventEndDate)
         }
       })
     }
