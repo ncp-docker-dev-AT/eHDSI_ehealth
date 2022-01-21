@@ -64,7 +64,7 @@
                 </template>
                 <v-spacer></v-spacer>
                 <v-date-picker
-                  :min="searchEventStartDate"
+                  :min="minDate"
                   v-model="searchEventEndDate"
                   @change="searchEndDateMenu = false"
                 ></v-date-picker>
@@ -158,6 +158,11 @@ export default {
     }
   },
   computed: {
+    minDate() {
+      return (this.searchEventStartDate
+            ? new Date(this.searchEventStartDate).toISOString()
+            : '').setHours(23, 59, 59, 999),
+    },
     // convertStartDate () {
     //   return this.searchEventStartDate
     //     ? this.convertDate(this.searchEventStartDate)
