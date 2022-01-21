@@ -266,7 +266,7 @@
                         WEB-INF/lib/commons-io-2.1.jar,
                         WEB-INF/lib/jaxb-api-2.2.6.jar,
                         WEB-INF/lib/jaxb-impl-2.2.6.jar,
-                        WEB-INF/lib/log4j-1.2.15.jar,
+                        WEB-INF/lib/log4j-api-2.14.1.jar,
                         WEB-INF/lib/mail-1.4.jar,
                         WEB-INF/lib/neethi-3.0.2.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,
