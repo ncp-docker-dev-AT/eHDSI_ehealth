@@ -14,7 +14,7 @@
             <v-col>
               <v-text-field
                 v-model="searchEventId"
-                append-icon="mdi-magnify"
+                clearable
                 label="Search Event ID"
                 single-line
                 hide-details
