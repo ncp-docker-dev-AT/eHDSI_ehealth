@@ -4,13 +4,12 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.MessageWrappe
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.old.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.Instant;
+
 
 @RestController
 @RequestMapping(path = "/api/atna")
@@ -23,9 +22,12 @@ public class MessageResource {
     }
 
     @GetMapping(path = "/messages")
-    public ResponseEntity<Page<Message>> listMessages(@RequestParam(defaultValue = "0") int pageNumber,
+    public ResponseEntity<Page<Message>> listMessages(@RequestParam(value = "searchEventId", required = false) String searchEventId,
+                                                      @RequestParam(value = "searchEventStartDate", required = false) Instant searchEventStartDate,
+                                                      @RequestParam(value = "searchEventEndDate", required = false)  Instant searchEventEndDate,
+                                                      @RequestParam(defaultValue = "0") int pageNumber,
                                                       @RequestParam(defaultValue = "20") int size) {
-        Page<Message> page = messageService.findMessages(PageRequest.of(pageNumber, size, Sort.by("eventDateTime").descending()));
+        Page<Message> page = messageService.findMessages(searchEventId, searchEventStartDate, searchEventEndDate, PageRequest.of(pageNumber, size, Sort.by("eventDateTime").descending()));
         return ResponseEntity.ok(page);
     }
 
