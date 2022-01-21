@@ -175,8 +175,8 @@ export default {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
           searchEventId: this.searchEventId,
-          searchEventId: this.searchEventDateTime,
-          searchEventId: this.searchEventOutcome
+          searchEventStartDate: this.searchEventStartDate,
+          searchEventEndDate: this.searchEventEndDate
         }
       })
     }
