@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.support;
 
 public class SearchCriteria {
+
     private String key;
     private String operation;
     private Object value;

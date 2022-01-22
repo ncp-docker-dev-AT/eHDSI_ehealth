@@ -17,9 +17,9 @@ public class MessagePredicatesBuilder {
     }
 
     public MessagePredicatesBuilder with(String key, String operation, Object value) {
-        if(value != null) {
+        if (value != null) {
             params.add(new SearchCriteria(key, operation, value));
-        };
+        }
         return this;
     }
 
@@ -40,4 +40,3 @@ public class MessagePredicatesBuilder {
         return result;
     }
 }
-

@@ -25,12 +25,13 @@ public class MessageResource {
     }
 
     @GetMapping(path = "/messages")
-    public ResponseEntity<Page<Message>> listMessages(@RequestParam(value = "searchEventId", required = false) String searchEventId,
-                                                      @RequestParam(value = "searchEventStartDate", required = false) Instant searchEventStartDate,
-                                                      @RequestParam(value = "searchEventEndDate", required = false)  Instant searchEventEndDate,
-                                                      @RequestParam(defaultValue = "0") int pageNumber,
-                                                      @RequestParam(defaultValue = "20") int size,
-                                                      @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
+    public ResponseEntity<Page<Message>> listMessages(
+            @RequestParam(value = "searchEventId", required = false) String searchEventId,
+            @RequestParam(value = "searchEventStartDate", required = false) Instant searchEventStartDate,
+            @RequestParam(value = "searchEventEndDate", required = false) Instant searchEventEndDate,
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
 
         List<Sort.Order> orders = new ArrayList<>();
 

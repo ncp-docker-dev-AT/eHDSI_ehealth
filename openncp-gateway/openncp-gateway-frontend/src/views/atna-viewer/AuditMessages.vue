@@ -177,7 +177,7 @@ export default {
         this.loading = false
       })
     },
-    apiCall () {
+    apiCall() {
       let endDate
       if (this.searchEventEndDate) {
         endDate = new Date(this.searchEventEndDate).setHours(23, 59, 59, 999)
