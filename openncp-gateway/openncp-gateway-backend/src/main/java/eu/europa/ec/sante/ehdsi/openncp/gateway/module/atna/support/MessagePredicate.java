@@ -26,7 +26,7 @@ public class MessagePredicate {
 
         if (StringUtils.equals(criteria.getKey(), ("eventId.code"))) {
             StringPath path = entityPath.getString(criteria.getKey());
-            if (criteria.getOperation().equalsIgnoreCase(":")) {
+            if (StringUtils.equals(criteria.getOperation(), ":")) {
                 return path.containsIgnoreCase(criteria.getValue().toString());
             }
         } else if (StringUtils.equals(criteria.getKey(), "eventStartDate")) {

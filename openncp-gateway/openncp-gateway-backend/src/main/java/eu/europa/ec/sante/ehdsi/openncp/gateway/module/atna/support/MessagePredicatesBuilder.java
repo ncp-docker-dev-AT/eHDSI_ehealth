@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.support;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class MessagePredicatesBuilder {
     }
 
     public BooleanExpression build() {
-        if (params.size() == 0) {
+        if (CollectionUtils.isEmpty(params)) {
             return null;
         }
 
