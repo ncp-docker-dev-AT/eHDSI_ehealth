@@ -9,6 +9,69 @@
     </div>
     <v-card>
       <v-card-text>
+        <v-card-title>
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="searchEventId"
+                clearable
+                label="Search Event ID"
+                single-line
+                hide-details
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-menu
+                v-model="searchStartDateMenu"
+                :close-on-content-click="false"
+                max-width="290"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    clearable
+                    readonly
+                    :value="searchEventStartDate"
+                    label="Start Date"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click:clear="searchEventStartDate = null"
+                  ></v-text-field>
+                </template>
+                <v-spacer></v-spacer>
+                <v-date-picker
+                  v-model="searchEventStartDate"
+                  @change="searchStartDateMenu = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col>
+              <v-menu
+                v-model="searchEndDateMenu"
+                :close-on-content-click="false"
+                max-width="290"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :value="searchEventEndDate"
+                    clearable
+                    readonly
+                    label="End Date"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click:clear="searchEventEndDate = null"
+                  ></v-text-field>
+                </template>
+                <v-spacer></v-spacer>
+                <v-date-picker
+                  :min="searchEventStartDate"
+                  v-model="searchEventEndDate"
+                  @change="searchEndDateMenu = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col><v-btn block @click="getDataFromApi"> Search </v-btn></v-col>
+          </v-row>
+        </v-card-title>
         <v-data-table
           :headers="headers"
           :items="messages"
@@ -63,6 +126,11 @@ export default {
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
       loading: true,
+      searchEventId: '',
+      searchEventStartDate: '',
+      searchEventEndDate: '',
+      searchStartDateMenu: false,
+      searchEndDateMenu: false,
       items: [
         {
           text: 'ATNA Viewer',
@@ -88,6 +156,17 @@ export default {
       deep: true
     }
   },
+  computed: {
+    minDate () {
+      console.log('typeof', typeof this.searchEventStartDate)
+      if (this.searchEventStartDate) {
+        const d = new Date(this.searchEventStartDate)
+        return d.setHours(23, 59, 59, 999)
+      } else {
+        return ''
+      }
+    }
+  },
   methods: {
     getDataFromApi () {
       this.loading = true
@@ -99,10 +178,23 @@ export default {
       })
     },
     apiCall () {
+      let endDate
+      if (this.searchEventEndDate) {
+        endDate = new Date(this.searchEventEndDate).setHours(23, 59, 59, 999)
+        endDate = new Date(endDate)
+        endDate = endDate.toISOString()
+      } else {
+        endDate = ''
+      }
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
         params: {
           pageNumber: this.options.page - 1,
-          size: this.options.itemsPerPage
+          size: this.options.itemsPerPage,
+          searchEventId: this.searchEventId,
+          searchEventStartDate: this.searchEventStartDate
+            ? new Date(this.searchEventStartDate).toISOString()
+            : '',
+          searchEventEndDate: endDate
         }
       })
     }
