@@ -106,11 +106,11 @@ public class DocumentDts {
     }
 
     private static String composeCodeAndText(String code, String text) {
-        String ret = code;
-        if (text != null && !text.isEmpty()) {
-            ret = "[" + code + "] " + text;
+        String label = code;
+        if (StringUtils.isNotBlank(text)) {
+            label = "[" + code + "] " + text;
         }
-        return ret;
+        return label;
     }
 
     private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {
