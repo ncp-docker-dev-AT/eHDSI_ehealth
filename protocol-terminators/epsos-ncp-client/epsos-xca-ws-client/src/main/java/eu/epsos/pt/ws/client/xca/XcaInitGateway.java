@@ -16,13 +16,11 @@ import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
-import net.bytebuddy.description.type.TypeList;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.commons.digester.parser.GenericParser;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +35,10 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * XCA Initiating Gateway
@@ -63,8 +64,7 @@ public class XcaInitGateway {
     private XcaInitGateway() {
     }
 
-    public static QueryResponse crossGatewayQuery(final PatientId pid,
-                                                  final String countryCode,
+    public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode,
                                                   final List<GenericDocumentCode> documentCodes,
                                                   final FilterParams filterParams,
                                                   final Map<AssertionEnum, Assertion> assertionMap,
@@ -73,14 +73,14 @@ public class XcaInitGateway {
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             final StringBuilder builder = new StringBuilder();
             builder.append("[");
-            documentCodes.forEach(s->{
+            documentCodes.forEach(s -> {
                 builder.append(s.getValue() + ",");
             });
-            builder.replace(builder.length()-1, builder.length(), "]");
+            builder.replace(builder.length() - 1, builder.length(), "]");
             String classCodes = builder.toString();
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
                     classCodes, assertionMap.get(AssertionEnum.CLINICIAN).getID(), assertionMap.get(AssertionEnum.TREATMENT).getID(), service);
-            if(filterParams != null){
+            if (filterParams != null) {
                 LOGGER_CLINICAL.info("FilterParams created Before: " + filterParams.getCreatedBefore());
                 LOGGER_CLINICAL.info("FilterParams created After: " + filterParams.getCreatedAfter());
                 LOGGER_CLINICAL.info("FilterParams size : " + filterParams.getMaximumSize());
@@ -104,7 +104,7 @@ public class XcaInitGateway {
 
             /* queryResponse */
             List<String> documentCodeValues = new ArrayList<>();
-            for (GenericDocumentCode genericDocumentCode: documentCodes) {
+            for (GenericDocumentCode genericDocumentCode : documentCodes) {
                 documentCodeValues.add(genericDocumentCode.getValue());
             }
             AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentCodeValues);

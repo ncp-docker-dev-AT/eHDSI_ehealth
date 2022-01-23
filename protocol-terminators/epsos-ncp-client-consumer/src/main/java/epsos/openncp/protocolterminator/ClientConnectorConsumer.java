@@ -6,8 +6,8 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
@@ -15,10 +15,16 @@ import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,10 +52,12 @@ public class ClientConnectorConsumer {
         if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
             throw new ClientConnectorConsumerException("HCP Assertion expired");
         }
-        var omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(
-                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                        "Security", "wsse"), null);
+
+        var omFactory = OMAbstractFactory.getSOAP12Factory();
+        SOAPHeaderBlock omSecurityElement = omFactory.createSOAPHeaderBlock(
+                omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                "Security", "wsse"), null));
+
         if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
             var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
             if (AssertionHelper.isExpired(assertion)) {
@@ -147,8 +155,7 @@ public class ClientConnectorConsumer {
             var queryPatientDocument = QueryPatientDocument.Factory.newInstance();
             queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
 
-            var queryPatientResponseDocument =
-                    clientConnectorServiceStub.queryPatient(queryPatientDocument);
+            QueryPatientResponseDocument queryPatientResponseDocument = clientConnectorServiceStub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (AxisFault axisFault){
@@ -270,6 +277,17 @@ public class ClientConnectorConsumer {
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.SO_TIMEOUT, TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CONNECTION_TIMEOUT, TIMEOUT);
+
+            SSLContext sslContext = SSLContexts.createDefault();
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+                    sslContext,
+                    new String[]{"TLSv1.2"},
+                    null,
+                    new NoopHostnameVerifier());
+
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+            clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+
             clientConnectorStub._getServiceClient().engageModule("addressing");
             this.registerEvidenceEmitterHandler(clientConnectorStub);
             logger.debug("[Axis2 configuration] Default Timeout: '{}'",
