@@ -11,7 +11,12 @@
       <v-tab href="#tab-transaction-identification"
         >Transaction Identification</v-tab
       >
-      <v-tab href="#tab-home-snd-recieving">Home / Sender / Receiver</v-tab>
+      <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
+      <v-tab
+        href="#transaction-details"
+        v-if="message.transactionData.length > 0"
+        >Transaction details</v-tab
+      >
     </v-tabs>
     <div v-if="message">
       <v-tabs-items v-model="tab">
@@ -97,52 +102,9 @@
                 />
               </v-col>
             </v-row>
-            <div v-if="message.transactionData">
-              <v-row> Data </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    label="Type"
-                    outlined
-                    :value="message.transactionData.dataType"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    label="Tyoe Name"
-                    outlined
-                    :value="message.transactionData.dataTypeName"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    label="Data Value"
-                    outlined
-                    :value="message.transactionData.dataValue"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    label="Value Display"
-                    outlined
-                    :value="message.transactionData.valueDisplay"
-                    disabled
-                    hide-details="auto"
-                  />
-                </v-col>
-              </v-row>
-            </div>
           </v-container>
         </v-tab-item>
-        <v-tab-item value="tab-home-snd-recieving">
+        <v-tab-item value="tab-home-snd-receiving">
           <v-row>
             <v-col><h2>Home</h2></v-col>
           </v-row>
@@ -271,13 +233,66 @@
             </v-col>
           </v-row>
         </v-tab-item>
+        <v-tab-item value="transaction-details">
+          <div
+            v-for="(item, i) in message.transactionData"
+            :key="`transaction-data-${i}`"
+            style="margin: 1rem 0"
+          >
+            <v-row>
+              <v-col>
+                <h2>Details</h2>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  label="Type"
+                  outlined
+                  :value="item.dataType"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  label="Type Name"
+                  outlined
+                  :value="item.dataTypeName"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  label="Data Value"
+                  outlined
+                  :value="item.dataValue"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  label="Value Display"
+                  outlined
+                  :value="item.valueDisplay"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+            </v-row>
+          </div>
+        </v-tab-item>
       </v-tabs-items>
     </div>
   </v-container>
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   props: ['id'],
@@ -285,15 +300,29 @@ export default {
     return {
       tab: 'tab-transaction-identification',
       loading: false,
-      message: null
+      message: {},
+      transactionData: []
     }
   },
   mounted () {
     this.loading = true
-    axios
-      .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-      .then((response) => {
-        this.message = response.data
+    // axios
+    //   .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+    //   .then((response) => {
+    //     this.message = response.data
+    //     console.log(response)
+    //     console.log(this.message)
+    //     console.log(this.message.transactionData)
+    //     this.loading = false
+    //   })
+
+    fetch(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        this.message = data
+        console.log(this.message)
+        console.log(this.message.transationData)
+        this.transactionData = data.transactionData
         this.loading = false
       })
   },
@@ -307,7 +336,7 @@ export default {
           disabled: true
         },
         {
-          text: 'Transations list',
+          text: 'Transactions list',
           disabled: false,
           exact: true,
           to: { name: 'transactions' }
