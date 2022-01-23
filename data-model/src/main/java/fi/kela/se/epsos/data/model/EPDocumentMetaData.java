@@ -22,7 +22,15 @@ public interface EPDocumentMetaData extends EPSOSDocumentMetaData {
     String getDoseFormCode();
     String getDoseFormName();
     String getStrength();
-    String getSubstitution();
+
+    SubstitutionMetaData getSubstitution();
+
+    interface SubstitutionMetaData {
+
+        String getSubstitutionCode();
+
+        String getSubstitutionDisplayName();
+    }
 
     interface ProductMetadata {
 

@@ -7,9 +7,9 @@ public class EpListParam {
     private String doseFormCode;
     private String doseFormName;
     private String strength;
-    private String substitution;
+    private EPDocumentMetaData.SubstitutionMetaData substitution;
 
-    public EpListParam(boolean dispensable, String atcCode, String atcName, String doseFormCode, String doseFormName, String strength, String substitution) {
+    public EpListParam(boolean dispensable, String atcCode, String atcName, String doseFormCode, String doseFormName, String strength, EPDocumentMetaData.SubstitutionMetaData substitution) {
         this.dispensable = dispensable;
         this.atcCode = atcCode;
         this.atcName = atcName;
@@ -55,11 +55,11 @@ public class EpListParam {
         this.strength = strength;
     }
 
-    public String getSubstitution() {
+    public EPDocumentMetaData.SubstitutionMetaData getSubstitution() {
         return substitution;
     }
 
-    public void setSubstitution(String substitution) {
+    public void setSubstitution(EPDocumentMetaData.SubstitutionMetaData substitution) {
         this.substitution = substitution;
     }
 }
