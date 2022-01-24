@@ -16,7 +16,7 @@
 
     <modules>
         <module>openstork-util</module>
-        <module>openstork-plugin</module>
+        <!--module>openstork-plugin</module-->
     </modules>
 
     <properties>

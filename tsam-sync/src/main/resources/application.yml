@@ -5,6 +5,8 @@ logging:
     org.hibernate: error
     org.springframework: error
 spring:
+  main:
+    allow-circular-references: true
   datasource:
     username: ${tsam-sync.datasource.username}
     password: ${tsam-sync.datasource.password}
