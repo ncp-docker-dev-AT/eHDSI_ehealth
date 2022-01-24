@@ -169,13 +169,15 @@ export default {
   },
   methods: {
     getDataFromApi () {
-      this.loading = true
-      this.apiCall().then((data) => {
-        this.messages = data.data.content
-        this.totalMessages = data.data.totalElements
-        this.options.page = data.data.number + 1
-        this.loading = false
-      })
+      if (!this.loading) {
+        this.loading = true
+        this.apiCall().then((data) => {
+          this.messages = data.data.content
+          this.totalMessages = data.data.totalElements
+          this.options.page = data.data.number + 1
+          this.loading = false
+        })
+      }
     },
     apiCall () {
       let endDate
