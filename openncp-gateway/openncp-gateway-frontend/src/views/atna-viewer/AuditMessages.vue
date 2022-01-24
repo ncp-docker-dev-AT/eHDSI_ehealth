@@ -144,7 +144,7 @@ export default {
     }
   },
   mounted () {
-    this.getDataFromApi()
+    // this.getDataFromApi()
   },
   watch: {
     options: {
