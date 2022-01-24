@@ -45,22 +45,9 @@
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
-    		<artifactId>itextpdf</artifactId>
+            <artifactId>itext7-core</artifactId>
+            <type>pom</type>
             <version>${itextpdf.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcmail-jdk14</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bcprov-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bctsp-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
