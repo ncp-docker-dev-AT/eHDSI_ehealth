@@ -8,7 +8,6 @@ package eu.epsos.exceptions;
  */
 public class XDRException extends ExceptionWithContext {
 
-
     public XDRException(String message) {
         super(message);
     }

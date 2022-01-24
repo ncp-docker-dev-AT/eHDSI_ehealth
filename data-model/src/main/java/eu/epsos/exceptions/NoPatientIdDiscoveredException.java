@@ -25,5 +25,4 @@ public class NoPatientIdDiscoveredException extends ExceptionWithContext {
     public NoPatientIdDiscoveredException(String message, String context, Throwable cause) {
         super(message, context, cause);
     }
-
 }

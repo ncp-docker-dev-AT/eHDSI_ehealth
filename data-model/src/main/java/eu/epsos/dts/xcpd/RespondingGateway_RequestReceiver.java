@@ -34,7 +34,7 @@ public class RespondingGateway_RequestReceiver {
      * @param pRPA_IN201306UV02 the XCPD response message.
      * @return a list containing Patient Demographics objects.
      * @throws NoPatientIdDiscoveredException This represents the impossibility to transform the
-     *                      input data.
+     *                                        input data.
      * @see PatientDemographics
      * @see PRPAIN201306UV02
      * @see List
@@ -171,7 +171,7 @@ public class RespondingGateway_RequestReceiver {
         return patients;
     }
 
-    private static String getAcknowledgementDetailText(final PRPAIN201306UV02 pRPA_IN201306UV02){
+    private static String getAcknowledgementDetailText(final PRPAIN201306UV02 pRPA_IN201306UV02) {
         if (pRPA_IN201306UV02 != null
                 && !pRPA_IN201306UV02.getAcknowledgement().isEmpty()
                 && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
@@ -182,7 +182,7 @@ public class RespondingGateway_RequestReceiver {
         return null;
     }
 
-    private static MCAIMT900001UV01DetectedIssueEvent getDetectedIssueEvent(final PRPAIN201306UV02 pRPA_IN201306UV02){
+    private static MCAIMT900001UV01DetectedIssueEvent getDetectedIssueEvent(final PRPAIN201306UV02 pRPA_IN201306UV02) {
         if (pRPA_IN201306UV02 != null
                 && pRPA_IN201306UV02.getControlActProcess() != null
                 && pRPA_IN201306UV02.getControlActProcess().getReasonOf() != null
@@ -193,5 +193,4 @@ public class RespondingGateway_RequestReceiver {
         }
         return null;
     }
-
 }

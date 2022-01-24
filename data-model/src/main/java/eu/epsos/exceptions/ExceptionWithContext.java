@@ -1,6 +1,6 @@
 package eu.epsos.exceptions;
 
-public abstract class ExceptionWithContext extends Exception{
+public abstract class ExceptionWithContext extends Exception {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,5 +31,4 @@ public abstract class ExceptionWithContext extends Exception{
     public String getContext() {
         return context;
     }
-
 }

@@ -1,5 +1,6 @@
 package eu.epsos.pt.cc;
 
+import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XDRException;
@@ -9,14 +10,6 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.sax.SAXSource;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -37,22 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
-
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryDocumentsResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientDocument;
-import epsos.openncp.protocolterminator.clientconnector.QueryPatientResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.RetrieveDocumentResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloDocument;
-import epsos.openncp.protocolterminator.clientconnector.SayHelloResponseDocument;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentDocument1;
-import epsos.openncp.protocolterminator.clientconnector.SubmitDocumentResponseDocument;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
-import java.util.*;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.sax.SAXSource;
 import java.text.ParseException;
+import java.util.*;
 
 /**
  * ClientConnectorServiceServiceMessageReceiverInOut message receiver.
@@ -79,7 +63,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         logSoapMessage(operationName, requestSoapEnvelope, LOG_INCOMING_REQUEST);
 
         try {
-
             /* Out Envelop */
             SOAPEnvelope responseSoapEnvelope;
 
@@ -141,7 +124,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 newMsgContext.getOptions().setMessageId(randomUUID);
             }
         } catch (Exception e) {
-           throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -156,7 +139,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         try {
             return builder.getDocumentElement(true);
         } catch (java.lang.Exception e) {
-            throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -279,7 +262,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             }
 
         } catch (Exception e) {
-            throw  ClientConnectorServiceUtils.createGeneralFaultMessage(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
         return null;
     }
@@ -299,7 +282,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         Map<String, String> returnMap = new HashMap<>();
         var namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
-            OMNamespace ns = (OMNamespace) namespaceIterator.next();
+            OMNamespace ns = namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;

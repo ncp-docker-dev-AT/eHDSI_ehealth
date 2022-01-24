@@ -52,9 +52,10 @@ public class XcaInitGateway {
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
 
-	private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
-			"2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
-			"4512");
+    private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
+            "2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
+            "4512");
+
     /**
      * Private constructor to disable class instantiation.
      */

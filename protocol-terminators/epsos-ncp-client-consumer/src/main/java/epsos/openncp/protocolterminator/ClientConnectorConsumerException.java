@@ -14,7 +14,7 @@ public class ClientConnectorConsumerException extends Exception {
 
     public ClientConnectorConsumerException(String message, String context, Throwable cause) {
         super(message, cause);
-        this.context=context;
+        this.context = context;
     }
 
     public String getContext() {
