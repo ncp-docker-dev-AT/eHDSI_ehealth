@@ -3,6 +3,8 @@ package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import epsos.ccd.netsmart.securitymanager.key.KeyStoreManager;
 import epsos.ccd.netsmart.securitymanager.key.impl.DefaultKeyStoreManager;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
+import org.apache.commons.lang.StringUtils;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
@@ -18,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import tr.com.srdc.epsos.util.Constants;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.OutputKeys;
@@ -28,6 +29,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -75,7 +77,7 @@ public class AssertionUtils {
         if (assertionList == null || assertionList.getLength() == 0) {
             LOGGER.error("Assertion List is Empty.");
         } else {
-            for (int i = 0; i < assertionList.getLength(); i++) {
+            for (var i = 0; i < assertionList.getLength(); i++) {
                 assertionElement = (Element) assertionList.item(i);
                 try {
                     assertion = (Assertion) SAML.fromElement(assertionElement);
@@ -116,7 +118,7 @@ public class AssertionUtils {
         if (assertionList == null || assertionList.getLength() == 0) {
             LOGGER.error("Assertion List is Empty.");
         } else {
-            for (int i = 0; i < assertionList.getLength(); i++) {
+            for (var i = 0; i < assertionList.getLength(); i++) {
                 assertionElement = (Element) assertionList.item(i);
                 try {
                     assertion = (Assertion) SAML.fromElement(assertionElement);
@@ -146,8 +148,8 @@ public class AssertionUtils {
             return null;
         }
 
-        final String ASSERTIONS_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
-        final String ASSERTION = "Assertion";
+        final var ASSERTIONS_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
+        final var ASSERTION = "Assertion";
 
         Element securityHeader;
         NodeList result = null;
@@ -202,13 +204,8 @@ public class AssertionUtils {
             LOGGER.error("Provided Assertion is null.");
             return false;
         }
-        boolean result = false;
 
-        if (assertion.getAdvice() == null) {
-            result = true;
-        }
-
-        return result;
+        return StringUtils.equals(assertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:hcp");
     }
 
     /**
@@ -223,22 +220,17 @@ public class AssertionUtils {
             LOGGER.error("Provided Assertion is null.");
             return false;
         }
-        boolean result = false;
 
-        if (assertion.getAdvice() != null) {
-            result = true;
-        }
-
-        return result;
+        return StringUtils.equals(assertion.getIssuer().getNameQualifier(), "urn:ehdsi:assertions:trc");
     }
 
     @SuppressWarnings("deprecation")
     public static void signSAMLAssertion(SignableSAMLObject as, String keyAlias, char[] keyPassword) throws Exception {
 
-        String KEYSTORE_LOCATION = Constants.NCP_SIG_KEYSTORE_PATH;
-        String KEY_STORE_PASS = Constants.NCP_SIG_KEYSTORE_PASSWORD;
-        String KEY_ALIAS = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
-        String PRIVATE_KEY_PASS = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
+        String ncpSigKeystorePath = Constants.NCP_SIG_KEYSTORE_PATH;
+        String ncpSigKeystorePassword = Constants.NCP_SIG_KEYSTORE_PASSWORD;
+        String sigPrivateKeyAlias = Constants.NCP_SIG_PRIVATEKEY_ALIAS;
+        String sigPrivatekeyPassword = Constants.NCP_SIG_PRIVATEKEY_PASSWORD;
 
         KeyStoreManager keyManager = new DefaultKeyStoreManager();
         X509Certificate cert;
@@ -248,40 +240,33 @@ public class AssertionUtils {
         if (keyAlias == null) {
             cert = (X509Certificate) keyManager.getDefaultCertificate();
         } else {
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            File file = new File(KEYSTORE_LOCATION);
-            keyStore.load(new FileInputStream(file), KEY_STORE_PASS.toCharArray());
-            privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, PRIVATE_KEY_PASS.toCharArray());
-            X509Certificate cert1 = (X509Certificate) keyStore.getCertificate(KEY_ALIAS);
+            var keyStore = KeyStore.getInstance("JKS");
+            var classLoader = Thread.currentThread().getContextClassLoader();
+            var file = new File(ncpSigKeystorePath);
+            keyStore.load(new FileInputStream(file), ncpSigKeystorePassword.toCharArray());
+            privateKey = (PrivateKey) keyStore.getKey(sigPrivateKeyAlias, sigPrivatekeyPassword.toCharArray());
+            X509Certificate cert1 = (X509Certificate) keyStore.getCertificate(sigPrivateKeyAlias);
             publicKey = cert1.getPublicKey();
             cert = (X509Certificate) keyManager.getCertificate(keyAlias);
         }
 
-        Signature sig = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
+        Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(Signature.DEFAULT_ELEMENT_NAME)
                 .buildObject(Signature.DEFAULT_ELEMENT_NAME);
         Credential signingCredential = CredentialSupport.getSimpleCredential(cert, privateKey);
 
-        sig.setSigningCredential(signingCredential);
-        sig.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        sig.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
-        KeyInfo keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
-        sig.setKeyInfo(keyInfo);
-//        SecurityConfiguration secConfig = Configuration.getGlobalSecurityConfiguration();
-//        try {
-//            SecurityHelper.prepareSignatureParams(sig, signingCredential, secConfig, null);
-//        } catch (SecurityException e) {
-//            throw new SMgrException(e.getMessage(), e);
-//        }
-
-        as.setSignature(sig);
+        signature.setSigningCredential(signingCredential);
+        signature.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        signature.setCanonicalizationAlgorithm("http://www.w3.org/2001/10/xml-exc-c14n#");
+        var keyInfo = (KeyInfo) XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME).buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        signature.setKeyInfo(keyInfo);
+        as.setSignature(signature);
         try {
             XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(as).marshall(as);
         } catch (MarshallingException e) {
             throw new SMgrException(e.getMessage(), e);
         }
         try {
-            Signer.signObject(sig);
+            Signer.signObject(signature);
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }
@@ -292,9 +277,9 @@ public class AssertionUtils {
         String resp = "";
         try {
             DOMSource domSource = new DOMSource(doc);
-            TransformerFactory tf = TransformerFactory.newInstance();
-            tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            Transformer transformer = tf.newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             String omit;
             if (header) {
                 omit = "no";
@@ -308,10 +293,10 @@ public class AssertionUtils {
             // note : this is broken in jdk1.5 beta!
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            java.io.StringWriter sw = new java.io.StringWriter();
-            StreamResult sr = new StreamResult(sw);
-            transformer.transform(domSource, sr);
-            resp = sw.toString();
+            StringWriter stringWriter = new StringWriter();
+            StreamResult streamResult = new StreamResult(stringWriter);
+            transformer.transform(domSource, streamResult);
+            resp = stringWriter.toString();
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
         }

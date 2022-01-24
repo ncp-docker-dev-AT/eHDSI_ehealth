@@ -3,10 +3,12 @@ package eu.epsos.pt.cc;
 import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 
 import java.text.ParseException;
+import java.util.Map;
 
 /**
  * ClientConnectorServiceSkeletonInterface java skeleton interface for the Axis Service
@@ -20,15 +22,15 @@ public interface ClientConnectorServiceSkeletonInterface {
      */
 
     /**
-     * Specifies the signature of the operation responsible for patient
-     * querying. It receives some demographic data to perform the query.
+     * Specifies the signature of the operation responsible for patient querying.
+     * It receives some demographic data to perform the query.
      *
      * @param queryPatient represents the query object.
      * @return a QueryPatientResponseDocument containing the query response(s).
      * @see QueryPatientResponseDocument
      * @see QueryPatientDocument
      */
-    QueryPatientResponseDocument queryPatient(QueryPatientDocument queryPatient, Assertion hcpAssertion)
+    QueryPatientResponseDocument queryPatient(QueryPatientDocument queryPatient, Map<AssertionEnum, Assertion> assertionMap)
             throws NoPatientIdDiscoveredException, ParseException;
 
     /*
@@ -45,7 +47,7 @@ public interface ClientConnectorServiceSkeletonInterface {
      * @see QueryDocumentsResponseDocument
      * @see QueryDocumentsDocument
      */
-    QueryDocumentsResponseDocument queryDocuments(QueryDocumentsDocument queryDocuments, Assertion hcpAssertion, Assertion trcAssertion) throws XCAException;
+    QueryDocumentsResponseDocument queryDocuments(QueryDocumentsDocument queryDocuments, Map<AssertionEnum, Assertion> assertionMap) throws XCAException;
 
     /**
      * Specifies the signature of the operation responsible for document retrieval, receiving the specific documents
@@ -56,7 +58,7 @@ public interface ClientConnectorServiceSkeletonInterface {
      * @see RetrieveDocumentResponseDocument
      * @see RetrieveDocumentDocument1
      */
-    RetrieveDocumentResponseDocument retrieveDocument(RetrieveDocumentDocument1 retrieveDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XCAException;
+    RetrieveDocumentResponseDocument retrieveDocument(RetrieveDocumentDocument1 retrieveDocument, Map<AssertionEnum, Assertion> assertionMap) throws XCAException;
 
     /*
      * XDR
@@ -71,7 +73,7 @@ public interface ClientConnectorServiceSkeletonInterface {
      * @see SubmitDocumentResponseDocument
      * @see SubmitDocumentDocument1
      */
-    SubmitDocumentResponseDocument submitDocument(SubmitDocumentDocument1 submitDocument, Assertion hcpAssertion, Assertion trcAssertion) throws XdrException, ParseException;
+    SubmitDocumentResponseDocument submitDocument(SubmitDocumentDocument1 submitDocument, Map<AssertionEnum, Assertion> assertionMap) throws XDRException, ParseException;
 
     /*
      * Auxiliar

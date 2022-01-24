@@ -6,17 +6,13 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp-cdadisplaytool</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.4-SNAPSHOT</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-cdadisplaytool</groupId>
     <artifactId>openncp-tsamexporter</artifactId>
 
     <name>OpenNCP TSAM Exporter</name>
-
-    <properties>
-        <spring.version>5.2.6.RELEASE</spring.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -33,6 +29,12 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
         </dependency>
         <!-- Databases drivers -->
         <dependency>

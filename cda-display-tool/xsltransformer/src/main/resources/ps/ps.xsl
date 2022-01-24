@@ -1,21 +1,21 @@
 <?xml version="1.0"  ?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
-    <xsl:import href="cdaHeader.xsl"/>
-    <xsl:import href="cdaExtendedHeader.xsl"/>
-    <xsl:import href="cdaAlerts.xsl"/>
-    <xsl:import href="cdaDiagnosticTest.xsl"/>
-    <xsl:import href="cdaCurrentProblems.xsl"/>
-    <xsl:import href="cdaMedicationSummary.xsl"/>
-    <xsl:import href="cdaMedicalDevices.xsl"/>
-    <xsl:import href="cdaSurgicalProcedures.xsl"/>
-    <xsl:import href="cdaHistoryIllness.xsl"/>
-    <xsl:import href="cdaVaccinations.xsl"/>
-    <xsl:import href="cdaTreatment.xsl"/>
-    <xsl:import href="cdaAutonomy.xsl"/>
-    <xsl:import href="cdaSocialHistory.xsl"/>
-    <xsl:import href="cdaPregnancyHistory.xsl"/>
-    <xsl:import href="cdaPhysicalFindings.xsl"/>
-    <xsl:import href="cdaOtherSection.xsl"/>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3" version="2.0">
+    <xsl:import href="psHeader.xsl"/>
+    <xsl:import href="psExtendedHeader.xsl"/>
+    <xsl:import href="psAllergiesAndOtherAdverseReactions.xsl"/>
+    <xsl:import href="psCodedResults.xsl"/>
+    <xsl:import href="psActiveProblems.xsl"/>
+    <xsl:import href="psMedicationSummary.xsl"/>
+    <xsl:import href="psMedicalDevices.xsl"/>
+    <xsl:import href="psListOfSurgeries.xsl"/>
+    <xsl:import href="psHistoryOfPastIllnesses.xsl"/>
+    <xsl:import href="psImmunizations.xsl"/>
+    <xsl:import href="psHealthMaintenanceCarePlan.xsl"/>
+    <xsl:import href="psFunctionalStatus.xsl"/>
+    <xsl:import href="psSocialHistory.xsl"/>
+    <xsl:import href="psPregnancyHistory.xsl"/>
+    <xsl:import href="psVitalSigns.xsl"/>
+    <xsl:import href="psOtherSection.xsl"/>
 
     <xsl:variable name="originalNarrativeTableTitle">
         <!-- Original narrative -->
@@ -30,6 +30,12 @@
         </xsl:call-template>
     </xsl:variable>
 
+    <xsl:template match="n1:text">
+        <div class="narrative_wrapper">
+            <xsl:apply-templates select="*"/>
+        </div>
+    </xsl:template>
+
     <!-- xsl:output method="html" indent="yes" version="4.01"   doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"/ -->
     <xsl:template name="psCda">
         <!-- Main -->
@@ -37,7 +43,7 @@
         <!-- START display top portion of clinical document -->
         <!--- PATIENT INFORMATION -->
         <div class="patient">
-            <div class="wrap-collabsible">
+            <div class="wrap-collapsible">
                 <input id="collapsible-patient-header" class="toggle" type="checkbox" checked="true"/>
                 <label for="collapsible-patient-header" class="lbl-toggle-main">
                     <!-- Patient-->
@@ -48,9 +54,9 @@
                 <div class="collapsible-content-main">
                     <div class="content-inner-main">
                         <div>
-                            <xsl:call-template name="patientBlock"/>
+                            <xsl:apply-templates select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole" mode="PS"/>
                             <br/>
-                            <div class="wrap-collabsible">
+                            <div class="wrap-collapsible">
                                 <input id="collapsible-extended-header" class="toggle" type="checkbox"/>
                                 <label for="collapsible-extended-header" class="lbl-toggle">
                                     <xsl:call-template name="show-eHDSIDisplayLabel">
@@ -75,7 +81,7 @@
             <!--- BASIC HEADER INFORMATION -->
             <xsl:call-template name="basicCdaHeader"/>
             <br/>
-            <div class="wrap-collabsible">
+            <div class="wrap-collapsible">
                 <input id="collapsible-clinical-sections" class="toggle" type="checkbox" checked="true"/>
                 <label for="collapsible-clinical-sections" class="lbl-toggle-main">
                     <!-- Clinical sections -->
@@ -85,33 +91,33 @@
                 </label>
                 <div class="collapsible-content-main">
                     <div class="content-inner-main">
-                        <!-- Alerts -->
-                        <xsl:call-template name="alerts"/>
-                        <!-- Diagnostic Tests -->
-                        <xsl:call-template name="diagnosticTests"/>
-                        <!-- Current Problems -->
-                        <xsl:call-template name="currentProblems"/>
-                        <!-- Medication Summary -->
+                        <!-- eHDSI Allergies and Other Adverse Reactions -->
+                        <xsl:call-template name="allergiesAndIntolerances"/>
+                        <!-- eHDSI Coded Results -->
+                        <xsl:call-template name="codedResults"/>
+                        <!-- eHDSI Active Problems -->
+                        <xsl:call-template name="activeProblems"/>
+                        <!-- eHDSI Medication Summary -->
                         <xsl:call-template name="medicationSummary"/>
-                        <!-- Medical Devices Summary -->
+                        <!-- eHDSI Medical Devices -->
                         <xsl:call-template name="medicalDevices"/>
-                        <!-- Surgical Procedures-->
+                        <!-- eHDSI List of Surgeries -->
                         <xsl:call-template name="surgicalProcedures"/>
-                        <!-- History Illness-->
-                        <xsl:call-template name="historyIllness"/>
-                        <!-- Vaccination-->
-                        <xsl:call-template name="vaccinations"/>
-                        <!-- Treatments-->
-                        <xsl:call-template name="treatment"/>
-                        <!-- Autonomy-->
-                        <xsl:call-template name="autonomy"/>
-                        <!-- Social History-->
+                        <!-- eHDSI History of Past Illnesses -->
+                        <xsl:call-template name="historyOfPastIllnesses"/>
+                        <!-- eHDSI Immunizations -->
+                        <xsl:call-template name="immunizations"/>
+                        <!-- eHDSI Health Maintenance Care Plan -->
+                        <xsl:call-template name="healthMaintenanceCarePlan"/>
+                        <!-- eHDSI Functional Status -->
+                        <xsl:call-template name="functionalStatus"/>
+                        <!-- eHDSI Social History -->
                         <xsl:call-template name="socialHistory"/>
-                        <!-- Pregnancy History-->
+                        <!-- eHDSI Pregnancy History -->
                         <xsl:call-template name="pregnancyHistory"/>
-                        <!-- Physical Findings-->
-                        <xsl:call-template name="physicalFindings"/>
-                        <!-- All other sections-->
+                        <!-- eHDSI Vital Signs -->
+                        <xsl:call-template name="vitalSigns"/>
+                        <!-- All other sections -->
                         <xsl:call-template name="otherSections"/>
                     </div>
                 </div>

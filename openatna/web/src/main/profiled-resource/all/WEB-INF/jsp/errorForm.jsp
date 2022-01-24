@@ -38,8 +38,8 @@
 <div class="main">
 <h1>OpenATNA Error Viewer</h1>
 
-<div class="nav"><a href="query.html">Message Viewer</a></div>
-    <form:form method="post" action="errors.html" modelAttribute="queryBean">
+<div class="nav"><a href="query">Message Viewer</a></div>
+    <form:form method="post" action="errors" modelAttribute="queryBean">
         <fieldset>
             <legend>Constraints</legend>
             <table>

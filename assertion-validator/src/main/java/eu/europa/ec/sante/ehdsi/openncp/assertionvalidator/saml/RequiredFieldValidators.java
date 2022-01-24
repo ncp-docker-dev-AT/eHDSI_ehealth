@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
-import org.opensaml.saml.saml2.core.Assertion;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import org.opensaml.saml.saml2.core.Assertion;
 
 public class RequiredFieldValidators {
 

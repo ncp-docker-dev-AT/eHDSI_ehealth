@@ -19,8 +19,6 @@ public final class StandardProperties {
     public static final String SMP_SML_ADMIN_URL = "SMP_ADMIN_URL";
 
     // SMP/SML Configuration Properties
-    public static final String SMP_SML_CLIENT_KEY_ALIAS = "SC_SMP_CLIENT_PRIVATEKEY_ALIAS";
-    public static final String SMP_SML_CLIENT_KEY_PASSWORD = "SC_SMP_CLIENT_PRIVATEKEY_PASSWORD";
     public static final String SMP_SML_DNS_DOMAIN = "SML_DOMAIN";
     public static final String SMP_SML_SUPPORT = "SMP_SUPPORT";
     public static final String SMP_SML_SUPPORT_EMAIL = "SMP_SUPPORT_EMAIL";

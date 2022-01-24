@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
 
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -10,12 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.List;
 
 public class AssertionHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionHelper.class);
-    private static final String ERROR_MESSAGE = "'{0}' - attribute shall contain AttributeValue element.";
+    private static final String ERROR_MESSAGE = "{0} - attribute shall contain AttributeValue element.";
 
     private AssertionHelper() {
     }
@@ -23,45 +25,48 @@ public class AssertionHelper {
     /**
      * Get attribute value from assertion.
      *
-     * @param assertion the assertion
-     * @param attribute the attribute to search for
+     * @param assertion     the assertion
+     * @param attributeName the attribute to search for
      * @return the attribute value
      * @throws MissingFieldException If attribute is missing
      */
-    public static String getAttributeFromAssertion(Assertion assertion, String attribute) throws MissingFieldException {
+    public static String getAttributeFromAssertion(Assertion assertion, String attributeName) throws MissingFieldException {
 
-        for (AttributeStatement as : assertion.getAttributeStatements()) {
-            for (Attribute a : as.getAttributes()) {
-                if (a.getName().equals(attribute)) {
-                    if (!a.getAttributeValues().isEmpty()) {
-                        return a.getAttributeValues().get(0).getDOM().getTextContent();
+        for (AttributeStatement attributeStatement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : attributeStatement.getAttributes()) {
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    if (!attribute.getAttributeValues().isEmpty()) {
+                        return attribute.getAttributeValues().get(0).getDOM().getTextContent();
                     } else {
-                        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+                        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+                        throw new MissingFieldException(errorMessage);
                     }
                 }
             }
         }
-        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+        throw new MissingFieldException(errorMessage);
     }
 
     /**
      * Get attribute values from assertion.
      *
-     * @param assertion the assertion
-     * @param attribute the attribute to search for
+     * @param assertion     the assertion
+     * @param attributeName the attribute to search for
      * @return the attribute values
      * @throws MissingFieldException If attribute is missing
      */
-    public static List<XMLObject> getAttributeValuesFromAssertion(Assertion assertion, String attribute) throws MissingFieldException {
+    public static List<XMLObject> getAttributeValuesFromAssertion(Assertion assertion, String attributeName) throws MissingFieldException {
 
-        for (AttributeStatement as : assertion.getAttributeStatements()) {
-            for (Attribute a : as.getAttributes()) {
-                if (a.getName().equals(attribute)) {
-                    return a.getAttributeValues();
+        for (AttributeStatement attributeStatement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : attributeStatement.getAttributes()) {
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    return attribute.getAttributeValues();
                 }
             }
         }
-        throw new MissingFieldException(MessageFormat.format(ERROR_MESSAGE, attribute));
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+        throw new MissingFieldException(errorMessage);
     }
 
     /**
@@ -84,11 +89,12 @@ public class AssertionHelper {
 
     public static boolean isExpired(Assertion assertion) {
 
-        if (assertion.getConditions().getNotBefore() != null && assertion.getConditions().getNotBefore().isAfterNow()) {
+        if (assertion.getConditions().getNotBefore() != null && assertion.getConditions().getNotBefore().isAfter(Instant.now())) {
             return true;
         }
 
         return assertion.getConditions().getNotOnOrAfter() != null
-                && (assertion.getConditions().getNotOnOrAfter().isBeforeNow() || assertion.getConditions().getNotOnOrAfter().isEqualNow());
+                && (assertion.getConditions().getNotOnOrAfter().isBefore(Instant.now())
+                || assertion.getConditions().getNotOnOrAfter().equals(Instant.now()));
     }
 }

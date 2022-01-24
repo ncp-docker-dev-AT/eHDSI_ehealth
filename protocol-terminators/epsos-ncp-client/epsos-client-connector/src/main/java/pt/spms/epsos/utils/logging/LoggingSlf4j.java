@@ -32,8 +32,9 @@ public class LoggingSlf4j {
         logger.debug("{} | {} : {}", methodName, END, msg);
     }
 
-    public static void error(Logger logger, String methodName) {
-        logger.debug("{} | {}", methodName, ERROR);
+    public static void error(Logger logger, String methodName, Exception ex) {
+        logger.error("{} | {}", methodName, ERROR);
+        logger.error("Exception: " + ex.getMessage() +" ", ex);
     }
 
     public static void errorMsg(Logger logger, String methodName, String msg) {

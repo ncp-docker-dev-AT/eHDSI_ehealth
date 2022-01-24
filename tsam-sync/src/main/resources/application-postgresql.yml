@@ -1,0 +1,7 @@
+spring:
+  jpa:
+    properties:
+      hibernate.dialect: ${tsam-sync.datasource.dialect}
+  datasource:
+    driver-class-name: ${tsam-sync.datasource.driver}
+    url: jdbc:postgresql://${tsam-sync.datasource.host}:${tsam-sync.datasource.port}/${tsam-sync.datasource.database}

@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <display-name>eHDSI OpenNCP TRC-STS - ${project.version}</display-name>
+    <display-name>MyHealth@EU - OpenNCP TRC-STS - ${project.version}</display-name>
 
     <listener>
         <listener-class>eu.europa.ec.sante.ehdsi.openncp.cc.WebAppContextListener</listener-class>
@@ -39,19 +39,19 @@
     </servlet>
 
     <servlet>
-        <servlet-name>STSServiceServiceEID</servlet-name>
+        <servlet-name>NextOfKinService</servlet-name>
         <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>STSServiceService</servlet-name>
-        <url-pattern>/STSServiceService</url-pattern>
+        <servlet-name>NextOfKinService</servlet-name>
+        <url-pattern>/NextOfKinService</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>STSServiceServiceEID</servlet-name>
-        <url-pattern>/STSServiceServiceEID</url-pattern>
+        <servlet-name>STSServiceService</servlet-name>
+        <url-pattern>/STSServiceService</url-pattern>
     </servlet-mapping>
 
     <session-config>

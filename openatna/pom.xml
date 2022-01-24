@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.4-SNAPSHOT</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
@@ -24,16 +24,10 @@
 
     <developers>
         <developer>
-            <id>scmabh</id>
             <name>Andrew Harrison</name>
-            <email>a&lt;dot&gt;b&lt;dot&gt;harrison&lt;at&gt;cs.cardiff.ac.uk</email>
-            <timezone>GMT</timezone>
         </developer>
         <developer>
-            <id>wenzhil</id>
             <name>Wenzhi Li</name>
-            <email>wenzhi&lt;dot&gt;li&lt;at&gt;misys.com</email>
-            <timezone>EST</timezone>
         </developer>
     </developers>
 

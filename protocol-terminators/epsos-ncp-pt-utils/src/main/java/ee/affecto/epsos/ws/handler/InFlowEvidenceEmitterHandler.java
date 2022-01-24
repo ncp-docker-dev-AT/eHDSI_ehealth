@@ -2,6 +2,8 @@ package ee.affecto.epsos.ws.handler;
 
 import epsos.ccd.gnomon.auditmanager.EventOutcomeIndicator;
 import eu.epsos.util.EvidenceUtils;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -33,6 +35,7 @@ import java.util.Map;
 public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 
     private final Logger logger = LoggerFactory.getLogger(InFlowEvidenceEmitterHandler.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     @Override
     public Handler.InvocationResponse invoke(MessageContext msgContext) {
@@ -120,75 +123,76 @@ public class InFlowEvidenceEmitterHandler extends AbstractHandler {
 
     private void debugInflowEvidenceEmitter(MessageContext msgContext) {
 
-        SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
-        if (soapHeader != null) {
-            Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
-            logger.debug("Iterating over soap headers");
-            while (blocks.hasNext()) {
-                logger.debug("Processing header");
-                SOAPHeaderBlock block = (SOAPHeaderBlock) blocks.next();
-                if (logger.isDebugEnabled()) {
-                    logger.debug(block.toString());
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
+            if (soapHeader != null) {
+                Iterator<?> blocks = soapHeader.examineAllHeaderBlocks();
+                loggerClinical.debug("Iterating over SOAP headers");
+                while (blocks.hasNext()) {
+                    loggerClinical.debug("Processing header");
+                    SOAPHeaderBlock block = (SOAPHeaderBlock) blocks.next();
+                    if (loggerClinical.isDebugEnabled()) {
+                        loggerClinical.debug(block.toString());
+                    }
+                    block.setProcessed();
                 }
-                block.setProcessed();
             }
-        }
 
-        logger.debug("LOGGING TEST VALUES");
-        logger.debug("MessageContext properties: '{}'", msgContext.getProperties());
-        logger.debug("MessageContext messageID: '{}'", msgContext.getMessageID());
+            loggerClinical.debug("MessageContext properties: '{}'", msgContext.getProperties());
+            loggerClinical.debug("MessageContext messageID: '{}'", msgContext.getMessageID());
 
-        SessionContext sessionCtx = msgContext.getSessionContext();
-        if (sessionCtx != null) {
-            logger.debug("SessionContext CookieID: '{}'", sessionCtx.getCookieID());
-        } else {
-            logger.debug("SessionContext is null!");
-        }
+            SessionContext sessionCtx = msgContext.getSessionContext();
+            if (sessionCtx != null) {
+                loggerClinical.debug("SessionContext CookieID: '{}'", sessionCtx.getCookieID());
+            } else {
+                loggerClinical.debug("SessionContext is null!");
+            }
 
-        OperationContext operationCtx = msgContext.getOperationContext();
-        if (operationCtx != null) {
-            logger.debug("OperationContext operationName: '{}'", operationCtx.getOperationName());
-            logger.debug("OperationContext serviceGroupName: '{}'", operationCtx.getServiceGroupName());
-            logger.debug("OperationContext serviceName: '{}'", operationCtx.getServiceName());
-            logger.debug("OperationContext isComplete: '{}'", operationCtx.isComplete());
-        } else {
-            logger.debug("OperationContext is null!");
-        }
+            OperationContext operationCtx = msgContext.getOperationContext();
+            if (operationCtx != null) {
+                loggerClinical.debug("OperationContext operationName: '{}'", operationCtx.getOperationName());
+                loggerClinical.debug("OperationContext serviceGroupName: '{}'", operationCtx.getServiceGroupName());
+                loggerClinical.debug("OperationContext serviceName: '{}'", operationCtx.getServiceName());
+                loggerClinical.debug("OperationContext isComplete: '{}'", operationCtx.isComplete());
+            } else {
+                loggerClinical.debug("OperationContext is null!");
+            }
 
-        ServiceGroupContext serviceGroupCtx = msgContext.getServiceGroupContext();
-        if (serviceGroupCtx != null) {
-            logger.debug("ServiceGroupContext ID: '{}'", serviceGroupCtx.getId());
-            AxisServiceGroup axisServiceGroup = serviceGroupCtx.getDescription();
-            Iterator<AxisService> itAxisService = axisServiceGroup.getServices();
-            while (itAxisService.hasNext()) {
-                AxisService axisService = itAxisService.next();
-                logger.debug("AxisService BindingName: '{}'", axisService.getBindingName());
-                logger.debug("AxisService CustomSchemaNamePrefix: '{}'", axisService.getCustomSchemaNamePrefix());
-                logger.debug("AxisService CustomSchemaNameSuffix: '{}'", axisService.getCustomSchemaNameSuffix());
-                logger.debug("AxisService endpointName: '{}'", axisService.getEndpointName());
-                Map<String, AxisEndpoint> axisEndpoints = axisService.getEndpoints();
-                for (String key : axisEndpoints.keySet()) {
-                    AxisEndpoint axisEndpoint = axisEndpoints.get(key);
-                    logger.debug("AxisEndpoint calculatedEndpointURL: '{}'", axisEndpoint.calculateEndpointURL());
-                    logger.debug("AxisEndpoint alias: '{}'", axisEndpoint.getAlias());
-                    logger.debug("AxisEndpoint endpointURL: '{}'", axisEndpoint.getEndpointURL());
-                    logger.debug("AxisEndpoint active: '{}'", axisEndpoint.isActive());
+            ServiceGroupContext serviceGroupCtx = msgContext.getServiceGroupContext();
+            if (serviceGroupCtx != null) {
+                loggerClinical.debug("ServiceGroupContext ID: '{}'", serviceGroupCtx.getId());
+                AxisServiceGroup axisServiceGroup = serviceGroupCtx.getDescription();
+                Iterator<AxisService> itAxisService = axisServiceGroup.getServices();
+                while (itAxisService.hasNext()) {
+                    AxisService axisService = itAxisService.next();
+                    loggerClinical.debug("AxisService BindingName: '{}'", axisService.getBindingName());
+                    loggerClinical.debug("AxisService CustomSchemaNamePrefix: '{}'", axisService.getCustomSchemaNamePrefix());
+                    loggerClinical.debug("AxisService CustomSchemaNameSuffix: '{}'", axisService.getCustomSchemaNameSuffix());
+                    loggerClinical.debug("AxisService endpointName: '{}'", axisService.getEndpointName());
+                    Map<String, AxisEndpoint> axisEndpoints = axisService.getEndpoints();
+                    for (String key : axisEndpoints.keySet()) {
+                        AxisEndpoint axisEndpoint = axisEndpoints.get(key);
+                        loggerClinical.debug("AxisEndpoint calculatedEndpointURL: '{}'", axisEndpoint.calculateEndpointURL());
+                        loggerClinical.debug("AxisEndpoint alias: '{}'", axisEndpoint.getAlias());
+                        loggerClinical.debug("AxisEndpoint endpointURL: '{}'", axisEndpoint.getEndpointURL());
+                        loggerClinical.debug("AxisEndpoint active: '{}'", axisEndpoint.isActive());
+                    }
+                    loggerClinical.debug("AxisService EPRs: '{}'", Arrays.toString(axisService.getEPRs()));
+                    loggerClinical.debug("AxisService name: '{}'", axisService.getName());
+                    loggerClinical.debug("AxisService isClientSide: '{}'", axisService.isClientSide());
                 }
-                logger.debug("AxisService EPRs: '{}'", Arrays.toString(axisService.getEPRs()));
-                logger.debug("AxisService name: '{}'", axisService.getName());
-                logger.debug("AxisService isClientSide: '{}'", axisService.isClientSide());
+            } else {
+                loggerClinical.debug("ServiceGroupContext is null!");
             }
-        } else {
-            logger.debug("ServiceGroupContext is null!");
-        }
 
-        ConfigurationContext configCtx = msgContext.getRootContext();
-        if (configCtx != null) {
-            logger.debug("ConfigurationContext contextRoot: '{}'", configCtx.getContextRoot());
-            logger.debug("ConfigurationContext serviceGroupContextIDs: '{}'", Arrays.toString(configCtx.getServiceGroupContextIDs()));
-            logger.debug("ConfigurationContext servicePath: '{}'", configCtx.getServicePath());
-        } else {
-            logger.debug("ConfigurationContext is null!");
+            ConfigurationContext configCtx = msgContext.getRootContext();
+            if (configCtx != null) {
+                loggerClinical.debug("ConfigurationContext contextRoot: '{}'", configCtx.getContextRoot());
+                loggerClinical.debug("ConfigurationContext serviceGroupContextIDs: '{}'", Arrays.toString(configCtx.getServiceGroupContextIDs()));
+                loggerClinical.debug("ConfigurationContext servicePath: '{}'", configCtx.getServicePath());
+            } else {
+                loggerClinical.debug("ConfigurationContext is null!");
+            }
         }
     }
 }

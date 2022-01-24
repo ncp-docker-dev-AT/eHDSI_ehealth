@@ -64,7 +64,7 @@ public class XDRConstants {
         public static final String CREATION_TIME = "creationTime";
         /* Language Code */
         public static final String LANGUAGE_CODE_STR = "languageCode";
-        public static final String LANGUAGE_CODE_VALUE = "en";
+        public static final String LANGUAGE_CODE_DEFAULT_VALUE = "en-GB";
         /* Source Patient */
         public static final String SOURCE_PATIENT_ID = "sourcePatientId";
         /* HealthCareFacility Code */
@@ -82,6 +82,7 @@ public class XDRConstants {
         public static final String CLASS_CODE_SCHEME = "urn:uuid:41a5887f-8865-4c09-adf7-e362475b143a";
         public static final String CLASS_CODE_VALUE = "2.16.840.1.113883.6.1";
         public static final String CLASS_CODE_ED_STR = "Medication dispensed";
+        public static final String CLASS_CODE_EDD_STR = "Discard Medication dispensed";
         public static final String CLASS_CODE_CONS_STR = "Privacy Policy Acknowledgement Document";
         public static final String CLASS_CODE_HCER_STR = "Summarization of Episode Note";
         /* Event Code */
@@ -119,6 +120,16 @@ public class XDRConstants {
                 public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
 
                 private EDispensation() {
+                }
+            }
+
+            public static final class EDispensationDiscard {
+
+                public static final String DISPLAY_NAME = "eDispensation Discard";
+                public static final String NODE_REPRESENTATION = "DISCARD-60593-1";
+                public static final String CODING_SCHEME = "2.16.840.1.113883.6.1";
+
+                private EDispensationDiscard() {
                 }
             }
 

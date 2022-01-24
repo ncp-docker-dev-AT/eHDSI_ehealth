@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                version="1.0">
+                version="2.0">
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
                 doctype-public="-//W3C//DTD HTML 4.01//EN"/>
@@ -551,7 +551,7 @@
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.28.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+            <xsl:with-param name="codeSystem" select="$node/@codeSystem"/>
         </xsl:call-template>
     </xsl:template>
 

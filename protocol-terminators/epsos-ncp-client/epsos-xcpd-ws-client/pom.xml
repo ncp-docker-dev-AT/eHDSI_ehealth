@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -6,7 +5,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-client</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.4-SNAPSHOT</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
@@ -16,6 +15,11 @@
     <name>OpenNCP CC IHE-XCPD Service Client</name>
 
     <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-ncp-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
             <artifactId>openncp-assertion-validator</artifactId>
@@ -78,6 +82,12 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
+            <exclusions>
+            	<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
@@ -86,10 +96,17 @@
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
+            <version>${axiom-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-compat</artifactId>
+            <version>${axiom-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
+            <version>${axiom-api.version}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -99,6 +116,7 @@
         <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
+            <version>1.6.3</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -17,22 +17,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * OpenNCP Configuration Manager class responsible for the properties management.
+ */
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
-    /**
-     * Static constants for SMP identifiers
-     */
-    private static final String PARTICIPANT_IDENTIFIER_SCHEME = "ehealth-participantid-qns";
-    private static final String PARTICIPANT_IDENTIFIER_VALUE = "urn:ehealth:%2s:ncp-idp";
-    private static final String DOCUMENT_IDENTIFIER_SCHEME = "ehealth-resid-qns";
-
+    private final Logger logger = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
     private final SessionFactory sessionFactory;
-
     private final Map<String, String> properties = new HashMap<>();
 
+    /**
+     * Constructor initializing the Hibernate SessionFactory of the component.
+     *
+     * @param sessionFactory - Hibernate Session Factory
+     */
     public ConfigurationManagerImpl(SessionFactory sessionFactory) {
-        Assert.notNull(sessionFactory, "sessionFactory must not be null!");
+        Assert.notNull(sessionFactory, "Hibernate SessionFactory must not be null!");
         this.sessionFactory = sessionFactory;
     }
 
@@ -42,11 +42,21 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         return getProperty(key, true);
     }
 
+    /**
+     * @param key      - OpenNCP property key.
+     * @param checkMap - boolean value if the cache should be checked or not.
+     * @return Value of the property requested.
+     */
     public String getProperty(String key, boolean checkMap) {
         Assert.notNull(key, "key must not be null!");
         return findProperty(key, checkMap).orElseThrow(() -> new PropertyNotFoundException("Property '" + key + "' not found!"));
     }
 
+    /**
+     * Returns a Map of all system properties.
+     *
+     * @return Map of all the system properties as a key and value pairs.
+     */
     public Map<String, String> getProperties() {
         return properties;
     }
@@ -67,14 +77,23 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         Property property = new Property(key, value);
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
-        session.saveOrUpdate(property);
-        transaction.commit();
-
         properties.put(key, value);
+
+        try {
+            session.saveOrUpdate(property);
+            transaction.commit();
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 
     /**
-     * @return
+     * Initializes the SML/SMP Dynamic Discovery Client.
+     *
+     * @return Dynamic Discovery Client initialized.
      */
     public DynamicDiscoveryBuilder initializeDynamicDiscoveryFetcher() {
 
@@ -91,15 +110,15 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
                 if (proxyAuthenticated) {
                     String proxyUsername = getProperty(StandardProperties.HTTP_PROXY_USERNAME);
                     String proxyPassword = getProperty(StandardProperties.HTTP_PROXY_PASSWORD);
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Configuring access through Authenticated Proxy '{}:{}' with Credentials: '{}/{}'",
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Configuring access through Authenticated Proxy '{}:{}' with Credentials: '{}/{}'",
                                 proxyHost, proxyPort, proxyUsername, StringUtils.isNoneBlank(proxyPassword) ? "XXXXXX" : "No Password provided");
                     }
                     discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort, proxyUsername, proxyPassword)));
 
                 } else {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Configuring access through Proxy '{}:{}'", proxyHost, proxyPort);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Configuring access through Proxy '{}:{}'", proxyHost, proxyPort);
                     }
                     discoveryBuilder.fetcher(new DefaultURLFetcher(new DefaultProxy(proxyHost, proxyPort)));
                 }
@@ -110,10 +129,24 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         }
     }
 
-    public void setServiceWSE(String coutryCode, String serviceName, String url) {
-        setProperty(coutryCode + "." + serviceName + ".WSE", url);
+    /**
+     * Sets information related to Endpoint into OpenNCP properties database.
+     *
+     * @param countryCode - ISO Country code of the Service Provider.
+     * @param serviceName - Interoperable service name used.
+     * @param url         - URL of the endpoint.
+     */
+    public void setServiceWSE(String countryCode, String serviceName, String url) {
+        setProperty(countryCode + "." + serviceName + ".WSE", url);
     }
 
+    /**
+     * Returns application properties including a check into the cache mechanism.
+     *
+     * @param key      - OpenNCP property key.
+     * @param checkMap - boolean value if the cache should be checked or not.
+     * @return OpenNCP property.
+     */
     private Optional<String> findProperty(String key, boolean checkMap) {
 
         String value = null;
@@ -123,8 +156,16 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
         if (value == null) {
             Session session = sessionFactory.getCurrentSession();
             Transaction transaction = session.beginTransaction();
-            Property property = session.get(Property.class, key);
-            transaction.commit();
+            Property property;
+            try {
+                property = session.get(Property.class, key);
+                transaction.commit();
+            } catch (RuntimeException e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                throw e;
+            }
 
             if (property == null) {
                 return Optional.empty();

@@ -1,29 +1,13 @@
-/*
- * Copyright (C) 2011, 2012 SRDC Yazilim Arastirma ve Gelistirme ve Danismanlik
- * Tic. Ltd. Sti. epsos@srdc.com.tr
- *
- * This file is part of SRDC epSOS NCP.
- *
- * SRDC epSOS NCP is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
- *
- * SRDC epSOS NCP is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * SRDC epSOS NCP. If not, see http://www.gnu.org/licenses/.
- */
 package tr.com.srdc.epsos.data.model.xds;
 
+import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * This classe encapsulats a set of properties related to a document, but not
- * it's content.
+ * This class encapsulates a set of properties related to a document, but not it's content.
  */
 public class XDSDocument {
 
@@ -31,14 +15,83 @@ public class XDSDocument {
     private String hcid;
     private String repositoryUniqueId;
     private String documentUniqueId;
+    private String mimeType;
     private String name;
+    private String size;
     private String description;
     private String creationTime;
+    private String eventTime;
     private String healthcareFacility;
-    private String authorPerson;
     private boolean isPDF;
+    private OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation;
+    private List<OrCDDocumentMetaData.Author> authors = new ArrayList<>();
+
     private GenericDocumentCode formatCode;
     private GenericDocumentCode classCode;
+
+    private String atcCode;
+    private String atcText;
+    private String strength;
+    private String doseFormCode;
+    private String doseFormText;
+    private String substitution;
+    private boolean dispensable;
+
+    public String getAtcCode() {
+        return atcCode;
+    }
+
+    public void setAtcCode(String atcCode) {
+        this.atcCode = atcCode;
+    }
+
+    public String getAtcText() {
+        return atcText;
+    }
+
+    public void setAtcText(String atcText) {
+        this.atcText = atcText;
+    }
+
+    public String getStrength() {
+        return strength;
+    }
+
+    public void setStrength(String strength) {
+        this.strength = strength;
+    }
+
+    public String getDoseFormCode() {
+        return doseFormCode;
+    }
+
+    public void setDoseFormCode(String doseFormCode) {
+        this.doseFormCode = doseFormCode;
+    }
+
+    public String getDoseFormText() {
+        return doseFormText;
+    }
+
+    public void setDoseFormText(String doseFormText) {
+        this.doseFormText = doseFormText;
+    }
+
+    public String getSubstitution() {
+        return substitution;
+    }
+
+    public void setSubstitution(String substitution) {
+        this.substitution = substitution;
+    }
+
+    public boolean isDispensable() {
+        return dispensable;
+    }
+
+    public void setDispensable(boolean dispensable) {
+        this.dispensable = dispensable;
+    }
 
     /**
      * @return the hcid
@@ -78,6 +131,10 @@ public class XDSDocument {
         this.name = name;
     }
 
+    public String getSize() { return size; }
+
+    public void setSize(String size) { this.size = size; }
+
     public String getDescription() {
         return description;
     }
@@ -93,6 +150,10 @@ public class XDSDocument {
     public void setCreationTime(String creationTime) {
         this.creationTime = creationTime;
     }
+
+    public String getEventTime() { return eventTime; }
+
+    public void setEventTime(String eventTime) { this.eventTime = eventTime; }
 
     public String getHealthcareFacility() {
         return healthcareFacility;
@@ -117,7 +178,19 @@ public class XDSDocument {
     public void setId(String id) {
         this.id = id;
     }
-    
+
+    public String getMimeType() { return mimeType; }
+
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+
+    public OrCDDocumentMetaData.ReasonOfHospitalisation getReasonOfHospitalisation() { return reasonOfHospitalisation; }
+
+    public void setReasonOfHospitalisation(OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation) { this.reasonOfHospitalisation = reasonOfHospitalisation; }
+
+    public List<OrCDDocumentMetaData.Author> getAuthors() { return authors; }
+
+    public void setAuthors(List<OrCDDocumentMetaData.Author> authors) { this.authors = authors; }
+
     /**
      * @return the formatCode
      */
@@ -134,13 +207,13 @@ public class XDSDocument {
 
     /**
      * @param schema the formatCode schema
-     * @param value the formatCode value
+     * @param value  the formatCode value
      */
     public void setFormatCode(String schema, String value) {
-        GenericDocumentCode formatCode = new GenericDocumentCode();
-        formatCode.setSchema(schema);
-        formatCode.setValue(value);
-        this.formatCode = formatCode;
+        GenericDocumentCode documentCode = new GenericDocumentCode();
+        documentCode.setSchema(schema);
+        documentCode.setValue(value);
+        this.formatCode = documentCode;
     }
 
     /**
@@ -159,26 +232,13 @@ public class XDSDocument {
 
     /**
      * @param schema the classCode schema
-     * @param value the classCode value
+     * @param value  the classCode value
      */
     public void setClassCode(String schema, String value) {
-        GenericDocumentCode classCode = new GenericDocumentCode();
-        classCode.setSchema(schema);
-        classCode.setValue(value);
-        this.classCode = classCode;
+        GenericDocumentCode documentCode = new GenericDocumentCode();
+        documentCode.setSchema(schema);
+        documentCode.setValue(value);
+        this.classCode = documentCode;
     }
 
-    /**
-     * @return the authorPerson
-     */
-    public String getAuthorPerson() {
-        return authorPerson;
-    }
-
-    /**
-     * @param authorPerson the authorPerson to set
-     */
-    public void setAuthorPerson(String authorPerson) {
-        this.authorPerson = authorPerson;
-    }
 }

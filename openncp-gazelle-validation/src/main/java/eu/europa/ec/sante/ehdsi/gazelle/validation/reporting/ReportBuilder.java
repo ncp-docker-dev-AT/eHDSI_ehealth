@@ -57,7 +57,6 @@ public class ReportBuilder {
      * @param validationObject the validated object.
      * @param validationResult the validation result.
      * @return A boolean flag, indicating if the reporting process succeed or not.
-     * @pa
      */
     public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject,
                                 final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
@@ -89,7 +88,7 @@ public class ReportBuilder {
             return false;
         }
         if (validationResult == null) {
-            LOGGER.error("The specified validation result object is null. Assigning empty String to validation result.");
+            LOGGER.warn("The specified validation result object is null. Assigning empty String to validation result.");
             validationTestResult = "";
         } else {
             LOGGER.info("Validation Result: '{}'", validationResult.getValidationResultsOverview() != null ?
@@ -202,7 +201,6 @@ public class ReportBuilder {
         }
 
         fileName.append(FILE_EXTENSION);
-
         return fileName.toString();
     }
 

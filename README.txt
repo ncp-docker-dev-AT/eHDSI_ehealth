@@ -4,29 +4,28 @@ It has been created from OpenNCP projects and restructured to a multi module pro
 
 Main Modules
 ------------
-configuration-manager
-e-sens-non-repudiation
-security-manager
-util
-data-model
-audit-manager
 assertion-validator
+audit-manager
 cda-display-tool
+configuration-manager
+consent-manager
+data-model
 default-policy-manager
+e-sens-non-repudiation
+eadc
+openatna
+openncp-common-components
+openncp-gateway
+openncp-gazelle-validation
+openstork
+protocol-terminators
+security-manager
+transformation-manager
 trc-sts
 trc-sts-client
 tsam
 tsam-sync
-transformation-manager
-eadc
-consent-manager
-protocol-terminators
-openatna
-openncp-portal
-openncp-web-portal
-openncp-common-components
-openstork
-openncp-gateway
+util
 
 Maven Configuration
 -------------------
@@ -42,3 +41,13 @@ keytool -import -alias gazelle.ehdsi.eu -file gazelle.ehdsi.eu.crt -keystore JAV
 Tips for creating new versions
 ------------------------------
 From the root directory just run the following command mvn versions:set -DnewVersion=<new version>
+
+
+Dependency check
+----------------
+mvn dependency-check:aggregate -DskipTests -U -T2C
+or
+mvn clean verify -DskipTests -T2C
+or
+mvn clean dependency-check:aggregate -DskipTests -U -T2C
+then see the file from target/dependency-check-report.html

@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>openatna-net</artifactId>
@@ -27,18 +27,18 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <artifactId>javax.mail-api</artifactId>
             <version>${mail.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15on</artifactId>
-            <version>1.65</version>
+            <version>${bcprov.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.65</version>
+            <version>${bcprov.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

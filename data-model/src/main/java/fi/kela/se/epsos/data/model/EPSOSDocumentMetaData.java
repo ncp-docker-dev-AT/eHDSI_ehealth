@@ -4,8 +4,6 @@ import java.util.Date;
 
 /**
  * Generic EPSOSDocumentMetaData interface. EPDocumentMetaData and PSDocumentMetaData extends this interface.
- *
- * @author mimyllyv
  */
 public interface EPSOSDocumentMetaData {
 
@@ -27,4 +25,14 @@ public interface EPSOSDocumentMetaData {
     String getTitle();
 
     String getAuthor();
+
+    String getLanguage();
+
+    ConfidentialityMetadata getConfidentiality();
+
+    interface ConfidentialityMetadata {
+        String getConfidentialityCode();
+
+        String getConfidentialityDisplay();
+    }
 }

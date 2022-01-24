@@ -1,14 +1,12 @@
 package tr.com.srdc.epsos.data.model;
 
-import org.opensaml.saml.saml2.core.Assertion;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * @author erdem
+ * @author DG-Sante A4
  */
 public class XdrRequest {
 
-    private Assertion idAssertion;
-    private Assertion trcAssertion;
     private String countryCode;
     private String countryName;
     private String cdaId;
@@ -49,22 +47,6 @@ public class XdrRequest {
         this.cda = cda;
     }
 
-    public Assertion getIdAssertion() {
-        return idAssertion;
-    }
-
-    public void setIdAssertion(Assertion idAssertion) {
-        this.idAssertion = idAssertion;
-    }
-
-    public Assertion getTrcAssertion() {
-        return trcAssertion;
-    }
-
-    public void setTrcAssertion(Assertion trcAssertion) {
-        this.trcAssertion = trcAssertion;
-    }
-
     public String getCountryCode() {
         return countryCode;
     }
@@ -93,5 +75,18 @@ public class XdrRequest {
      */
     public void setDocumentCode(GenericDocumentCode documentCode) {
         this.documentCode = documentCode;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("countryCode", countryCode)
+                .append("countryName", countryName)
+                .append("cdaId", cdaId)
+                .append("submissionSetId", submissionSetId)
+                .append("cda", cda)
+                .append("documentCode", documentCode)
+                .append("patient", patient)
+                .toString();
     }
 }

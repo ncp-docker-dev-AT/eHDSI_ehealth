@@ -2,10 +2,12 @@ package eu.epsos.pt.cc.stub;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.pt.ws.client.xcpd.XcpdInitGateway;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -44,15 +46,15 @@ public final class IdentificationService {
      * types)
      *
      * @param patient      List of patient identity traits as provided by the patient to the HCP.
-     * @param hcpAssertion [ST] epSOS HCP Identity Assertion, [PT] X.509 NCP-B service certificate
+     * @param assertionMap [ST] epSOS HCP Identity Assertion, [PT] X.509 NCP-B service certificate
      * @return The Patients found
      * @throws NoPatientIdDiscoveredException containing the error message
      */
     public static List<PatientDemographics> findIdentityByTraits(final PatientDemographics patient,
-                                                                 final Assertion hcpAssertion,
-                                                                 final String countrCode)
+                                                                 final Map<AssertionEnum, Assertion> assertionMap,
+                                                                 final String countryCode)
             throws NoPatientIdDiscoveredException {
 
-        return XcpdInitGateway.patientDiscovery(patient, hcpAssertion, countrCode);
+        return XcpdInitGateway.patientDiscovery(patient, assertionMap, countryCode);
     }
 }

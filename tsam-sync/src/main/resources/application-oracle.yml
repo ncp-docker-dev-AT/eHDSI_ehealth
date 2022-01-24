@@ -1,3 +1,7 @@
 spring:
+  jpa:
+    properties:
+      hibernate.dialect: ${tsam-sync.datasource.dialect}
   datasource:
-    url: jdbc:oracle:thin:@//${tsam-sync.datasource.host}:${tsam-sync.datasource.port}/${tsam-sync.datasource.database}
+    driver-class-name: ${tsam-sync.datasource.driver}
+    url: ${tsam-sync.datasource.url}

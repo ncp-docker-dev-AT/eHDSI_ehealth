@@ -1,22 +1,4 @@
-/*
- *  Copyright 2010 Jerry Dimitriou <jerouris at netsmart.gr>.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
- */
-
 package epsos.ccd.netsmart.securitymanager.keyselector;
-
 
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 
@@ -33,29 +15,25 @@ import java.security.cert.*;
 import java.util.Enumeration;
 
 /**
- * A <code>KeySelector</code> that returns {@link PublicKey}s of trusted
- * {@link X509Certificate}s stored in a {@link KeyStore}.
+ * A <code>KeySelector</code> that returns {@link PublicKey}s of trusted {@link X509Certificate}s stored in a {@link KeyStore}.
  * <p>
- * <p>This <code>KeySelector</code> uses the specified <code>KeyStore</code>
- * to find a trusted <code>X509Certificate</code> that matches information
- * specified in the {@link KeyInfo} passed to the {@link #select} method.
- * The public key from the first match is returned. If no match,
- * <code>null</code> is returned. See the <code>select</code> method for more
- * information.
+ * <p>This <code>KeySelector</code> uses the specified <code>KeyStore</code> to find a trusted <code>X509Certificate</code>
+ * that matches information specified in the {@link KeyInfo} passed to the {@link #select} method.
+ * The public key from the first match is returned. If no match, <code>null</code> is returned.
+ * See the <code>select</code> method for more information.
  *
  * @author Sean Mullan
  */
 public class X509KeySelector extends KeySelector {
 
-    private KeyStore ks;
+    private final KeyStore ks;
 
     /**
      * Creates an <code>X509KeySelector</code>.
      *
      * @param keyStore the keystore
      * @throws KeyStoreException    if the keystore has not been initialized
-     * @throws NullPointerException if <code>keyStore</code> is
-     *                              <code>null</code>
+     * @throws NullPointerException if <code>keyStore</code> is <code>null</code>
      */
     public X509KeySelector(KeyStore keyStore) throws KeyStoreException {
         if (keyStore == null) {
@@ -69,26 +47,19 @@ public class X509KeySelector extends KeySelector {
     /**
      * Finds a key from the keystore satisfying the specified constraints.
      * <p>
-     * <p>This method compares data contained in {@link KeyInfo} entries
-     * with information stored in the <code>KeyStore</code>. The implementation
-     * iterates over the KeyInfo types and returns the first {@link PublicKey}
-     * of an X509Certificate in the keystore that is compatible with the
-     * specified AlgorithmMethod according to the following rules for each
+     * <p>This method compares data contained in {@link KeyInfo} entries with information stored in the <code>KeyStore</code>.
+     * The implementation iterates over the KeyInfo types and returns the first {@link PublicKey} of an X509Certificate
+     * in the keystore that is compatible with the specified AlgorithmMethod according to the following rules for each
      * keyinfo type:
      * <p>
-     * X509Data X509Certificate: if it contains a <code>KeyUsage</code>
-     * extension that asserts the <code>digitalSignature</code> bit and
-     * matches an <code>X509Certificate</code> in the <code>KeyStore</code>.
-     * X509Data X509IssuerSerial: if the serial number and issuer DN match an
-     * <code>X509Certificate</code> in the <code>KeyStore</code>.
-     * X509Data X509SubjectName: if the subject DN matches an
-     * <code>X509Certificate</code> in the <code>KeyStore</code>.
-     * X509Data X509SKI: if the subject key identifier matches an
-     * <code>X509Certificate</code> in the <code>KeyStore</code>.
+     * X509Data X509Certificate: if it contains a <code>KeyUsage</code> extension that asserts the <code>digitalSignature</code>
+     * bit and matches an <code>X509Certificate</code> in the <code>KeyStore</code>.
+     * X509Data X509IssuerSerial: if the serial number and issuer DN match an <code>X509Certificate</code> in the <code>KeyStore</code>.
+     * X509Data X509SubjectName: if the subject DN matches an <code>X509Certificate</code> in the <code>KeyStore</code>.
+     * X509Data X509SKI: if the subject key identifier matches an <code>X509Certificate</code> in the <code>KeyStore</code>.
      * KeyName: if the keyname matches an alias in the <code>KeyStore</code>.
-     * RetrievalMethod: supports rawX509Certificate and X509Data types. If
-     * rawX509Certificate type, it must match an <code>X509Certificate</code>
-     * in the <code>KeyStore</code>.
+     * RetrievalMethod: supports rawX509Certificate and X509Data types. If rawX509Certificate type, it must match
+     * an <code>X509Certificate</code> in the <code>KeyStore</code>.
      *
      * @param keyInfo a <code>KeyInfo</code> (may be <code>null</code>)
      * @param purpose the key's purpose
@@ -119,33 +90,31 @@ public class X509KeySelector extends KeySelector {
             }
 
             // Iterate through KeyInfo types
-            for (Object o : keyInfo.getContent()) {
-                XMLStructure kiType = (XMLStructure) o;
+            for (XMLStructure xmlStructure : keyInfo.getContent()) {
                 // check X509Data
-                if (kiType instanceof X509Data) {
-                    X509Data xd = (X509Data) kiType;
+                if (xmlStructure instanceof X509Data) {
+                    X509Data xd = (X509Data) xmlStructure;
                     KeySelectorResult ksr = x509DataSelect(xd, sm);
                     if (ksr != null) {
                         return ksr;
                     }
                     // check KeyName
-                } else if (kiType instanceof KeyName) {
-                    KeyName kn = (KeyName) kiType;
+                } else if (xmlStructure instanceof KeyName) {
+                    KeyName kn = (KeyName) xmlStructure;
                     Certificate cert = ks.getCertificate(kn.getName());
-                    if (cert != null && algEquals(sm.getAlgorithm(),
-                            cert.getPublicKey().getAlgorithm())) {
+                    if (cert != null && algEquals(sm.getAlgorithm(), cert.getPublicKey().getAlgorithm())) {
                         return new SimpleKeySelectorResult(cert.getPublicKey());
                     }
                     // check RetrievalMethod
-                } else if (kiType instanceof RetrievalMethod) {
-                    RetrievalMethod rm = (RetrievalMethod) kiType;
+                } else if (xmlStructure instanceof RetrievalMethod) {
+                    RetrievalMethod rm = (RetrievalMethod) xmlStructure;
                     try {
                         KeySelectorResult ksr = null;
                         switch (rm.getType()) {
                             case X509Data.RAW_X509_CERTIFICATE_TYPE:
                                 OctetStreamData data = (OctetStreamData) rm.dereference(context);
-                                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                                X509Certificate cert = (X509Certificate) cf.generateCertificate(data.getOctetStream());
+                                CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+                                X509Certificate cert = (X509Certificate) certificateFactory.generateCertificate(data.getOctetStream());
                                 ksr = certSelect(cert, sm);
                                 break;
                             case X509Data.TYPE:
@@ -176,11 +145,9 @@ public class X509KeySelector extends KeySelector {
     }
 
     /**
-     * Searches the specified keystore for a certificate that matches the
-     * criteria specified in the CertSelector.
+     * Searches the specified keystore for a certificate that matches the criteria specified in the CertSelector.
      *
-     * @return a KeySelectorResult containing the cert's public key if there
-     * is a match; otherwise null
+     * @return a KeySelectorResult containing the cert's public key if there is a match; otherwise null
      */
     private KeySelectorResult keyStoreSelect(CertSelector cs) throws KeyStoreException {
 
@@ -196,12 +163,10 @@ public class X509KeySelector extends KeySelector {
     }
 
     /**
-     * Searches the specified keystore for a certificate that matches the
-     * specified X509Certificate and contains a public key that is compatible
-     * with the specified SignatureMethod.
+     * Searches the specified keystore for a certificate that matches the specified X509Certificate and contains
+     * a public key that is compatible with the specified SignatureMethod.
      *
-     * @return a KeySelectorResult containing the cert's public key if there
-     * is a match; otherwise null
+     * @return a KeySelectorResult containing the cert's public key if there is a match; otherwise null
      */
     private KeySelectorResult certSelect(X509Certificate xcert, SignatureMethod sm) throws KeyStoreException {
 
@@ -224,8 +189,7 @@ public class X509KeySelector extends KeySelector {
     }
 
     /**
-     * Returns an OID of a public-key algorithm compatible with the specified
-     * signature algorithm URI.
+     * Returns an OID of a public-key algorithm compatible with the specified signature algorithm URI.
      */
     private String getPKAlgorithmOID(String algURI) {
         if (algURI.equalsIgnoreCase(CryptographicConstant.ALGO_ID_SIGNATURE_DSA_SHA256)) {
@@ -311,7 +275,7 @@ public class X509KeySelector extends KeySelector {
                 // check X509CRL
                 // not supported: should use CertPath API
             } else {
-                // skip all other entries
+                // skip all others entries
                 continue;
             }
             if (ksr != null) {

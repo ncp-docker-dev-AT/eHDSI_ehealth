@@ -21,6 +21,9 @@ package eu.epsos.pt.cc.dts;
 
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This is an Data Transformation Service. This provide functions to transform
  * data into a tr.com.srdc.epsos.data.model.GenericDocumentCode object.
@@ -30,12 +33,24 @@ import tr.com.srdc.epsos.data.model.GenericDocumentCode;
  */
 public class GenericDocumentCodeDts {
 
+    public static List<GenericDocumentCode> newInstance(List<epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode> documentCodes) {
+        final List<GenericDocumentCode> result = new ArrayList<>();
+
+        for (epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode documentCode: documentCodes) {
+            GenericDocumentCode genericDocumentCode = new GenericDocumentCode();
+            genericDocumentCode.setSchema(documentCode.getSchema());
+            genericDocumentCode.setValue(documentCode.getNodeRepresentation());
+            result.add(genericDocumentCode);
+        }
+        return result;
+    }
+
     public static GenericDocumentCode newInstance(epsos.openncp.protocolterminator.clientconnector.GenericDocumentCode documentCode) {
         final GenericDocumentCode result = new GenericDocumentCode();
-        
+
         result.setSchema(documentCode.getSchema());
         result.setValue(documentCode.getNodeRepresentation());
-        
+
         return result;
     }
 

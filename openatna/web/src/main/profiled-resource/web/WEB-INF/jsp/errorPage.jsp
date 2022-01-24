@@ -44,11 +44,11 @@
 		<h1>OpenATNA Viewer Error</h1>
 
 		<div class="nav">
-			<p><a href="query.html">Message Viewer</a></p>
-			<p><a href="errors.html">Errors Viewer</a></p>
+			<p><a href="query">Message Viewer</a></p>
+			<p><a href="errors">Errors Viewer</a></p>
 		</div>
 
-		<form:form action="error.html" commandName="errorBean">
+		<form:form action="error" commandName="errorBean">
 			Error occurred while attempting to write log. Error message was: ${errorBean.message}
 		</form:form>
 	</div>

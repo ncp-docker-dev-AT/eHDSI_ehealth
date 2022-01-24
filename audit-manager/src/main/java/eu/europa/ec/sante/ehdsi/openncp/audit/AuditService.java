@@ -5,6 +5,8 @@ import epsos.ccd.gnomon.auditmanager.EventLog;
 import epsos.ccd.gnomon.utils.SerializableMessage;
 import eu.epsos.util.audit.*;
 import eu.epsos.util.audit.AuditLogSerializer.Type;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.RFC3881.AuditMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,19 +17,18 @@ import java.io.Serializable;
  * This service provides access to the system defined properties
  *
  * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
  * @see net.RFC3881 http://www.rfc3881.net/ generated classes using JAXB Library for populating audit trail entries
  */
 public class AuditService implements MessageHandlerListener {
 
     private final Logger logger = LoggerFactory.getLogger(AuditService.class);
-    private FailedLogsHandlerService failedLogsHandlerService;
-    private AuditLogSerializer auditLogSerializer;
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
+    private final FailedLogsHandlerService failedLogsHandlerService;
+    private final AuditLogSerializer auditLogSerializer;
 
     protected AuditService() {
 
-        logger.debug("Creating Audit Service...");
+        logger.debug("Initializing Audit Service...");
         auditLogSerializer = new AuditLogSerializerImpl(Type.AUDIT_MANAGER);
         failedLogsHandlerService = new FailedLogsHandlerServiceImpl(this, Type.AUDIT_MANAGER);
         failedLogsHandlerService.start();
@@ -36,25 +37,29 @@ public class AuditService implements MessageHandlerListener {
     /**
      * Provides a method to write an Audit Log.
      *
-     * @param el
-     * @param facility the facility number according to log4j
-     * @param severity the severity of the message
-     * @return true if auditLog is attempted to be sent
+     * @param eventObject Message to be submitted to the ATNA repository.
+     * @param facility    the facility number according to log4j.
+     * @param severity    the severity of the message.
+     * @return true if auditLog is attempted to be sent.
      */
-    public synchronized Boolean write(Object el, String facility, String severity) {
+    public synchronized Boolean write(Object eventObject, String facility, String severity) {
+
+        logger.info("[Audit Service] Writing Audit Message");
 
         try {
-            if (el instanceof EventLog) {
-                EventLog eventLog = (EventLog) el;
-                AuditMessage am = AuditTrailUtils.getInstance().createAuditMessage(eventLog);
-                logger.debug("Start of AuditLog transmission");
-                AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, am, facility, severity);
-            } else if (el instanceof AuditMessage) {
-                AuditMessage am = (AuditMessage) el;
-                logger.debug("Start of AuditLog transmission of backuped audit log");
-                AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, am, facility, severity);
+            if (eventObject instanceof EventLog) {
+                if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                    loggerClinical.debug("Processing EventLog: '{}'", eventObject != null ? eventObject.toString() : "Event Log is null");
+                }
+
+                EventLog eventLog = (EventLog) eventObject;
+                AuditMessage auditMessage = AuditTrailUtils.getInstance().createAuditMessage(eventLog);
+                AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, auditMessage, facility, severity);
+            } else if (eventObject instanceof AuditMessage) {
+                AuditMessage auditMessage = (AuditMessage) eventObject;
+                AuditTrailUtils.getInstance().sendATNASyslogMessage(auditLogSerializer, auditMessage, facility, severity);
             } else {
-                throw new IllegalArgumentException("Unsupported message format: " + el.getClass().getCanonicalName());
+                throw new IllegalArgumentException("Unsupported message format: " + eventObject.getClass().getCanonicalName());
             }
             return true;
         } catch (Exception e) {

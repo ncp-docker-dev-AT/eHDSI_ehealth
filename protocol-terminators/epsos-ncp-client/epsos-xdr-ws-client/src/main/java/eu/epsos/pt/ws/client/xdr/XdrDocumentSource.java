@@ -1,10 +1,13 @@
 package eu.epsos.pt.ws.client.xdr;
 
-import eu.epsos.exceptions.XdrException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
+import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
+import org.apache.commons.lang3.StringUtils;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.XdrRequest;
@@ -14,6 +17,7 @@ import tr.com.srdc.epsos.ws.xdr.client.XDSbRepositoryServiceInvoker;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Document Source Actor, from the IHE XDR (Cross-enterprise Document Reliable Interchange) Profile.
@@ -32,51 +36,49 @@ public final class XdrDocumentSource {
     }
 
     /**
-     * Implements the necessary mechanisms to provide and register a document next to the XDR Document Recipient Actor.
+     * Implements the necessary mechanisms to discard a medication document next to the XDR Document Recipient Actor.
      *
-     * @param request     a XDR request, encapsulating the CDA and it's Metadata
-     * @param countryCode the country code of the requesting country in ISO
-     *                    format.
+     * @param request     - XDR request encapsulating the CDA and it's Metadata.
+     * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse initialize(final XdrRequest request, final String countryCode) throws XdrException {
+    public static XdrResponse discard(final XdrRequest request, final String countryCode,
+                                      final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
 
-        RegistryResponseType response;
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.EDD_CLASSCODE);
+    }
 
-        try {
-            response = new XDSbRepositoryServiceInvoker().provideAndRegisterDocumentSet(request, countryCode, Constants.ED_CLASSCODE);
-            if (response.getRegistryErrorList() != null) {
-                RegistryErrorList registryErrorList = response.getRegistryErrorList();
-                processRegistryErrors(registryErrorList);
-            }
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex);
-        } catch (RuntimeException ex) {
-            throw ex;
-        }
-        return XdrResponseDts.newInstance(response);
+    /**
+     * Implements the necessary mechanisms to dispense a medication document next to the XDR Document Recipient Actor.
+     *
+     * @param request     - XDR request encapsulating the CDA and it's Metadata.
+     * @param countryCode - Country code of the requesting country in ISO format.
+     */
+    public static XdrResponse initialize(final XdrRequest request, final String countryCode,
+                                         final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
+
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.ED_CLASSCODE);
     }
 
     /**
      * Implements the necessary mechanisms to provide and register a document next to the XDR Document Recipient Actor.
      *
-     * @param request     a XDR request, encapsulating the CDA and it's Metadata
-     * @param countryCode the country code of the requesting country in ISO
-     *                    format.
+     * @param request     - XDR request encapsulating the CDA and it's Metadata.
+     * @param countryCode - Country code of the requesting country in ISO format.
      */
-    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode, String docClassCode) throws XdrException {
+    public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode,
+                                                       final Map<AssertionEnum, Assertion> assertionMap, String docClassCode)
+            throws XDRException {
 
         RegistryResponseType response;
 
         try {
-            response = new XDSbRepositoryServiceInvoker().provideAndRegisterDocumentSet(request, countryCode, docClassCode);
+            response = new XDSbRepositoryServiceInvoker().provideAndRegisterDocumentSet(request, countryCode, assertionMap, docClassCode);
             if (response.getRegistryErrorList() != null) {
-                RegistryErrorList registryErrorList = response.getRegistryErrorList();
+                var registryErrorList = response.getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
-        } catch (RemoteException ex) {
-            throw new RuntimeException(ex);
-        } catch (RuntimeException ex) {
-            throw ex;
+        } catch (RemoteException e) {
+            throw new XDRException(e);
         }
         return XdrResponseDts.newInstance(response);
     }
@@ -86,7 +88,7 @@ public final class XdrDocumentSource {
      *
      * @param registryErrorList the Registry Error List to be processed.
      */
-    private static void processRegistryErrors(final RegistryErrorList registryErrorList) throws XdrException {
+    private static void processRegistryErrors(final RegistryErrorList registryErrorList) throws XDRException {
 
         if (registryErrorList == null) {
             return;
@@ -97,8 +99,8 @@ public final class XdrDocumentSource {
             return;
         }
 
-        StringBuilder srtBuilder = new StringBuilder();
-        boolean hasError = false;
+        var stringBuilder = new StringBuilder();
+        var hasError = false;
 
         for (RegistryError error : errorList) {
             String errorCode = error.getErrorCode();
@@ -110,15 +112,15 @@ public final class XdrDocumentSource {
             LOGGER.error("errorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
                     errorCode, codeContext, location, severity, value);
 
-            if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity)) {
-                srtBuilder.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
+            if (StringUtils.equals("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error", severity)) {
+                stringBuilder.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                 hasError = true;
             }
             if (hasError) {
                 if (errorCode != null && errorCode.trim().length() > 0) {
-                    throw new XdrException(errorCode);
+                    throw new XDRException(errorCode);
                 } else {
-                    throw new XdrException(codeContext);
+                    throw new XDRException(codeContext);
                 }
             }
         }

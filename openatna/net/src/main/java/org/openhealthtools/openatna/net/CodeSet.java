@@ -12,15 +12,14 @@ import java.util.Set;
  */
 public class CodeSet {
 
-    private String name = null;
-    private String classificationScheme = null;
+    private final String name;
+    private final String classificationScheme;
     //Pair<String(code), String(codingScheme)>
     //code is required (cannot be null) while codingScheme is optional.
-    private Hashtable<Pair, CodeSetEntry> entries = null;
+    private final Hashtable<Pair, CodeSetEntry> entries;
 
     /**
-     * Create a new code set with the given name and ebXML
-     * classification scheme ID.
+     * Create a new code set with the given name and ebXML classification scheme ID.
      *
      * @param name                 The name of the coding scheme
      * @param classificationScheme The classification scheme ID
@@ -29,7 +28,7 @@ public class CodeSet {
 
         this.name = name;
         this.classificationScheme = classificationScheme;
-        entries = new Hashtable<Pair, CodeSetEntry>();
+        entries = new Hashtable<>();
     }
 
     /**
@@ -49,12 +48,12 @@ public class CodeSet {
      */
     public void addEntry(String code, String displayName, String codingSchemeName, String ext) {
 
-        CodeSetEntry entry = new CodeSetEntry();
-        entry.value = code;
-        entry.displayName = displayName;
-        entry.codingScheme = codingSchemeName;
-        entry.ext = ext;
-        entries.put(new Pair(code, codingSchemeName), entry);
+        var codeSetEntry = new CodeSetEntry();
+        codeSetEntry.value = code;
+        codeSetEntry.displayName = displayName;
+        codeSetEntry.codingScheme = codingSchemeName;
+        codeSetEntry.ext = ext;
+        entries.put(new Pair(code, codingSchemeName), codeSetEntry);
     }
 
     /**
@@ -76,9 +75,9 @@ public class CodeSet {
      *
      * @param code The code value to check
      * @return True if this code set contains this value as a code
-     * @deprecated the new data structure requires a codingScheme,
-     * so use {@link #containsCode(String, String)} instead of this method.
+     * @deprecated the new data structure requires a codingScheme, so use {@link #containsCode(String, String)} instead of this method.
      */
+    @Deprecated(since = "5.2.0", forRemoval = true)
     public boolean containsCode(String code) {
 
         for (Pair pair : entries.keySet()) {
@@ -109,9 +108,9 @@ public class CodeSet {
      *
      * @param code The code value
      * @return The display name for this code value
-     * @deprecated the new data structure requires a codingScheme,
-     * so use {@link #getDisplayName(String, String)} instead of this method.
+     * @deprecated the new data structure requires a codingScheme, so use {@link #getDisplayName(String, String)} instead of this method.
      */
+    @Deprecated(since = "5.2.0", forRemoval = true)
     public String getDisplayName(String code) {
 
         for (Pair pair : entries.keySet()) {
@@ -149,9 +148,9 @@ public class CodeSet {
      *
      * @param code The code value
      * @return The coding scheme this code value is taken from
-     * @deprecated the new data structure requires a codingScheme,
-     * so use {@link #getDisplayName(String, String)} instead of this method.
+     * @deprecated the new data structure requires a codingScheme, so use {@link #getDisplayName(String, String)} instead of this method.
      */
+    @Deprecated(since = "5.2.0", forRemoval = true)
     public String getCodingScheme(String code) {
 
         for (Pair pair : entries.keySet()) {

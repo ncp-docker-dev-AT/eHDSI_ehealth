@@ -37,9 +37,9 @@
 <div class="main">
 <h1>OpenATNA Audit Message Viewer</h1>
 
-<div class="nav"><a href="errors.html">Error Viewer</a></div>
+<div class="nav"><a href="errors">Error Viewer</a></div>
 
-<form:form action="query.html" commandName="queryBean">
+<form:form action="query" commandName="queryBean">
 <fieldset>
 <legend>Constraints</legend>
 <table>
@@ -305,12 +305,12 @@
     <tr>
         <td align="left" width="100%">
             <c:if test="${offset > 0}">
-                <a href="query.html?start=${offset - 1}">Previous</a>
+                <a href="query?start=${offset - 1}">Previous</a>
             </c:if>
         </td>
         <td align="right">
             <c:if test="${fn:length(messages) > 0 && fn:length(messages) == queryBean.maxResults}">
-                <a href="query.html?start=${offset + 1}" class="rightlink">Next</a>
+                <a href="query?start=${offset + 1}" class="rightlink">Next</a>
             </c:if>
         </td>
     </tr>

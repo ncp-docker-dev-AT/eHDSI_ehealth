@@ -1,12 +1,377 @@
 # Change Log
 
-All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/> 
+All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
+
+## [5.2.3] - 17-11-2021
+The OpenNCP 5.2.3 is the Wave 5 Preparatory Test Event HotFix release.
+This version is an emergency version planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021 as a replacement of version 5.2.2.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP BugFix related to the TRC SAML assertion extra parameters: prescription ID and dispense PIN Code.</li>
+<li>OpenNCP Gateway Portal navigation menu improvement (SMP List services).</li>
+</ul>
+
+### Bug:
+    [EHNCP-2219] - TRC SAML ePrescription ID and dispensePinCode are not processed
+
+### Improvement:
+    [EHNCP-2218] - Gateway Portal - List and delete SMP resources view
+
+## [5.2.2] - 15-11-2021
+The OpenNCP 5.2.2 is the Wave 5 Preparatory Test Event HotFix release.
+This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP BugFix JAXB and Saxon HE libraries update (Gateway and Protocol Terminator).</li>
+<li>BugFix on ePrescription List metadata (CP-0051).</li>
+<li>BugFix on OrCD List metadata and Audit Messages.</li>
+<li>Minor fix on OpenNCP Gateway portal.</li>
+</ul>
+
+### Bug:
+    [EHNCP-2199] - Deleting SMP files locked on European Commission jurisdiction
+    [EHNCP-2202] - ePrescription List throws index out of bounds exception when some metadatas are not available
+    [EHNCP-2203] - XCAServiceImpl - Dispensable event status not correct
+    [EHNCP-2206] - Missing XDS classification scheme into the eP List (CP-0051)
+    [EHNCP-2207] - OpenNCP Gateway Upload - Http code 200
+    [EHNCP-2210] - JAXB libraries upgrade
+    [EHNCP-2211] - Saxon-HE library is missing on Gateway module
+    [EHNCP-2212] - OrCD list query return NullPointerException as Description is not available
+    [EHNCP-2214] - OrCD Audit message - transaction code for Query and Retrieve operations is not mapped
+
+### Task:
+    [EHNCP-2205] - Update Home Community ID for Member State
+
+### Issue:
+    [EHNCP-2201] - OrCD XDS metadata issue
+    [EHNCP-2204] - Hardcoded configurations of Gmail SMTP and email accounts
+
+### Support:
+    [EHNCP-2208] - Problem with initialization of Util Constants and configuration manager during XCPD transaction
+    [EHNCP-2209] - Problem with OpenNCP Gateway and Saxon Provider
+
+## [5.2.1] - 27-09-2021
+The OpenNCP 5.2.1 is the Wave 5 Preparatory Test Event release.
+This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Gateway refactoring (ATNA, eADC and SMP management through the SPA implemented with Vue.js), previous version removed</li>
+<li>Improvement of Change Proposals: 39, 47 and 51
+<ul>- CP-039 - Patient Identification through Next of Kin</ul>
+<ul>- CP-047 - OrCD service implemented.</ul>
+<ul>- CP-051 - ePrescriptions list improvement (structured format).</ul>
+</li>
+<li>CDA Display Tool improvements linked to Wave 5 requirements.</li>
+</ul>
+
+### Sub-task:
+    [EHNCP-2141] - Java 11 source code minor refactoring
+    [EHNCP-2174] - [CDA Display Tool] In the case of multiple clinical manifestations, the values are glued together
+    [EHNCP-2177] - [CDA Display Tool] In the case of multiple first names, make sure all are displayed correctly
+    [EHNCP-2178] - [CDA Display Tool] For ePrescription, correct the display logic of the active ingredient on product level
+
+### Bug:
+    [EHNCP-1905] - SMP Query ISM file producing not correct Audit Messages
+    [EHNCP-2160] - OpenNCP Gateway doesn't start properly
+    [EHNCP-2161] - OpenNCP Gateway login not implemented
+    [EHNCP-2180] - ATNA Gateway admin console not able to provide audit message details
+    [EHNCP-2182] - Reload OpenNCP Gateway Portal creates 404 error
+    [EHNCP-2183] - OpenNCP Gateway Backend hotdeploy doesn't work properly
+    [EHNCP-2185] - Gateway - SMP Editor generates inconsistency
+    [EHNCP-2187] - Generate SMP File for ISM
+    [EHNCP-2189] - NoK Assertion audit message is not correct
+    [EHNCP-2191] - Validation fails for the OrCD service because of an empty description
+    [EHNCP-2192] - Fix subsitution field for ePrescription List
+    [EHNCP-2196] - XCPD Audit message doesn't return the Patient ID but the Identity Traits
+
+### New Feature:
+    [EHNCP-2184] - Implement change password feature for the Gateway console
+
+### Task:
+    [EHNCP-2194] - Integration of the new OpenNCP Gateway implementation
+
+### Improvement:
+    [EHNCP-1760] - Export KPIs functionality through OpenNCP Gateway
+    [EHNCP-2144] - Display eADC data and Export to Excel
+    [EHNCP-2179] - Remove the possibility of having 3 eADC DB schemas
+    [EHNCP-2181] - OpenNCP Gateway - Front End improvements
+    [EHNCP-2195] - Security Token Service improvements (TRC and NoK assertions)
+
+### Support:
+    [EHNCP-2188] - Login to the current gateway
+
+### Issue:
+    [EHNCP-2186] - OpenNCP Gateway Front - "Click me" Button
+
+## [5.2.0] - 14-07-2021
+The OpenNCP 5.2.0 is the Wave 5 Initial release including the implementation of the Wave 5 Change Proposals.
+This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 5 from October 2021. 
+Based on the Member States feedback and further improvement items as decided by the OpenNCP Steering Work Group, 
+a new release is expected mid-September, in due time before the Preparatory PPT.
+
+Main changes in this release are:<br/>
+<ul>
+<li>Update to Java 11 and OpenSAML 4</li>
+<li>Implementation of Change Proposals: 39, 43, 46, 47 and 51
+<ul>- CP-039 - Patient Identification through Next of Kin</ul>
+<ul>- CP-043 - Error handling.</ul>
+<ul>- CP-046 - Two-Factor Authentication and NCP-A role based access control removed.</ul>
+<ul>- CP-047 - OrCD service implemented.</ul>
+<ul>- CP-051 - ePrescriptions list improvement (structured format).</ul>
+</li>
+<li>CDA Display Tool compliant with Wave 5 requirements.</li>
+</ul>
+
+### Story:
+    [EHNCP-1981] - Implement CP-eHealthDSI-039: Next of kin.
+    [EHNCP-1988] - Implement CP-eHealthDSI-047: Enable the exchange of original (unstructured) clinical documents.
+    [EHNCP-1989] - Implement CP-eHealthDSI-043: Error handling in NCP-B.
+    [EHNCP-2065] - Implement CP-eHealthDSI-046: Two-Factor Authentication and NCP-A role based access control removed.
+    [EHNCP-2070] - Implement CP-eHealthDSI-051: Improve ePrescription list.
+
+### Task:
+    [EHNCP-1990] - Analyze Technical impact on OpenNCP Reference Implementation.
+    [EHNCP-2053] - Implement Original Clinical Document service.
+    [EHNCP-2068] - OrCD exchange - Test activities.
+    [EHNCP-2092] - [CDA Display Tool] Refactor CDA Display Tool implementation.
+    [EHNCP-2116] - Create Mock CDA documents for OrCD Service.
+    [EHNCP-2124] - [CDA Display Tool] Implementation for Wave 5.
+    [EHNCP-2130] - [CP-046] Implementation activities - Two-factor authentication mechanism.
+    [EHNCP-2136] - Implement Original Clinical Document service in openncp-client-connector.
+    [EHNCP-2137] - Implement Original Clinical Document service in openncp-ws-server.
+    [EHNCP-2140] - Releasing OpenNCP 5.2.0 (Wave 5 Initial Release).
+    [EHNCP-2146] - [CDA Display Tool] Only SNOMED CT concepts are displayed from the eHDSIVaccine value set.
+    [EHNCP-2147] - [CDA Display Tool] collapsible panels share the same name.
+    [EHNCP-2148] - [CDA Display Tool] For different vital signs observations, the same date is displayed in the html.
+    [EHNCP-2149] - [CDA Display Tool] Organisation Id not correctly displayed in the eP Prescriber header.
+    [EHNCP-2150] - Update coded_element_list_ehdsi.xml with the updated OIDs.
+
+### Improvement
+    [EHNCP-2076] - Migration Java 8 to 11 (OpenJDK).
+    [EHNCP-2081] - Upgrade to OpenSAML 4.
+
+## [5.1.6] - 03-06-2021
+The OpenNCP 5.1.6 is the Wave 4 Formal Second HotFix release including the Formal Test Event improvements, a bug fix of
+the Medication Dispense Discard use case (eHDSI Business Requirements and eHDSI SAML Profile update), and some minor
+improvements and bug fix based on the stakeholders feedback on version 5.1.5.
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 July 2021 strongly recommended as a replacement of version 5.1.5.
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Reference Implementation build - Maven HTTP repositories discarded.</li>
+<li>XDR messages - date format compliant with IHE DTM definition.</li>
+<li>Minor updates of JAR dependencies marked as vulnerable.</li>
+</ul>
+
+### Sub-Task
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-2132] - Releasing OpenNCP 5.1.6 (Wave 4 Operation Ready 2nd HotFix).
+
+### Bug
+- [EHNCP-2129] - XDR request invalid due to time format.
+- [EHNCP-2128] - DocumentFactory uses wrong implementation class in PS and MRO.
+- [EHNCP-2135] - ClientConnectorService WSDL doesn't enforce the use of CountryCode.
+
+### Improvement
+- [EHNCP-2133] - Remove trivial Java dependencies and implementations deprecated.
+- [EHNCP-2134] - Support Maven build with version 3.8.1 (none http repository not supported).
+
+## [5.1.5] - 17-05-2021
+The OpenNCP 5.1.5 is the Wave 4 Formal HotFix release including the Formal Test Event improvements, and a clarification
+of the Requirements for HCP identification during Medication Dispense Discard use case (eHDSI Business Requirements and eHDSI SAML Profile update).
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 July 2021 as a replacement of version 5.1.4.
+
+Main changes in this release are:<br/>
+<ul>
+<li>Practitioner Organization ID SAML token is now mandatory only for the Medication Discard workflow.</li>
+<li>OpenNCP Gateway -  customization of the certificate used during the SML/SMP authentication.</li>
+</ul>
+
+### Change Request
+- [EHNCP-2120] - eHDSI SAML OrganizationID mandatory for the medication discard operation (linked with [EHNCP-2089] - Organisation-id in SAML assertion vs. disp CDA value representedOrganization).
+
+### Improvement
+- [EHNCP-2119] - OpenNCP Gateway - Certificates independent configuration.
+
+## [5.1.4] - 23-04-2021
+The OpenNCP 5.1.4 release is the CEF eHDSI Wave 4 Operation Ready version based on the Formal Test event feedback.
+This version is planned to be used as the official eHDSI Wave 4 GoLive release from 01 Jul 2021 .
+<br/>Practitioner SAML token definition has been updated, and the field urn:oasis:names:tc:xspa:1.0:subject:organization-id is now mandatory.
+<br/>Patient identifier root id is not overwritten anymore by the eHNCP Home Community ID during the XCA List operation.
+<br/>XDS metadata improvement (data extracted from CDA instead of static values).
+<br/>OpenNCP Gateway fix related to multiple database support.
+<br/>Minor bug fixing on the Discard Dispense Medication operation.
+<br/>Minor bug fixing into the CDA Display Tool (missing translation).
+
+### Bug
+- [EHNCP-1851] - Patient ID is not the same in XCA List Response and CDA record target.
+- [EHNCP-2077] - [CDA Display Tool] Hardcoded label not retrieved from EpsosRepository value set XML.
+- [EHNCP-2079] - XML audit evidences not generated on the correct folder after CDA transformation.
+- [EHNCP-2080] - OpenNCP Gateway is forcing the use of MySQL hibernate.dialect.
+- [EHNCP-2085] - XDS Metadata shall be aligned with CDA content exchanged.
+- [EHNCP-2086] - XDR Discard operation doesn't return transaction status.
+- [EHNCP-2087] - SAML Organization and Organization-ID are not processed properly during the Discard operation.
+- [EHNCP-2088] - XDS metadata "languageCode" hardcoded in XDR transaction.
+- [EHNCP-2107] - Common Components - Dynamic Discovery missing dependency at runtime.
+
+### Improvement
+- [EHNCP-217] - Circular dependency between unused XHTML pages.
+
+### Decision
+- [EHNCP-2089] - Organisation-id in SAML assertion vs. disp CDA value representedOrganization.
+
+### Issue
+- [EHNCP-2090] - Clinical logs have multiple occurrences of the same message.
+
+### Test
+- [EHNCP-2094] - Test Cases_01_OpenNCPeH Actor verifies XDS Metadata is aligned with CDA content exchanged.
+- [EHNCP-2095] - Test Cases_02_OpenNCPeH Actor verifies the XDR Discard operation return transaction status
+- [EHNCP-2096] - Test Cases_03_OpenNCPeH Actor XDS metadata "languageCode" hardcoded in XDR transaction.
+
+## [5.1.3] - 08-02-2021
+The OpenNCP 5.1.3 release is the CEF eHDSI Wave 4 Formal Test Event Security HotFix version.
+<br/>Vulnerabilities contained into the project dependencies have been removed
+<br/>OpenNCP Configuration Manager transaction handling improvement.
+<br/>OpenNCP NCP-A mock has been improved according Wave 4 specifications.
+
+### Sub-task
+- [EHNCP-1782] - Oracle Database 12c support (bugFix).
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-2058] - Releasing OpenNCP 5.1.3 (Wave 4 Formal Test Event Security HotFix).
+
+### Bug
+- [EHNCP-2054] - Adapt CDA mock documents and logic to generate valid CDA L1 documents.
+
+### Improvement
+- [EHNCP-2057] - Configuration Manager - Save or Update operation using transaction rollback.
+
+## [5.1.2] - 11-01-2021
+The OpenNCP 5.1.2 release is the CEF eHDSI Wave 4 Formal Test Event HotFix version.
+<br/>eHDSI Testing Portals inherited from the epSOS Pilot have been removed from the Reference Implementation.
+<br/>CDA DisplayTool improvements and bug fix reported during the Wave 4 Preparatory Test Event.
+<br/>Minor BugFix and improvements into the Reference Implementation.
+
+### Sub-task
+- [EHNCP-1969] - Alignment of the Gazelle validators to Wave 4.
+- [EHNCP-2050] - Releasing OpenNCP 5.1.2 (Wave 4 Formal Test Event).
+
+### Bug
+- [EHNCP-2000] - ATNA FailedLogsHandlerImpl doesn't work properly for Sweden without Xerces.jar.
+- [EHNCP-2031] - EADC Database Creation : Missing Column.
+- [EHNCP-2048] - [CDA Display Tool] Units per intake duplicated in Prescription Details view.
+
+### Issue
+- [EHNCP-1983] - OpenATNA-Web Viewer filter has bug with date ranges.
+- [EHNCP-2003] - Incoherent and confusing logging statement.
+- [EHNCP-2044] - ISM XSD missing required attribute in birthDate format.
+- [EHNCP-2045] - XCA WSDL exposes SOAP 1.1 binding.
+
+### Improvement
+- [EHNCP-1993] - FailedLogsHandler process is not working properly when an unexpected file format backuped is loaded.
+- [EHNCP-2002] - CountryConfigManager can't find patient search ID label.
+- [EHNCP-2049] - Improve the way the duration of treatment is represented.
+
+### Decision to remove eHDSI Testing Portals from Pilot phase
+- [EHNCP-2040] - Remove eHDSI Portals from the Reference Implementation core.
+- [EHNCP-1101] - Migration from Liferay 6.2-GA6 to 7.0.2-GA3 Community Edition.
+- [EHNCP-820] - Update Java Wicket version.
+- [EHNCP-212] - Set the AllowScriptAccess.
+- [EHNCP-214] - Verify that parameter values are in their expected ranges and types.
+- [EHNCP-216] - Circular dependency between XHTML page and Java method.
+- [EHNCP-178] - Block body parameters.
+
+### Support
+- [EHNCP-1364] - Gazelle CDA validator finds eD errors in data coming from eP.
+- [EHNCP-1904] - Wrong PatientID Root in XCA OrderService Response for EP.
+- [EHNCP-1992] - TSAM - Memory leak.
+- [EHNCP-2016] - NC PatientSearchImpl support only id attributes from ISM, so demographics can't be processed by NC.
+- [EHNCP-2052] - Portugal cannot retrieve Estonian HomeCommunity ID from configuration.
+
+## [5.1.1] - 10-10-2020
+The OpenNCP 5.1.1 release is the CEF eHDSI Wave 4 Preparatory Test Event HotFix version.
+<br/>This version is fully supporting all the Patient Identification Traits.
+<br/>OpenNCP Gateway has been fixed (support Media type, Hungary country code and Patient Address)
+<br/>OpenNCP Portal improvement (Medication Discard feature and ISM Search Mask).
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/H4NtEg
+
+### Sub-task
+- [EHNCP-1623] - Schema validation error for eD message when explicit unit is used for supply unit quantity in eP message.
+- [EHNCP-2034] - Portals should support all the available identity traits.
+- [EHNCP-2035] - Releasing OpenNCP 5.1.1 (Wave 4 Hotfix version).
+- [EHNCP-2036] - TSAM Sync should support PostgreSQL database.
+
+### Bug
+- [EHNCP-1997] - Search masks with Media Content cannot be uploaded to SMP server.
+- [EHNCP-2001] - In ehdsi-ism-2020.xsd the countryCode enumeration list does not contain a "HU" country code.
+
+### Improvement
+- [EHNCP-1998] - OpenNCP Portal Medications Dispensed List.
+
+### Initiative
+- [EHNCP-1996] - OpenNCP Portal - Patient confirmation doesn't work without Document Search criteria.
+
+### Issue
+- [EHNCP-1903] - Problem with Service Provider Element in ATNA Audits.
+- [EHNCP-2015] - Incorrect parsing of Search Mask attribute "contextualDescription".
+
+## [5.1.0] - 05-10-2020
+The OpenNCP 5.1.0 release is the CEF eHDSI Wave 4 Preparatory Test Event version.
+<br/>This version is fully supporting Change Proposals 33, 35, 36 and 42.
+<br/>Dispensation workflow extension - discard operation (CP-036).
+<br/>Improvement of the International Search Mask (CP-042).
+<br/>CDA Display Tool supporting the Wave 4 - CDA Implementation Guidelines.
+<br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/YgATE
+
+### Sub-task
+- [EHNCP-1942] - IP address returned by TRC-STS not coherent for Portugal.
+- [EHNCP-1955] - Implementation of Dispense Discard KPI.
+- [EHNCP-1957] - OpenNCP default infrastructure evolution and upgrade.
+- [EHNCP-1961] - Hibernate 5.4.18 vulnerabilities.
+- [EHNCP-1966] - OpenNCP Java Dependencies Security analysis.
+- [EHNCP-1967] - Releasing OpenNCP 5.1.0 (Wave 4 Preparatory version).
+- [EHNCP-1969] - Alignment of the Gazelle validators to Wave 4.
+- [EHNCP-1991] - Implement optional documents criteria parameters for CP-042 in Portals.
+
+### Bug
+- [EHNCP-1668] - PrettyPrinter uses a licensed Saxon feature.
+- [EHNCP-1939] - ATNA persistence layer returns an exception with userId too long.
+- [EHNCP-1952] - Transformation configuration not correct for PS - generalizedMedicineClass.
+- [EHNCP-1958] - Serialization of ISM forms might not work on Windows OS.
+
+### Story
+- [EHNCP-1892] - Implement CP-036 in OpenNCP.
+- [EHNCP-1895] - Implement CP-035 in OpenNCP.
+- [EHNCP-1896] - Implement CP-042 in Interoperability Specifications.
+- [EHNCP-1912] - Implement CP-033 in OpenNCP.
+
+### Improvement
+- [EHNCP-1510] - Specify the International Search Mask.
+- [EHNCP-1962] - Empty parenthesis are shown for the Current problems section entry in the case of a nullFlavor.
+- [EHNCP-1963] - Support indication of dosage period length for medication summary section.
+- [EHNCP-1964] - Display descriptions from ICD-10 to the Problem column of the History of Past Illnesses section.
+
+### Support
+- [EHNCP-1511] - Substitution flag not sent to Country A when substitution is performed.
+
+### Issue
+- [EHNCP-1755] - LivingSubjectBirthPlaceAddress identity trait is not supported.
+- [EHNCP-1970] - Java 8 and OpenSAML framework upgrade are creating an ACCESS_EXTERNAL_SCHEMA property.
+- [EHNCP-1975] - TRC-STS: Evidence Emitter dependency is not needed.
+- [EHNCP-1976] - eADC - XML Transformer issue NullPointerException.
+- [EHNCP-1977] - Requests are logged in PROD.
+- [EHNCP-1978] - ITI-38 audit message too long for OpenATNA's messageContent column.
 
 ## [5.0.0] - 07-07-2020
 The OpenNCP 5.0.0 release is the CEF eHDSI Wave 4 Initial Release.
 <br/>This version is the first release supporting the Change Proposals 36 and 42.
-<br/>Improvement of the International Search Mask (CP-042). 
+<br/>Improvement of the International Search Mask (CP-042).
 <br/>Dispensation workflow extension - discard operation (CP-036).
 <br/>CDA Display Tool supporting the Wave 4 - CDA Implementation Guidelines.
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/sQFnDw
@@ -38,7 +403,7 @@ The OpenNCP 5.0.0 release is the CEF eHDSI Wave 4 Initial Release.
 ## [4.1.0] - 03-06-2020
 The OpenNCP 4.1.0 release is the CEF eHDSI Wave 3 HotFix version - available for the eHDSI 2020 Re-Test Event.
 <br/>This version is mainly improving the vulnerabilities from the JAR dependencies (Spring, Hibernate and SAML).
-<br/>CDA Display Tool improvements according the Formal Test Event feedback. 
+<br/>CDA Display Tool improvements according the Formal Test Event feedback.
 <br/>Web Services communication is using SOAP 1.2 between all the components.
 <br/>eHDSI Central Services (SMP Server) has been upgraded to 4.1.1-EC with Dynamic Discovery Client 1.11.
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/qoKSDg
@@ -77,7 +442,7 @@ The OpenNCP 4.1.0 release is the CEF eHDSI Wave 3 HotFix version - available for
 ## [4.0.3] - 31-01-2020
 The OpenNCP 4.0.3 release is the CEF eHDSI Wave 3 Third HotFix version - available for the eHDSI 2020 Formal Test Event.
 <br/>This version is fixing an issue related to the Audit Message and the network equipments.
-<br/>A fix has been applied to the CDA Display Tool for substitution purpose. 
+<br/>A fix has been applied to the CDA Display Tool for substitution purpose.
 <br/>Marketing Authorization Holder has been also fixed since the last re-factoring of the CDA Display Tool.
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/dguNCw
 ### Added
@@ -98,7 +463,7 @@ The OpenNCP 4.0.3 release is the CEF eHDSI Wave 3 Third HotFix version - availab
 ## [4.0.2] - 13-01-2020
 The OpenNCP 4.0.2 release is the CEF eHDSI Wave 3 Second HotFix version - available for the eHDSI Formal Test Event.
 <br/>This is the first release compliant with the eHDSI MVC 3.1.0; most of the changes are related to the CDA Display Tool and the updated version of eHDSI CDA Implementation Guidelines 3.0.1.
-<br/>Improvements have been implemented into the Audit Manager, Transformation Manager (configuration file embedded into the JAR) and Portals. 
+<br/>Improvements have been implemented into the Audit Manager, Transformation Manager (configuration file embedded into the JAR) and Portals.
 <br/>Oracle and PostgreSQL databases are now supported.
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/QQEbCw
 ### Added
@@ -140,8 +505,8 @@ The OpenNCP 4.0.2 release is the CEF eHDSI Wave 3 Second HotFix version - availa
 - [EHNCP-1811] - National Connector Mock - Wave 3 CDA are not correct.
 - [EHNCP-1799] - CDA Display Tool - Distinguish clearly between primary and secondary patientID.
 - [EHNCP-1770] - Refactor CDA Display Tool Visualization for ePrescription.
-- [EHNCP-1761] - LTRDB does not support Oracle Database - Hibernate Identifier strategy.      
-    
+- [EHNCP-1761] - LTRDB does not support Oracle Database - Hibernate Identifier strategy.
+
 ### Deprecated
 - [N/A].
 
@@ -158,7 +523,7 @@ The OpenNCP 4.0.2 release is the CEF eHDSI Wave 3 Second HotFix version - availa
 ## [4.0.1] - 11-10-2019
 The OpenNCP 4.0.1 release is the CEF eHDSI Wave 3 RC HotFix version available for the eHDSI Preparatory Test Event.
 <br/>Update of the validation performed by the default-policy-manager.
-<br/>BugFix on XDS Metadata associated to the XCA List response message (incorrect type of documents). 
+<br/>BugFix on XDS Metadata associated to the XCA List response message (incorrect type of documents).
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/iwbKC
 ### Added
 - [EHNCP-1829] Alignment of default-policy-manager to Change Proposal 23.
@@ -166,7 +531,7 @@ The OpenNCP 4.0.1 release is the CEF eHDSI Wave 3 RC HotFix version available fo
 - [EHNCP-1814] Audit message EHDSI-91 are not conformant with specification on portals.
 - [EHNCP-1813] Alignment of Spring Boot and Spring Framework version among the project
 - [EHNCP-1808] OpenNCP Web Portal is not handling ISM containing XML Namespaces.
-- [EHNCP-1578] Add database schema management tool 
+- [EHNCP-1578] Add database schema management tool
 
 ### Changed
 - [EHNCP-1830] Problem running OpenNCP TSAM-Sync.
@@ -185,31 +550,31 @@ The OpenNCP 4.0.1 release is the CEF eHDSI Wave 3 RC HotFix version available fo
 ## [4.0.0] - 23-09-2019
 The OpenNCP 4.0.0 release is the CEF eHDSI Wave 3 Release Candidate available for the eHDSI Preparatory Test Event.
 <br/>Most of the changed are related to the implementation of eHDSI Wave 3 Change Proposals.
-<br/>Major technical update is related to the Apache Axis2 framework upgrade (1.6.2 to 1.7.9). 
+<br/>Major technical update is related to the Apache Axis2 framework upgrade (1.6.2 to 1.7.9).
 <br/>Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/rgC6Bg
 ### Added
 - [EHNCP-1808] OpenNCP Web Portal is not handling ISM containing XML Namespaces.
-- [EHNCP-1794] Dynamic Discovery Client doesn't work properly with Proxy and TLS. 
+- [EHNCP-1794] Dynamic Discovery Client doesn't work properly with Proxy and TLS.
 - [EHNCP-1788] CP-eHealthDSI-023: SAML - Update Structural Role values of the HP.
-- [EHNCP-1787] CP-eHealthDSI-024: Formalize the 'Description' element in the eP list. 
-- [EHNCP-1754] Use the labels from the MVC 3.0.0 RC1 instead of the hardcoded labels in the CDA Display Tool. 	
+- [EHNCP-1787] CP-eHealthDSI-024: Formalize the 'Description' element in the eP list.
+- [EHNCP-1754] Use the labels from the MVC 3.0.0 RC1 instead of the hardcoded labels in the CDA Display Tool.
 - [EHNCP-1753] Implement CP25 in the CDA Display Tool.
 - [EHNCP-1752] Display Marketing Authorization Holder (MAH) in CDA Display Tool.
-- [EHNCP-1737] Align value sets in MVC 3.0.0 for the representation of "no information"/"known absence" scenarios.  
+- [EHNCP-1737] Align value sets in MVC 3.0.0 for the representation of "no information"/"known absence" scenarios.
 
 ### Changed
 - [EHNCP-1810] Add date information into the log files - Logback configuration.
-- [EHNCP-1809] Update Gazelle configuration in order to call formal Wave 3 validators. 
+- [EHNCP-1809] Update Gazelle configuration in order to call formal Wave 3 validators.
 - [EHNCP-1807] Update national connector mock with Wave 3 examples.
-- [EHNCP-1806] Alignment of audit messages and the Wave 3 specifications - Code System Name. 
+- [EHNCP-1806] Alignment of audit messages and the Wave 3 specifications - Code System Name.
 - [EHNCP-1804] NullFlavored brand names of immunizations are not displayed.
 - [EHNCP-1801] TSAM-Sync backup filename only contains the date.
 - [EHNCP-1798] Incorrect separator in openncp-web-portal.
-- [EHNCP-1797] NullFlavor tooltip is cut by table margin. 
+- [EHNCP-1797] NullFlavor tooltip is cut by table margin.
 - [EHNCP-1795] Harmonize OpenNCP Java dependencies.
 - [EHNCP-1785] Frequency of intakes not well displayed in CDA Display Tool in the case of the EIVL_TS datatype.
 - [EHNCP-1784] Administered icons are not displayed in PDF version of the Patient Summary.
-- [EHNCP-1713] Some labels used into OpenNCP DisplayTool are not part of the VS epSOSDisplayLabel. 
+- [EHNCP-1713] Some labels used into OpenNCP DisplayTool are not part of the VS epSOSDisplayLabel.
 - [EHNCP-1571] Axis2 Framework version upgrade (1.7.9).
 
 ### Deprecated
@@ -267,12 +632,12 @@ Detailed release note: https://ec.europa.eu/cefdigital/wiki/x/nLSuB
 - CDA Display Tool - Minor improvements [EHNCP-1725] [EHNCP-1743] [EHNCP-1744] [EHNCP-1757].
 - First-Time Configuration Utility doesn't recognize properties table [EHNCP-1696].
 - Minor code refactoring and BugFix on OpenNCP components [EHNCP-1698].
-  
+
 ### Deprecated
 - [N/A].
 
 ### Removed
-- Remove the Database Logging (Logback) [EHNCP-1759].                    
+- Remove the Database Logging (Logback) [EHNCP-1759].
 
 ## [3.0.0.RC4] - 30-04-2019
 ### Added
@@ -295,7 +660,7 @@ Detailed release note: https://ec.europa.eu/cefdigital/wiki/x/nLSuB
 - CDA Display Tool enhancement.
 - Audit message content fix after an error has been raised [EHNCP-1166].
 - Logging appender misconfiguration fixed [EHNCP-1676].
-  
+
 ### Deprecated
 - eSense obligation for Consent transactions.
 - Patient Consent handling out of eHDSI scope (creation, revocation).
@@ -310,7 +675,7 @@ Detailed release note: https://ec.europa.eu/cefdigital/wiki/x/nLSuB
 
 ### Changed
 - [N/A].
-  
+
 ### Deprecated
 - [N/A].
 
@@ -319,23 +684,23 @@ Detailed release note: https://ec.europa.eu/cefdigital/wiki/x/nLSuB
 
 ## [3.0.0.RC2] - 06-02-2019
 ### Added
-- eHDSI Gazelle platform updated: all the validators are now labelled according the Wave & Specification version. 
+- eHDSI Gazelle platform updated: all the validators are now labelled according the Wave & Specification version.
 
 ### Changed
 - Identity HCP Assertions validity has been extended to 4 hours instead of 2 hours (conformance to specification).
 - Removing Personal Data (Patient ID) from the NRO evidences file produced during the Dispense (XDR).
 - CDA DisplayTool improvements and alignment to eHDSI Specification (Change Proposal 09).
 - Server Monitoring (Javamelody) and Running Mode (PAT messages) tools have been fixed (minor issue).
-- Bug fix on the HCP Assertions signature (wrong Canonicalization method). 
+- Bug fix on the HCP Assertions signature (wrong Canonicalization method).
 - Bug fix on XDR Request message: field authorPerson was not correct (HTML escape character).
 - Member State HomeCommunityId list updated (pn-oid.xml).
-  
+
 ### Deprecated
 - [N/A].
 
 ### Removed
 - eID confirmation button has been removed from the OpenNCP Demo Portal.
-- OpenATNA logs have been cleaned (verbose and useless information removed). 
+- OpenATNA logs have been cleaned (verbose and useless information removed).
 
 ## [3.0.0.RC1] - 11-12-2018
 ### Added
@@ -351,7 +716,7 @@ Detailed release note: https://ec.europa.eu/cefdigital/wiki/x/nLSuB
 
 ### Removed
 - XSPA role "medical doctor" has been removed from the HCP Assertion generator, the role is still accepted by the
-default policy.
+  default policy.
 - Remove generated JAXB class from Evidence Emitter ETSI-REM (created on the fly).
 
 ## [2.5.6] - 19-07-2019
@@ -387,7 +752,7 @@ Detailed release notes: https://ec.europa.eu/cefdigital/wiki/x/hAkIBQ
 
 ### Changed
 - Audit messages Participants Identifier aligned with specifications (HP Assurance Audit Schema, Patient Privacy Audit Schema and
-Patient ID Mapping Audit Schema).
+  Patient ID Mapping Audit Schema).
 - eHDSI Gazelle test platform updated (new Schematron WSDL definition).
 - OpenNCP Gazelle Validation updated with new Schematron WS client.
 - Enabling & disabling feature for Javamelody monitoring tool.
@@ -507,7 +872,7 @@ The OpenNCP 2.5.0.RC1 is now ready for the next connectathon session and this is
 - EHNCP-1112 Jasper reports - deprecated parameter 'isSplitAllowed'.
 - EHNCP-1110 Displaying a PS through the Portal does not render the html labels.
 - EHNCP-1107 Deployment Warning Tomcat 8 AntiJarLocking.
-- EHNCP-1099 Error while building OpenNCP in clean environment. 
+- EHNCP-1099 Error while building OpenNCP in clean environment.
 - EHNCP-1085 Code factoring optimizations and quality review.
 ### Deprecated
 - EHNCP-1094 References to deprecated XMLGregorianCalendarImpl constructor prevent build of OpenNCP.
@@ -522,7 +887,7 @@ This release fixes minor issues of the OpenNCP reference implementation ready fo
 - Code improvements and SMP discriminator applied for properties retrieval.
 - OpenNCP Web Portal: Integration with the current 2.4.3 implementation.
 - Re-branding epSOS to OpenNCP reference implementation.
-- Moving logging framework from java.util.Logging and Log4j to Logback + Slf4j.    
+- Moving logging framework from java.util.Logging and Log4j to Logback + Slf4j.
 - Version alignment of the core OpenNCP frameworks dependencies (Spring, Hibernate etc.).
 ### Deprecated
 - [N/A].
@@ -530,7 +895,7 @@ This release fixes minor issues of the OpenNCP reference implementation ready fo
 - Removing deprecated and duplicated external libraries.
 
 ## [2.4.2] - 08-11-2016
-OpenNCP version used during the eHealth Week in Greece. 
+OpenNCP version used during the eHealth Week in Greece.
 ### Added
 - Integration of a cache responsible for retrieving required properties by OpenNCP including the SMP lookup.
 ### Changed
@@ -659,7 +1024,7 @@ Release 1.1.3 is the approved release after the IHE CAT.
 - [N/A].
 
 ## [1.1.2] - 10-04-2013
-Release 1.1.2 is a HotFix preparatory version for IHE CAT. 
+Release 1.1.2 is a HotFix preparatory version for IHE CAT.
 ### Added
 - [N/A].
 ### Changed

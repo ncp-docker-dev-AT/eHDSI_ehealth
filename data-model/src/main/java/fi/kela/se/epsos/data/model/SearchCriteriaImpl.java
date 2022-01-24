@@ -1,5 +1,6 @@
 package fi.kela.se.epsos.data.model;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -16,9 +17,9 @@ import java.util.Map;
 
 public class SearchCriteriaImpl implements SearchCriteria {
 
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(SearchCriteriaImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(SearchCriteriaImpl.class);
 
-    private Map<Criteria, String> criteriaMap = new HashMap<>();
+    private final Map<Criteria, String> criteriaMap = new HashMap<>();
 
     public SearchCriteriaImpl() {
     }
@@ -59,7 +60,7 @@ public class SearchCriteriaImpl implements SearchCriteria {
 
     public Document asXml() {
 
-        Document doc = null;
+        Document document;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -76,8 +77,8 @@ public class SearchCriteriaImpl implements SearchCriteria {
                 sb.append(">");
             }
             sb.append("</SearchCriteria>");
-            doc = builder.parse(new InputSource(new StringReader(sb.toString())));
-            return doc;
+            document = builder.parse(new InputSource(new StringReader(sb.toString())));
+            return document;
         } catch (SAXException ex) {
             logger.error("SAXException: '{}'", ex.getMessage(), ex);
         } catch (IOException ex) {
@@ -85,6 +86,6 @@ public class SearchCriteriaImpl implements SearchCriteria {
         } catch (ParserConfigurationException ex) {
             logger.error("ParserConfigurationException: '{}'", ex.getMessage(), ex);
         }
-        return doc;
+        return null;
     }
 }

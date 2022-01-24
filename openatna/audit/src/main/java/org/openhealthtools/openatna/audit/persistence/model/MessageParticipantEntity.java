@@ -1,6 +1,6 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 
@@ -91,16 +91,13 @@ public class MessageParticipantEntity extends PersistentEntity {
         return result;
     }
 
+    @Override
     public String toString() {
-        return "[" + getClass().getName() +
-                " id=" +
-                getId() +
-                ", network access point=" +
-                getNetworkAccessPoint() +
-                ", is user requestor=" +
-                isUserIsRequestor() +
-                ", participant=" +
-                getParticipant() +
-                "]";
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("participant", participant)
+                .append("userIsRequestor", userIsRequestor)
+                .append("networkAccessPoint", networkAccessPoint)
+                .toString();
     }
 }

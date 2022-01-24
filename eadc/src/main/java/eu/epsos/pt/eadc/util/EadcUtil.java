@@ -8,29 +8,28 @@ import eu.epsos.pt.eadc.datamodel.TransactionInfo;
 import eu.epsos.pt.eadc.helper.TransactionHelper;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 /**
- * The purpose of this class is to help the eADC invocation process, by
- * providing utility methods to invoke the service.
- *
- * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
+ * The purpose of this class is to help the eADC invocation process, by providing utility methods to invoke the service.
  */
 public class EadcUtil {
 
+    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Logger LOGGER = LoggerFactory.getLogger(EadcUtil.class);
+    private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
     private static String defaultDsPath = null;
 
     /**
@@ -40,8 +39,7 @@ public class EadcUtil {
      *
      * @param reqMsgContext the Servlet request message context
      * @param rspMsgContext the Servlet response message context
-     * @param cdaDocument   the optional CDA document, leave as null if not
-     *                      necessary
+     * @param cdaDocument   the optional CDA document, leave as null if not necessary
      * @param transInfo     the Transaction Info object
      * @throws Exception
      */
@@ -52,12 +50,9 @@ public class EadcUtil {
         watch.start();
         Document reqEnv;
         Document respEnv;
-        EadcEntry eadcEntry;
-        EadcReceiverImpl eadcReceiver;
         Transaction transaction;
-        Document transDoc;
+        Document transactionDocument;
 
-        LOGGER.info("[EADC] Transaction Processing Started...");
         reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         respEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -71,30 +66,31 @@ public class EadcUtil {
         transaction = buildTransaction(transInfo);
 
         if (cdaDocument != null) {
-            transDoc = TransactionHelper.insertCdaInTransaction(transaction, cdaDocument);
+            transactionDocument = TransactionHelper.insertCdaInTransaction(transaction, cdaDocument);
         } else {
-            transDoc = TransactionHelper.convertTransaction(transaction);
+            transactionDocument = TransactionHelper.convertTransaction(transaction);
         }
-
-        eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transDoc, reqEnv, respEnv);
-        eadcReceiver = new EadcReceiverImpl();
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.debug("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
+        }
+        EadcEntry eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transactionDocument, reqEnv, respEnv);
+        EadcReceiverImpl eadcReceiver = new EadcReceiverImpl();
         eadcReceiver.process(eadcEntry);
 
         watch.stop();
-        LOGGER.debug("[EADC] method invokeEADC executed in: '{}ms'", watch.getTime());
-        LOGGER.info("[EADC] Transaction Processing Finished...");
+        LOGGER.info("[EADC] Transaction Processing executed in: '{}ms'", watch.getTime());
     }
 
     /**
      * Fills a Transaction object with a Transaction Info element.
      *
-     * @param transInfo
+     * @param transactionInfo
      * @return
      */
-    private static Transaction buildTransaction(TransactionInfo transInfo) {
+    private static Transaction buildTransaction(TransactionInfo transactionInfo) {
 
         Transaction result = new ObjectFactory().createComplexTypeTransaction();
-        result.setTransactionInfo(transInfo);
+        result.setTransactionInfo(transactionInfo);
         return result;
     }
 
@@ -104,7 +100,7 @@ public class EadcUtil {
     public static String getDefaultDsPath() {
 
         if (defaultDsPath == null) {
-            defaultDsPath = getEpsosPropsPath();
+            defaultDsPath = getApplicationRootPath();
         }
         return defaultDsPath;
     }
@@ -112,9 +108,9 @@ public class EadcUtil {
     /**
      * Helper method to return the system epSOS Properties Path
      *
-     * @return the full epSOS Props Path currently on the system.
+     * @return the full OpenNCP Props Path currently used by the system.
      */
-    public static String getEpsosPropsPath() {
+    public static String getApplicationRootPath() {
 
         String path = System.getenv("EPSOS_PROPS_PATH");
 
@@ -128,6 +124,24 @@ public class EadcUtil {
         return path;
     }
 
+    public static String xmlToString(Node node) {
+
+        try {
+            Source source = new DOMSource(node);
+            StringWriter stringWriter = new StringWriter();
+            Result result = new StreamResult(stringWriter);
+            TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = factory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(source, result);
+            return stringWriter.getBuffer().toString();
+        } catch (TransformerException e) {
+            LOGGER.error("TransformerException: '{}'", e.getMessage());
+        }
+        return StringUtils.EMPTY;
+    }
+
     /**
      * convertXMLDocumentToString
      *
@@ -138,7 +152,6 @@ public class EadcUtil {
     public static String convertXMLDocumentToString(Document xmlDocument) throws Exception {
 
         if (xmlDocument == null) {
-
             LOGGER.warn("XML Document is NULL. Can't convert XML Document to String.");
             return "";
         }
@@ -163,7 +176,7 @@ public class EadcUtil {
     public enum Direction {
 
         INBOUND("INBOUND"), OUTBOUND("OUTBOUND");
-        private String value;
+        private final String value;
 
         Direction(final String value) {
             this.value = value;

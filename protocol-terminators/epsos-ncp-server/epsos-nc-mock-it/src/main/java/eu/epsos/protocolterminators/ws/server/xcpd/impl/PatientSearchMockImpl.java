@@ -1,7 +1,9 @@
 package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
+import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
@@ -36,15 +38,22 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
     private static final String TELEPHONE = "telephone";
     private final Logger logger = LoggerFactory.getLogger(PatientSearchMockImpl.class);
 
+    PatientDemographics patientDemographics;
+
     @Override
     public String getPatientId(String citizenNumber) {
-
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Get Patient ID: '{}'", citizenNumber);
+        }
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) {
+    public List<PatientDemographics> getPatientDemographics(List<PatientId> idList) throws NIException {
 
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Get Patient Demographics: '{}'", getPatientDemographics().toString());
+        }
         List<PatientDemographics> result = new ArrayList<>(1);
 
         // Identifying mocked Patient File.
@@ -52,10 +61,14 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
         patientFile.append(Constants.EPSOS_PROPS_PATH).append("integration/");
         PatientId id = null;
 
-        // Building Path File.
+        // Building Path File.XCPDServiceImpl
         for (PatientId patientId : idList) {
             logger.info("[National Infrastructure Mock] Searching patients with ID: '{}' and Assigning Authority: '{}'", patientId.getExtension(), patientId.getRoot());
             File rootDir = new File(patientFile + patientId.getRoot());
+            //  Patient ID 999999 will throw an Exception from National Connector
+            if (StringUtils.equals(patientId.getExtension(), "999999")) {
+                throw new NIException("EU-0000", "Mocked Patient Repository not working");
+            }
 
             if (rootDir.exists()) {
                 File extensionFile = new File(patientFile + patientId.getRoot() + File.separator + patientId.getExtension() + ".properties");
@@ -75,11 +88,13 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
         // Load Patient properties file.
         Properties properties = new Properties();
-        try {
-            logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile.toString());
-            properties.load(new FileInputStream(patientFile.toString()));
+        try (FileInputStream inputStream = new FileInputStream(patientFile.toString())) {
+            logger.info("[National Infrastructure Mock] Loading Patient information from filesystem resource: '{}'", patientFile);
+            properties.load(inputStream);
 
             PatientDemographics patient = new PatientDemographics();
+            String newRoot = id.getRoot();
+            id.setRoot(newRoot + ".1000");
             patient.setIdList(Collections.singletonList(id));
             patient.setAdministrativeGender(Gender.parseGender(properties.getProperty(GENDER)));
             int year = Integer.parseInt(properties.getProperty(BIRTH_DATE_YEAR));
@@ -99,7 +114,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
-            logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getfullId());
+            logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getFullId());
 
         } catch (Exception e) {
             logger.error("[National Infrastructure Mock] Patient Not Found Exception: '{}'", e.getMessage(), e);
@@ -109,11 +124,16 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
         return result;
     }
 
+    public PatientDemographics getPatientDemographics() {
+        return patientDemographics;
+    }
+
     @Override
     public void setPatientDemographics(PatientDemographics patientDemographics) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(patientDemographics.toString());
+        if (logger.isInfoEnabled()) {
+            logger.info("[National Infrastructure Mock] Set Patient Demographics: '{}'", patientDemographics.toString());
         }
+        this.patientDemographics = patientDemographics;
     }
 }

@@ -1,16 +1,11 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
-import net.shibboleth.utilities.java.support.security.SecureRandomIdentifierGenerationStrategy;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import net.shibboleth.utilities.java.support.security.impl.SecureRandomIdentifierGenerationStrategy;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
-import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.Marshaller;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.core.xml.schema.XSAny;
@@ -30,7 +25,8 @@ import javax.xml.transform.TransformerException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 
 public class SAML {
@@ -83,53 +79,12 @@ public class SAML {
     }
 
     /**
-     * Parse the command line for a filename to read, and optionally a filename to write (absent which the application
-     * will write to the console).
-     * Reads the given file as an XMLObject, and then dumps using a simple.
-     */
-    public static void main(String[] args) throws Exception {
-
-        if (args.length == 0) {
-            LOGGER.info("Need arguments: <inputFile> [<outputFile>]");
-            System.exit(-1);
-        }
-
-        String command = args[0];
-        if (StringUtils.equals(command, "generate")) {
-            String type = args[1];
-
-            SAML handler = new SAML("http://saml.r.us/AssertingParty");
-
-            switch (type) {
-
-                case "authn":
-                    handler.printToFile(handler.createAuthnAssertion(handler.createSubject("harold_dt",
-                            null, "sender-vouches"), AuthnContext.PPT_AUTHN_CTX), null);
-                    break;
-                case "attr":
-                    Subject subject = handler.createSubject("louisdraper@abc.gov", NameID.EMAIL, null);
-                    Map<String, String> attributes = new HashMap<>();
-                    attributes.put("securityClearance", "C2");
-                    attributes.put("roles", "editor,reviewer");
-                    handler.printToFile(handler.createAttributeAssertion(subject, attributes), null);
-                    break;
-                default:
-                    LOGGER.info("Usage: java cc.saml.SAML <generate> authn|attr");
-                    System.exit(-1);
-            }
-        } else {
-            SAML handler = new SAML();
-            handler.printToFile(handler.readFromFile(args[0]), args.length > 1 ? args[1] : null);
-        }
-    }
-
-    /**
      * Helper method to add an XMLObject as a child of a DOM Element.
      */
     public static Element addToElement(XMLObject object, Element parent) throws MarshallingException {
 
-        Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
-        return out.marshall(object, parent);
+        var marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
+        return marshaller.marshall(object, parent);
     }
 
     /**
@@ -147,10 +102,10 @@ public class SAML {
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> cls, QName qname) {
 
-        XMLObjectBuilderFactory xobf = XMLObjectProviderRegistrySupport.getBuilderFactory();
-        XMLObjectBuilder xob = xobf.getBuilder(qname);
-        XMLObject xo = xob.buildObject(qname);
-        return (T) xo;
+        var xmlObjectBuilderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
+        XMLObjectBuilder xmlObjectBuilder = xmlObjectBuilderFactory.getBuilder(qname);
+        XMLObject xmlObject = xmlObjectBuilder.buildObject(qname);
+        return (T) xmlObject;
     }
 
     /**
@@ -159,8 +114,8 @@ public class SAML {
     public Document asDOMDocument(XMLObject object) throws MarshallingException {
 
         Document document = builder.newDocument();
-        Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
-        out.marshall(object, document);
+        var marshaller = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(object);
+        marshaller.marshall(object, document);
 
         return document;
     }
@@ -174,9 +129,9 @@ public class SAML {
 
         String result = PrettyPrinter.prettyPrint(document);
         if (filename != null) {
-            PrintWriter writer = new PrintWriter(new FileWriter(filename));
-            writer.println(result);
-            writer.close();
+            var printWriter = new PrintWriter(new FileWriter(filename));
+            printWriter.println(result);
+            printWriter.close();
         } else {
             LOGGER.info("File not found! Printing to system out: '{}'", result);
         }
@@ -243,9 +198,8 @@ public class SAML {
         Assertion assertion = create(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
         assertion.setID(generator.generateIdentifier());
 
-        DateTime now = new DateTime();
-        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        assertion.setIssueInstant(nowUTC.toDateTime());
+        var issueInstant = Instant.now();
+        assertion.setIssueInstant(issueInstant);
 
         if (issuerURL != null) {
             assertion.setIssuer(spawnIssuer());
@@ -253,8 +207,8 @@ public class SAML {
         assertion.setSubject(subject);
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
-        conditions.setNotBefore(nowUTC.toDateTime());
-        conditions.setNotOnOrAfter(nowUTC.toDateTime().plusHours(4));
+        conditions.setNotBefore(issueInstant);
+        conditions.setNotOnOrAfter(issueInstant.plus(Duration.ofHours(4)));
         assertion.setConditions(conditions);
 
         return assertion;
@@ -289,9 +243,8 @@ public class SAML {
             response.setInResponseTo(inResponseTo);
         }
 
-        DateTime now = new DateTime();
-        DateTime nowUTC = now.withZone(DateTimeZone.UTC).toDateTime();
-        response.setIssueInstant(nowUTC.toDateTime());
+        var issueInstant = Instant.now();
+        response.setIssueInstant(issueInstant);
 
         if (issuerURL != null) {
             response.setIssuer(spawnIssuer());
@@ -307,7 +260,7 @@ public class SAML {
         if (message != null) {
 
             StatusMessage statusMessage = create(StatusMessage.class, StatusMessage.DEFAULT_ELEMENT_NAME);
-            statusMessage.setMessage(message);
+            statusMessage.setValue(message);
             status.setStatusMessage(statusMessage);
         }
 
@@ -319,7 +272,7 @@ public class SAML {
      */
     public Response createResponse(Assertion assertion, String inResponseTo) {
 
-        Response response = createResponse(StatusCode.SUCCESS, inResponseTo);
+        var response = createResponse(StatusCode.SUCCESS, inResponseTo);
         response.getAssertions().add(assertion);
 
         return response;
@@ -334,9 +287,9 @@ public class SAML {
      */
     public Assertion createAuthnAssertion(Subject subject, String authnCtx) {
 
-        Assertion assertion = createAssertion(subject);
-        AuthnContextClassRef ref = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
-        ref.setAuthnContextClassRef(authnCtx);
+        var assertion = createAssertion(subject);
+        AuthnContextClassRef authnContextClassRef = create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+        authnContextClassRef.setURI(authnCtx);
 
         // As of this writing, OpenSAML doesn't model the wide range of authentication context namespaces defined in SAML 2.0.
         // For a real project we'd probably move on to XSAny objects, setting QNames and values each-by-each a
@@ -344,7 +297,7 @@ public class SAML {
         // For classroom purposes the road ends here ...
 
         AuthnContext authnContext = create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
-        authnContext.setAuthnContextClassRef(ref);
+        authnContext.setAuthnContextClassRef(authnContextClassRef);
 
         AuthnStatement authnStatement = create(AuthnStatement.class, AuthnStatement.DEFAULT_ELEMENT_NAME);
         authnStatement.setAuthnContext(authnContext);
@@ -364,7 +317,7 @@ public class SAML {
     public void addAttribute(AttributeStatement statement, String name, String value) {
 
         // Build attribute values as XMLObjects, there is an AttributeValue interface, but it's apparently dead code
-        final XMLObjectBuilder xmlObjectBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+        final var xmlObjectBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
 
         XSAny valueElement = (XSAny) xmlObjectBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         valueElement.setTextContent(value);
@@ -384,7 +337,7 @@ public class SAML {
      */
     public Assertion createAttributeAssertion(Subject subject, Map<String, String> attributes) {
 
-        Assertion assertion = createAssertion(subject);
+        var assertion = createAssertion(subject);
 
         AttributeStatement statement = create(AttributeStatement.class, AttributeStatement.DEFAULT_ELEMENT_NAME);
         if (attributes != null) {
