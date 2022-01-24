@@ -3,6 +3,7 @@ package eu.epsos.protocolterminators.ws.server.xca.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.common.ResourceList;
 import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
+import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
@@ -10,7 +11,7 @@ import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xerces.dom.DeferredElementNSImpl;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -107,7 +108,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String doseFormCode = getDoseFormCode(xmlDoc);
                 String doseFormName = getDoseFormName(xmlDoc);
                 String strength = getStrength(xmlDoc);
-                String substitution = getSubstitution(xmlDoc);
+                EPDocumentMetaData.SubstitutionMetaData substitution = getSubstitution(xmlDoc);
                 boolean dispensable = getDispensable(xmlDoc);
 
                 var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
@@ -359,29 +360,29 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         logger.debug("Node: '{}'", node1.getLocalName());
                         switch (node1.getLocalName()) {
                             case "prefix":
-                                if(prefix.length() > 0) {
+                                if (prefix.length() > 0) {
                                     prefix.append(" ");
                                 }
                                 prefix.append(node1.getTextContent());
                                 break;
                             case "suffix":
-                                if(suffix.length() > 0) {
+                                if (suffix.length() > 0) {
                                     suffix.append(" ");
                                 }
                                 suffix.append(node1.getTextContent());
                                 break;
                             case "given":
-                                if(given.length() <= 0) {
+                                if (given.length() <= 0) {
                                     given.append(node1.getTextContent());
                                 } else {
-                                    if(givenAdditional.length() > 0) {
+                                    if (givenAdditional.length() > 0) {
                                         givenAdditional.append(" ");
                                     }
                                     givenAdditional.append(node1.getTextContent());
                                 }
                                 break;
                             case "family":
-                                if(family.length() > 0) {
+                                if (family.length() > 0) {
                                     family.append(" ");
                                 }
                                 family.append(node1.getTextContent());
@@ -495,8 +496,10 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     public List<DocumentAssociation<EPDocumentMetaData>> getEPDocumentList(SearchCriteria searchCriteria) {
 
         logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
-        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
+        Assertion assertion = NationalConnectorUtil.getTRCAssertionFromSOAPHeader(getSOAPHeader());
+        NationalConnectorUtil.logAssertionAsXml(assertion);
 
+        List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
         for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
@@ -773,7 +776,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return strength;
     }
 
-    private String getSubstitution(Document doc) {
+    private EPDocumentMetaData.SubstitutionMetaData getSubstitution(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
         String substitution;
@@ -784,21 +787,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         List<Node> nodeListCode = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/code[@code = 'SUBST']");
         List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
 
-        substitution = "Yes"; // default value
-        if(nodeListCode != null && !nodeListCode.isEmpty()) {
+        var substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");
+        if (nodeListCode != null && !nodeListCode.isEmpty()) {
             for (Node node : nodeListValue) {
                 String valueAttr = node.getNodeName();
                 String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
                 logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
-                if(valueAttr.equals("value") && codeAttr.equals("N")) {
-                    substitution = "No";
+                if (valueAttr.equals("value") && codeAttr.equals("N")) {
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("N", "none");
                 } else {
-                    substitution = "Yes";
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");;
                 }
                 break;
             }
         }
-        return substitution;
+        return substitutionMetadata;
     }
 
     private boolean getDispensable(Document xmlDoc) {

@@ -33,8 +33,8 @@ public class RespondingGateway_RequestReceiver {
      *
      * @param pRPA_IN201306UV02 the XCPD response message.
      * @return a list containing Patient Demographics objects.
-     * @throws InvalidInput This represents the impossibility to transform the
-     *                      input data.
+     * @throws NoPatientIdDiscoveredException This represents the impossibility to transform the
+     *                                        input data.
      * @see PatientDemographics
      * @see PRPAIN201306UV02
      * @see List
@@ -145,42 +145,52 @@ public class RespondingGateway_RequestReceiver {
         } else {
 
             String errorMsg = null;
-            MCAIMT900001UV01DetectedIssueEvent issue;
+            MCAIMT900001UV01DetectedIssueEvent detectedIssueEvent = getDetectedIssueEvent(pRPA_IN201306UV02);
+            String acknowledgementDetailText = getAcknowledgementDetailText(pRPA_IN201306UV02);
 
             // Tries to retrieve DetectedIssueEvent to fill error message
-            if (pRPA_IN201306UV02.getControlActProcess() != null
-                    && pRPA_IN201306UV02.getControlActProcess().getReasonOf() != null
-                    && !pRPA_IN201306UV02.getControlActProcess().getReasonOf().isEmpty()
-                    && pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent() != null) {
-
-                issue = pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent();
-
-                if (issue.getMitigatedBy() != null && !issue.getMitigatedBy().isEmpty()) {
-
-                    errorMsg = issue.getMitigatedBy().get(0).getDetectedIssueManagement().getCode().getCode();
-
-                } else if (issue.getTriggerFor() != null && !issue.getTriggerFor().isEmpty()) {
-
-                    issue.getTriggerFor().get(0).getActOrderRequired().getCode().getCode();
-
+            if (detectedIssueEvent != null) {
+                if (detectedIssueEvent.getMitigatedBy() != null && !detectedIssueEvent.getMitigatedBy().isEmpty()) {
+                    errorMsg = detectedIssueEvent.getMitigatedBy().get(0).getDetectedIssueManagement().getCode().getCode();
+                } else if (detectedIssueEvent.getTriggerFor() != null && !detectedIssueEvent.getTriggerFor().isEmpty()) {
+                    errorMsg = detectedIssueEvent.getTriggerFor().get(0).getActOrderRequired().getCode().getCode();
                 } else {
                     errorMsg = "UnexpectedError";
                 }
             } else {
                 // If DetectedIssueEvent is not present, it tries to get Acknowledgement details.
-                if (!pRPA_IN201306UV02.getAcknowledgement().isEmpty()
-                        && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
-                        && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
-                        && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent() != null) {
-                    errorMsg = pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
-                } else {
-                    errorMsg = "Error: DetectedIssueEvent element or sub-element not present.";
+                errorMsg = "Error: DetectedIssueEvent element or sub-element not present.";
+                if (acknowledgementDetailText != null) {
+                    errorMsg = acknowledgementDetailText;
                 }
             }
 
-            throw new NoPatientIdDiscoveredException(errorMsg);
+            throw new NoPatientIdDiscoveredException(errorMsg, acknowledgementDetailText);
         }
 
         return patients;
+    }
+
+    private static String getAcknowledgementDetailText(final PRPAIN201306UV02 pRPA_IN201306UV02) {
+        if (pRPA_IN201306UV02 != null
+                && !pRPA_IN201306UV02.getAcknowledgement().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
+                && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent() != null) {
+            return pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
+        }
+        return null;
+    }
+
+    private static MCAIMT900001UV01DetectedIssueEvent getDetectedIssueEvent(final PRPAIN201306UV02 pRPA_IN201306UV02) {
+        if (pRPA_IN201306UV02 != null
+                && pRPA_IN201306UV02.getControlActProcess() != null
+                && pRPA_IN201306UV02.getControlActProcess().getReasonOf() != null
+                && !pRPA_IN201306UV02.getControlActProcess().getReasonOf().isEmpty()
+                && pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent() != null) {
+
+            return pRPA_IN201306UV02.getControlActProcess().getReasonOf().get(0).getDetectedIssueEvent();
+        }
+        return null;
     }
 }

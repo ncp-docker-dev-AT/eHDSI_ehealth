@@ -77,7 +77,6 @@
                   label="Email"
                   type="email"
                   :rules="emailRules"
-                  required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="12">
@@ -160,7 +159,6 @@
                 <v-text-field
                   v-model="itemSelected.email"
                   label="Email"
-                  required
                   :rules="emailRules"
                 ></v-text-field>
               </v-col>
@@ -269,8 +267,7 @@ export default {
           'Password must be more than 8 characters and one Uppercase letter. '
       ],
       emailRules: [
-        (v) => !!v || 'Email is required',
-        (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+        (v) => !v || /.+@.+\..+/.test(v) || 'E-mail must be valid'
       ],
       usernameRules: [
         (v) => !!v || 'Username is required',

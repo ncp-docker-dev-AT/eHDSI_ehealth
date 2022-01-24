@@ -3,8 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.config.CtsProperties;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemConceptModel;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,9 +23,9 @@ public class SimpleCtsClient implements CtsClient {
 
     private static final String FETCH_CONCEPTS_URL = "/api/sync/valueset/{valueSetId}/valuesetdefinition/{valueSetDefinition}/entries?page={page}&maxtoreturn={size}";
 
-    private CtsProperties ctsProperties;
+    private final CtsProperties ctsProperties;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public SimpleCtsClient(CtsProperties ctsProperties, RestTemplate restTemplate) {
         this.ctsProperties = ctsProperties;

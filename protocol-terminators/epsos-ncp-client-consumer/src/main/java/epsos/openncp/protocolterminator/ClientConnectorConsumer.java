@@ -6,8 +6,8 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP12Constants;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
@@ -15,10 +15,16 @@ import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,10 +52,12 @@ public class ClientConnectorConsumer {
         if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
             throw new ClientConnectorConsumerException("HCP Assertion expired");
         }
-        var omFactory = OMAbstractFactory.getOMFactory();
-        OMElement omSecurityElement = omFactory.createOMElement(
-                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                        "Security", "wsse"), null);
+
+        var omFactory = OMAbstractFactory.getSOAP12Factory();
+        SOAPHeaderBlock omSecurityElement = omFactory.createSOAPHeaderBlock(
+                omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                        "Security", "wsse"), null));
+
         if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
             var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
             if (AssertionHelper.isExpired(assertion)) {
@@ -68,33 +76,6 @@ public class ClientConnectorConsumer {
         omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
     }
-
-//    private static void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub, Assertion idAssertion,
-//                                      Optional<Assertion> nokAssertion, Assertion trcAssertion) throws Exception {
-//
-//        if (AssertionHelper.isExpired(idAssertion)) {
-//            throw new ClientConnectorConsumerException("HCP Assertion expired");
-//        }
-//        var omFactory = OMAbstractFactory.getOMFactory();
-//        OMElement omSecurityElement = omFactory.createOMElement(
-//                new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-//                        "Security", "wsse"), null);
-//        var assertion = nokAssertion.orElse(null);
-//        if (assertion != null) {
-//            if (AssertionHelper.isExpired(assertion)) {
-//                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-//        }
-//        if (trcAssertion != null) {
-//            if (AssertionHelper.isExpired(trcAssertion)) {
-//                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
-//            }
-//            omSecurityElement.addChild(XMLUtils.toOM(trcAssertion.getDOM()));
-//        }
-//        omSecurityElement.addChild(XMLUtils.toOM(idAssertion.getDOM()));
-//        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
-//    }
 
     private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
 
@@ -117,7 +98,7 @@ public class ClientConnectorConsumer {
 
     public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
                                                String countryCode, PatientId patientId,
-                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) {
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
         var clientConnectorServiceStub = initializeServiceStub();
@@ -129,7 +110,7 @@ public class ClientConnectorConsumer {
             var queryDocuments = queryDocumentsDocument.addNewQueryDocuments();
             var queryDocumentRequest = queryDocuments.addNewArg0();
             GenericDocumentCode[] array = new GenericDocumentCode[classCodes.size()];
-            for(int i = 0; i < classCodes.size(); i++) {
+            for (int i = 0; i < classCodes.size(); i++) {
                 array[i] = classCodes.get(i);
             }
             queryDocumentRequest.setClassCodeArray(array);
@@ -143,6 +124,10 @@ public class ClientConnectorConsumer {
             EpsosDocument1[] docArray = queryDocumentsResponseDocument.getQueryDocumentsResponse().getReturnArray();
 
             return Arrays.asList(docArray);
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -155,7 +140,7 @@ public class ClientConnectorConsumer {
      * @return List of patients found (only 1 patient is expected in eHDSI)
      */
     public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions,
-                                                  String countryCode, PatientDemographics patientDemographics) {
+                                                  String countryCode, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -170,10 +155,13 @@ public class ClientConnectorConsumer {
             var queryPatientDocument = QueryPatientDocument.Factory.newInstance();
             queryPatientDocument.addNewQueryPatient().setArg0(queryPatientRequest);
 
-            var queryPatientResponseDocument =
-                    clientConnectorServiceStub.queryPatient(queryPatientDocument);
+            QueryPatientResponseDocument queryPatientResponseDocument = clientConnectorServiceStub.queryPatient(queryPatientDocument);
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -182,7 +170,7 @@ public class ClientConnectorConsumer {
     /**
      * Default Webservice test method available mainly for configuration purpose.
      */
-    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) {
+    public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: sayHello(name:'{}')", name);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -193,6 +181,10 @@ public class ClientConnectorConsumer {
 
             var sayHelloResponseDocument = clientConnectorServiceStub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -200,7 +192,7 @@ public class ClientConnectorConsumer {
 
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode,
-                                           String targetLanguage) {
+                                           String targetLanguage) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
                 countryCode, homeCommunityId, targetLanguage);
@@ -222,6 +214,10 @@ public class ClientConnectorConsumer {
                     clientConnectorServiceStub.retrieveDocument(retrieveDocumentDocument);
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -232,14 +228,14 @@ public class ClientConnectorConsumer {
      */
     @Deprecated(since = "2.5.0", forRemoval = true)
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) {
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
         return retrieveDocument(assertions, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
     public SubmitDocumentResponse submitDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics patientDemographics) {
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
         logger.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
@@ -257,6 +253,10 @@ public class ClientConnectorConsumer {
             submitDocumentDoc.setSubmitDocument(submitDocument);
 
             return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -267,7 +267,7 @@ public class ClientConnectorConsumer {
      *
      * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
      */
-    private ClientConnectorServiceStub initializeServiceStub() {
+    private ClientConnectorServiceStub initializeServiceStub() throws ClientConnectorConsumerException {
 
         try {
 
@@ -277,6 +277,17 @@ public class ClientConnectorConsumer {
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.SO_TIMEOUT, TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CONNECTION_TIMEOUT, TIMEOUT);
+
+            SSLContext sslContext = SSLContexts.createDefault();
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+                    sslContext,
+                    new String[]{"TLSv1.2"},
+                    null,
+                    new NoopHostnameVerifier());
+
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+            clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+
             clientConnectorStub._getServiceClient().engageModule("addressing");
             this.registerEvidenceEmitterHandler(clientConnectorStub);
             logger.debug("[Axis2 configuration] Default Timeout: '{}'",
@@ -286,15 +297,17 @@ public class ClientConnectorConsumer {
             logger.debug("[Axis2 configuration] HTTPConstants.CONNECTION_TIMEOUT: '{}'",
                     clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.CONNECTION_TIMEOUT));
             return clientConnectorStub;
-        } catch (AxisFault e) {
-            throw new ClientConnectorConsumerException(e.getMessage(), e);
+        } catch (AxisFault axisFault) {
+            throw new ClientConnectorConsumerException(axisFault.getMessage(),
+                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
+                    axisFault);
         }
     }
 
     /**
      * Trims the Patient Demographics sent by the client and received by the Client Connector.
      *
-     * @param patientDemographics Identity Traits to be trimmed and provided by the by the client
+     * @param patientDemographics Identity Traits to be trimmed and provided by the client
      */
     private void trimPatientDemographics(PatientDemographics patientDemographics) {
 
