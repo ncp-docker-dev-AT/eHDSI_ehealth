@@ -117,7 +117,7 @@ export default {
         { text: 'Event Date Time', value: 'eventDateTime', sortable: false },
         {
           text: 'Event Outcome Indicator',
-          value: 'eventOutcomeIndicator',
+          value: 'eventOutcome',
           sortable: false
         },
         { value: 'actions', sortable: false }
