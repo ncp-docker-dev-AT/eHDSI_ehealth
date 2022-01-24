@@ -40,6 +40,9 @@
                 <version>3.3.2</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <packagingExcludes>
+                        WEB-INF/lib/slf4j-simple-1.7.30.jar
+                    </packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
