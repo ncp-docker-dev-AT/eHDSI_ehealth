@@ -125,7 +125,7 @@ export default {
       messages: [],
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
-      loading: true,
+      loading: false,
       searchEventId: '',
       searchEventStartDate: '',
       searchEventEndDate: '',
@@ -144,7 +144,7 @@ export default {
     }
   },
   mounted () {
-    this.getDataFromApi()
+    // this.getDataFromApi()
   },
   watch: {
     options: {
@@ -152,8 +152,7 @@ export default {
         this.getDataFromApi()
       },
       page: 1,
-      itemsPerPage: 10,
-      deep: true
+      itemsPerPage: 10
     }
   },
   computed: {
@@ -169,13 +168,15 @@ export default {
   },
   methods: {
     getDataFromApi () {
-      this.loading = true
-      this.apiCall().then((data) => {
-        this.messages = data.data.content
-        this.totalMessages = data.data.totalElements
-        this.options.page = data.data.number + 1
-        this.loading = false
-      })
+      if (!this.loading) {
+        this.loading = true
+        this.apiCall().then((data) => {
+          this.messages = data.data.content
+          this.totalMessages = data.data.totalElements
+          this.options.page = data.data.number + 1
+          this.loading = false
+        })
+      }
     },
     apiCall () {
       let endDate
