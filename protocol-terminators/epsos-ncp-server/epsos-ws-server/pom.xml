@@ -239,6 +239,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <nonFilteredFileExtensions>
@@ -267,6 +268,8 @@
                         WEB-INF/lib/jaxb-api-2.2.6.jar,
                         WEB-INF/lib/jaxb-impl-2.2.6.jar,
                         WEB-INF/lib/log4j-api-2.14.1.jar,
+                        WEB-INF/lib/log4j-core-2.14.1.jar,
+                        WEB-INF/lib/log4j-jcl-2.14.1.jar,
                         WEB-INF/lib/mail-1.4.jar,
                         WEB-INF/lib/neethi-3.0.2.jar,
                         WEB-INF/lib/xalan-2.7.0.jar,

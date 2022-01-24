@@ -74,7 +74,7 @@ public class XcaInitGateway {
             final StringBuilder builder = new StringBuilder();
             builder.append("[");
             documentCodes.forEach(s -> {
-                builder.append(s.getValue() + ",");
+                builder.append(s.getValue()).append(",");
             });
             builder.replace(builder.length() - 1, builder.length(), "]");
             String classCodes = builder.toString();

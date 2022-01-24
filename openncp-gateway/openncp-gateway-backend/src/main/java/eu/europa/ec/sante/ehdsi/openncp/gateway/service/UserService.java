@@ -148,6 +148,15 @@ public class UserService {
 
     private void setPassword(User user, String password) {
 
+        if (!isValidPassword(password)) {
+            throw new RuntimeException("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+        }
+
+        user.setPassword(passwordEncoder.encode(password));
+    }
+
+    public boolean isValidPassword(String password) {
+
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
                 new LengthRule(8, 30),
                 new UppercaseCharacterRule(1),
@@ -161,10 +170,8 @@ public class UserService {
          */
 
         RuleResult result = validator.validate(new PasswordData(password));
-        if (!result.isValid()) {
-            throw new RuntimeException("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
-        }
-
-        user.setPassword(passwordEncoder.encode(password));
+        return result.isValid();
     }
+
+
 }
