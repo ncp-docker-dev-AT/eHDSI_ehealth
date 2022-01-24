@@ -6,9 +6,7 @@ package eu.epsos.exceptions;
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
  */
-public class XCAException extends Exception {
-
-    private static final long serialVersionUID = 1L;
+public class XCAException extends ExceptionWithContext {
 
     public XCAException(String message) {
         super(message);
@@ -20,5 +18,13 @@ public class XCAException extends Exception {
 
     public XCAException(Throwable cause) {
         super(cause);
+    }
+
+    public XCAException(String message, String context) {
+        super(message, context);
+    }
+
+    public XCAException(String message, String context, Throwable cause) {
+        super(message, context, cause);
     }
 }

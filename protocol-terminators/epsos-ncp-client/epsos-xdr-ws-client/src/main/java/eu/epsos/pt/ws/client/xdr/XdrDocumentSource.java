@@ -118,7 +118,7 @@ public final class XdrDocumentSource {
             }
             if (hasError) {
                 if (errorCode != null && errorCode.trim().length() > 0) {
-                    throw new XDRException(errorCode);
+                    throw new XDRException(errorCode, codeContext);
                 } else {
                     throw new XDRException(codeContext);
                 }
