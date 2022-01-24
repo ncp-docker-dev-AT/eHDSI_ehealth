@@ -125,7 +125,7 @@ export default {
       messages: [],
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
-      loading: true,
+      loading: false,
       searchEventId: '',
       searchEventStartDate: '',
       searchEventEndDate: '',
