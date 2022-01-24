@@ -29,6 +29,11 @@
             <artifactId>openncp-evidence-emitter</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
+        </dependency>
         <!-- TODO: Aligning version of Xalan and Xerces among the full Project -->
         <dependency>
             <groupId>xalan</groupId>
