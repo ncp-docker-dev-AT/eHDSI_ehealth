@@ -4,6 +4,8 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.Direction;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "eTransaction")
@@ -81,8 +83,10 @@ public class Transaction {
 
     private String duration;
 
-    @OneToOne(mappedBy = "transaction")
-    private TransactionData transactionData;
+    //    @OneToOne(mappedBy = "transaction")
+    //    private TransactionData transactionData;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaction", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<TransactionData> transactionData = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -208,11 +212,11 @@ public class Transaction {
         return duration;
     }
 
-    public TransactionData getTransactionData() {
+    public List<TransactionData> getTransactionData() {
         return transactionData;
     }
 
-    public void setTransactionData(TransactionData transactionData) {
+    public void setTransactionData(List<TransactionData> transactionData) {
         this.transactionData = transactionData;
     }
 }

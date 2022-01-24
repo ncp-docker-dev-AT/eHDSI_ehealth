@@ -8,6 +8,7 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
+    open-in-view: false
   datasource:
     default:
       jndi-name: java:comp/env/jdbc/ConfMgr
@@ -20,7 +21,6 @@ spring:
       ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect

@@ -12,6 +12,7 @@ import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
@@ -33,9 +34,6 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.lang.StringUtils;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
@@ -50,9 +48,15 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.*;
 
 /**
@@ -123,15 +127,16 @@ public class RespondingGateway_ServiceStub extends Stub {
         // Set the soap version
         _serviceClient.getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
 
-        var multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
-        var httpConnectionManagerParams = new HttpConnectionManagerParams();
-        httpConnectionManagerParams.setDefaultMaxConnectionsPerHost(20);
-        multiThreadedHttpConnectionManager.setParams(httpConnectionManagerParams);
-        var httpClient = new HttpClient(multiThreadedHttpConnectionManager);
-
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-        this._getServiceClient().getServiceContext().getConfigurationContext().setProperty(HTTPConstants.AUTO_RELEASE_CONNECTION, false);
+        // Enabling Axis2 - SSL 2 ways communication (not active by default).
+        try {
+            _serviceClient.getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.CACHED_HTTP_CLIENT, HttpsClientConfiguration.getSSLClient());
+            _serviceClient.getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException | CertificateException |
+                KeyStoreException | UnrecoverableKeyException e) {
+            throw new RuntimeException("SSL Context cannot be initialized");
+        }
     }
 
     /**
@@ -166,7 +171,6 @@ public class RespondingGateway_ServiceStub extends Stub {
         axisOperation.setName(new QName(XCPDConstants.SOAP_HEADERS.NAMESPACE_URI, XCPDConstants.SOAP_HEADERS.NAMESPACE_REQUEST_LOCAL_PART));
         _service.addOperation(axisOperation);
         _operations[0] = axisOperation;
-
     }
 
     // populates the faults

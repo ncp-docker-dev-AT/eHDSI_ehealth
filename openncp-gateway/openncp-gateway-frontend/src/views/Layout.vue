@@ -198,7 +198,7 @@ export default {
   },
   computed: {
     authenticatedUser () {
-      console.log(this.$store.state.authenticatedUser.roles)
+      // console.log(this.$store.state.authenticatedUser.roles)
       return this.$store.state.authenticatedUser
     }
   },
@@ -241,11 +241,15 @@ export default {
       this.changePasswordDialog = true
     },
     checkRoles (role) {
-      return (
-        this.authenticatedUser.roles.includes('GTW_ADMIN') ||
-        this.authenticatedUser.roles.includes('SMP_ADMIN') ||
-        this.authenticatedUser.roles.includes(role)
-      )
+      if (this.authenticatedUser.roles) {
+        return (
+          this.authenticatedUser.roles.includes('GTW_ADMIN') ||
+          this.authenticatedUser.roles.includes('SMP_ADMIN') ||
+          this.authenticatedUser.roles.includes(role)
+        )
+      } else {
+        return false
+      }
     },
     logout () {
       this.$store.dispatch('logout').then(() => {

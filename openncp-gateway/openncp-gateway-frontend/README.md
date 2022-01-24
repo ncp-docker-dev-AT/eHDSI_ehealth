@@ -13,7 +13,7 @@ You can specify env variables by placing the following files in your project roo
 An env file simply contains key=value pairs of environment variables. Add the server URL:
 
 ```
-VUE_APP_SERVER_URL=http://localhost:8080/openncp-gateway-server
+VUE_APP_SERVER_URL=http://localhost:8080/openncp-gateway-backend
 ```
 Run in a terminal the command
 

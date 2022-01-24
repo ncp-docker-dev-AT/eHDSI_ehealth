@@ -791,9 +791,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(strengthClassification);
 
         // Substitution
+        String substitutionCode = document.getSubstitution() != null
+                && document.getSubstitution().getSubstitutionCode() != null
+                ? document.getSubstitution().getSubstitutionCode()
+                : "G";
+        String substitutionDisplay = document.getSubstitution() != null
+                && document.getSubstitution().getSubstitutionDisplayName() != null
+                ? document.getSubstitution().getSubstitutionDisplayName()
+                : "Generic";
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getSubstitution(), "eHDSI_Substitution_Codesystem", "Subsitution availability");
+                substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
         eot.getClassification().add(substitutionClassification);
 
         // Confidentiality Code
