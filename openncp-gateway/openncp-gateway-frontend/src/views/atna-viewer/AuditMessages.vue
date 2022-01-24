@@ -79,7 +79,7 @@
           :footer-props="{
             'items-per-page-options': [10]
           }"
-          :options.sync="options"
+          @update:options="handler($event)"
           :server-items-length="totalMessages"
           :loading="loading"
         >
@@ -152,8 +152,7 @@ export default {
         this.getDataFromApi()
       },
       page: 1,
-      itemsPerPage: 10,
-      deep: true
+      itemsPerPage: 10
     }
   },
   computed: {
@@ -169,15 +168,15 @@ export default {
   },
   methods: {
     getDataFromApi () {
-      if (!this.loading) {
-        this.loading = true
-        this.apiCall().then((data) => {
-          this.messages = data.data.content
-          this.totalMessages = data.data.totalElements
-          this.options.page = data.data.number + 1
-          this.loading = false
-        })
-      }
+      // if (!this.loading) {
+      this.loading = true
+      this.apiCall().then((data) => {
+        this.messages = data.data.content
+        this.totalMessages = data.data.totalElements
+        this.options.page = data.data.number + 1
+        this.loading = false
+      })
+      // }
     },
     apiCall () {
       let endDate
