@@ -36,6 +36,11 @@ public class UserResource {
         List<User> users = userService.findAll();
         long lastId = 0L;
 
+        if (!userService.isValidPassword(newUser.getPassword())) {
+            logger.error("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+            return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
+        }
+
         for (User user : users) {
             if (user.getId().compareTo(lastId) >= 0) {
                 lastId = user.getId() + 1;
@@ -68,6 +73,7 @@ public class UserResource {
             }
         }
         */
+
         newUser.setId(lastId);
         userService.createUser(newUser);
         return ResponseEntity.ok().build();
@@ -126,6 +132,12 @@ public class UserResource {
 //        if(passwordReset.getToken() != null){
 //            userService.changePasswordWithToken(passwordReset.getToken(), passwordReset.getPassword());
 //        }
+
+        if (!userService.isValidPassword(passwordReset.getPassword())) {
+            logger.error("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+            return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
+        }
+
         userService.changePassword(passwordReset.getPassword(), passwordReset.getOldPassword());
         //auditLogService.log(null, AuditLogAction.UPDATE_USER_PASSWORD);
         return new ResponseEntity(HttpStatus.NO_CONTENT);

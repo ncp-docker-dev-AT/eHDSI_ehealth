@@ -34,6 +34,13 @@
             <column name="PASSWORD" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="ENABLED" type="bit(1)" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMAIL" type="varchar(45)" />
+            <column name="VERIFICATION_CODE" type="varchar(64)" />
+            <column name="RESET_DATE" type="datetime(6)" />
+            <column name="RESET_KEY" type="varchar(255)" />
         </createTable>
 
         <createTable tableName="EHNCP_USER_ROLE">

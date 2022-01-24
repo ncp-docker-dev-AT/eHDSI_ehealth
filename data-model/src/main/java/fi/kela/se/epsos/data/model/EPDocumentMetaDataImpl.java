@@ -14,7 +14,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     private String doseFormCode;
     private String doseFormName;
     private String strength;
-    private String substitution;
+    private SubstitutionMetaData substitution;
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description) {
         this(metaData, description, (ProductMetadata)null);
@@ -72,7 +72,7 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     public String getStrength() { return strength; }
 
     @Override
-    public String getSubstitution() { return substitution; }
+    public SubstitutionMetaData getSubstitution() { return substitution; }
 
     public static class SimpleProductMetadata implements ProductMetadata {
 
@@ -93,6 +93,28 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
         @Override
         public String getProductName() {
             return productName;
+        }
+    }
+
+    public static class SimpleSubstitutionMetadata implements SubstitutionMetaData {
+
+        private String substitutionCode;
+
+        private String substitutionDisplayName;
+
+        public SimpleSubstitutionMetadata(String substitutionCode, String substitutionDisplayName) {
+            this.substitutionCode = substitutionCode;
+            this.substitutionDisplayName = substitutionDisplayName;
+        }
+
+        @Override
+        public String getSubstitutionCode() {
+            return substitutionCode;
+        }
+
+        @Override
+        public String getSubstitutionDisplayName() {
+            return substitutionDisplayName;
         }
     }
 }

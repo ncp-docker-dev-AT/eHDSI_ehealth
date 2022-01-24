@@ -207,8 +207,18 @@
                 <version>${axis2.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-xmlbeans-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-api</artifactId>
+                <version>${axiom-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-compat</artifactId>
                 <version>${axiom-api.version}</version>
             </dependency>
             <dependency>
@@ -284,7 +294,7 @@
             <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
-                <version>1.6.2</version>
+                <version>${wsdl4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.neethi</groupId>

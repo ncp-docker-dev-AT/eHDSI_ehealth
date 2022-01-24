@@ -3,11 +3,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
-    <display-name>MyHealth@EU - OpenNCP WS Server - ${project.version}</display-name>
-
-    <listener>
-        <listener-class>eu.europa.ec.sante.ehdsi.openncp.cc.WebAppContextListener</listener-class>
-    </listener>
+    <display-name>MyHealth@EU - OpenNCP Gateway Server - ${project.version}</display-name>
 
     ${enable.monitoring.start}
     <filter>
@@ -15,7 +11,7 @@
         <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
         <async-supported>true</async-supported>
     </filter>
-    
+
     <filter-mapping>
         <filter-name>javamelody</filter-name>
         <url-pattern>/*</url-pattern>
@@ -28,14 +24,7 @@
     </listener>
     ${enable.monitoring.stop}
 
-    <servlet>
-        <servlet-name>AxisServlet</servlet-name>
-        <servlet-class>org.apache.axis2.transport.http.AxisServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AxisServlet</servlet-name>
-        <url-pattern>/services/*</url-pattern>
-    </servlet-mapping>
+    <session-config>
+        <session-timeout>5</session-timeout>
+    </session-config>
 </web-app>
