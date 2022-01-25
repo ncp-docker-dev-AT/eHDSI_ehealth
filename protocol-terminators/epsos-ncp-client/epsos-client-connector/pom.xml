@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-client</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.4</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
@@ -280,14 +280,6 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
-                        <!--                        <resource>-->
-                        <!--                            <directory>src/main/resources/wsdl</directory>-->
-                        <!--                            <includes>-->
-                        <!--                                <include>**.wsdl</include>-->
-                        <!--                                <include>**.xsd</include>-->
-                        <!--                            </includes>-->
-                        <!--                            <targetPath>META-INF</targetPath>-->
-                        <!--                        </resource>-->
                         <resource>
                             <directory>src/main/resources/servicedata</directory>
                             <includes>
