@@ -1,25 +1,24 @@
 package eu.esens.abb.nonrep;
 
-import java.util.HashMap;
-import java.util.List;
+import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.herasaf.xacml.core.policy.impl.AttributeAssignmentType;
-import org.joda.time.DateTime;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
 
 public class ATNAObligationHandler implements ObligationHandler {
 
-    private final static String ATNA_PREFIX = "urn:eSENS:obligations:nrr:ATNA";
+    private static final String ATNA_PREFIX = "urn:eSENS:obligations:nrr:ATNA";
     private final HashMap<String, String> auditValueMap = new HashMap<>();
-    private IHEMessageType messageType;
-    private List<ESensObligation> obligations;
+    private final IHEMessageType messageType;
+    private final List<ESensObligation> obligations;
+    private final Context context;
     private Document audit = null;
-    private Context context;
 
     public ATNAObligationHandler(MessageType messageType, List<ESensObligation> obligations, Context context) {
 
@@ -99,7 +98,7 @@ public class ATNAObligationHandler implements ObligationHandler {
         audit.appendChild(auditMessage);
         Element eventIdentification = audit.createElement("EventIdentification");
         eventIdentification.setAttribute("EventActionCode", auditValueMap.get("EventActionCode").trim() != null ? auditValueMap.get("EventActionCode").trim() : "N/A");
-        eventIdentification.setAttribute("EventDateTime", new DateTime().toString());
+        eventIdentification.setAttribute("EventDateTime", Instant.now().toString());
         eventIdentification.setAttribute("EventOutcomeIndicator", auditValueMap.get("EventOutcomeIndicator").trim() != null ? auditValueMap.get("EventOutcomeIndicator").trim() : "N/A"); // by default, we fail
 
         Element eventId = audit.createElement("EventID");

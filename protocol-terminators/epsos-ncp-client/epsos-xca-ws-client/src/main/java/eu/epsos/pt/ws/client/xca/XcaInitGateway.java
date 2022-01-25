@@ -16,13 +16,11 @@ import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
-import net.bytebuddy.description.type.TypeList;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.commons.digester.parser.GenericParser;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +51,18 @@ public class XcaInitGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
+
+    private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
+            "2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
+            "4512");
+
     /**
      * Private constructor to disable class instantiation.
      */
     private XcaInitGateway() {
     }
 
-    public static QueryResponse crossGatewayQuery(final PatientId pid,
-                                                  final String countryCode,
+    public static QueryResponse crossGatewayQuery(final PatientId pid, final String countryCode,
                                                   final List<GenericDocumentCode> documentCodes,
                                                   final FilterParams filterParams,
                                                   final Map<AssertionEnum, Assertion> assertionMap,
@@ -69,14 +71,14 @@ public class XcaInitGateway {
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && LOGGER_CLINICAL.isDebugEnabled()) {
             final StringBuilder builder = new StringBuilder();
             builder.append("[");
-            documentCodes.forEach(s->{
-                builder.append(s.getValue() + ",");
+            documentCodes.forEach(s -> {
+                builder.append(s.getValue()).append(",");
             });
-            builder.replace(builder.length()-1, builder.length(), "]");
+            builder.replace(builder.length() - 1, builder.length(), "]");
             String classCodes = builder.toString();
             LOGGER_CLINICAL.info("QueryResponse crossGatewayQuery('{}','{}','{}','{}','{}','{}')", pid.getExtension(), countryCode,
                     classCodes, assertionMap.get(AssertionEnum.CLINICIAN).getID(), assertionMap.get(AssertionEnum.TREATMENT).getID(), service);
-            if(filterParams != null){
+            if (filterParams != null) {
                 LOGGER_CLINICAL.info("FilterParams created Before: " + filterParams.getCreatedBefore());
                 LOGGER_CLINICAL.info("FilterParams created After: " + filterParams.getCreatedAfter());
                 LOGGER_CLINICAL.info("FilterParams size : " + filterParams.getMaximumSize());
@@ -100,7 +102,7 @@ public class XcaInitGateway {
 
             /* queryResponse */
             List<String> documentCodeValues = new ArrayList<>();
-            for (GenericDocumentCode genericDocumentCode: documentCodes) {
+            for (GenericDocumentCode genericDocumentCode : documentCodes) {
                 documentCodeValues.add(genericDocumentCode.getValue());
             }
             AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentCodeValues);
@@ -253,7 +255,7 @@ public class XcaInitGateway {
                         if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("Registry Errors: '{}'", msg);
                         }
-                        throw new XCAException(errorCode);
+                        throw new XCAException(errorCode, codeContext);
                     }
                 }
             }
@@ -267,31 +269,6 @@ public class XcaInitGateway {
      * @return True | false according the Error Codes List.
      */
     private static boolean checkTransformationErrors(String errorCode) {
-
-        List<String> errorCodes = new ArrayList<>();
-        errorCodes.add("2500");
-        errorCodes.add("2501");
-        errorCodes.add("2502");
-        errorCodes.add("2503");
-        errorCodes.add("2504");
-        errorCodes.add("2505");
-        errorCodes.add("2506");
-        errorCodes.add("2507");
-        errorCodes.add("2508");
-        errorCodes.add("4500");
-        errorCodes.add("4501");
-        errorCodes.add("4502");
-        errorCodes.add("4503");
-        errorCodes.add("4504");
-        errorCodes.add("4505");
-        errorCodes.add("4506");
-        errorCodes.add("4507");
-        errorCodes.add("4508");
-        errorCodes.add("4509");
-        errorCodes.add("4510");
-        errorCodes.add("4511");
-        errorCodes.add("4512");
-
-        return errorCodes.contains(errorCode);
+        return ERROR_CODES.contains(errorCode);
     }
 }

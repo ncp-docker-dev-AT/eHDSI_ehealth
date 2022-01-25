@@ -108,7 +108,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 String doseFormCode = getDoseFormCode(xmlDoc);
                 String doseFormName = getDoseFormName(xmlDoc);
                 String strength = getStrength(xmlDoc);
-                String substitution = getSubstitution(xmlDoc);
+                EPDocumentMetaData.SubstitutionMetaData substitution = getSubstitution(xmlDoc);
                 boolean dispensable = getDispensable(xmlDoc);
 
                 var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
@@ -776,7 +776,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return strength;
     }
 
-    private String getSubstitution(Document doc) {
+    private EPDocumentMetaData.SubstitutionMetaData getSubstitution(Document doc) {
         XPathFactory factory = XPathFactory.newInstance();
         XPath path = factory.newXPath();
         String substitution;
@@ -787,21 +787,21 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         List<Node> nodeListCode = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/code[@code = 'SUBST']");
         List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
 
-        substitution = "Yes"; // default value
+        var substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");
         if (nodeListCode != null && !nodeListCode.isEmpty()) {
             for (Node node : nodeListValue) {
                 String valueAttr = node.getNodeName();
                 String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
                 logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
                 if (valueAttr.equals("value") && codeAttr.equals("N")) {
-                    substitution = "No";
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("N", "none");
                 } else {
-                    substitution = "Yes";
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");;
                 }
                 break;
             }
         }
-        return substitution;
+        return substitutionMetadata;
     }
 
     private boolean getDispensable(Document xmlDoc) {

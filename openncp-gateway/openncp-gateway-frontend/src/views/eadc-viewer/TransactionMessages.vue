@@ -31,7 +31,7 @@
                 </v-form>
               </v-card-text>
               <v-card-actions>
-                <v-btn text @click="exoprtTransactions">Export</v-btn>
+                <v-btn text @click="exportTransactions">Export</v-btn>
               </v-card-actions>
             </v-card>
           </template>
@@ -94,7 +94,7 @@ export default {
           disabled: true
         },
         {
-          text: 'Transations list',
+          text: 'Transactions list',
           disabled: true
         }
       ]
@@ -110,7 +110,7 @@ export default {
   },
 
   methods: {
-    exoprtTransactions: function () {
+    exportTransactions: function () {
       this.dialog = false
 
       let fromDate = this.year + '-'

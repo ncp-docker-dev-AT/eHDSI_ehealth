@@ -410,7 +410,7 @@ public final class AdhocQueryResponseConverter {
 
     private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "eHDSI_Substitution_Codesystem";
+            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "2.16.840.1.113883.5.1070";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
                 if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {

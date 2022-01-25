@@ -6,7 +6,7 @@
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>5.2.3</version>
+        <version>5.2.4</version>
     </parent>
 
     <artifactId>openncp-protocol-terminators</artifactId>
@@ -207,8 +207,18 @@
                 <version>${axis2.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-xmlbeans-codegen</artifactId>
+                <version>${axis2.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.ws.commons.axiom</groupId>
                 <artifactId>axiom-api</artifactId>
+                <version>${axiom-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-compat</artifactId>
                 <version>${axiom-api.version}</version>
             </dependency>
             <dependency>
@@ -226,20 +236,6 @@
                 <artifactId>axis2-webapp</artifactId>
                 <version>${axis2.version}</version>
                 <type>war</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xalan</groupId>
-                        <artifactId>xalan</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-						<groupId>org.apache.xalan</groupId>
-   						<artifactId>xalan</artifactId>
-					</exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
@@ -284,7 +280,7 @@
             <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
-                <version>1.6.2</version>
+                <version>${wsdl4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.neethi</groupId>

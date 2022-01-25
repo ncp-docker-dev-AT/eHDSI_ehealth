@@ -26,7 +26,7 @@ public class ClientConnectorServiceSkeletonMock implements ClientConnectorServic
     public ClientConnectorServiceSkeletonMock() {
         patientsList.add(createMockedPatient("Bilbo", "Baggins", "190012121234", Gender.MALE));
         patientsList.add(createMockedPatient("Frodo", "Baggins", "190001011234", Gender.MALE));
-        documentMetaDataList.add(createMockedDocumentMetadata("bla", "57833-6", "urn:epSOS:ep:pre:2010"));
+        documentMetaDataList.add(createMockedDocumentMetadata("bla", "57833-6", "urn:epsos:ep:pre:2010"));
     }
 
     private PatientDemographics createMockedPatient(String givenName, String familyName, String patient, Gender gender) {

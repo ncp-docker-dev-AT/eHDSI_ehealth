@@ -17,6 +17,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.util.Assert;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.HashUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.EndpointType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ProcessListType;
@@ -24,6 +25,7 @@ import org.oasis_open.docs.bdxr.ns.smp._2016._05.ProcessType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ServiceEndpointList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 import org.w3c.dom.Document;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.util.http.IPUtil;
@@ -204,7 +206,7 @@ public class DynamicDiscoveryService {
 
                 EndpointType e = endpoints.get(0);
                 String address = e.getEndpointURI();
-                if (address == null) {
+                if (StringUtils.isEmpty(address)) {
                     throw new Exception("No address found for: " + documentType + ":" + participantIdentifierValue);
                 }
                 URL urlAddress = new URL(address);

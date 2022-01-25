@@ -83,6 +83,13 @@ public class EventLogUtil {
             if (instanceIdentifier.getExtension() != null && instanceIdentifier.getRoot() != null) {
                 patientId = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
             }
+        } else {
+            // TODO: To be reviewed - No Patient details return then audit message is reporting Patient search criteria
+            II instanceIdentifier = response.getControlActProcess().getQueryByParameter().getValue().getParameterList()
+                    .getLivingSubjectId().get(0).getValue().get(0);
+            if (instanceIdentifier.getExtension() != null && instanceIdentifier.getRoot() != null) {
+                patientId = instanceIdentifier.getExtension() + "^^^&" + instanceIdentifier.getRoot() + "&ISO";
+            }
         }
         eventLog.setPT_ParticipantObjectID(patientId);
 

@@ -24,6 +24,8 @@
 
     <xs:element name="submitDocumentResponse" type="tns:submitDocumentResponse"/>
 
+	<xs:element name="GeneralFault" type="tns:GeneralFault"/>
+
     <xs:complexType name="queryPatient">
         <xs:sequence>
             <xs:element name="arg0" type="tns:queryPatientRequest"/>
@@ -127,7 +129,9 @@
             <xs:element name="associatedDocuments" type="tns:epsosDocument" nillable="true" minOccurs="0"
                         maxOccurs="unbounded"/>
             <xs:element name="atcCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="atcText" type="xs:string" minOccurs="0"/>
             <xs:element name="doseFormCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="doseFormText" type="xs:string" minOccurs="0"/>
             <xs:element name="strength" type="xs:string" minOccurs="0"/>
             <xs:element name="substitution" type="xs:string" minOccurs="0"/>
             <xs:element name="dispensable" type="xs:boolean" default="false"/>
@@ -232,5 +236,11 @@
             <xs:element name="maximumSize" type="xs:integer" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
+
+	<xs:complexType name="GeneralFault">
+		<xs:sequence>
+			<xs:element name="faultMessage" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
 
 </xs:schema>
