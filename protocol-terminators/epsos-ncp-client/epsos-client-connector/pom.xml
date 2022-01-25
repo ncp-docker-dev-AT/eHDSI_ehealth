@@ -280,14 +280,6 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
-                        <!--                        <resource>-->
-                        <!--                            <directory>src/main/resources/wsdl</directory>-->
-                        <!--                            <includes>-->
-                        <!--                                <include>**.wsdl</include>-->
-                        <!--                                <include>**.xsd</include>-->
-                        <!--                            </includes>-->
-                        <!--                            <targetPath>META-INF</targetPath>-->
-                        <!--                        </resource>-->
                         <resource>
                             <directory>src/main/resources/servicedata</directory>
                             <includes>

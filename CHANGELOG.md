@@ -20,14 +20,12 @@ Main changes in this release are:<br/>
     [EHNCP-2064] - Test activities - Implement CP-eHealthDSI-043.
     [EHNCP-2237] - Gateway Backend implementation.
     [EHNCP-2238] - Gateway Front-end implementation.
-    [EHNCP-2247] - Log4j core update.
 
 ### Bug
     [EHNCP-1946] - NCP-A doesn't block requests containing a TRCA with non-eHDSI PoU.
     [EHNCP-2056] - OpenATNA-Web paginator doesn't work.
     [EHNCP-2221] - ePrescription list doesn't provide dispensable element and not aligned with Business Requirements.
     [EHNCP-2239] - Investigate critical vulnerability in Apache Log4j library.
-    [EHNCP-2246] - Implement fix for critical vulnerability in Apache Log4j library for OpenNCP.
     [EHNCP-2249] - ePrescription list doesn't provide substitution element aligned with Business Requirements.
     [EHNCP-2261] - OpenNCP-Gateway-Backend still depends on Thymeleaf.
     [EHNCP-2263] - OpenNCP-Gateway ATNA-Viewer doesn't show all records.
