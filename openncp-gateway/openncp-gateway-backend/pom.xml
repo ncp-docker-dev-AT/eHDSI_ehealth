@@ -15,7 +15,7 @@
     <properties>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <querydsl.version>4.3.0</querydsl.version>
-        <spring-boot.version>2.6.2</spring-boot.version>
+        <spring-boot.version>2.6.3</spring-boot.version>
     </properties>
 
     <build>

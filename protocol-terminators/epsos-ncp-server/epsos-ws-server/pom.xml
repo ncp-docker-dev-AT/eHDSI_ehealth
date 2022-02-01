@@ -91,8 +91,19 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
             <artifactId>openncp-xdr-ws-server-impl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -111,6 +122,28 @@
             <artifactId>axis2-webapp</artifactId>
             <version>${axis2.version}</version>
             <type>war</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+					<groupId>org.apache.xalan</groupId>
+   					<artifactId>xalan</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpcore</artifactId>
+				</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -146,6 +179,10 @@
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
             	<exclusion>
@@ -206,6 +243,13 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
                 <configuration>
+                    <dependentWarIncludes></dependentWarIncludes>
+                    <dependentWarExcludes>
+                        WEB-INF/lib/log4j-api-2.14.1.jar,
+                        WEB-INF/lib/log4j-core-2.14.1.jar,
+                        WEB-INF/lib/log4j-jcl-2.14.1.jar,
+                    </dependentWarExcludes>
+
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>aar</nonFilteredFileExtension>

@@ -236,6 +236,20 @@
                 <artifactId>axis2-webapp</artifactId>
                 <version>${axis2.version}</version>
                 <type>war</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xalan</groupId>
+                        <artifactId>xalan</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+						<groupId>org.apache.xalan</groupId>
+   						<artifactId>xalan</artifactId>
+					</exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
@@ -285,7 +299,7 @@
             <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
-                <version>3.0.2</version>
+                <version>3.2.0</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>
