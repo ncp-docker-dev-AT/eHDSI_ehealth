@@ -49,7 +49,7 @@ import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.FilterParams;
-import tr.com.srdc.epsos.data.model.SubstitutionCode;
+import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
@@ -795,10 +795,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Substitution
         String substitutionCode = document.getSubstitution() != null
                 ? document.getSubstitution().getSubstitutionCode()
-                : SubstitutionCode.G.name();
+                : SubstitutionCodeEnum.G.name();
         String substitutionDisplay = document.getSubstitution() != null
                 ? document.getSubstitution().getSubstitutionDisplayName()
-                : SubstitutionCode.G.getDisplayName();
+                : SubstitutionCodeEnum.G.getDisplayName();
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
                 substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);

@@ -1,12 +1,14 @@
 package tr.com.srdc.epsos.data.model;
 
-public enum SubstitutionCode {
+public enum SubstitutionCodeEnum {
+
     G("Generic"),
     N("none"),
     TE("therapeutic alternative");
+
     private final String displayName;
 
-    SubstitutionCode(String displayName) {
+    SubstitutionCodeEnum(String displayName) {
         this.displayName = displayName;
     }
 
