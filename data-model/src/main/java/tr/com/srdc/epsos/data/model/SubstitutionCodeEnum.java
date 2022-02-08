@@ -2,9 +2,9 @@ package tr.com.srdc.epsos.data.model;
 
 public enum SubstitutionCodeEnum {
 
-    G("Generic"),
+    G("generic"),
     N("none"),
-    TE("therapeutic alternative");
+    TE("therapeutic");
 
     private final String displayName;
 
