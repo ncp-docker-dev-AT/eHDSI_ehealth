@@ -788,7 +788,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         // Strength
         ClassificationType strengthClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getStrength(), "eHDSI_Strength_Codesystem", "Strength of medication");
+                document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
         eot.getClassification().add(strengthClassification);
 
         // Substitution
