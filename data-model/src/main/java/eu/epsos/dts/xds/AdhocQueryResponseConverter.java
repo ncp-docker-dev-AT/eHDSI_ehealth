@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
@@ -378,7 +377,7 @@ public final class AdhocQueryResponseConverter {
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_Codesystem";
+            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_CodeSystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
                 if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
