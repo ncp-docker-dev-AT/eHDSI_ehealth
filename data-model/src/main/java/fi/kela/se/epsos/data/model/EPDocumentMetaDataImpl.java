@@ -1,5 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
+import tr.com.srdc.epsos.data.model.SubstitutionCode;
+
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements EPDocumentMetaData {
 
@@ -98,23 +100,20 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
 
     public static class SimpleSubstitutionMetadata implements SubstitutionMetaData {
 
-        private String substitutionCode;
+        private SubstitutionCode substitutionCode;
 
-        private String substitutionDisplayName;
-
-        public SimpleSubstitutionMetadata(String substitutionCode, String substitutionDisplayName) {
+        public SimpleSubstitutionMetadata(SubstitutionCode substitutionCode) {
             this.substitutionCode = substitutionCode;
-            this.substitutionDisplayName = substitutionDisplayName;
         }
 
         @Override
         public String getSubstitutionCode() {
-            return substitutionCode;
+            return substitutionCode.name();
         }
 
         @Override
         public String getSubstitutionDisplayName() {
-            return substitutionDisplayName;
+            return substitutionCode.getDisplayName();
         }
     }
 }

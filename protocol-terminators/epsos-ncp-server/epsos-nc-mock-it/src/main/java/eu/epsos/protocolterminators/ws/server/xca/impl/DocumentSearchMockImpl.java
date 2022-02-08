@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
+import tr.com.srdc.epsos.data.model.SubstitutionCode;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
 
@@ -787,16 +788,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         List<Node> nodeListCode = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/code[@code = 'SUBST']");
         List<Node> nodeListValue = XMLUtil.getNodeList(doc, "/ClinicalDocument/component/structuredBody/component/section/entry/substanceAdministration[@classCode = 'SBADM']/entryRelationship[@typeCode = 'SUBJ']/observation[@classCode = 'OBS']/value[@code = 'N']");
 
-        var substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");
+        var substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata(SubstitutionCode.G);
         if (nodeListCode != null && !nodeListCode.isEmpty()) {
             for (Node node : nodeListValue) {
                 String valueAttr = node.getNodeName();
                 String codeAttr = node.getAttributes().getNamedItem("code").getNodeValue();
                 logger.debug("Value: '{}' - Code: '{}'", valueAttr, codeAttr);
                 if (valueAttr.equals("value") && codeAttr.equals("N")) {
-                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("N", "none");
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata(SubstitutionCode.N);
                 } else {
-                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata("G", "Generic");;
+                    substitutionMetadata = new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata(SubstitutionCode.G);
                 }
                 break;
             }
