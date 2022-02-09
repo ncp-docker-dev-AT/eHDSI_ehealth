@@ -14,7 +14,7 @@
       <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
       <v-tab
         href="#transaction-details"
-        v-if="message.transactionData.length > 0"
+        v-if="message.transactionData && message.transactionData.length > 0"
         >Transaction details</v-tab
       >
     </v-tabs>
@@ -233,7 +233,10 @@
             </v-col>
           </v-row>
         </v-tab-item>
-        <v-tab-item value="transaction-details">
+        <v-tab-item
+          value="transaction-details"
+          v-if="message.transactionData && message.transactionData.length > 0"
+        >
           <div
             v-for="(item, i) in message.transactionData"
             :key="`transaction-data-${i}`"
