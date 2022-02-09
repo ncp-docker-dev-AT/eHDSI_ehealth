@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>openatna-web</artifactId>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.4.5</version>
+            <version>${hikaricp.version}</version>
         </dependency>
     </dependencies>
 

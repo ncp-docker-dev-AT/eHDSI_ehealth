@@ -66,11 +66,11 @@ public class DocumentDts {
 
         result.setAtcCode(document.getAtcCode());
         result.setAtcText(document.getAtcText());
+        result.setDispensable(document.isDispensable());
         result.setDoseFormCode(document.getDoseFormCode());
         result.setDoseFormText(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
-        result.setDispensable(document.isDispensable());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
