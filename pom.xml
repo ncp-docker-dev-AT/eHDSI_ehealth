@@ -116,6 +116,7 @@
         <h2database.version>1.4.200</h2database.version>
         <herasaf-xacml.version>1.0.4.RELEASE</herasaf-xacml.version>
         <hibernate.version>5.5.9.Final</hibernate.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
         <httpclient.version>4.5.13</httpclient.version>
         <jasperreports.version>6.18.1</jasperreports.version>
         <javamelody.version>1.90.0</javamelody.version>
