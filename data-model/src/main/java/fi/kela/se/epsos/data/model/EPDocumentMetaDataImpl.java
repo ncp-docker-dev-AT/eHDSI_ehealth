@@ -1,23 +1,22 @@
 package fi.kela.se.epsos.data.model;
 
+import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
+
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements EPDocumentMetaData {
 
-    private String description;
-
-    private ProductMetadata product;
-
-    private boolean dispensable;
-
-    private String atcCode;
-    private String atcName;
-    private String doseFormCode;
-    private String doseFormName;
-    private String strength;
-    private SubstitutionMetaData substitution;
+    private final String description;
+    private final ProductMetadata product;
+    private final boolean dispensable;
+    private final String atcCode;
+    private final String atcName;
+    private final String doseFormCode;
+    private final String doseFormName;
+    private final String strength;
+    private final SubstitutionMetaData substitution;
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description) {
-        this(metaData, description, (ProductMetadata)null);
+        this(metaData, description, (ProductMetadata) null);
     }
 
     public EPDocumentMetaDataImpl(EPSOSDocumentMetaData metaData, String description, ProductMetadata product) {
@@ -57,28 +56,40 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
     }
 
     @Override
-    public String getAtcCode() { return atcCode; }
+    public String getAtcCode() {
+        return atcCode;
+    }
 
     @Override
-    public String getAtcName() { return atcName; }
+    public String getAtcName() {
+        return atcName;
+    }
 
     @Override
-    public String getDoseFormCode() { return doseFormCode; }
+    public String getDoseFormCode() {
+        return doseFormCode;
+    }
 
     @Override
-    public String getDoseFormName() { return doseFormName; }
+    public String getDoseFormName() {
+        return doseFormName;
+    }
 
     @Override
-    public String getStrength() { return strength; }
+    public String getStrength() {
+        return strength;
+    }
 
     @Override
-    public SubstitutionMetaData getSubstitution() { return substitution; }
+    public SubstitutionMetaData getSubstitution() {
+        return substitution;
+    }
 
     public static class SimpleProductMetadata implements ProductMetadata {
 
-        private String productCode;
+        private final String productCode;
 
-        private String productName;
+        private final String productName;
 
         public SimpleProductMetadata(String productCode, String productName) {
             this.productCode = productCode;
@@ -98,23 +109,20 @@ public class EPDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements
 
     public static class SimpleSubstitutionMetadata implements SubstitutionMetaData {
 
-        private String substitutionCode;
+        private final SubstitutionCodeEnum substitutionCode;
 
-        private String substitutionDisplayName;
-
-        public SimpleSubstitutionMetadata(String substitutionCode, String substitutionDisplayName) {
+        public SimpleSubstitutionMetadata(SubstitutionCodeEnum substitutionCode) {
             this.substitutionCode = substitutionCode;
-            this.substitutionDisplayName = substitutionDisplayName;
         }
 
         @Override
         public String getSubstitutionCode() {
-            return substitutionCode;
+            return substitutionCode.name();
         }
 
         @Override
         public String getSubstitutionDisplayName() {
-            return substitutionDisplayName;
+            return substitutionCode.getDisplayName();
         }
     }
 }
