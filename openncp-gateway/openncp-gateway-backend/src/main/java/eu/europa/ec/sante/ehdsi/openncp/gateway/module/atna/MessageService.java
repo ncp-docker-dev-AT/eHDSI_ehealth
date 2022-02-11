@@ -4,10 +4,12 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.MessageWrapper;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.domain.old.Message;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model.Code;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model.MessageEntity;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model.ParticipantEntity;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.repository.MessageRepository;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.support.MessageMapper;
-import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.support.MessagePredicatesBuilder;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.support.SearchPredicatesBuilder;
 import generated.AuditMessage;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -43,13 +45,19 @@ public class MessageService {
         return new PageImpl<>(messageMapper.map(page), pageable, page.getTotalElements());
     }
 
-    public Page<Message> findMessages(String searchEventId, Instant searchEventStartDate, Instant searchEventEndDate,
+    public Page<Message> findMessages(String searchEventId,
+                                      Instant searchEventStartDate,
+                                      Instant searchEventEndDate,
+                                      String activeParticipantId,
+                                      String activeTypeCode,
                                       Pageable pageable) {
 
-        MessagePredicatesBuilder builder = new MessagePredicatesBuilder();
-        builder.with("eventId.code", ":", searchEventId);
-        builder.with("eventStartDate", ":", searchEventStartDate);
-        builder.with("eventEndDate", ":", searchEventEndDate);
+        SearchPredicatesBuilder builder = new SearchPredicatesBuilder();
+        builder.with(MessageEntity.class, "eventId.codeName", ":", searchEventId);
+        builder.with(ParticipantEntity.class, "userId", ":", activeParticipantId);
+        builder.with(Code.class,"codeName", ":", activeTypeCode);
+        builder.with(MessageEntity.class, "eventDateTime", ">", searchEventStartDate);
+        builder.with(MessageEntity.class, "eventDateTime", "<", searchEventEndDate);
 
         BooleanExpression exp = builder.build();
 
