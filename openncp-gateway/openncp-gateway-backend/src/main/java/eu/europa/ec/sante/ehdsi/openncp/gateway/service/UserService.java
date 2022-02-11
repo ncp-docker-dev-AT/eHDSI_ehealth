@@ -14,13 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional()
@@ -71,43 +68,11 @@ public class UserService {
         return true;
     }
 
-    private void sendPasswordResetMail(User user) throws MessagingException {
-
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", smtpProperties.getAuth());
-        properties.put("mail.smtp.starttls.enable", smtpProperties.getStartTls().isEnabled());
-        properties.put("mail.smtp.host", smtpProperties.getHost());
-        properties.put("mail.smtp.port", smtpProperties.getPort());
-
-        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(smtpProperties.getUsername(), smtpProperties.getPassword());
-            }
-        });
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(applicationProperties.getMail().getFrom(), false));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
-        message.setSubject("ehdsi gateway reset password");
-        message.setContent("Here is your key for resetting the password : " + user.getResetKey(), "text/html");
-        message.setSentDate(new Date());
-
-        MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent("ehdsi gateway reset password : " + user.getResetKey(), "text/html");
-
-        Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(messageBodyPart);
-
-        message.setContent(multipart);
-        Transport.send(message);
-    }
-
     public String requestPasswordReset(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && user.get().isEnabled()) {
             user.get().setResetKey(RandomStringUtils.randomAlphanumeric(32));
             user.get().setResetDate(Instant.now());
-
             return mailService.sendPasswordResetMail(user.get());
         }
         return "User not found!!!";
