@@ -20,6 +20,26 @@
                 hide-details
               ></v-text-field>
             </v-col>
+
+            <v-col>
+              <v-text-field
+                v-model="activeParticipantId"
+                clearable
+                label="Active Participant ID"
+                single-line
+                hide-details
+              ></v-text-field>
+            </v-col>
+
+            <v-col>
+              <v-text-field
+                v-model="activeTypeCode"
+                clearable
+                label="Active Type Code"
+                single-line
+                hide-details
+              ></v-text-field>
+            </v-col>
             <v-col>
               <v-menu
                 v-model="searchStartDateMenu"
@@ -127,6 +147,8 @@ export default {
       options: { page: 1, itemsPerPage: 10 },
       loading: false,
       searchEventId: '',
+      activeParticipantId: '',
+      activeTypeCode: '',
       searchEventStartDate: '',
       searchEventEndDate: '',
       searchStartDateMenu: false,
@@ -192,6 +214,8 @@ export default {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
           searchEventId: this.searchEventId,
+          activeParticipantId: this.activeParticipantId,
+          activeTypeCode: this.activeTypeCode,
           searchEventStartDate: this.searchEventStartDate
             ? new Date(this.searchEventStartDate).toISOString()
             : '',
