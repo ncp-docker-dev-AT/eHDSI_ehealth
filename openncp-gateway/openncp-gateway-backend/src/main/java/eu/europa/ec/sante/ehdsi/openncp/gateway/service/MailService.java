@@ -41,10 +41,11 @@ public class MailService implements MessageSourceAware {
         this.smtpProperties = smtpProperties;
     }
 
+
     @Override
     public void setMessageSource(@NonNull MessageSource messageSource) {
         messages = new MessageSourceAccessor(messageSource);
-    }
+   }
 
     @Async
     public void sendMail(String to, String subject, String content, boolean multipart, boolean html) throws MessagingException {
@@ -61,12 +62,17 @@ public class MailService implements MessageSourceAware {
         properties.put("mail.smtp.ssl.enable", smtpProperties.getSmtp().getSsl().getEnable());
         properties.put("mail.smtp.ssl.trust", smtpProperties.getSmtp().getSsl().getTrust());
 
-        Session session = Session.getInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(smtpProperties.getUsername(), smtpProperties.getPassword());
-            }
-        });
+        Session session;
+        if(smtpProperties.getSmtp().getAuth() == true) {
+            session = Session.getInstance(properties, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(smtpProperties.getUsername(), smtpProperties.getPassword());
+                }
+            });
+        } else {
+            session = Session.getInstance(properties);
+        }
         MimeMessage mimeMessage = new MimeMessage(session);
         mimeMessage.setFrom(new InternetAddress(applicationProperties.getMail().getFrom(), false));
         mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
