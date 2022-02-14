@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Mapper
 public interface MessageMapper {
 
@@ -30,5 +29,4 @@ public interface MessageMapper {
                 .collect(Collectors.joining(", ", "", ""));
 
     }
-
 }

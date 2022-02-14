@@ -45,17 +45,13 @@ public class MessageService {
         return new PageImpl<>(messageMapper.map(page), pageable, page.getTotalElements());
     }
 
-    public Page<Message> findMessages(String searchEventId,
-                                      Instant searchEventStartDate,
-                                      Instant searchEventEndDate,
-                                      String activeParticipantId,
-                                      String activeTypeCode,
-                                      Pageable pageable) {
+    public Page<Message> findMessages(String searchEventId, Instant searchEventStartDate, Instant searchEventEndDate,
+                                      String activeParticipantId, String activeTypeCode, Pageable pageable) {
 
         SearchPredicatesBuilder builder = new SearchPredicatesBuilder();
         builder.with(MessageEntity.class, "eventId.codeName", ":", searchEventId);
         builder.with(ParticipantEntity.class, "userId", ":", activeParticipantId);
-        builder.with(Code.class,"codeName", ":", activeTypeCode);
+        builder.with(Code.class, "codeName", ":", activeTypeCode);
         builder.with(MessageEntity.class, "eventDateTime", ">", searchEventStartDate);
         builder.with(MessageEntity.class, "eventDateTime", "<", searchEventEndDate);
 

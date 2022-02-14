@@ -19,7 +19,7 @@ public class SearchPredicatesBuilder {
     }
 
     public SearchPredicatesBuilder with(Class<?> rootClass, String key, String operation, Object value) {
-        if (value != null && !StringUtils.isEmpty(value.toString())){
+        if (value != null && !StringUtils.isEmpty(value.toString())) {
             params.add(new SearchCriteria(rootClass, key, operation, value));
         }
         return this;
