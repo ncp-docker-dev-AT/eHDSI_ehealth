@@ -21,7 +21,10 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
@@ -31,14 +34,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-/**
- * @author Andrew Harrison
- */
 public class JaxbIOFactory implements AtnaIOFactory, Serializable {
 
     private static final long serialVersionUID = 6923830059780468692L;
     private static final DatatypeFactory DATATYPE_FACTORY;
-    private static JAXBContext jaxbContext;
+    private static final JAXBContext jaxbContext;
 
     static {
         try {
@@ -60,13 +60,13 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
 
         try {
             Canonicalizer canonicalizer = Canonicalizer.getInstance(CanonicalizationMethod.INCLUSIVE);
-            byte[] back = canonicalizer.canonicalizeSubtree(document);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            canonicalizer.canonicalizeSubtree(document, outputStream);
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
-            return documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(back));
+            return documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(outputStream.toByteArray()));
 
         } catch (InvalidCanonicalizerException | CanonicalizationException | ParserConfigurationException | SAXException | IOException e) {
-            logger.error("Canonicalize Exception: '{}'", e.getMessage(), e);
             throw new AtnaException(e.getMessage(), e);
         }
     }
@@ -107,7 +107,7 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
     }
 
     /**
-     * @param in
+     * @param inputStream
      * @return
      * @throws AtnaException
      */
@@ -129,7 +129,6 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
             return atnaMessage;
 
         } catch (AtnaException | JAXBException | IOException e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
             throw new AtnaException(e, AtnaException.AtnaError.INVALID_MESSAGE);
         }
     }
@@ -143,7 +142,6 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
             return documentBuilder.parse(stream);
 
         } catch (ParserConfigurationException | SAXException e) {
-            logger.error("XML Exception: '{}'", e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
     }
@@ -163,12 +161,8 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
             DOMSource domSource = new DOMSource(document);
             transformer.transform(domSource, streamResult);
 
-        } catch (TransformerConfigurationException tce) {
-            logger.error("TransformerConfigurationException: '{}'", tce.getMessage(), tce);
-            assert (false);
-        } catch (TransformerException te) {
-            logger.error("TransformerException: '{}'", te.getMessage(), te);
-            throw new IOException(te.getMessage());
+        } catch (TransformerException e) {
+            throw new IOException(e.getMessage(), e);
         }
         return streamResult;
     }
@@ -195,7 +189,6 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
                 message.setEventDateTime(new Date());
             }
             out.write(message.getMessageContent());
-            // Old implementation: write(message, out, true);
         } catch (IOException e) {
             throw new AtnaException(e.getMessage(), e);
         }
@@ -348,19 +341,19 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
 //            }
 //            ao.addObjectDescription(od);
 //        }
-        AtnaMessageObject ret = new AtnaMessageObject(ao);
+        AtnaMessageObject atnaMessageObject = new AtnaMessageObject(ao);
         List<TypeValuePairType> pairs = obj.getParticipantObjectDetail();
         for (TypeValuePairType pair : pairs) {
             AtnaObjectDetail detail = new AtnaObjectDetail();
             detail.setType(pair.getType());
             detail.setValue(pair.getValue());
-            ret.addObjectDetail(detail);
+            atnaMessageObject.addObjectDetail(detail);
         }
-        ret.setObjectQuery(obj.getParticipantObjectQuery());
+        atnaMessageObject.setObjectQuery(obj.getParticipantObjectQuery());
         if (obj.getParticipantObjectDataLifeCycle() != null) {
-            ret.setObjectDataLifeCycle(ObjectDataLifecycle.getLifecycle(obj.getParticipantObjectDataLifeCycle()));
+            atnaMessageObject.setObjectDataLifeCycle(ObjectDataLifecycle.getLifecycle(obj.getParticipantObjectDataLifeCycle()));
         }
-        return ret;
+        return atnaMessageObject;
     }
 
     private ParticipantObjectIdentificationType createObject(AtnaMessageObject obj) throws AtnaException {
@@ -497,13 +490,13 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
         for (CodedValueType code : codes) {
             ap.addRoleIDCode(createCode(AtnaCode.PARTICIPANT_ROLE_TYPE, code));
         }
-        AtnaMessageParticipant ret = new AtnaMessageParticipant(ap);
-        ret.setNetworkAccessPointId(participant.getNetworkAccessPointID());
+        AtnaMessageParticipant messageParticipant = new AtnaMessageParticipant(ap);
+        messageParticipant.setNetworkAccessPointId(participant.getNetworkAccessPointID());
         if (participant.getNetworkAccessPointTypeCode() != null) {
-            ret.setNetworkAccessPointType(NetworkAccessPoint.getAccessPoint(participant.getNetworkAccessPointTypeCode()));
+            messageParticipant.setNetworkAccessPointType(NetworkAccessPoint.getAccessPoint(participant.getNetworkAccessPointTypeCode()));
         }
-        ret.setUserIsRequestor(participant.isUserIsRequestor());
-        return ret;
+        messageParticipant.setUserIsRequestor(participant.isUserIsRequestor());
+        return messageParticipant;
     }
 
     private AtnaCode createCode(String type, CodedValueType code) throws AtnaException {

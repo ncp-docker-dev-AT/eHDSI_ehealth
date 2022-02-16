@@ -20,7 +20,7 @@ public class MessageDetails {
 
     private List<MessageParticipant> messageParticipants = new ArrayList<>();
 
-    private String messageContent;
+    private byte[] messageContent;
 
     public Long getId() {
         return id;
@@ -78,11 +78,11 @@ public class MessageDetails {
         this.messageParticipants = messageParticipants;
     }
 
-    public String getMessageContent() {
+    public byte[] getMessageContent() {
         return messageContent;
     }
 
-    public void setMessageContent(String messageContent) {
+    public void setMessageContent(byte[] messageContent) {
         this.messageContent = messageContent;
     }
 }
