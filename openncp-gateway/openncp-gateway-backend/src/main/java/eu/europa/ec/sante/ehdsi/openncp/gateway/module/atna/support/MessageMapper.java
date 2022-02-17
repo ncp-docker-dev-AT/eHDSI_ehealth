@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Mapper
 public interface MessageMapper {
 
@@ -28,7 +27,5 @@ public interface MessageMapper {
         return codes.stream()
                 .map(Code::getCode)
                 .collect(Collectors.joining(", ", "", ""));
-
     }
-
 }

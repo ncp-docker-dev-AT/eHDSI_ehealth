@@ -50,6 +50,7 @@ public class SmtpProperties {
     }
 
     public static class Smtp {
+
         private final StartTls startTls = new StartTls();
         private final Ssl ssl = new Ssl();
         private Boolean auth;
@@ -98,6 +99,7 @@ public class SmtpProperties {
         }
 
         public static class StartTls {
+
             private Boolean enabled;
             private Boolean required;
 
@@ -119,6 +121,7 @@ public class SmtpProperties {
         }
 
         public static class Ssl {
+
             private Boolean enable;
             private String trust;
 

@@ -15,30 +15,43 @@ import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
+import tr.com.srdc.epsos.util.Constants;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 /*
- *  ClientConnectorConsumer
+ *  Client Service class providing access to the MyHealth@EU workflows (Patient Summary, ePrescription, OrCD etc.).
  */
 public class ClientConnectorConsumer {
 
     // Default timeout set to Three minutes.
     private static final Integer TIMEOUT = 180000;
+    private static final String WSSE_NS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+    // Logger
     private final Logger logger = LoggerFactory.getLogger(ClientConnectorConsumer.class);
+    // URL of the targeted NCP-B - ClientConnectorService.wsdl
     private final String endpointReference;
 
     public ClientConnectorConsumer(String endpointReference) {
@@ -46,61 +59,22 @@ public class ClientConnectorConsumer {
         this.endpointReference = endpointReference;
     }
 
-    private static void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub,
-                                      Map<AssertionEnum, Assertion> assertions) throws Exception {
-
-        if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
-            throw new ClientConnectorConsumerException("HCP Assertion expired");
-        }
-
-        var omFactory = OMAbstractFactory.getSOAP12Factory();
-        SOAPHeaderBlock omSecurityElement = omFactory.createSOAPHeaderBlock(
-                omFactory.createOMElement(new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                        "Security", "wsse"), null));
-
-        if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
-            var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
-            if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
-            }
-            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-        }
-        if (assertions.containsKey(AssertionEnum.TREATMENT)) {
-            var assertion = assertions.get(AssertionEnum.TREATMENT);
-            if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
-            }
-            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-        }
-        var assertion = assertions.get(AssertionEnum.CLINICIAN);
-        omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
-        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
-    }
-
-    private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
-
-        // Adding custom phase for evidence emitter processing.
-        logger.debug("Adding custom phase for Outflow Evidence Emitter processing");
-        var outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
-        outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
-        var axisConfiguration = clientConnectorServiceStub._getServiceClient().getServiceContext()
-                .getConfigurationContext().getAxisConfiguration();
-        List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
-        var outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
-        try {
-            outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
-        } catch (PhaseException ex) {
-            logger.error("PhaseException: '{}'", ex.getMessage(), ex);
-        }
-        outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
-        axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
-    }
-
+    /**
+     * Returns a list of clinical documents related to the patient demographics provided.
+     *
+     * @param assertions   - Map of assertions required by the transaction (HCP, TRC and NoK optional).
+     * @param countryCode  - ISO Country code of the patient country of origin.
+     * @param patientId    - Unique Patient Identifier retrieved from NCP-A.
+     * @param classCodes   - Class Codes of the documents to retrieve.
+     * @param filterParams - Extra parameters for search filtering.
+     * @return List of clinical documents and metadata searched by the clinician.
+     */
     public List<EpsosDocument1> queryDocuments(Map<AssertionEnum, Assertion> assertions,
                                                String countryCode, PatientId patientId,
-                                               List<GenericDocumentCode> classCodes, FilterParams filterParams) throws ClientConnectorConsumerException {
+                                               List<GenericDocumentCode> classCodes, FilterParams filterParams)
+            throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: queryDocuments(countryCode:'{}', patientId:'{}')", countryCode, patientId.getRoot());
+        logger.info("[National Connector] queryDocuments(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
 
         try {
@@ -114,7 +88,6 @@ public class ClientConnectorConsumer {
                 array[i] = classCodes.get(i);
             }
             queryDocumentRequest.setClassCodeArray(array);
-//            queryDocumentRequest.setClassCodeArray(classCodes.toArray(GenericDocumentCode[]::new));
             queryDocumentRequest.setPatientId(patientId);
             queryDocumentRequest.setCountryCode(countryCode);
             queryDocumentRequest.setFilterParams(filterParams);
@@ -134,15 +107,17 @@ public class ClientConnectorConsumer {
     }
 
     /**
-     * @param assertions          - Map of assertions used to identify clinician and next of kin.
-     * @param countryCode         - Country of treatment
+     * Returns demographics of the patient corresponding to the identity traits provided.
+     *
+     * @param assertions          - Map of assertions required by the transaction (HCP, TRC and NoK optional)
+     * @param countryCode         - ISO Country code of the patient country of origin.
      * @param patientDemographics - Identifiers of the requested patient
-     * @return List of patients found (only 1 patient is expected in eHDSI)
+     * @return List of patients found (only 1 patient is expected in MyHealth@EU)
      */
-    public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions,
-                                                  String countryCode, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
+    public List<PatientDemographics> queryPatient(Map<AssertionEnum, Assertion> assertions, String countryCode,
+                                                  PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: queryPatient(countryCode:'{}')", countryCode);
+        logger.info("[National Connector] queryPatient(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
 
         try {
@@ -168,11 +143,15 @@ public class ClientConnectorConsumer {
     }
 
     /**
-     * Default Webservice test method available mainly for configuration purpose.
+     * Default Webservice test method available mainly for configuration and testing purpose.
+     *
+     * @param assertions - Map of assertions required by the transaction (HCP, TRC and NoK optional).
+     * @param name       - Token sent for testing.
+     * @return Hello message concatenated with the token passed as parameter.
      */
     public String sayHello(Map<AssertionEnum, Assertion> assertions, String name) throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: sayHello(name:'{}')", name);
+        logger.info("[National Connector] sayHello(name:'{}')", name);
         var clientConnectorServiceStub = initializeServiceStub();
         try {
             addAssertions(clientConnectorServiceStub, assertions);
@@ -190,11 +169,22 @@ public class ClientConnectorConsumer {
         }
     }
 
+    /**
+     * Retrieves the clinical document of an identified patient (prescription, patient summary or original clinical document).
+     *
+     * @param assertions      - Map of assertions required by the transaction (HCP, TRC and NoK optional).
+     * @param countryCode     - ISO Country code of the patient country of origin.
+     * @param documentId      - Unique identifier of the CDA document.
+     * @param homeCommunityId - HL7 Home Community ID of the country of origin.
+     * @param classCode       - HL7 ClassCode of the document type to be retrieved.
+     * @param targetLanguage  - Expected target language of the CDA translation.
+     * @return Clinical Document and metadata returned by the Country of Origin.
+     */
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
                                            DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode,
                                            String targetLanguage) throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
+        logger.info("[National Connector] retrieveDocument(countryCode:'{}', homeCommunityId:'{}', targetLanguage:'{}')",
                 countryCode, homeCommunityId, targetLanguage);
         var clientConnectorServiceStub = initializeServiceStub();
 
@@ -228,16 +218,27 @@ public class ClientConnectorConsumer {
      */
     @Deprecated(since = "2.5.0", forRemoval = true)
     public EpsosDocument1 retrieveDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode) throws ClientConnectorConsumerException {
+                                           DocumentId documentId, String homeCommunityId, GenericDocumentCode classCode)
+            throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
+        logger.info("[National Connector] retrieveDocument(countryCode:'{}', homeCommunityId:'{}')", countryCode, homeCommunityId);
         return retrieveDocument(assertions, countryCode, documentId, homeCommunityId, classCode, null);
     }
 
+    /**
+     * Submits Clinical Document to the patient country of origin (dispense and discard).
+     *
+     * @param assertions          - Map of assertions required by the transaction (HCP, TRC and NoK optional).
+     * @param countryCode         - ISO Country code of the patient country of origin.
+     * @param document            - Clinical document and metadata to be submitted to the patient country of origin.
+     * @param patientDemographics - Demographics of the patient linked to the document submission.
+     * @return Acknowledge and status of the document submission.
+     */
     public SubmitDocumentResponse submitDocument(Map<AssertionEnum, Assertion> assertions, String countryCode,
-                                                 EpsosDocument1 document, PatientDemographics patientDemographics) throws ClientConnectorConsumerException {
+                                                 EpsosDocument1 document, PatientDemographics patientDemographics)
+            throws ClientConnectorConsumerException {
 
-        logger.info("[Portal]: submitDocument(countryCode:'{}')", countryCode);
+        logger.info("[National Connector] submitDocument(countryCode:'{}')", countryCode);
         var clientConnectorServiceStub = initializeServiceStub();
 
         try {
@@ -263,7 +264,86 @@ public class ClientConnectorConsumer {
     }
 
     /**
-     * Initializing the ClientConnectorService client stubs to contact WSDL.
+     * Adds the different types of Assertions to the SOAP Header.
+     *
+     * @param clientConnectorServiceStub - Client Service stub.
+     * @param assertions                 - Map of assertions required by the transaction (HCP, TRC and NoK optional).
+     */
+    private void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub,
+                               Map<AssertionEnum, Assertion> assertions) throws Exception {
+
+        if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
+            throw new ClientConnectorConsumerException("HCP Assertion expired");
+        }
+
+        var omFactory = OMAbstractFactory.getSOAP12Factory();
+        SOAPHeaderBlock omSecurityElement = omFactory.createSOAPHeaderBlock(
+                omFactory.createOMElement(new QName(WSSE_NS, "Security", "wsse"), null));
+
+        if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
+            var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
+            if (AssertionHelper.isExpired(assertion)) {
+                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
+            }
+            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
+        }
+        if (assertions.containsKey(AssertionEnum.TREATMENT)) {
+            var assertion = assertions.get(AssertionEnum.TREATMENT);
+            if (AssertionHelper.isExpired(assertion)) {
+                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
+            }
+            omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
+        }
+        var assertion = assertions.get(AssertionEnum.CLINICIAN);
+        omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
+        clientConnectorServiceStub._getServiceClient().addHeader(omSecurityElement);
+    }
+
+    /**
+     * Configures the SSL Context to support Two Way SLL and using the Service Consumer TLS certificate.
+     *
+     * @return Initialized SSL Context supporting Two Way SSL.
+     */
+    private SSLContext buildSSLContext() throws ClientConnectorConsumerException {
+
+        try {
+            SSLContextBuilder builder = SSLContextBuilder.create();
+            builder.setKeyStoreType("JKS");
+            builder.setKeyManagerFactoryAlgorithm("SunX509");
+
+            builder.loadKeyMaterial(ResourceUtils.getFile(Constants.SC_KEYSTORE_PATH),
+                    Constants.SC_KEYSTORE_PASSWORD.toCharArray(),
+                    Constants.SC_PRIVATEKEY_PASSWORD.toCharArray());
+
+            builder.loadTrustMaterial(ResourceUtils.getFile(Constants.TRUSTSTORE_PATH),
+                    Constants.TRUSTSTORE_PASSWORD.toCharArray(), TrustAllStrategy.INSTANCE);
+
+            return builder.build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | CertificateException |
+                IOException | KeyManagementException e) {
+            throw new ClientConnectorConsumerException("SSL Context cannot be initialized: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Returns Apache HttpClient supporting Two Way SSL and using TLS protocol 1.2 and 1.3.
+     *
+     * @return Secured HttpClient initialized.
+     */
+    private HttpClient getSSLClient() throws ClientConnectorConsumerException {
+
+        SSLContext sslContext = buildSSLContext();
+        SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+                sslContext, new String[]{"TLSv1.2", "TLSv1.3"}, null, NoopHostnameVerifier.INSTANCE);
+        HttpClientBuilder builder = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
+        builder.setSSLContext(sslContext);
+        builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+
+        return builder.build();
+    }
+
+    /**
+     * Initializes the ClientConnectorService client stubs to contact WSDL.
      *
      * @return Initialized ClientConnectorServiceStub set to the configured EPR and the SOAP version.
      */
@@ -271,37 +351,52 @@ public class ClientConnectorConsumer {
 
         try {
 
-            logger.info("Initializing Client Connector Stub Services");
+            logger.info("[National Connector] Initializing ClientConnectorService Stub");
             var clientConnectorStub = new ClientConnectorServiceStub(endpointReference);
             clientConnectorStub._getServiceClient().getOptions().setSoapVersionURI(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
             clientConnectorStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.SO_TIMEOUT, TIMEOUT);
             clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CONNECTION_TIMEOUT, TIMEOUT);
-
-            SSLContext sslContext = SSLContexts.createDefault();
-            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
-                    sslContext,
-                    new String[]{"TLSv1.2"},
-                    null,
-                    new NoopHostnameVerifier());
-
-            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
-            clientConnectorStub._getServiceClient().getOptions().setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
-
+            // Enabling WS Addressing module.
             clientConnectorStub._getServiceClient().engageModule("addressing");
             this.registerEvidenceEmitterHandler(clientConnectorStub);
-            logger.debug("[Axis2 configuration] Default Timeout: '{}'",
-                    clientConnectorStub._getServiceClient().getOptions().getTimeOutInMilliSeconds());
-            logger.debug("[Axis2 configuration] HTTPConstants.SO_TIMEOUT: '{}'",
-                    clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.SO_TIMEOUT));
-            logger.debug("[Axis2 configuration] HTTPConstants.CONNECTION_TIMEOUT: '{}'",
-                    clientConnectorStub._getServiceClient().getOptions().getProperty(HTTPConstants.CONNECTION_TIMEOUT));
+
+            // Enabling Axis2 - SSL 2 ways communication (not active by default).
+            clientConnectorStub._getServiceClient().getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.CACHED_HTTP_CLIENT, getSSLClient());
+            clientConnectorStub._getServiceClient().getServiceContext().getConfigurationContext()
+                    .setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
+
             return clientConnectorStub;
         } catch (AxisFault axisFault) {
             throw new ClientConnectorConsumerException(axisFault.getMessage(),
                     axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
                     axisFault);
         }
+    }
+
+    /**
+     * Configures the Non Repudiation process into the Apache Axis2 phase.
+     *
+     * @param clientConnectorServiceStub - Client Service stub.
+     */
+    private void registerEvidenceEmitterHandler(ClientConnectorServiceStub clientConnectorServiceStub) {
+
+        // Adding custom phase for evidence emitter processing.
+        logger.debug("Adding custom phase for Outflow Evidence Emitter processing");
+        var outFlowHandlerDescription = new HandlerDescription("OutFlowEvidenceEmitterHandler");
+        outFlowHandlerDescription.setHandler(new OutFlowEvidenceEmitterHandler());
+        var axisConfiguration = clientConnectorServiceStub._getServiceClient().getServiceContext()
+                .getConfigurationContext().getAxisConfiguration();
+        List<Phase> outFlowPhasesList = axisConfiguration.getOutFlowPhases();
+        var outFlowEvidenceEmitterPhase = new Phase("OutFlowEvidenceEmitterPhase");
+        try {
+            outFlowEvidenceEmitterPhase.addHandler(outFlowHandlerDescription);
+        } catch (PhaseException ex) {
+            logger.error("PhaseException: '{}'", ex.getMessage(), ex);
+        }
+        outFlowPhasesList.add(outFlowEvidenceEmitterPhase);
+        axisConfiguration.setGlobalOutPhase(outFlowPhasesList);
     }
 
     /**

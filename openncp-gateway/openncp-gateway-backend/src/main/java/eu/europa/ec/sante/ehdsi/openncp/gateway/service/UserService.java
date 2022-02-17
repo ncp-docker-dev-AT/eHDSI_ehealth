@@ -14,10 +14,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional()
@@ -69,6 +72,37 @@ public class UserService {
         return true;
     }
 
+    private void sendPasswordResetMail(User user) throws MessagingException {
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", smtpProperties.getSmtp().getAuth());
+        properties.put("mail.smtp.starttls.enable", smtpProperties.getSmtp().getStartTls().getEnabled());
+        properties.put("mail.smtp.host", smtpProperties.getHost());
+        properties.put("mail.smtp.port", smtpProperties.getPort());
+
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(smtpProperties.getUsername(), smtpProperties.getPassword());
+            }
+        });
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(applicationProperties.getMail().getFrom(), false));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
+        message.setSubject("MyHealth@EU - Gateway Admin reset password");
+        message.setContent("Here is your key for resetting the password: " + user.getResetKey(), "text/html");
+        message.setSentDate(new Date());
+
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setContent("MyHealth@EU - Gateway Admin reset password: " + user.getResetKey(), "text/html");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(messageBodyPart);
+
+        message.setContent(multipart);
+        Transport.send(message);
+    }
+
     public String requestPasswordReset(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && user.get().isEnabled()) {
@@ -92,8 +126,7 @@ public class UserService {
     public void changePasswordWithToken(String token, String password) {
         Optional<User> user = userRepository.findByResetKey(token);
 
-        if (user.isPresent()
-                && user.get().getResetDate().isAfter(Instant.now().minusSeconds(86400))) {
+        if (user.isPresent() && user.get().getResetDate().isAfter(Instant.now().minusSeconds(86400))) {
             setPassword(user.get(), password);
             user.get().setResetKey(null);
             user.get().setResetDate(null);
@@ -114,10 +147,9 @@ public class UserService {
 
     private void setPassword(User user, String password) {
 
-        if (!isValidPassword(password)) {
-            throw new RuntimeException("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
-        }
-
+//        if (!isValidPassword(password)) {
+//            throw ExceptionFactory.create(ExceptionType.PWD_INVALID_FORMAT);
+//        }
         user.setPassword(passwordEncoder.encode(password));
     }
 
@@ -125,15 +157,8 @@ public class UserService {
 
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
                 new LengthRule(8, 30),
-                new UppercaseCharacterRule(1),
+                new CharacterRule(EnglishCharacterData.UpperCase, 1),
                 new WhitespaceRule()));
-        /* More rules examples :
-                new DigitCharacterRule(1),
-                new SpecialCharacterRule(1),
-                new NumericalSequenceRule(3,false),
-                new AlphabeticalSequenceRule(3,false),
-                new QwertySequenceRule(3,false),
-         */
 
         RuleResult result = validator.validate(new PasswordData(password));
         return result.isValid();
