@@ -15,7 +15,7 @@
               <v-text-field
                 v-model="searchEventId"
                 clearable
-                label="Search Event ID"
+                label="Event ID Code"
                 single-line
                 hide-details
               ></v-text-field>
@@ -35,7 +35,7 @@
               <v-text-field
                 v-model="activeTypeCode"
                 clearable
-                label="Active Type Code"
+                label="Participant Type Code"
                 single-line
                 hide-details
               ></v-text-field>
