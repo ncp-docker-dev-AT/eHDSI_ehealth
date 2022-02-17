@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 @Service
@@ -59,10 +60,9 @@ public class MessageService {
 
     public MessageWrapper getMessage(Long id) {
 
-        MessageEntity entity = messageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+        MessageEntity entity = messageRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
         AuditMessage auditMessage = (AuditMessage) marshaller.unmarshal(
-                new StreamSource(new StringReader(entity.getMessageContent())));
+                new StreamSource(new StringReader(new String(entity.getMessageContent(), StandardCharsets.UTF_8))));
         StringWriter outWriter = new StringWriter();
         StreamResult result = new StreamResult(outWriter);
         marshaller.marshal(auditMessage, result);
