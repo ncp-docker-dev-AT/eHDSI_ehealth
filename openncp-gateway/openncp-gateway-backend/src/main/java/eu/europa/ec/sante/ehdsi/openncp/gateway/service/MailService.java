@@ -41,11 +41,10 @@ public class MailService implements MessageSourceAware {
         this.smtpProperties = smtpProperties;
     }
 
-
     @Override
     public void setMessageSource(@NonNull MessageSource messageSource) {
         messages = new MessageSourceAccessor(messageSource);
-   }
+    }
 
     @Async
     public void sendMail(String to, String subject, String content, boolean multipart, boolean html) throws MessagingException {
@@ -63,7 +62,7 @@ public class MailService implements MessageSourceAware {
         properties.put("mail.smtp.ssl.trust", smtpProperties.getSmtp().getSsl().getTrust());
 
         Session session;
-        if(smtpProperties.getSmtp().getAuth() == true) {
+        if (smtpProperties.getSmtp().getAuth()) {
             session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -85,7 +84,7 @@ public class MailService implements MessageSourceAware {
     @Async
     public String sendMailFromTemplate(User user, String titleKey) {
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
-        boolean mail = false;
+        boolean mail;
         String content = "Change your password <a href='" +
                 applicationProperties.getPortal().getBaseUrl() +
                 "/#/reset?key=" +

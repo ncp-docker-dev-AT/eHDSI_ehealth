@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "spring.mail")
 public class SmtpProperties {
 
+    private final Smtp smtp = new Smtp();
     private String host;
     private String port;
     private String username;
     private String password;
-    private final Smtp smtp = new Smtp();
 
     public String getHost() {
         return host;
@@ -50,6 +50,8 @@ public class SmtpProperties {
     }
 
     public static class Smtp {
+        private final StartTls startTls = new StartTls();
+        private final Ssl ssl = new Ssl();
         private Boolean auth;
         private int connectionTimeout;
         private int writeTimeout;
@@ -87,10 +89,12 @@ public class SmtpProperties {
             this.writeTimeout = writeTimeout;
         }
 
-        private final StartTls startTls = new StartTls();
-
         public StartTls getStartTls() {
             return startTls;
+        }
+
+        public Ssl getSsl() {
+            return ssl;
         }
 
         public static class StartTls {
@@ -112,12 +116,6 @@ public class SmtpProperties {
             public void setRequired(Boolean required) {
                 this.required = required;
             }
-        }
-
-        private final Ssl ssl = new Ssl();
-
-        public Ssl getSsl() {
-            return ssl;
         }
 
         public static class Ssl {

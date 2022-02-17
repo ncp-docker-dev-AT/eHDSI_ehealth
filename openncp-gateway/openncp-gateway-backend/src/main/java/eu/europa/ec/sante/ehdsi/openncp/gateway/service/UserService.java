@@ -33,7 +33,8 @@ public class UserService {
 
     private final SmtpProperties smtpProperties;
 
-    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder, ApplicationProperties applicationProperties, SmtpProperties smtpProperties) {
+    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder,
+                       ApplicationProperties applicationProperties, SmtpProperties smtpProperties) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
@@ -137,6 +138,4 @@ public class UserService {
         RuleResult result = validator.validate(new PasswordData(password));
         return result.isValid();
     }
-
-
 }
