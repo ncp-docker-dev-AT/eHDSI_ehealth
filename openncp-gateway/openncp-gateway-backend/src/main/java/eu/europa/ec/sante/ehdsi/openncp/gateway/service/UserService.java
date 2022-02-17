@@ -75,8 +75,8 @@ public class UserService {
     private void sendPasswordResetMail(User user) throws MessagingException {
 
         Properties properties = new Properties();
-        properties.put("mail.smtp.auth", smtpProperties.getAuth());
-        properties.put("mail.smtp.starttls.enable", smtpProperties.getStartTls().isEnabled());
+        properties.put("mail.smtp.auth", smtpProperties.getSmtp().getAuth());
+        properties.put("mail.smtp.starttls.enable", smtpProperties.getSmtp().getStartTls().getEnabled());
         properties.put("mail.smtp.host", smtpProperties.getHost());
         properties.put("mail.smtp.port", smtpProperties.getPort());
 
@@ -108,7 +108,6 @@ public class UserService {
         if (user.isPresent() && user.get().isEnabled()) {
             user.get().setResetKey(RandomStringUtils.randomAlphanumeric(32));
             user.get().setResetDate(Instant.now());
-
             return mailService.sendPasswordResetMail(user.get());
         }
         return "User not found!!!";

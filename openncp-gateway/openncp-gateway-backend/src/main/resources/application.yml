@@ -34,6 +34,17 @@ spring:
     port: 25
     username: email@ehdsi.eu
     password: password
+    smtp:
+      auth: true
+      connectiontimeout: 5000
+      timeout: 5000
+      writetimeout: 5000
+      starttls:
+        enabled: true
+        required: false
+      ssl:
+        enable: false
+        trust: "*"
 application:
   mail:
     from: sante-ehealth-dsi-support@ec.europa.eu
