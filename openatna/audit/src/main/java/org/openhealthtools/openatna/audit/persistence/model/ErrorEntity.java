@@ -4,9 +4,6 @@ import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
 
-/**
- * @author Andrew Harrison
- */
 @Entity
 @Table(name = "errors")
 public class ErrorEntity extends PersistentEntity {

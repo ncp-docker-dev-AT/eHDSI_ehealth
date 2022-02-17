@@ -4,10 +4,13 @@ logging:
     eu.europa.ec.sante.ehdsi.openncp: info
     org.hibernate: warn
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
   datasource:
     default:

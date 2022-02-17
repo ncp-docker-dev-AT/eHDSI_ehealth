@@ -148,6 +148,7 @@
         <dependency>
             <groupId>org.apache.neethi</groupId>
             <artifactId>neethi</artifactId>
+            <version>${neethi.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>stax-api</artifactId>
