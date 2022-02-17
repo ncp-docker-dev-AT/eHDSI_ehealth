@@ -279,13 +279,12 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
                 <configuration>
-                    <dependentWarIncludes></dependentWarIncludes>
+                    <dependentWarIncludes/>
                     <dependentWarExcludes>
                         WEB-INF/lib/log4j-api-2.14.1.jar,
                         WEB-INF/lib/log4j-core-2.14.1.jar,
                         WEB-INF/lib/log4j-jcl-2.14.1.jar,
                     </dependentWarExcludes>
-
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <webResources>
                         <resource>
