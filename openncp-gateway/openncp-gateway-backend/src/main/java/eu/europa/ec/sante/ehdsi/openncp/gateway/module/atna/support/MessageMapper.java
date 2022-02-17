@@ -27,6 +27,5 @@ public interface MessageMapper {
         return codes.stream()
                 .map(Code::getCodeName)
                 .collect(Collectors.joining(", ", "", ""));
-
     }
 }

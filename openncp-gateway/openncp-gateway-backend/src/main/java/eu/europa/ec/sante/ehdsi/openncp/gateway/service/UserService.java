@@ -36,7 +36,8 @@ public class UserService {
 
     private final SmtpProperties smtpProperties;
 
-    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder, ApplicationProperties applicationProperties, SmtpProperties smtpProperties) {
+    public UserService(UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder,
+                       ApplicationProperties applicationProperties, SmtpProperties smtpProperties) {
         this.userRepository = userRepository;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
@@ -74,8 +75,8 @@ public class UserService {
     private void sendPasswordResetMail(User user) throws MessagingException {
 
         Properties properties = new Properties();
-        properties.put("mail.smtp.auth", smtpProperties.getAuth());
-        properties.put("mail.smtp.starttls.enable", smtpProperties.getStartTls().isEnabled());
+        properties.put("mail.smtp.auth", smtpProperties.getSmtp().getAuth());
+        properties.put("mail.smtp.starttls.enable", smtpProperties.getSmtp().getStartTls().getEnabled());
         properties.put("mail.smtp.host", smtpProperties.getHost());
         properties.put("mail.smtp.port", smtpProperties.getPort());
 
@@ -88,12 +89,12 @@ public class UserService {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(applicationProperties.getMail().getFrom(), false));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(user.getEmail()));
-        message.setSubject("ehdsi gateway reset password");
-        message.setContent("Here is your key for resetting the password : " + user.getResetKey(), "text/html");
+        message.setSubject("MyHealth@EU - Gateway Admin reset password");
+        message.setContent("Here is your key for resetting the password: " + user.getResetKey(), "text/html");
         message.setSentDate(new Date());
 
         MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent("ehdsi gateway reset password : " + user.getResetKey(), "text/html");
+        messageBodyPart.setContent("MyHealth@EU - Gateway Admin reset password: " + user.getResetKey(), "text/html");
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
@@ -107,7 +108,6 @@ public class UserService {
         if (user.isPresent() && user.get().isEnabled()) {
             user.get().setResetKey(RandomStringUtils.randomAlphanumeric(32));
             user.get().setResetDate(Instant.now());
-
             return mailService.sendPasswordResetMail(user.get());
         }
         return "User not found!!!";
@@ -126,8 +126,7 @@ public class UserService {
     public void changePasswordWithToken(String token, String password) {
         Optional<User> user = userRepository.findByResetKey(token);
 
-        if (user.isPresent()
-                && user.get().getResetDate().isAfter(Instant.now().minusSeconds(86400))) {
+        if (user.isPresent() && user.get().getResetDate().isAfter(Instant.now().minusSeconds(86400))) {
             setPassword(user.get(), password);
             user.get().setResetKey(null);
             user.get().setResetDate(null);
@@ -148,10 +147,9 @@ public class UserService {
 
     private void setPassword(User user, String password) {
 
-        if (!isValidPassword(password)) {
-            throw new RuntimeException("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
-        }
-
+//        if (!isValidPassword(password)) {
+//            throw ExceptionFactory.create(ExceptionType.PWD_INVALID_FORMAT);
+//        }
         user.setPassword(passwordEncoder.encode(password));
     }
 
@@ -159,19 +157,10 @@ public class UserService {
 
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
                 new LengthRule(8, 30),
-                new UppercaseCharacterRule(1),
+                new CharacterRule(EnglishCharacterData.UpperCase, 1),
                 new WhitespaceRule()));
-        /* More rules examples :
-                new DigitCharacterRule(1),
-                new SpecialCharacterRule(1),
-                new NumericalSequenceRule(3,false),
-                new AlphabeticalSequenceRule(3,false),
-                new QwertySequenceRule(3,false),
-         */
 
         RuleResult result = validator.validate(new PasswordData(password));
         return result.isValid();
     }
-
-
 }
