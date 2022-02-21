@@ -130,7 +130,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response,
                                          Element sh, String classCode) {
 
-        logger.info("method prepareEventLogForQuery('{}')", request.getId());
+        logger.info("method prepareEventLogForQuery(Request: '{}', ClassCode: '{}')", request.getId(), classCode);
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
@@ -1179,8 +1179,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     response.setRegistryErrorList(registryErrorList);
                     response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     break;
-
-
             }
 
             try {
