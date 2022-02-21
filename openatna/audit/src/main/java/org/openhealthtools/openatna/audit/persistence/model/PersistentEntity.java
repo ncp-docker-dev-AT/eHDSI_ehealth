@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 /**
  * Force entities to implement these methods and be serializable
- *
- * @author Andrew Harrison
  */
 public abstract class PersistentEntity implements Serializable {
 

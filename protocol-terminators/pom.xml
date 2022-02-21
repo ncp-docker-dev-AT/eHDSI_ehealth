@@ -6,7 +6,7 @@
     <parent>
         <artifactId>openncp</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>5.2.4</version>
+        <version>5.2.5</version>
     </parent>
 
     <artifactId>openncp-protocol-terminators</artifactId>
@@ -28,6 +28,7 @@
         <project.source.version>${java.version}</project.source.version>
         <project.target.version>${java.version}</project.target.version>
         <project.jUnitVersion>4.10</project.jUnitVersion>
+        <neethi.version>3.2.0</neethi.version>
     </properties>
 
     <dependencyManagement>
@@ -285,7 +286,7 @@
             <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
-                <version>3.0.2</version>
+                <version>${neethi.version}</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>

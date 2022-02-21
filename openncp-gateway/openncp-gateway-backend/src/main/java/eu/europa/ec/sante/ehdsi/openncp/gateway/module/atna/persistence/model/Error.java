@@ -2,7 +2,9 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 @Entity
@@ -16,11 +18,13 @@ public class Error {
 
     private Instant errorTimestamp;
 
-    private String payload;
+    @Lob
+    private byte[] payload = new byte[0];
 
     private String sourceIp;
 
-    private String stackTrace;
+    @Lob
+    private byte[] stackTrace = new byte[0];
 
     private String version;
 
@@ -37,7 +41,7 @@ public class Error {
     }
 
     public String getPayload() {
-        return payload;
+        return new String(payload, StandardCharsets.UTF_8);
     }
 
     public String getSourceIp() {
@@ -45,7 +49,7 @@ public class Error {
     }
 
     public String getStackTrace() {
-        return stackTrace;
+        return new String(stackTrace, StandardCharsets.UTF_8);
     }
 
     public String getVersion() {

@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -510,7 +511,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getId().setRoot(UUID.randomUUID().toString());
 
         // Generate and Set random extension
-        var generator = new Random();
+        var generator = SecureRandom.getInstanceStrong();
         var extension = new StringBuilder();
         for (var i = 0; i < 13; i++) {
             var d = generator.nextInt(10);
