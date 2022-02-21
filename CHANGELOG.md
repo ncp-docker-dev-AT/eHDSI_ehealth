@@ -64,7 +64,7 @@ Detailed installation manual is available here: https://webgate.ec.europa.eu/fpf
 Main changes in this release are:<br/>
 <ul>
 <li>Apache Axis2 upgrade to version 1.8.0</li>
-<li>Change Proposal 051: ePrescription list bug fix related to XDS metadatas returned (substitution, ATC, dispensable etc.).</li>
+<li>Change Proposal 051: ePrescription list bug fix related to XDS metadata returned (substitution, ATC, dispensable etc.).</li>
 <li>OpenNCP Gateway Portal and Backend: bug fix and improvements on the user interface.</li>
 </ul>
 
