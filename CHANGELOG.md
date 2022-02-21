@@ -3,6 +3,59 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [5.2.5] - 21-02-2021
+The OpenNCP 5.2.5 is the Wave 5 Formal Test Event HotFix release.
+This version is planned to be used during the eHDSI Formal Test event in February 2022.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ
+
+Main changes in this release are:<br/>
+<ul>
+<li>ePrescription List metadata bug fix.</li>
+<li>OpenNCP Client Connector ClassLoading issue.</li>
+<li>OpenNCP Client Connector Consumer - 2 Way SSL enabling.</li>
+<li>OpenNCP Gateway Portal and Backend improvements (ATNA and eADC).</li>
+<li>Log4j vulnerability fix.</li>
+</ul>
+
+### Sub-task
+    [EHEALTH-7016] - Log4j core update implementation
+
+### Technical Sub-task
+    [EHEALTH-8010] - Releasing OpenNCP 5.2.5 (Wave 5 Formal Test Event HotFix)
+
+### Bug
+    [EHEALTH-6247] - OpenNCP-Gateway ATNA-Viewer main page lacks functionality
+    [EHEALTH-7851] - OpenNCP-Gateway ATNA Viewer does not work with Oracle database
+    [EHEALTH-7866] - Gateway Front - eADC viewing returns black screen
+    [EHEALTH-7867] - Gateway Front - Npm build doesn't work on Windows machine with Node
+    [EHEALTH-7921] - ATNA-Viewer: Code Systems are not displayed
+    [EHEALTH-7922] - OpenNCP-Gateway-Backend doesn't support HikariCP-5.x
+    [EHEALTH-7923] - OpenNCP-Gateway-Backend embedded application.yml misses Spring config
+    [EHEALTH-7924] - eP List: dispensable value is switched
+    [EHEALTH-7925] - eP List: substitution allows incoherence of code and description
+    [EHEALTH-7971] - OpenNCP-Gateway-Backend: Spring mail configurations missing and undocumented
+    [EHEALTH-7986] - OpenNCP Client Connector Consumer doesn't support 2-ways-SSL with PPT certificates
+
+### Story
+    [EHEALTH-7859] - Investigate NoSuchMethorError in openncp-client-connector for OpenNCP release v5.2.4
+
+### Improvement
+    [EHEALTH-7179] - OpenNCP Gateway Portal Password security strength implementation
+
+### Test
+    [EHEALTH-7987] - Test- ATNA-Viewer: Code Systems are not displayed
+    [EHEALTH-7988] - Test - OpenNCP-Gateway ATNA-Viewer main page lacks functionality
+    [EHEALTH-7989] - Test- Remove ATNA user interface from OpenATNA module
+    [EHEALTH-7992] - Test - Gateway Front - eADC viewing returns black screen 
+    [EHEALTH-7996] - Test - Investigate NoSuchMethorError in openncp-client-connector for OpenNCP release v5.2.4
+    [EHEALTH-7999] - Test- OpenNCP-Gateway-Backend: Spring mail configurations missing and undocumented
+    [EHEALTH-8001] - Test - OpenNCP-Gateway-Backend embedded application.yml misses Spring config
+    [EHEALTH-8003] - Test - eP List: dispensable value is switched
+    [EHEALTH-8004] - Test - eP List: substitution allows incoherence of code and description
+    [EHEALTH-8009] - Regression PS
+    [EHEALTH-8011] - Regression eP/eD
+    [EHEALTH-8012] - Regression OrCD
+
 ## [5.2.4] - 25-01-2021
 The OpenNCP 5.2.4 is the Wave 5 Formal Test Event release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
