@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.xmlsec.signature.G;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -49,6 +50,7 @@ import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.FilterParams;
+import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
@@ -808,11 +810,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
         String confidentialityCode = document.getConfidentiality() != null
                 && document.getConfidentiality().getConfidentialityCode() != null
                 ? document.getConfidentiality().getConfidentialityCode()
-                : "N";
+                : SimpleConfidentialityEnum.N.name();
         String confidentialityDisplay = document.getConfidentiality() != null
                 && document.getConfidentiality().getConfidentialityDisplay() != null
                 ? document.getConfidentiality().getConfidentialityDisplay()
-                : "Normal";
+                : SimpleConfidentialityEnum.N.getDisplayName();
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
