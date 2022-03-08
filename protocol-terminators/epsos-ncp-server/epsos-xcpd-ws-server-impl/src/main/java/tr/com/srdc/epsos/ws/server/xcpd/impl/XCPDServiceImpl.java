@@ -17,6 +17,8 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
@@ -39,6 +41,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -510,13 +513,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.getId().setRoot(UUID.randomUUID().toString());
 
         // Generate and Set random extension
-        var generator = new Random();
-        var extension = new StringBuilder();
-        for (var i = 0; i < 13; i++) {
-            var d = generator.nextInt(10);
-            extension.append(d);
-        }
-        outputMessage.getId().setExtension(extension.toString());
+        outputMessage.getId().setExtension(RandomStringUtils.randomNumeric(10));
 
         // Set creation time
         outputMessage.setCreationTime(objectFactory.createTS());
