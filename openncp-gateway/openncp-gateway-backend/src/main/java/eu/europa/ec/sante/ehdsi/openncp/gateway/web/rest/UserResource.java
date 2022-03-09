@@ -38,7 +38,9 @@ public class UserResource {
         long lastId = 0L;
 
         if (!userService.isValidPassword(newUser.getPassword())) {
-            logger.error("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+            logger.error("Invalid password : Length should between 8 and 30 characters with at least one uppercase letter, " +
+                    "one lowercase letter, one number and one special character" +
+                    "and no white spaces");
             return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
         }
 
@@ -93,21 +95,31 @@ public class UserResource {
     }
 
     @PostMapping(path = "/user/reset-password/finish")
-    public ResponseEntity<Void> completePasswordReset(@Valid @RequestBody PasswordResetCommand command) {
+    public ResponseEntity<String> completePasswordReset(@Valid @RequestBody PasswordResetCommand command) {
+        if (!userService.isValidPassword(command.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("New password does not meet complexity rules");
+        }
+        
         userService.completePasswordReset(command.getToken(), command.getPassword());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/user/change-password")
     public ResponseEntity<String> changePassword(@Valid @RequestBody PasswordReset passwordReset) {
-
         if (!userService.isValidPassword(passwordReset.getPassword())) {
-            throw ExceptionFactory.create(ExceptionType.PWD_INVALID_FORMAT);
-            //  return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("New password does not meet complexity rules");
         }
 
-        userService.changePassword(passwordReset.getPassword(), passwordReset.getOldPassword());
-        //auditLogService.log(null, AuditLogAction.UPDATE_USER_PASSWORD);
+        if(!userService.changePassword(passwordReset.getPassword(), passwordReset.getOldPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Current password does not match");
+        }
+
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

@@ -11,14 +11,14 @@
               <v-text-field
                 v-model="password"
                 type="password"
-                :rules="pwdRules"
+                :rules="passwordRulesComplexity"
                 label="New Password"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="confirmPwd"
                 type="password"
-                :rules="pwdRules2"
+                :rules="passwordRuleMatch"
                 label="Confirm New Password"
                 required
               ></v-text-field>
@@ -42,14 +42,14 @@ export default {
       password: '',
       confirmPwd: '',
 
-      pwdRules: [
+      passwordRulesComplexity: [
         (v) => !!v || 'Password is required',
         (v) => v.length <= 30 || '30 Characters max',
         (v) =>
-          /^(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,30}$/.test(v) ||
-          'Password must be more than 8 characters and one Uppercase letter. '
+          this.validatePasswordRuleComplexity(v) ||
+          'Password must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces'
       ],
-      pwdRules2: [
+      passwordRuleMatch: [
         (v) => {
           return this.password === this.confirmPwd || "Passwords don't match"
         }
@@ -69,8 +69,8 @@ export default {
         .then(() => {
           this.$router.push('/login')
         })
-        .catch((e) => {
-          console.log('mince')
+        .catch((err) => {
+          this.error('An error occurred : ' + err.response.data, err)
         })
     }
   }
