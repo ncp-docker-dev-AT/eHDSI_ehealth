@@ -375,8 +375,8 @@
             <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
         </repository>
         <repository>
-            <name>Official OpenSaml Repository</name>
             <id>openSamlRep</id>
+            <name>Official OpenSaml Repository</name>
             <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
         </repository>
     </repositories>
