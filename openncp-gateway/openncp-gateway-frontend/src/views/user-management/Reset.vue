@@ -11,7 +11,6 @@
               <v-text-field
                 v-model="password"
                 type="password"
-                :rules="pwdRules"
                 label="New Password"
                 required
               ></v-text-field>

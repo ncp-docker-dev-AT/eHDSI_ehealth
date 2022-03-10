@@ -98,6 +98,12 @@ public class UserResource {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping(path = "/user/reset-password/abort")
+    public ResponseEntity<Void> abortPasswordReset(@Valid @RequestBody PasswordResetCommand command) {
+        userService.abortPasswordReset(command.getToken(), command.getPassword());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping("/user/change-password")
     public ResponseEntity<String> changePassword(@Valid @RequestBody PasswordReset passwordReset) {
 

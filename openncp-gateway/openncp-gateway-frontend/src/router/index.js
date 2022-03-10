@@ -25,6 +25,7 @@ import TransactionMessageDetails from '../views/eadc-viewer/TransactionMessageDe
 import Forgot from '../views/user-management/Forgot'
 import ForgotMailSent from '../views/user-management/ForgotMailSent'
 import Reset from '../views/user-management/Reset'
+import Abort from '../views/user-management/Abort'
 
 Vue.use(VueRouter)
 
@@ -48,6 +49,11 @@ const routes = [
     path: '/reset',
     name: 'Reset',
     component: Reset
+  },
+  {
+    path: '/abort',
+    name: 'Abort',
+    component: Abort
   },
   {
     path: '/',
@@ -173,7 +179,8 @@ router.beforeEach((to, from, next) => {
     !to.path.startsWith('/login') &&
     !store.getters.isAuthenticated &&
     !to.path.startsWith('/forgot') &&
-    !to.path.startsWith('/reset')
+    !to.path.startsWith('/reset') &&
+    !to.path.startsWith('/abort')
   ) {
     next('/login')
   } else {

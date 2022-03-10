@@ -123,6 +123,15 @@ public class UserService {
         }
     }
 
+    public void abortPasswordReset(String key, String password) {
+        Optional<User> user = userRepository.findByResetKey(key);
+
+        if (user.isPresent() && user.get().getResetDate().isAfter(Instant.now().minusSeconds(3600))) {
+            user.get().setResetKey(null);
+            user.get().setResetDate(null);
+        }
+    }
+
     public void changePasswordWithToken(String token, String password) {
         Optional<User> user = userRepository.findByResetKey(token);
 

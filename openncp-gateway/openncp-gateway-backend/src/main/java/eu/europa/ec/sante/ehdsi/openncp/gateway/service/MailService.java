@@ -85,16 +85,47 @@ public class MailService implements MessageSourceAware {
     public String sendMailFromTemplate(User user, String titleKey) {
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         boolean mail;
-        String content = "Change your password <a href='" +
+
+        String resetUrl = "<a href='" +
                 applicationProperties.getPortal().getBaseUrl() +
                 "/#/reset?key=" +
                 user.getResetKey() +
+                "'>Change OpenNCP Gateway password</a>";
+
+        String abortUrl = "<a href='" +
+                applicationProperties.getPortal().getBaseUrl() +
+                "/#/abort?key=" +
+                user.getResetKey() +
                 "'>here</a>";
+
+        String emailBody = "<div><div>Dear %USERNAME%,<br>" +
+                "<br>" +
+                "You have requested a reset of your OpenNCP Gateway Login password. You can do this by following the link below, preferably before a delay of 1 hour from the reception of this message.<br>" +
+                "<br>" +
+                "%URL_RESET%<br>" +
+                "<br>" +
+                "If you did not make or authorise this request yourself, it may be due to a typing error by another user. To cancel the request, please click %URL_ABORT%.<br>" +
+                "<br>" +
+                "If the above mentioned link does not work, you can copy-paste it (without any line break) in your browser address bar.<br>" +
+                "If this message was delayed or for some other reason you are unable to complete the rest of the process within 1 hour, please return here to make another request.<br>" +
+                "<br>" +
+                "If you suspect that someone else is trying to obtain or reset your password, please report this to your local support desk.<br>" +
+                "<br>" +
+                "Sent to you by OpenNCP Gateway automated password reset service ";
+
+        String content = resetUrl;
+
+        String email = user.getUsername() + " [" + user.getEmail() + "]";
+
+        emailBody = emailBody
+                    .replaceAll("\\%(USERNAME)\\%", email)
+                    .replaceAll("\\%(URL_RESET)\\%", resetUrl)
+                    .replaceAll("\\%(URL_ABORT)\\%", abortUrl);
         try {
             mail = configurationManager.getBooleanProperty("GTW_MAIL_ENABLED");
             if (mail) {
-                String subject = messages.getMessage(titleKey, "subject");
-                sendMail(user.getEmail(), subject, content, false, true);
+                String emailSubject = messages.getMessage(titleKey, "Subject");
+                sendMail(user.getEmail(), emailSubject, emailBody, false, true);
             }
         } catch (PropertyNotFoundException e) {
             logger.error("PropertyNotFoundException: '{}'", e.getMessage());
@@ -108,6 +139,6 @@ public class MailService implements MessageSourceAware {
 
     @Async
     public String sendPasswordResetMail(User user) {
-        return sendMailFromTemplate(user, "Mail.PasswordReset.Title");
+        return sendMailFromTemplate(user, "Mail.SmpEditor.PasswordReset.Title");
     }
 }
