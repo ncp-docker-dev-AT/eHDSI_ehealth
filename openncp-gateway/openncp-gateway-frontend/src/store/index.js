@@ -90,19 +90,6 @@ export default new Vuex.Store({
             reject(reason)
           })
       })
-    },
-    abort ({ commit }, payload) {
-      console.log(payload)
-      return new Promise((resolve, reject) => {
-        axios
-          .post(process.env.VUE_APP_SERVER_URL + '/api/user/reset-password/abort', payload)
-          .then((response) => {
-            console.log(response)
-          })
-          .catch((reason) => {
-            reject(reason)
-          })
-      })
     }
   },
   modules: {}

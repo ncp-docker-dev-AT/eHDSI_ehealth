@@ -19,6 +19,11 @@ import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Properties;
 
@@ -34,6 +39,7 @@ public class MailService implements MessageSourceAware {
     private final SmtpProperties smtpProperties;
 
     private MessageSourceAccessor messages;
+    private String resetUrl;
 
     public MailService(ApplicationProperties applicationProperties, SmtpProperties smtpProperties, JavaMailSender mailSender) {
         this.applicationProperties = applicationProperties;
@@ -92,35 +98,26 @@ public class MailService implements MessageSourceAware {
                 user.getResetKey() +
                 "'>Change OpenNCP Gateway password</a>";
 
-        String abortUrl = "<a href='" +
-                applicationProperties.getPortal().getBaseUrl() +
-                "/#/abort?key=" +
-                user.getResetKey() +
-                "'>here</a>";
-
-        String emailBody = "<div><div>Dear %USERNAME%,<br>" +
-                "<br>" +
-                "You have requested a reset of your OpenNCP Gateway Login password. You can do this by following the link below, preferably before a delay of 1 hour from the reception of this message.<br>" +
-                "<br>" +
-                "%URL_RESET%<br>" +
-                "<br>" +
-                "If you did not make or authorise this request yourself, it may be due to a typing error by another user. To cancel the request, please click %URL_ABORT%.<br>" +
-                "<br>" +
-                "If the above mentioned link does not work, you can copy-paste it (without any line break) in your browser address bar.<br>" +
-                "If this message was delayed or for some other reason you are unable to complete the rest of the process within 1 hour, please return here to make another request.<br>" +
-                "<br>" +
-                "If you suspect that someone else is trying to obtain or reset your password, please report this to your local support desk.<br>" +
-                "<br>" +
-                "Sent to you by OpenNCP Gateway automated password reset service ";
-
+        String emailBody = "<html></html>";
         String content = resetUrl;
 
         String email = user.getUsername() + " [" + user.getEmail() + "]";
 
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/templates/mails/passwordResetMail.html");
+        try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(streamReader)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                emailBody += line;
+            }
+        } catch (IOException e) {
+            logger.error("IOException: '{}'", e.getMessage());
+        }
+
         emailBody = emailBody
                     .replaceAll("\\%(USERNAME)\\%", email)
-                    .replaceAll("\\%(URL_RESET)\\%", resetUrl)
-                    .replaceAll("\\%(URL_ABORT)\\%", abortUrl);
+                    .replaceAll("\\%(URL_RESET)\\%", resetUrl);
+
         try {
             mail = configurationManager.getBooleanProperty("GTW_MAIL_ENABLED");
             if (mail) {
