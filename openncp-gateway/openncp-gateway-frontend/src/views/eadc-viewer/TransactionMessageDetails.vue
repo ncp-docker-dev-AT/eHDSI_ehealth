@@ -295,7 +295,8 @@
 </template>
 
 <script>
-// import axios from 'axios'
+
+import axios from 'axios'
 
 export default {
   props: ['id'],
@@ -309,23 +310,10 @@ export default {
   },
   mounted () {
     this.loading = true
-    // axios
-    //   .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-    //   .then((response) => {
-    //     this.message = response.data
-    //     console.log(response)
-    //     console.log(this.message)
-    //     console.log(this.message.transactionData)
-    //     this.loading = false
-    //   })
-
-    fetch(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        this.message = data
-        console.log(this.message)
-        console.log(this.message.transationData)
-        this.transactionData = data.transactionData
+    axios
+      .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+      .then((response) => {
+        this.message = response.data
         this.loading = false
       })
   },

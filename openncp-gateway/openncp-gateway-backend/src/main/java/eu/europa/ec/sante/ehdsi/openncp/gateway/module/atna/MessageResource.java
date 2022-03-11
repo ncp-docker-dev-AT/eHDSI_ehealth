@@ -25,7 +25,18 @@ public class MessageResource {
     }
 
     @GetMapping(path = "/messages")
-    public ResponseEntity<Page<Message>> listMessages(
+    public ResponseEntity<Page<Message>> getMessages(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
+
+        Pageable pageable = PageRequest.of(pageNumber, size, getSort(sort));
+        Page<Message> page = messageService.findMessages(pageable);
+        return ResponseEntity.ok(page);
+    }
+
+    @GetMapping(path = "/search_messages")
+    public ResponseEntity<Page<Message>> searchMessages(
             @RequestParam(value = "searchEventId", required = false) String searchEventId,
             @RequestParam(value = "searchEventStartDate", required = false) Instant searchEventStartDate,
             @RequestParam(value = "searchEventEndDate", required = false) Instant searchEventEndDate,
@@ -35,6 +46,17 @@ public class MessageResource {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
 
+        Pageable pageable = PageRequest.of(pageNumber, size, getSort(sort));
+        Page<Message> page = messageService.searchMessages(searchEventId, searchEventStartDate, searchEventEndDate, activeParticipantId, activeTypeCode, pageable);
+        return ResponseEntity.ok(page);
+    }
+
+    @GetMapping(path = "/messages/{id}")
+    public ResponseEntity<MessageWrapper> getMessage(@PathVariable Long id) {
+        return ResponseEntity.ok(messageService.getMessage(id));
+    }
+
+    private Sort getSort(String[] sort) {
         List<Sort.Order> orders = new ArrayList<>();
 
         if (sort[0].contains(",")) {
@@ -48,15 +70,6 @@ public class MessageResource {
             // sort=[field, direction]
             orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
         }
-
-        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(orders));
-
-        Page<Message> page = messageService.findMessages(searchEventId, searchEventStartDate, searchEventEndDate, activeParticipantId, activeTypeCode, pageable);
-        return ResponseEntity.ok(page);
-    }
-
-    @GetMapping(path = "/messages/{id}")
-    public ResponseEntity<MessageWrapper> getMessage(@PathVariable Long id) {
-        return ResponseEntity.ok(messageService.getMessage(id));
+        return Sort.by(orders);
     }
 }
