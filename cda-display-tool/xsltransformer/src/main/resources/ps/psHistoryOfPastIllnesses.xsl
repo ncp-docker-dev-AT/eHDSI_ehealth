@@ -45,7 +45,7 @@
                                             <th>
                                                 <!-- Closed Inactive Problem -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'2'"/>
+                                                    <xsl:with-param name="code" select="'11'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
