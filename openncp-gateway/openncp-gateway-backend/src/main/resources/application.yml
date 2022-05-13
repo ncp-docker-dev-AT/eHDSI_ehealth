@@ -4,6 +4,10 @@ logging:
     eu.europa.ec.sante.ehdsi.openncp: info
     org.hibernate: warn
 spring:
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
   mvc:
     pathmatch:
       matching-strategy: ant-path-matcher
