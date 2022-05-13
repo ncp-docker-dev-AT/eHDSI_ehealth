@@ -775,34 +775,38 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // ATC code (former Product element)
-        ClassificationType atcCodeClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
-        eot.getClassification().add(atcCodeClassification);
+        if (StringUtils.isNotBlank(document.getAtcCode())) {
+            ClassificationType atcCodeClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
+            eot.getClassification().add(atcCodeClassification);
+        }
 
         // Dose Form Code
-        ClassificationType doseFormClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
-        eot.getClassification().add(doseFormClassification);
+        if (StringUtils.isNotBlank(document.getDoseFormCode())) {
+            ClassificationType doseFormClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
+            eot.getClassification().add(doseFormClassification);
+        }
 
         // Strength
-        ClassificationType strengthClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
-        eot.getClassification().add(strengthClassification);
+        if (StringUtils.isNotBlank(document.getStrength())) {
+            ClassificationType strengthClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
+            eot.getClassification().add(strengthClassification);
+        }
 
         // Substitution
-        String substitutionCode = document.getSubstitution() != null
-                ? document.getSubstitution().getSubstitutionCode()
-                : SubstitutionCodeEnum.G.name();
-        String substitutionDisplay = document.getSubstitution() != null
-                ? document.getSubstitution().getSubstitutionDisplayName()
-                : SubstitutionCodeEnum.G.getDisplayName();
-        ClassificationType substitutionClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
-        eot.getClassification().add(substitutionClassification);
+        if (document.getSubstitution() != null) {
+            String substitutionCode = document.getSubstitution().getSubstitutionCode();
+            String substitutionDisplay = document.getSubstitution().getSubstitutionDisplayName();
+            ClassificationType substitutionClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
+            eot.getClassification().add(substitutionClassification);
+        }
 
         // Confidentiality Code
         String confidentialityCode = document.getConfidentiality() != null
@@ -815,6 +819,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 : "Normal";
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
+
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
