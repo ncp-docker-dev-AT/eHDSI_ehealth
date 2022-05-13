@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.web.rest;
 
+import eu.europa.ec.sante.ehdsi.openncp.gateway.error.ApiException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.cfg.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.*;
@@ -66,7 +67,7 @@ public class SMPUpdateFileController {
     }
 
     @PostMapping(value = "smpeditor/updater/updateSmpFile")
-    public ResponseEntity postUpdate(@RequestBody SMPHttp smpfileupdate) throws IOException {
+    public ResponseEntity<SMPHttp> postUpdate(@RequestBody SMPHttp smpfileupdate) throws IOException {
 
         logger.debug("\n==== in postUpdate ====");
         if (logger.isDebugEnabled()) {
@@ -130,13 +131,10 @@ public class SMPUpdateFileController {
                     }
                 }
                 if (smpfileupdate.getCountry() == null) {
-                    String message = environment.getProperty("error.redirect.href.participantID"); //messages.properties
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.redirect.href.participantID"));
                 }
             } else {
-                logger.error("\n****NOT VALID HREF IN REDIRECT");
-                String message = environment.getProperty("error.redirect.href"); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.redirect.href"));
             }
 
         } else if (serviceMetadata.getServiceInformation() != null) {
@@ -182,8 +180,7 @@ public class SMPUpdateFileController {
             }
 
             if (smpfileupdate.getDocumentType() == null) {
-                String message = environment.getProperty("error.serviceinformation.documentID"); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.serviceinformation.documentID"));
             }
 
             String participanteID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
@@ -196,9 +193,7 @@ public class SMPUpdateFileController {
                 }
             }
             if (smpfileupdate.getCountry() == null) {
-                //  messages.properties
-                String message = environment.getProperty("error.serviceinformation.participantID");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.serviceinformation.participantID"));
             }
 
             /*Builds final file name*/
@@ -371,13 +366,10 @@ public class SMPUpdateFileController {
                     }
                 }
                 if (smpHttp.getCountry() == null) {
-                    String message = environment.getProperty("error.redirect.href.participantID"); //messages.properties
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.redirect.href.participantID"));
                 }
             } else {
-                logger.error("\n****NOT VALID HREF IN REDIRECT");
-                String message = environment.getProperty("error.redirect.href"); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.redirect.href"));
             }
 
         } else if (serviceMetadata.getServiceInformation() != null) {
@@ -423,8 +415,7 @@ public class SMPUpdateFileController {
             }
 
             if (smpHttp.getDocumentType() == null) {
-                String message = environment.getProperty("error.serviceinformation.documentID"); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.serviceinformation.documentID"));
             }
 
             String participanteID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
@@ -437,9 +428,7 @@ public class SMPUpdateFileController {
                 }
             }
             if (smpHttp.getCountry() == null) {
-                //  messages.properties
-                String message = environment.getProperty("error.serviceinformation.participantID");
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.serviceinformation.participantID"));
             }
 
             /*Builds final file name*/

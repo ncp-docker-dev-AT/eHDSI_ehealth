@@ -7,6 +7,7 @@ import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.error.ApiException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.SMPFileOps;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.SMPHttp;
@@ -93,7 +94,6 @@ public class SMPUploadFileController {
         } catch (IllegalStateException ex) {
             logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         }
-
         smpHttp.setSmpFile(convFile);
         return ResponseEntity.ok(smpHttp);
 
@@ -110,17 +110,15 @@ public class SMPUploadFileController {
             if (logger.isDebugEnabled()) {
                 logger.debug("Converted File deleted: '{}'", fileDeleted);
             }
-            logger.error(environment.getProperty("error.notsmp"));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.notsmp"));
         }
 
 
         Object fileConverted = smpconverter.convertFromXml(smpHttp.getSmpFile());
         if (smpconverter.isSignedServiceMetadata(fileConverted)) {
-            logger.error(environment.getProperty("warning.isSigned.sigmenu"));
             fileDeleted = smpHttp.getSmpFile().delete();
             logger.debug("Converted File deleted: '{}'", fileDeleted);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("warning.isSigned.sigmenu"));
         }
 
         ServiceMetadata serviceMetadata = smpconverter.getServiceMetadata(fileConverted);
@@ -136,8 +134,7 @@ public class SMPUploadFileController {
             logger.debug("\n******** REDIRECT");
 
             if (serviceMetadata.getRedirect().getExtensions().isEmpty()) {
-                logger.error(environment.getProperty("error.notsigned")); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.notsigned"));
             }
 
             /* Check if url of redirect is correct */
@@ -151,16 +148,14 @@ public class SMPUploadFileController {
                 participantID = ids[0];
                 documentTypeID = ids[1];
             } else {
-                logger.error(environment.getProperty("error.redirect.href")); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.redirect.href"));
             }
 
         } else if (serviceMetadata.getServiceInformation() != null) {
             logger.debug("\n******** SERVICE INFORMATION");
 
             if (serviceMetadata.getServiceInformation().getExtensions().isEmpty()) {
-                logger.error(environment.getProperty("error.notsigned")); //messages.properties
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.notsigned"));
             }
 
             partID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
@@ -218,9 +213,7 @@ public class SMPUploadFileController {
         try {
             response = DynamicDiscoveryService.buildHttpClient(sslcontext).execute(httpput);
         } catch (IOException ex) {
-            logger.error("IOException response - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-            logger.error(environment.getProperty("error.server.failed")); //messages.properties
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.server.failed"));
         }
 
         // Get Http Client response
@@ -249,17 +242,13 @@ public class SMPUploadFileController {
             byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
             AuditManager.handleDynamicDiscoveryPush(serverSMPUrl, new String(encodedObjectID),
                     Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
-
-            logger.error(environment.getProperty("error.server.failed")); //messages.properties
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.server.failed"));
         } else if (smpHttp.getStatusCode() == 401) {
             //Audit Error
             byte[] encodedObjectDetail = Base64.encodeBase64(response.getStatusLine().getReasonPhrase().getBytes());
             AuditManager.handleDynamicDiscoveryPush(serverSMPUrl, new String(encodedObjectID),
                     Integer.toString(response.getStatusLine().getStatusCode()), encodedObjectDetail);
-
-            logger.error(environment.getProperty("error.nouser")); //messages.properties
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, environment.getProperty("error.nouser"));
         }
 
         if (!(smpHttp.getStatusCode() == 200 || smpHttp.getStatusCode() == 201)) {
