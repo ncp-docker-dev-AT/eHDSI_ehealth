@@ -20,3 +20,6 @@ spring:
       username: ehealth_openncp
       password: MyOpenncpPwd
       driver-class-name: com.mysql.jdbc.Driver
+server:
+  error:
+    include-message: always

@@ -45,6 +45,9 @@ spring:
       ssl:
         enable: false
         trust: "*"
+server:
+  error:
+    include-message: always
 application:
   mail:
     from: sante-ehealth-dsi-support@ec.europa.eu
