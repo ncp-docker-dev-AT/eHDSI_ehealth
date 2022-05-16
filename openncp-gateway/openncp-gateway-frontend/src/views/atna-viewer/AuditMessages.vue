@@ -12,13 +12,14 @@
         <v-card-title>
           <v-row>
             <v-col>
-              <v-text-field
+              <v-combobox
                 v-model="searchEventId"
                 clearable
                 label="Event ID Code"
+                :items="EventIdCodeItems"
                 single-line
                 hide-details
-              ></v-text-field>
+              ></v-combobox>
             </v-col>
 
             <v-col>
@@ -32,14 +33,16 @@
             </v-col>
 
             <v-col>
-              <v-text-field
+              <v-combobox
                 v-model="activeTypeCode"
                 clearable
                 label="Participant Type Code"
+                :items="ParticipantTypeCodeItems"
                 single-line
                 hide-details
-              ></v-text-field>
+              ></v-combobox>
             </v-col>
+
             <v-col>
               <v-menu
                 v-model="searchStartDateMenu"
@@ -162,6 +165,21 @@ export default {
           text: 'Audit messages list',
           disabled: true
         }
+      ],
+      EventIdCodeItems: [
+        'EHDSI-92',
+        'EHDSI-94',
+        'EHDSI-96',
+        'ITI-38',
+        'ITI-39',
+        'ITI-41',
+        'ITI-55'
+      ],
+      ParticipantTypeCodeItems: [
+        'Medical Doctors',
+        'Resident Physician',
+        'ServiceConsumer',
+        'ServiceProvider'
       ]
     }
   },
