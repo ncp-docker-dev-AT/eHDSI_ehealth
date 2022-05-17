@@ -1,8 +1,11 @@
 package tr.com.srdc.epsos.ws.server.xca.impl.eP;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property;
 import fi.kela.se.epsos.data.model.*;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
