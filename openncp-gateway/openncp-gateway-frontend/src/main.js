@@ -6,6 +6,14 @@ import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 
+Vue.mixin({
+  methods: {
+    validatePasswordRuleComplexity: function (data) {
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/.test(data)
+    }
+  }
+})
+
 new Vue({
   router,
   store,
