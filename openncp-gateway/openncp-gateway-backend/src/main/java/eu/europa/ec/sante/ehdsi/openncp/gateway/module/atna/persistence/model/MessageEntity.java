@@ -1,15 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -43,7 +34,7 @@ public class MessageEntity {
     private Set<MessageParticipantEntity> messageParticipants = new LinkedHashSet<>();
 
     @Lob
-    private String messageContent;
+    private byte[] messageContent = new byte[0];
 
     public Long getId() {
         return id;
@@ -73,7 +64,7 @@ public class MessageEntity {
         return messageParticipants;
     }
 
-    public String getMessageContent() {
+    public byte[] getMessageContent() {
         return messageContent;
     }
 }

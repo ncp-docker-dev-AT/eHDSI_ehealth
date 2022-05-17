@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>openatna-web</artifactId>
@@ -17,22 +17,9 @@
     <dependencies>
         <dependency>
             <groupId>com.itextpdf</groupId>
-    		<artifactId>itextpdf</artifactId>
+            <artifactId>itext7-core</artifactId>
             <version>${itextpdf.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>bcmail-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bcprov-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bctsp-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-            </exclusions>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
@@ -89,7 +76,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.4.5</version>
+            <version>${hikaricp.version}</version>
         </dependency>
     </dependencies>
 
@@ -162,6 +149,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
+                        <version>3.3.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <webXml>${basedir}/src/main/profiled-resource/all/WEB-INF/web.xml</webXml>
@@ -182,6 +170,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
+                        <version>3.3.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <warName>openncp-openatna-service</warName>
@@ -204,6 +193,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
+                        <version>3.3.2</version>
                         <configuration>
                             <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                             <warName>openncp-openatna-web</warName>

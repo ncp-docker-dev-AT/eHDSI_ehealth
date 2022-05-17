@@ -118,14 +118,13 @@
             <v-text-field
               v-model="oldPwd"
               type="password"
-              :rules="pwdRules"
               label="Current Password"
               required
             ></v-text-field>
             <v-text-field
               v-model="pwd"
               type="password"
-              :rules="pwdRules"
+              :rules="passwordRulesComplexity"
               label="New Password"
               required
             ></v-text-field>
@@ -133,7 +132,7 @@
             <v-text-field
               v-model="confirmPwd"
               type="password"
-              :rules="pwdRules2"
+              :rules="passwordRuleMatch"
               label="Confirm New Password"
               required
             ></v-text-field>
@@ -181,14 +180,14 @@ export default {
       snackbarMod: 'success',
       changePasswordDialog: false,
 
-      pwdRules: [
+      passwordRulesComplexity: [
         (v) => !!v || 'Password is required',
         (v) => v.length <= 30 || '30 Characters max',
         (v) =>
-          /^(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,30}$/.test(v) ||
-          'Password must be more than 8 characters and one Uppercase letter. '
+          this.validatePasswordRuleComplexity(v) ||
+          'Password must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces'
       ],
-      pwdRules2: [
+      passwordRuleMatch: [
         (v) => {
           return this.pwd === this.confirmPwd || "Passwords don't match"
         }
@@ -198,7 +197,7 @@ export default {
   },
   computed: {
     authenticatedUser () {
-      console.log(this.$store.state.authenticatedUser.roles)
+      // console.log(this.$store.state.authenticatedUser.roles)
       return this.$store.state.authenticatedUser
     }
   },
@@ -234,18 +233,22 @@ export default {
           this.loading = false
         })
         .catch((err) => {
-          this.error('An error occurs. The operations is not completed! ', err)
+          this.error('An error occurred : ' + err.response.data, err)
         })
     },
     onDropdownClick (evt) {
       this.changePasswordDialog = true
     },
     checkRoles (role) {
-      return (
-        this.authenticatedUser.roles.includes('GTW_ADMIN') ||
-        this.authenticatedUser.roles.includes('SMP_ADMIN') ||
-        this.authenticatedUser.roles.includes(role)
-      )
+      if (this.authenticatedUser.roles) {
+        return (
+          this.authenticatedUser.roles.includes('GTW_ADMIN') ||
+          this.authenticatedUser.roles.includes('SMP_ADMIN') ||
+          this.authenticatedUser.roles.includes(role)
+        )
+      } else {
+        return false
+      }
     },
     logout () {
       this.$store.dispatch('logout').then(() => {

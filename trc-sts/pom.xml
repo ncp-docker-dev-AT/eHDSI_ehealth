@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-trc-sts</artifactId>
@@ -22,22 +22,9 @@
     <dependencies>
         <dependency>
             <groupId>com.itextpdf</groupId>
-    		<artifactId>itextpdf</artifactId>
+            <artifactId>itext7-core</artifactId>
             <version>${itextpdf.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>bcmail-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bcprov-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bctsp-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-            </exclusions>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
@@ -173,13 +160,14 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
+                    <version>3.3.2</version>
                     <configuration>
                         <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
-                        <packagingExcludes>
-                            WEB-INF/lib/xercesImpl-${xerces.version}.jar,
-                            WEB-INF/lib/commons-httpclient-3.1.jar,
-                        </packagingExcludes>
+<!--                        <packagingExcludes>-->
+<!--                            WEB-INF/lib/xercesImpl-${xerces.version}.jar,-->
+<!--                            WEB-INF/lib/commons-httpclient-3.1.jar,-->
+<!--                        </packagingExcludes>-->
                     </configuration>
                 </plugin>
                 <plugin>

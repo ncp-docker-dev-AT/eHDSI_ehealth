@@ -21,8 +21,8 @@ public class TransactionData {
     private String valueDisplay;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn (name="Transaction_FK")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Transaction_FK")
     private Transaction transaction;
 
     public String getId() {

@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This is an Data Transformation Service providing functions to transform data into a Document object.
+ * This is a Data Transformation Service providing functions to transform data into a Document object.
  *
  * @author Marcelo Fonseca - <marcelo.fonseca@iuz.pt>
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -66,11 +66,11 @@ public class DocumentDts {
 
         result.setAtcCode(document.getAtcCode());
         result.setAtcText(document.getAtcText());
+        result.setDispensable(document.isDispensable());
         result.setDoseFormCode(document.getDoseFormCode());
         result.setDoseFormText(document.getDoseFormText());
         result.setStrength(document.getStrength());
         result.setSubstitution(document.getSubstitution());
-        result.setDispensable(document.isDispensable());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             switch (result.getClassCode().getNodeRepresentation()) {
@@ -105,13 +105,12 @@ public class DocumentDts {
         return result;
     }
 
-    private static String composeCodeAndText(String code, String text)
-    {
-        String ret = code;
-        if(text != null && !text.isEmpty()) {
-            ret = "[" + code + "] " + text;
+    private static String composeCodeAndText(String code, String text) {
+        String label = code;
+        if (StringUtils.isNotBlank(text)) {
+            label = "[" + code + "] " + text;
         }
-        return ret;
+        return label;
     }
 
     private static Author[] convertAuthorList(List<OrCDDocumentMetaData.Author> authors) {

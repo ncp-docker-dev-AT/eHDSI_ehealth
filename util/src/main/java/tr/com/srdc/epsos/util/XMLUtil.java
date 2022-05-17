@@ -62,18 +62,19 @@ public class XMLUtil {
      * <p>
      * Add by massi - 29/12/2016
      *
-     * @param doc The document to be canonicalized
+     * @param document The document to be canonicalized
      * @return the canonicalized document
      * @throws Exception either the document is null, there is no available DOM factory, or a generic c14n error
      */
-    public static Document canonicalize(Document doc) throws Exception {
+    public static Document canonicalize(Document document) throws Exception {
 
-        Canonicalizer canon = Canonicalizer.getInstance(CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS);
-        byte[] back = canon.canonicalizeSubtree(doc);
+        Canonicalizer canonicalizer = Canonicalizer.getInstance(CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        canonicalizer.canonicalizeSubtree(document, outputStream);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
 
-        return documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(back));
+        return documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(outputStream.toByteArray()));
     }
 
     public static Document parseContent(byte[] byteContent) throws ParserConfigurationException, SAXException, IOException {

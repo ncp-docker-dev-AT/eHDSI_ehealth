@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>openatna-report</artifactId>
@@ -45,22 +45,9 @@
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
-    		<artifactId>itextpdf</artifactId>
+            <artifactId>itext7-core</artifactId>
+            <type>pom</type>
             <version>${itextpdf.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcmail-jdk14</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bcprov-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>bctsp-jdk14</artifactId>
-                    <groupId>bouncycastle</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

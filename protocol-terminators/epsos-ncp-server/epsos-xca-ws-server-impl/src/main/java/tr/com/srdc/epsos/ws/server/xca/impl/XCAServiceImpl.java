@@ -49,6 +49,7 @@ import org.springframework.http.MediaType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import tr.com.srdc.epsos.data.model.FilterParams;
+import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
 import tr.com.srdc.epsos.data.model.xds.DocumentType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
@@ -129,7 +130,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response,
                                          Element sh, String classCode) {
 
-        logger.info("method prepareEventLogForQuery('{}')", request.getId());
+        logger.info("method prepareEventLogForQuery(Request: '{}', ClassCode: '{}')", request.getId(), classCode);
 
         switch (classCode) {
             case Constants.EP_CLASSCODE:
@@ -518,11 +519,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
         if (isPDF) {
-            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, "urn:ihe:iti:xds-sd:pdf:2008", "IHE PCC", "PDF/A coded document"));
+            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+                    uuid, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.NODE_REPRESENTATION,
+                    "IHE PCC", XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.DISPLAY_NAME));
         } else {
-            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
+            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+                    uuid, nodeRepresentation, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.EpsosPivotCoded.CODING_SCHEME, displayName));
         }
 
         /*
@@ -662,7 +664,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
-        eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
+        eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
                 uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
 
         /*
@@ -759,7 +761,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, Constants.EP_CLASSCODE, "2.16.840.1.113883.6.1", name));
 
-         // Dispensable
+        // Dispensable
         if (document.isDispensable()) {
             ClassificationType dispensableClassification = makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open");
@@ -773,27 +775,39 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // ATC code (former Product element)
-        ClassificationType atcCodeClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
-        eot.getClassification().add(atcCodeClassification);
+        if(StringUtils.isNotBlank(document.getAtcCode())) {
+            ClassificationType atcCodeClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
+            eot.getClassification().add(atcCodeClassification);
+        }
 
         // Dose Form Code
-        ClassificationType doseFormClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
-        eot.getClassification().add(doseFormClassification);
+        if(StringUtils.isNotBlank(document.getDoseFormCode())) {
+            ClassificationType doseFormClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
+            eot.getClassification().add(doseFormClassification);
+        }
 
         // Strength
-        ClassificationType strengthClassification = makeClassification(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getStrength(), "eHDSI_Strength_Codesystem", "Strength of medication");
-        eot.getClassification().add(strengthClassification);
+        if(StringUtils.isNotBlank(document.getStrength())) {
+            ClassificationType strengthClassification = makeClassification(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
+            eot.getClassification().add(strengthClassification);
+        }
 
         // Substitution
+        String substitutionCode = document.getSubstitution() != null
+                ? document.getSubstitution().getSubstitutionCode()
+                : SubstitutionCodeEnum.G.name();
+        String substitutionDisplay = document.getSubstitution() != null
+                ? document.getSubstitution().getSubstitutionDisplayName()
+                : SubstitutionCodeEnum.G.getDisplayName();
         ClassificationType substitutionClassification = makeClassification(
                 "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getSubstitution(), "eHDSI_Substitution_Codesystem", "Subsitution availability");
+                substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
         eot.getClassification().add(substitutionClassification);
 
         // Confidentiality Code
@@ -809,11 +823,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
         if (isPDF) {
-            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, "urn:ihe:iti:xds-sd:pdf:2008", "IHE PCC", "PDF/A coded document"));
+            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+                    uuid, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.NODE_REPRESENTATION, "IHE PCC",
+                    XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.DISPLAY_NAME));
         } else {
-            eot.getClassification().add(makeClassification("urn:uuid:a09d5840-386c-46f2-b5ad-9c3699a4309d",
-                    uuid, "urn:epSOS:ep:pre:2010", "eHDSI formatCodes", "epSOS coded ePrescription"));
+            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+                    uuid, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.EpsosPivotCoded.NODE_REPRESENTATION,
+                    XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.EpsosPivotCoded.CODING_SCHEME,
+                    XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.EpsosPivotCoded.DISPLAY_NAME));
         }
         // Healthcare facility code
         // TODO: Get healthcare facility info from national implementation
@@ -860,9 +877,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private String getLocation() {
 
-        //String location = ConfigurationManagerFactory.getConfigurationManager().getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH),
-        //              RegisteredService.PATIENT_SERVICE);
-        // EHNCP-1131
+        //TODO: to be reviewed in the future linked with JIRA EHNCP-1131.
+        //  String location = ConfigurationManagerFactory.getConfigurationManager()
+        //      .getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
         return Constants.OID_PREFIX + Constants.HOME_COMM_ID;
     }
 
@@ -924,16 +941,20 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
             if (classCodeValues.contains(Constants.EP_CLASSCODE)) {
-                registryErrorList.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
+                registryErrorList.getRegistryError().add(
+                        createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
             } else if (classCodeValues.contains(Constants.PS_CLASSCODE)) {
-                registryErrorList.getRegistryError().add(createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
+                registryErrorList.getRegistryError().add(
+                        createErrorMessage("1102", "No patient summary is registered for the given patient.", "", true));
             } else if (classCodeValues.contains(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
-                registryErrorList.getRegistryError().add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
+                registryErrorList.getRegistryError()
+                        .add(createErrorMessage("1104", "There is no original clinical data of the requested type registered for the given patient.", "", true));
             } else {
-                registryErrorList.getRegistryError().add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
+                registryErrorList.getRegistryError()
+                        .add(createErrorMessage("1100", "No documents are registered for the given patient.", "", true));
             }
         }
         String patientId = trimDocumentEntryPatientId(fullPatientId);
@@ -1164,8 +1185,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     response.setRegistryErrorList(registryErrorList);
                     response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     break;
-
-
             }
 
             try {

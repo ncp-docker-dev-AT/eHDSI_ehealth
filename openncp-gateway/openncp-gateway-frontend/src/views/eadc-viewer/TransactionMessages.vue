@@ -31,7 +31,7 @@
                 </v-form>
               </v-card-text>
               <v-card-actions>
-                <v-btn text @click="exoprtTransactions">Export</v-btn>
+                <v-btn text @click="exportTransactions">Export</v-btn>
               </v-card-actions>
             </v-card>
           </template>
@@ -41,6 +41,12 @@
         <v-data-table
           :headers="headers"
           :items="transactions"
+          :disable-items-per-page="true"
+          :footer-props="{
+            'items-per-page-options': [10]
+          }"
+          :options.sync="options"
+          :server-items-length="totalTransactions"
           :loading="loading"
         >
           <template v-slot:[`item.actions`]="{ item }">
@@ -87,30 +93,34 @@ export default {
         { value: 'actions', sortable: false }
       ],
       transactions: [],
-      loading: true,
+      totalTransactions: 0,
+      options: { page: 1, itemsPerPage: 10 },
+      loading: false,
       items: [
         {
           text: 'EADC Viewer',
           disabled: true
         },
         {
-          text: 'Transations list',
+          text: 'Transactions list',
           disabled: true
         }
       ]
     }
   },
   mounted () {
-    axios
-      .get(process.env.VUE_APP_SERVER_URL + '/api/eadc/transactions')
-      .then((response) => {
-        this.transactions = response.data
-        this.loading = false
-      })
   },
-
+  watch: {
+    options: {
+      handler () {
+        this.getDataFromApi()
+      }
+    },
+    page: 1,
+    itemsPerPage: 10
+  },
   methods: {
-    exoprtTransactions: function () {
+    exportTransactions: function () {
       this.dialog = false
 
       let fromDate = this.year + '-'
@@ -143,6 +153,23 @@ export default {
           document.body.appendChild(fileLink)
           fileLink.click()
         })
+    },
+    getDataFromApi () {
+      if (!this.loading) {
+        this.loading = true
+        axios
+          .get(process.env.VUE_APP_SERVER_URL + '/api/eadc/transactions', {
+            params: {
+              pageNumber: this.options.page - 1,
+              size: this.options.itemsPerPage
+            }
+          }).then((response) => {
+            this.transactions = response.data.content
+            this.totalTransactions = response.data.totalElements
+            this.options.page = response.data.number + 1
+            this.loading = false
+          })
+      }
     }
   }
 }

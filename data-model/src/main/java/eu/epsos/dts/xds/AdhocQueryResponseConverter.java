@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.xds.QueryResponse;
 import tr.com.srdc.epsos.data.model.xds.XDSDocument;
 import tr.com.srdc.epsos.data.model.xds.XDSDocumentAssociation;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
@@ -71,9 +70,8 @@ public final class AdhocQueryResponseConverter {
 
                     setAdministrativeXdsMetadata(eo.getValue(), xdsDocument);
 
-                    for (var j = 0; j < eo.getValue().getClassification().size(); j++) {
+                    for (ClassificationType classificationType : eo.getValue().getClassification()) {
 
-                        ClassificationType classificationType = eo.getValue().getClassification().get(j);
                         var documentClassCodeType = classificationType.getNodeRepresentation();
                         classificationScheme = classificationType.getClassificationScheme();
                         //Set isPDF
@@ -101,7 +99,7 @@ public final class AdhocQueryResponseConverter {
                         setSubstitution(classificationScheme, classificationType, xdsDocument);
 
                         // Set Dispensable
-                        setDispensable(documentClassCodeType, eo.getValue(), classificationType, xdsDocument);
+                        setDispensable(classificationType, xdsDocument);
 
                         // Set Reason of Hospitalisation
                         setReasonOfHospitalisation(classificationScheme, classificationType, xdsDocument);
@@ -236,28 +234,12 @@ public final class AdhocQueryResponseConverter {
         }
     }
 
-    private static void setDispensable(String documentClassCodeType, ExtrinsicObjectType extrinsicObjectType,
-                                       ClassificationType classificationType, XDSDocument xdsDocument) {
-
-        if (StringUtils.equals(documentClassCodeType, Constants.EP_CLASSCODE)
-                && extrinsicObjectType.getDescription() != null
-                && CollectionUtils.isNotEmpty(extrinsicObjectType.getDescription().getLocalizedString())) {
-            var dispensable = false;
-
-            List<ClassificationType> classificationTypeList = classificationType.getClassification();
-            for (ClassificationType type : classificationTypeList) {
-                var valueList = type.getSlot().get(0).getValueList().getValue();
-                if (StringUtils.equals(type.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")
-                        && CollectionUtils.isNotEmpty(valueList)
-                        && StringUtils.equals(valueList.get(0), "1.3.6.1.4.1.19376.1.2.3")) {
-                    if (StringUtils.equals(type.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open")) {
-                        dispensable = true;
-                    } else if (StringUtils.equals(type.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:closed")) {
-                        dispensable = false;
-                    }
-                }
-            }
-            xdsDocument.setDispensable(dispensable);
+    private static void setDispensable(ClassificationType classificationType, XDSDocument xdsDocument) {
+        var valueList = classificationType.getSlot().get(0).getValueList().getValue();
+        if (StringUtils.equals(classificationType.getClassificationScheme(), "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4")
+                && CollectionUtils.isNotEmpty(valueList)
+                && StringUtils.equals(valueList.get(0), "1.3.6.1.4.1.19376.1.2.3")) {
+            xdsDocument.setDispensable(StringUtils.equals(classificationType.getNodeRepresentation(), "urn:ihe:iti:xdw:2011:eventCode:open"));
         }
     }
 
@@ -395,7 +377,7 @@ public final class AdhocQueryResponseConverter {
 
     private static void setStrength(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_Codesystem";
+            final var EHDSI_STRENGTH_CODE_SYSTEM_OID = "eHDSI_Strength_CodeSystem";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
                 if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
@@ -410,7 +392,7 @@ public final class AdhocQueryResponseConverter {
 
     private static void setSubstitution(String classificationScheme, ClassificationType classificationType, XDSDocument xdsDocument) {
         if (StringUtils.equals(classificationScheme, IheConstants.CLASSIFICATION_EVENT_CODE_LIST) && classificationType.getSlot() != null) {
-            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "eHDSI_Substitution_Codesystem";
+            final var EHDSI_SUBSTITUTION_CODE_SYSTEM_OID = "2.16.840.1.113883.5.1070";
             for (SlotType1 slot : classificationType.getSlot()) {
                 var valueList = slot.getValueList().getValue();
                 if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
