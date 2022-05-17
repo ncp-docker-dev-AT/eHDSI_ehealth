@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model.Transaction;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +39,7 @@ public class ExportService {
 
     public byte[] export(LocalDate fromDate, LocalDate toDate) {
 
-        List<Transaction> transactions = transactionService.findTransactions();
+        List<Transaction> transactions = transactionService.findTransactions(null).getContent();
 
         //Filter transactions between the dates
         List<Transaction> filteredTransactions = transactions.stream().filter(t ->
