@@ -42,11 +42,11 @@ public class MessageService {
     }
 
     public Page<Message> findMessages(Pageable pageable) {
-        Page<MessageEntity> page = messageRepository.findAllMessages(new BooleanBuilder(), pageable);
+        Page<MessageEntity> page = messageRepository.findAllMessages(pageable);
         return new PageImpl<>(messageMapper.map(page), pageable, page.getTotalElements());
     }
 
-    public Page<Message> findMessages(String searchEventId, Instant searchEventStartDate, Instant searchEventEndDate,
+    public Page<Message> searchMessages(String searchEventId, Instant searchEventStartDate, Instant searchEventEndDate,
                                       String activeParticipantId, String activeTypeCode, Pageable pageable) {
 
         SearchPredicatesBuilder builder = new SearchPredicatesBuilder();
@@ -58,7 +58,7 @@ public class MessageService {
 
         BooleanExpression exp = builder.build();
 
-        Page<MessageEntity> page = messageRepository.findAllMessages(exp, pageable);
+        Page<MessageEntity> page = messageRepository.searchMessages(exp, pageable);
         return new PageImpl<>(messageMapper.map(page), pageable, page.getTotalElements());
     }
 
