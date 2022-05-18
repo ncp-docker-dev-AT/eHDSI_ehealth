@@ -9,7 +9,8 @@ public enum ExceptionType {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "An internal server error occurred."),
 
     // Gateway Admin module
-    PWD_INVALID_FORMAT(HttpStatus.FORBIDDEN, "Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+    PWD_INVALID_FORMAT(HttpStatus.FORBIDDEN, "Invalid password : Length should between 8 and 30 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces"),
+    PWD_NOT_MATCHING(HttpStatus.FORBIDDEN, "Invalid password : Current password does not match");
 
     private final HttpStatus status;
     private final String message;
