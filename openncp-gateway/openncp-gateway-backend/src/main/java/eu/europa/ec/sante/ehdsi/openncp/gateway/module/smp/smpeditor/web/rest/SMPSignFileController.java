@@ -69,7 +69,7 @@ public class SMPSignFileController {
 
         logger.debug("\n==== in signCreatedFile ====");
         if (smpfile.getGeneratedFile() == null) {
-            throw new RuntimeException("The requested file does not exists");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "The requested file does not exists");
         }
         File file = new File(smpfile.getGeneratedFile().getPath());
         SMPFileOps smpFileOps = new SMPFileOps();
@@ -85,10 +85,8 @@ public class SMPSignFileController {
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);
-        } catch (IOException ex) {
-            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (IllegalStateException ex) {
-            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (IOException | IllegalStateException ex) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName());
         }
 
         smpFileOps.setFileToSign(convFile);

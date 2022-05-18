@@ -75,7 +75,7 @@ public class SMPUploadFileController {
     public ResponseEntity<SMPHttp> createSMPFileOps(@RequestBody SMPFileOps smpFileOps) {
 
         if (smpFileOps.getGeneratedFile() == null) {
-            throw new RuntimeException("The requested file does not exists");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "The requested file does not exists");
         }
         File file = new File(smpFileOps.getGeneratedFile().getPath());
         SMPHttp smpHttp = new SMPHttp();
@@ -89,10 +89,8 @@ public class SMPUploadFileController {
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);
-        } catch (IOException ex) {
-            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (IllegalStateException ex) {
-            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (IOException | IllegalStateException ex) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName());
         }
         smpHttp.setSmpFile(convFile);
         return ResponseEntity.ok(smpHttp);
