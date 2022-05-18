@@ -110,8 +110,8 @@
         </div>
       </v-col>
     </v-row>
-    <v-snackbar v-model="snackbar" :color="snackbarMod" top>
-      {{ snackbarText }}
+    <v-snackbar v-model="snackbar" :color="snackbarMod" top >
+      <span v-html="snackbarText"></span>
       <template>
         <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
       </template>
@@ -145,7 +145,6 @@ function readFile (file = {}, method = 'readAsText') {
 
 function toUTCDate (d) {
   const date = new Date(d)
-  console.log(date)
   return Date.UTC(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -166,6 +165,7 @@ export default {
       rangeDate: null,
       showXml: false,
       valid: false,
+      multiline: true,
       showSignedXml: false,
       smpTypes: [],
       self: this,
@@ -236,8 +236,8 @@ export default {
         .catch((err) => {
           this.showXml = false
           this.error(
-            'An error occurs. The operations is not completed! ' +
-              err.response.data
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
           )
         })
       this.showXml = true
@@ -274,8 +274,8 @@ export default {
                 })
                 .catch((err) => {
                   this.error(
-                    'An error occurs. The operations is not completed! ',
-                    err
+                    'An error occurs. The operations is not completed! <br/>' +
+                    err.response.data.message
                   )
                 })
             })
@@ -324,8 +324,8 @@ export default {
             })
             .catch((err) => {
               this.error(
-                'An error occurs. The operations is not completed! ',
-                err
+                'An error occurs. The operations is not completed! <br/>' +
+                err.response.data.message
               )
             })
         })
