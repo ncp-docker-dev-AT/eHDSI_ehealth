@@ -56,23 +56,23 @@
     </modules>
 
     <scm>
-        <connection>scm:git:https://ec.europa.eu/cefdigital/code/scm/ehncp/ehealth.git</connection>
+        <connection>scm:git:https://citnet.tech.ec.europa.eu/CITnet/stash/scm/ehealth/ehealth.git</connection>
         <tag>HEAD</tag>
-        <url>https://ec.europa.eu/cefdigital/code/projects/EHNCP/repos/ehealth/browse</url>
+        <url>https://citnet.tech.ec.europa.eu/CITnet/stash/projects/ehealth/repos/ehealth/browse</url>
     </scm>
     <issueManagement>
         <system>JIRA</system>
-        <url>https://ec.europa.eu/cefdigital/tracker/projects/EHNCP/</url>
+        <url>https://citnet.tech.ec.europa.eu/CITnet/jira/projects/EHEALTH/</url>
     </issueManagement>
     <ciManagement/>
     <distributionManagement>
         <repository>
-            <id>cef-digital-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
+            <id>CITnet-releases</id>
+            <url>https://citnet.tech.ec.europa.eu/CITnet/nexus/repository/sanco/</url>
         </repository>
         <snapshotRepository>
-            <id>cef-digital-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
+            <id>CITnet-snapshots</id>
+            <url>https://citnet.tech.ec.europa.eu/CITnet/nexus/repository/sanco-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -350,6 +350,14 @@
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
         <repository>
+            <id>CITnet-releases</id>
+            <url>https://citnet.tech.ec.europa.eu/CITnet/nexus/repository/sanco/</url>
+        </repository>
+        <repository>
+            <id>CITnet-snapshots</id>
+            <url>https://citnet.tech.ec.europa.eu/CITnet/nexus/repository/sanco-snapshots/</url>
+        </repository>
+        <repository>
             <id>cef-digital-releases</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
         </repository>
@@ -469,7 +477,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
-                    <version>6.2.2</version>
+                    <version>7.1.0</version>
                     <executions>
                         <execution>
                             <goals>
@@ -494,7 +502,7 @@
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
-                        <version>6.2.2</version>
+                        <version>7.1.0</version>
                         <!--<configuration>
                             <suppressionFiles>${basedir}/suppressed.xml</suppressionFiles>
                         </configuration>-->
