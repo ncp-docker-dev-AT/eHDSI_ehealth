@@ -1,6 +1,7 @@
 package eu.epsos.dts.xcpd;
 
 import eu.epsos.util.xcpd.XCPDConstants;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hl7.v3.*;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientId;
@@ -32,7 +33,7 @@ public final class PRPAIN201305UV022DTS {
         // Set id of the message
         request.setId(of.createII());
         request.getId().setRoot(UUID.randomUUID().toString());
-        request.getId().setExtension(UUID.randomUUID().toString());
+        request.getId().setExtension(RandomStringUtils.randomNumeric(10));
 
         // Set creationTime
         request.setCreationTime(of.createTS());

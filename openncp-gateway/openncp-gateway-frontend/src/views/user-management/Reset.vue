@@ -4,27 +4,28 @@
       <v-row class="justify-center">
         <v-card width="400">
           <v-card-text>
-            <form ref="form">
+            <v-form ref="form" v-model="valid" >
               <h3>Reset Password</h3>
               <br />
 
               <v-text-field
                 v-model="password"
                 type="password"
+                :rules="passwordRulesComplexity"
                 label="New Password"
                 required
               ></v-text-field>
               <v-text-field
                 v-model="confirmPwd"
                 type="password"
-                :rules="pwdRules2"
+                :rules="passwordRuleMatch"
                 label="Confirm New Password"
                 required
               ></v-text-field>
-            </form>
+            </v-form>
           </v-card-text>
           <v-card-actions class="justify-center">
-            <v-btn @click="handleSubmit" color="indigo"> Submit </v-btn>
+            <v-btn @click="handleSubmit" :disabled="!valid" color="indigo"> Submit </v-btn>
           </v-card-actions>
         </v-card>
       </v-row>
@@ -38,24 +39,30 @@ export default {
   name: 'Reset',
   data () {
     return {
+      valid: false,
       password: '',
       confirmPwd: '',
 
-      pwdRules: [
+      passwordRulesComplexity: [
         (v) => !!v || 'Password is required',
         (v) => v.length <= 30 || '30 Characters max',
         (v) =>
-          /^(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,30}$/.test(v) ||
-          'Password must be more than 8 characters and one Uppercase letter. '
+          this.validatePasswordRuleComplexity(v) ||
+          'Password must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces'
       ],
-      pwdRules2: [
+      passwordRuleMatch: [
         (v) => {
-          return this.password === this.confirmPwd || "Passwords don't match"
+          return (this.validatePasswordRuleComplexity(v) && this.password === this.confirmPwd) || "Passwords don't match"
         }
       ]
     }
   },
   methods: {
+    validate (evt) {
+      console.log(this.$refs.form.checkValidity())
+      this.valid =
+        this.$refs.form.checkValidity()
+    },
     async handleSubmit () {
       await axios
         .post(
@@ -68,8 +75,8 @@ export default {
         .then(() => {
           this.$router.push('/login')
         })
-        .catch((e) => {
-          console.log('mince')
+        .catch((err) => {
+          this.error('An error occurred : ' + err.response.data, err)
         })
     }
   }

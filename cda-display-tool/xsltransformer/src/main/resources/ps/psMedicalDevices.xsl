@@ -112,7 +112,7 @@
                     </td>
                     <td>
                         <!-- Implant Date -->
-                        <xsl:call-template name="show-TS">
+                        <xsl:call-template name="show-IVL_TS">
                             <xsl:with-param name="node" select="$medDeviceImplantDate"/>
                         </xsl:call-template>
                     </td>

@@ -169,7 +169,7 @@
             </td>
             <td>
                 <!-- Severity -->
-                <xsl:apply-templates select="n1:entryRelationship/n1:observation" mode="severity" />
+                <xsl:apply-templates select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation" mode="severity" />
             </td>
         </tr>
     </xsl:template>
@@ -219,7 +219,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="n1:entryRelationship/n1:observation" mode="severity">
+    <xsl:template match="n1:entryRelationship[@typeCode='SUBJ']/n1:observation" mode="severity">
         <xsl:call-template name="show-eHDSISeverity">
             <xsl:with-param name="node" select="n1:value"/>
         </xsl:call-template>
