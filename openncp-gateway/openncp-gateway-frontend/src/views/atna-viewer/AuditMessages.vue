@@ -92,7 +92,7 @@
                 ></v-date-picker>
               </v-menu>
             </v-col>
-            <v-col><v-btn block @click="getDataFromApi"> Search </v-btn></v-col>
+            <v-col><v-btn block @click="searchDataFromApi"> Search </v-btn></v-col>
           </v-row>
         </v-card-title>
         <v-data-table
@@ -149,7 +149,7 @@ export default {
       totalMessages: 0,
       options: { page: 1, itemsPerPage: 10 },
       loading: false,
-
+      filteredData: false,
       searchStartDateMenu: false,
       searchEndDateMenu: false,
       items: [
@@ -204,7 +204,11 @@ export default {
   watch: {
     options: {
       handler () {
-        this.getDataFromApi()
+        if (this.filteredData) {
+          this.searchDataFromApi()
+        } else {
+          this.getDataFromApi()
+        }
       },
       page: 1,
       itemsPerPage: 10
@@ -251,7 +255,7 @@ export default {
     }
   },
   methods: {
-    getDataFromApi () {
+    searchDataFromApi () {
       if (!this.loading) {
         this.loading = true
         this.apiCall().then((data) => {
@@ -259,6 +263,7 @@ export default {
           this.totalMessages = data.data.totalElements
           this.options.page = data.data.number + 1
           this.loading = false
+          this.filteredData = true
         })
       }
     },
@@ -271,8 +276,7 @@ export default {
       } else {
         endDate = ''
       }
-
-      return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
+      return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/search_messages', {
         params: {
           pageNumber: this.options.page - 1,
           size: this.options.itemsPerPage,
@@ -285,6 +289,22 @@ export default {
           searchEventEndDate: endDate
         }
       })
+    },
+    getDataFromApi () {
+      if (!this.loading) {
+        this.loading = true
+        axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/messages', {
+          params: {
+            pageNumber: this.options.page - 1,
+            size: this.options.itemsPerPage
+          }
+        }).then((response) => {
+          this.messages = response.data.content
+          this.totalMessages = response.data.totalElements
+          this.options.page = response.data.number + 1
+          this.loading = false
+        })
+      }
     }
   }
 }
