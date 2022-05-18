@@ -2,6 +2,8 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model.Error;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.repository.ErrorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +19,7 @@ public class ErrorService {
         this.errorRepository = errorRepository;
     }
 
-    public List<Error> findErrors() {
-        return errorRepository.findAll();
+    public Page<Error> findErrors(Pageable pageable) {
+        return errorRepository.findAll(pageable);
     }
 }
