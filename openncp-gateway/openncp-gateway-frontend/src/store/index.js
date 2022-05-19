@@ -9,12 +9,20 @@ export default new Vuex.Store({
     authenticatedUser: {},
     token: '',
     smpData: null,
-    country: null
+    country: null,
+    searchAtnaOpts: {
+      searchEventId: null,
+      activeParticipantId: null,
+      activeTypeCode: null,
+      searchEventStartDate: null,
+      searchEventEndDate: null
+    }
   },
   getters: {
     isAuthenticated: (state) => !!state.token,
     smpData: (state) => state.smpData,
-    country: (state) => state.country
+    country: (state) => state.country,
+    searchAtnaOpts: (state) => state.searchAtnaOpts
   },
   mutations: {
     authenticatedUser (state, user) {
@@ -31,6 +39,9 @@ export default new Vuex.Store({
     },
     country (state, data) {
       state.country = data
+    },
+    searchAtnaOpts (state, obj) {
+      state.searchAtnaOpts = { ...state.searchAtnaOpts, ...obj }
     }
   },
   actions: {
