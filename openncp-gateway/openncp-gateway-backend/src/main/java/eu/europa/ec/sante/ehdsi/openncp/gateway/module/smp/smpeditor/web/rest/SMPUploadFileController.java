@@ -87,7 +87,7 @@ public class SMPUploadFileController {
     @PostMapping(path = "/smpeditor/uploader/fileToUpload")
     public ResponseEntity<SMPHttp> createSMPHttp(@RequestPart MultipartFile multipartFile) {
         SMPHttp smpHttp = new SMPHttp();
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);

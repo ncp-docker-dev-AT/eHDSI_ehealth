@@ -83,7 +83,7 @@ public class SMPSignFileController {
     public ResponseEntity<SMPFileOps> createSMPFileOps(@RequestPart MultipartFile multipartFile) {
 
         SMPFileOps smpFileOps = new SMPFileOps();
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);

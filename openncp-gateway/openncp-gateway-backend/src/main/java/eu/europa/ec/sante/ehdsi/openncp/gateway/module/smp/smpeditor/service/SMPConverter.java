@@ -85,7 +85,7 @@ public class SMPConverter {
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
         //XML file generated at path
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         generatedFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
 
         //Type of SMP File -> Redirect | Service Information
@@ -284,7 +284,7 @@ public class SMPConverter {
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
         //  XML file generated at path
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         generatedFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
 
         //  Type of SMP File -> Redirect | Service Information

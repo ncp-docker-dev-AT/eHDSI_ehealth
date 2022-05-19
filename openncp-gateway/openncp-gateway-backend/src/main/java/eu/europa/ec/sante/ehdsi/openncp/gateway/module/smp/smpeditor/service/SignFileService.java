@@ -86,7 +86,7 @@ public class SignFileService {
         Element siSigPointer = findSig(type, docUnwrapped);
         SignatureValidator.validateSignature(siSigPointer);
 
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         File generatedSignFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
         Source source = new DOMSource(docServiceMetadata);
         Result result = new StreamResult(generatedSignFile);

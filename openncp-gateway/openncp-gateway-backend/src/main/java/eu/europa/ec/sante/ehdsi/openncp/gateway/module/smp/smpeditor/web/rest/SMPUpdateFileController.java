@@ -62,7 +62,7 @@ public class SMPUpdateFileController {
     @PostMapping(path = "/smpeditor/updater/setSmpFileToUpdate")
     public ResponseEntity<SMPUpdateFields> createSMPHttp(@RequestPart MultipartFile multipartFile) throws IOException {
 
-        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         File smpFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(smpFile);
