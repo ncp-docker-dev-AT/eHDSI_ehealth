@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.web.rest;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.error.ApiException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.cfg.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.*;
@@ -68,7 +69,7 @@ public class SMPSignFileController {
 
         logger.debug("\n==== in signCreatedFile ====");
         if (smpfile.getGeneratedFile() == null) {
-            throw new RuntimeException("The requested file does not exists");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "The requested file does not exists");
         }
         File file = new File(smpfile.getGeneratedFile().getPath());
         SMPFileOps smpFileOps = new SMPFileOps();
@@ -84,10 +85,8 @@ public class SMPSignFileController {
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);
-        } catch (IOException ex) {
-            logger.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (IllegalStateException ex) {
-            logger.error("\n IllegalStateException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+        } catch (IOException | IllegalStateException ex) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName());
         }
 
         smpFileOps.setFileToSign(convFile);
@@ -96,33 +95,27 @@ public class SMPSignFileController {
     }
 
     @PostMapping(path = "/smpeditor/sign/generateSmpFileOpsData")
-    public ResponseEntity generateSMPFileOpsData(@RequestBody SMPFileOps smpFileOps) throws IOException {
+    public ResponseEntity<SMPFileOps> generateSMPFileOpsData(@RequestBody SMPFileOps smpFileOps) throws IOException {
 
         String type = null;
 
         String contentFile = new String(Files.readAllBytes(Paths.get(smpFileOps.getFileToSign().getPath())));
         //boolean valid = XMLValidator.validate(contentFile, "/bdx-smp-201605.xsd");
         if (!BdxSmpValidator.validateFile(contentFile)) {
-            logger.error(env.getProperty("error.notsmp"));
             boolean fileDeleted = smpFileOps.getFileToSign().delete();
             logger.debug("Converted File deleted: '{}'", fileDeleted);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.notsmp"));
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.notsmp"));
         }
 
         Object fileConverted = smpconverter.convertFromXml(smpFileOps.getFileToSign());
 
         if (smpconverter.isSignedServiceMetadata(fileConverted)) {
-            logger.error(env.getProperty("warning.isSigned.sigmenu"));
             boolean fileDeleted = smpFileOps.getFileToSign().delete();
             logger.debug("Converted File deleted: '{}'", fileDeleted);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("warning.isSigned.sigmenu"));
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("warning.isSigned.sigmenu"));
         }
 
         ServiceMetadata serviceMetadata = smpconverter.getServiceMetadata(fileConverted);
-//        boolean fileDeleted = convFile.delete();
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Converted File deleted: '{}'", fileDeleted);
-//        }
 
       /*
        Condition to know the type of file (Redirect|ServiceInformation) in order to build the form
@@ -157,8 +150,7 @@ public class SMPSignFileController {
                     }
                 }
                 if (smpFileOps.getCountry() == null) {
-                    logger.error(env.getProperty("error.redirect.href.participantID"));
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.redirect.href.participantID"));
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href.participantID"));
                 }
 
                 String docID = ids[1];
@@ -178,8 +170,7 @@ public class SMPSignFileController {
                 }
 
                 if (documentID.equals("")) {
-                    logger.error(env.getProperty("error.redirect.href.documentID"));
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.redirect.href.documentID"));
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href.documentID"));
                 }
 
                 /*Builds final file name*/
@@ -187,8 +178,7 @@ public class SMPSignFileController {
                 String fileName = smpFileOps.getType().name() + "_" + documentID + "_" + smpFileOps.getCountry().toUpperCase() + "_Signed_" + timeStamp + ".xml";
                 smpFileOps.setFileName(fileName);
             } else {
-                logger.error(env.getProperty("error.redirect.href"));
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.redirect.href"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href"));
             }
 
         } else if (serviceMetadata.getServiceInformation() != null) { /*Service Information Type*/
@@ -224,8 +214,7 @@ public class SMPSignFileController {
                 }
             }
             if (smpFileOps.getType() == null) {
-                logger.error(env.getProperty("error.serviceinformation.documentID"));
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.serviceinformation.documentID"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.serviceinformation.documentID"));
             }
 
             String participanteID = serviceMetadata.getServiceInformation().getParticipantIdentifier().getValue();
@@ -237,8 +226,7 @@ public class SMPSignFileController {
                 }
             }
             if (smpFileOps.getCountry() == null) {
-                logger.error(env.getProperty("error.serviceinformation.participantID"));
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.serviceinformation.participantID"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.serviceinformation.participantID"));
             }
 
             /*Builds final file name*/
