@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.service;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.Constants;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.FileUtil;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,13 +86,14 @@ public class SignFileService {
         Element siSigPointer = findSig(type, docUnwrapped);
         SignatureValidator.validateSignature(siSigPointer);
 
+        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
         File generatedSignFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
         Source source = new DOMSource(docServiceMetadata);
         Result result = new StreamResult(generatedSignFile);
         TransformerFactory factory = TransformerFactory.newInstance();
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        Transformer xformer = factory.newTransformer();
-        xformer.transform(source, result);
+        Transformer transformer = factory.newTransformer();
+        transformer.transform(source, result);
 
         return generatedSignFile;
     }

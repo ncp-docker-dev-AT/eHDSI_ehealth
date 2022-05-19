@@ -4,6 +4,7 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.Constants;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.SMPFieldProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.service.SimpleErrorHandler;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.FileUtil;
 import org.apache.commons.lang.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ehdsi.*;
 import org.slf4j.Logger;
@@ -84,6 +85,7 @@ public class SMPConverter {
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
 
         //XML file generated at path
+        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
         generatedFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
 
         //Type of SMP File -> Redirect | Service Information
@@ -281,11 +283,11 @@ public class SMPConverter {
 
         ObjectFactory objectFactory = new ObjectFactory();
         ServiceMetadata serviceMetadata = objectFactory.createServiceMetadata();
-//        ServiceMetadataType serviceMetadataType
-        //XML file generated at path
+        //  XML file generated at path
+        FileUtil.initializeSMPConfigurationFolder(Constants.SMP_DIR_PATH);
         generatedFile = new File(Constants.SMP_DIR_PATH + File.separator + fileName);
 
-        //Type of SMP File -> Redirect | Service Information
+        //  Type of SMP File -> Redirect | Service Information
         if ("Redirect".equals(type)) {
 
             //  Redirect SMP Type
