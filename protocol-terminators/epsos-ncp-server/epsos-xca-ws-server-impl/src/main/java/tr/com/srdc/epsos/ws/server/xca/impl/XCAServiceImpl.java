@@ -775,7 +775,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // ATC code (former Product element)
-        if (StringUtils.isNotBlank(document.getAtcCode())) {
+        if(StringUtils.isNotBlank(document.getAtcCode())) {
             ClassificationType atcCodeClassification = makeClassification(
                     "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
                     document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
@@ -783,7 +783,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // Dose Form Code
-        if (StringUtils.isNotBlank(document.getDoseFormCode())) {
+        if(StringUtils.isNotBlank(document.getDoseFormCode())) {
             ClassificationType doseFormClassification = makeClassification(
                     "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
                     document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
@@ -791,7 +791,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
 
         // Strength
-        if (StringUtils.isNotBlank(document.getStrength())) {
+        if(StringUtils.isNotBlank(document.getStrength())) {
             ClassificationType strengthClassification = makeClassification(
                     "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
                     document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
@@ -819,7 +819,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 : "Normal";
         eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
-
         // FormatCode
         if (isPDF) {
             eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
