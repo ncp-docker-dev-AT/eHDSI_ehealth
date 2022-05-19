@@ -16,6 +16,7 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.ws.server.xca.impl.ClassificationBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.SlotBuilder;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.UUID;
 
@@ -88,22 +89,28 @@ public class EPExtrinsicObjectBuilder {
         }
 
         // ATC code (former Product element)
-        ClassificationType atcCodeClassification = ClassificationBuilder.build(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
-        eot.getClassification().add(atcCodeClassification);
+        if(StringUtils.isNotBlank(document.getAtcCode())) {
+            ClassificationType atcCodeClassification = ClassificationBuilder.build(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getAtcCode(), "2.16.840.1.113883.6.73", document.getAtcName());
+            eot.getClassification().add(atcCodeClassification);
+        }
 
         // Dose Form Code
-        ClassificationType doseFormClassification = ClassificationBuilder.build(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
-        eot.getClassification().add(doseFormClassification);
+        if(StringUtils.isNotBlank(document.getDoseFormCode())) {
+            ClassificationType doseFormClassification = ClassificationBuilder.build(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getDoseFormCode(), "0.4.0.127.0.16.1.1.2.1", document.getDoseFormName());
+            eot.getClassification().add(doseFormClassification);
+        }
 
         // Strength
-        ClassificationType strengthClassification = ClassificationBuilder.build(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
-        eot.getClassification().add(strengthClassification);
+        if(StringUtils.isNotBlank(document.getStrength())) {
+            ClassificationType strengthClassification = ClassificationBuilder.build(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    document.getStrength(), "eHDSI_Strength_CodeSystem", "Strength of medication");
+            eot.getClassification().add(strengthClassification);
+        }
 
         // Substitution
         String substitutionCode = document.getSubstitution() != null
