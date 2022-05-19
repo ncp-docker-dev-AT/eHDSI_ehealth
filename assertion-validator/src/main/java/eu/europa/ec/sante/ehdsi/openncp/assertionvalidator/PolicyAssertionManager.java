@@ -23,6 +23,8 @@ public interface PolicyAssertionManager {
 
     void XSPAFunctionalRoleValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException;
 
+    void PurposeOfUseValidatorForTRC(Assertion assertion, String documentClass) throws MissingFieldException, InsufficientRightsException;
+
     void XSPALocalityValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException;
 
     void XSPAOrganizationIdValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException;

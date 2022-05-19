@@ -4,10 +4,14 @@ logging:
     eu.europa.ec.sante.ehdsi.openncp: info
     org.hibernate: warn
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    open-in-view: false
   datasource:
     default:
       jndi-name: java:comp/env/jdbc/ConfMgr
@@ -20,27 +24,32 @@ spring:
       ddl-auto: validate
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
   jackson:
     default-property-inclusion: non_empty
   mail:
-    host: localhost
+    host: 127.0.0.1
     port: 25
-    username: test@gmail.com
-    password: xxxxx
-#    auth: true
-#    starttls:
-#      enable: true
-#      required: true
-
+    username: email@ehdsi.eu
+    password: password
+    smtp:
+      auth: true
+      connectiontimeout: 5000
+      timeout: 5000
+      writetimeout: 5000
+      starttls:
+        enabled: true
+        required: false
+      ssl:
+        enable: false
+        trust: "*"
 application:
   mail:
-    from: SANTE-EHEALTH-DSI-SUPPORT@ec.europa.eu
+    from: sante-ehealth-dsi-support@ec.europa.eu
   portal:
-    base-url: http://localhost:8082/openncp-gateway
+    base-url: http://127.0.0.1:8080/openncp-gateway
   security:
     jwt:
-      secret: mysecret
+      secret: S7U418zVNeAIRmznNyNQec7eimPD0qEv

@@ -11,11 +11,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Mapper
 public interface MessageMapper {
 
-    @Mapping(target = "eventId", source = "eventId.code")
+    @Mapping(target = "eventId", source = "eventId.codeName")
     @Mapping(target = "eventTypes", source = "eventTypes")
     Message map(MessageEntity entity);
 
@@ -26,9 +25,7 @@ public interface MessageMapper {
     default String mapEventTypes(Set<Code> codes) {
 
         return codes.stream()
-                .map(Code::getCode)
+                .map(Code::getCodeName)
                 .collect(Collectors.joining(", ", "", ""));
-
     }
-
 }

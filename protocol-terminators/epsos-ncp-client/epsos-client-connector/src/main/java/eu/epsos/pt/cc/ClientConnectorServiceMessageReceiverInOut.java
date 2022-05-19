@@ -35,9 +35,6 @@ import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.sax.SAXSource;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.*;
 import java.text.ParseException;
 import java.util.*;
 
@@ -66,7 +63,6 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         logSoapMessage(operationName, requestSoapEnvelope, LOG_INCOMING_REQUEST);
 
         try {
-
             /* Out Envelop */
             SOAPEnvelope responseSoapEnvelope;
 
@@ -128,8 +124,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
                 newMsgContext.getOptions().setMessageId(randomUUID);
             }
         } catch (Exception e) {
-
-            throw AxisFault.makeFault(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -144,7 +139,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         try {
             return builder.getDocumentElement(true);
         } catch (java.lang.Exception e) {
-            throw AxisFault.makeFault(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
     }
 
@@ -267,7 +262,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
             }
 
         } catch (Exception e) {
-            throw AxisFault.makeFault(e);
+            throw ClientConnectorServiceUtils.createGeneralFaultMessage(e);
         }
         return null;
     }
@@ -287,7 +282,7 @@ public class ClientConnectorServiceMessageReceiverInOut extends AbstractInOutMes
         Map<String, String> returnMap = new HashMap<>();
         var namespaceIterator = env.getAllDeclaredNamespaces();
         while (namespaceIterator.hasNext()) {
-            OMNamespace ns = (OMNamespace) namespaceIterator.next();
+            OMNamespace ns = namespaceIterator.next();
             returnMap.put(ns.getPrefix(), ns.getNamespaceURI());
         }
         return returnMap;

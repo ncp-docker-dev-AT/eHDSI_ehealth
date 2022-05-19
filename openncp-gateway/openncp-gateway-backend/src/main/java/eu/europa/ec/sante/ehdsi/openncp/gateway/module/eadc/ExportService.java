@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model.Transaction;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +39,7 @@ public class ExportService {
 
     public byte[] export(LocalDate fromDate, LocalDate toDate) {
 
-        List<Transaction> transactions = transactionService.findTransactions();
+        List<Transaction> transactions = transactionService.findTransactions(null).getContent();
 
         //Filter transactions between the dates
         List<Transaction> filteredTransactions = transactions.stream().filter(t ->
@@ -111,7 +112,7 @@ public class ExportService {
                 case SHEET_KPI_1_5:
                 case SHEET_KPI_1_6:
                 case SHEET_KPI_1_7:
-                    cell.setCellValue(transaction.getTransactionData().getValueDisplay());
+                    cell.setCellValue(transaction.getTransactionData().get(0).getValueDisplay());
                     break;
             }
 
@@ -149,7 +150,7 @@ public class ExportService {
 
         return transactions.stream().filter(transaction ->
                 transaction.getTransactionData() != null
-                        && dataValues.contains(transaction.getTransactionData().getDataValue())).collect(Collectors.toList());
+                        && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
 
     }
 
@@ -157,7 +158,7 @@ public class ExportService {
         //eDispensation
         return transactions.stream().filter(transaction ->
                 transaction.getTransactionData() != null
-                        && transaction.getTransactionData().getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2")).collect(Collectors.toList());
+                        && transaction.getTransactionData().get(0).getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2")).collect(Collectors.toList());
     }
 
     private List<Transaction> getTransactionsForKPI_1_5(List<Transaction> transactions) {
@@ -170,15 +171,14 @@ public class ExportService {
 
         return transactions.stream().filter(transaction ->
                 transaction.getTransactionData() != null
-                        && dataValues.contains(transaction.getTransactionData().getDataValue())).collect(Collectors.toList());
-
+                        && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
     }
 
     private List<Transaction> getTransactionsForKPI_1_6(List<Transaction> transactions) {
         //eDispensation discard
         return transactions.stream().filter(transaction ->
                 transaction.getTransactionData() != null
-                        && transaction.getTransactionData().getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2-DISCARD")).collect(Collectors.toList());
+                        && transaction.getTransactionData().get(0).getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2-DISCARD")).collect(Collectors.toList());
     }
 
     private List<Transaction> getTransactionsForKPI_1_7(List<Transaction> transactions) {
@@ -194,6 +194,6 @@ public class ExportService {
 
         return transactions.stream().filter(transaction ->
                 transaction.getTransactionData() != null
-                        && dataValues.contains(transaction.getTransactionData().getDataValue())).collect(Collectors.toList());
+                        && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
     }
 }

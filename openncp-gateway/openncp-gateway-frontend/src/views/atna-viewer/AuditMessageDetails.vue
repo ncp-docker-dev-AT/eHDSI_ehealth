@@ -81,10 +81,10 @@
               </v-col>
               <v-col>
                 <v-text-field
-                  label="Code System"
+                  label="Code System Name"
                   outlined
                   :value="
-                    message.auditMessage.eventIdentification.eventID.codeSystem
+                    message.auditMessage.eventIdentification.eventID.codeSystemName
                   "
                   disabled
                   hide-details="auto"
@@ -122,9 +122,9 @@
               </v-col>
               <v-col>
                 <v-text-field
-                  label="Code System"
+                  label="Code System Name"
                   outlined
-                  :value="eventTypeCode.codeSystem"
+                  :value="eventTypeCode.codeSystemName"
                   disabled
                   hide-details="auto"
                 />
@@ -246,7 +246,159 @@
           </v-container>
         </v-tab-item>
         <v-tab-item value="tab-participant-object-identifications">
-          <h1>Active Participants</h1>
+          <v-container
+              fluid
+              v-for="(participantObjectIdentification, i) in message.auditMessage
+                .participantObjectIdentification"
+              :key="`participant-object-identification-${i}`"
+            >
+            <v-card outlined>
+              <v-card-title> Participant Object Identification #{{ i }}</v-card-title>
+                <v-card-text>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        label="ID"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectID"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Name"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectName"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Query"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectQuery"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        label="Sensitivity"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectSensitivity"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Type Code"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectTypeCode"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Type Code Role"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectTypeCodeRole"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>ID Type Code</v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        label="Code"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.code"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Code System"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.codeSystem"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Code System Name"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.codeSystemName"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        label="Display Name"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.displayName"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Original Text"
+                        outlined
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.originalText"
+                        disabled
+                        hide-details="auto"
+                      />
+                    </v-col>
+                    <v-col>
+                    </v-col>
+                  </v-row>
+                  <v-container
+                    fluid
+                    v-for="(participantObjectDetail, i) in participantObjectIdentification.participantObjectDetail"
+                    :key="`participant-object-detail-${i}`"
+                  >
+                    <v-row>
+                      <v-col> Participant Object Detail </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-text-field
+                          label="Type"
+                          outlined
+                          :value="participantObjectDetail.type"
+                          disabled
+                          hide-details="auto"
+                        />
+                      </v-col>
+                      <v-col>
+                        <v-text-field
+                          label="Value"
+                          outlined
+                          :value="participantObjectDetail.value"
+                          disabled
+                          hide-details="auto"
+                        />
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-container>
         </v-tab-item>
         <v-tab-item value="tab-xml-message">
           <v-container fluid>

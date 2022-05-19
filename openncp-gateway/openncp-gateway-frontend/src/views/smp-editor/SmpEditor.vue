@@ -6,7 +6,7 @@
       <v-tab :to="{ name: 'SmpUpdate' }">Update</v-tab>
       <v-tab :to="{ name: 'SmpSign' }">Sign </v-tab>
       <v-tab :to="{ name: 'SmpUpload' }">Upload File to SMP Server</v-tab>
-      <v-tab :to="{ name: 'SmpDelete' }">delete File to SMP Server</v-tab>
+      <v-tab :to="{ name: 'SmpDelete' }">List SMP services</v-tab>
       <v-tab :to="{ name: 'SmpSynchronize' }">Synchronize Search Mask</v-tab>
     </v-tabs>
     <router-view />

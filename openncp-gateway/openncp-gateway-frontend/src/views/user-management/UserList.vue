@@ -77,7 +77,6 @@
                   label="Email"
                   type="email"
                   :rules="emailRules"
-                  required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="12">
@@ -86,7 +85,7 @@
                   @keydown="event.charCode != 32"
                   label="Password"
                   required
-                  :rules="passwordRules"
+                  :rules="passwordRulesComplexity"
                   minlength="5"
                 ></v-text-field>
               </v-col>
@@ -160,7 +159,6 @@
                 <v-text-field
                   v-model="itemSelected.email"
                   label="Email"
-                  required
                   :rules="emailRules"
                 ></v-text-field>
               </v-col>
@@ -261,16 +259,15 @@ export default {
       resetPasswordMessage: '',
       conditions: [],
       rolesRules: [(v) => v.length > 0 || 'At least one role must be check'],
-      passwordRules: [
+      passwordRulesComplexity: [
         (v) => !!v || 'Password is required',
         (v) => v.length <= 30 || '30 Characters max',
         (v) =>
-          /^(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,30}$/.test(v) ||
-          'Password must be more than 8 characters and one Uppercase letter. '
+          this.validatePasswordRuleComplexity(v) ||
+          'Password must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces'
       ],
       emailRules: [
-        (v) => !!v || 'Email is required',
-        (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+        (v) => !v || /.+@.+\..+/.test(v) || 'E-mail must be valid'
       ],
       usernameRules: [
         (v) => !!v || 'Username is required',
