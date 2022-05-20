@@ -71,15 +71,19 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testATCNormalFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
-        var strength = "100 U/ml";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode(atcCode)
+                .setAtcName(atcName)
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setStrength("100 U/ml")
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -99,13 +103,15 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testATCNullFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
-        var strength = "100 U/ml";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(null, null, doseFormCode, doseFormName, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setStrength("100 U/ml")
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -121,15 +127,19 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testDoseFormNormalFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
         var doseFormCode = "10219000";
         var doseFormName = "Tablet";
-        var strength = "100 U/ml";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setDoseFormCode(doseFormCode)
+                .setDoseFormName(doseFormName)
+                .setStrength("100 U/ml")
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -149,13 +159,15 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testDoseFormNullFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
-        var strength = "100 U/ml";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, null, null, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setStrength("100 U/ml")
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -171,15 +183,18 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testStrengthNormalFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
         var strength = "100 U/ml";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setStrength(strength)
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -198,14 +213,16 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testStrengthNullFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
-        var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, null, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setSubtitutionCode(SubstitutionCodeEnum.G)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -221,15 +238,18 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testSubstitutionCodeNormalFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
-        var strength = "100 U/ml";
         var substitutionCode = SubstitutionCodeEnum.G;
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, strength, substitutionCode);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setStrength("100 U/ml")
+                .setSubtitutionCode(substitutionCode)
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -249,14 +269,16 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testSubstitutionCodeNullFlow() {
-        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
+        var adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
-        var atcCode = "A10AE04";
-        var atcName = "insulin glargine";
-        var doseFormCode = "10219000";
-        var doseFormName = "Tablet";
-        var strength = "100 U/ml";
-        var epDocumentMetaData = buildEPDocumentMetaData(atcCode, atcName, doseFormCode, doseFormName, strength, null);
+        var ePListParam = EPListParamBuilder.newInstance()
+                .setAtcCode("A10AE04")
+                .setAtcName("insulin glargine")
+                .setDoseFormCode("10219000")
+                .setDoseFormName("Tablet")
+                .setStrength("100 U/ml")
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
 
         EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
         var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
@@ -272,12 +294,7 @@ public class EPExtrinsicObjectBuilderTest {
         Assert.assertFalse(found);
     }
 
-    private EPDocumentMetaData buildEPDocumentMetaData(String atcCode,
-                                                       String atcName,
-                                                       String doseFormCode,
-                                                       String doseFormName,
-                                                       String strength,
-                                                       SubstitutionCodeEnum substitutionCode) {
+    private EPDocumentMetaData buildEPDocumentMetaData(EpListParam ePListParam) {
         var epsosDocumentMetaData = new EPSOSDocumentMetaDataImpl(
                 "id",
                 "patientid",
@@ -289,15 +306,7 @@ public class EPExtrinsicObjectBuilderTest {
                 "author",
                 new EPSOSDocumentMetaDataImpl.SimpleConfidentialityMetadata("N", "normal"),
                 "en-EN");
-        var epListParam = new EpListParam(
-                true,
-                atcCode,
-                atcName,
-                doseFormCode,
-                doseFormName,
-                strength,
-                substitutionCode == null ? null : new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata(substitutionCode));
-        return new EPDocumentMetaDataImpl(epsosDocumentMetaData, "description", epListParam);
+        return new EPDocumentMetaDataImpl(epsosDocumentMetaData, "description", ePListParam);
     }
 
     private String toXml(JAXBElement element) {
@@ -329,5 +338,56 @@ public class EPExtrinsicObjectBuilderTest {
         adhocQueryType.getSlot().add(patientIdSlot);
         adHocQueryRequest.setAdhocQuery(adhocQueryType);
         return adHocQueryRequest;
+    }
+
+    private static class EPListParamBuilder {
+
+        private String atcCode;
+        private String atcName;
+        private String doseFormCode;
+        private String doseFormName;
+        private String strength;
+        private SubstitutionCodeEnum substitutionCode;
+
+        public static EPListParamBuilder newInstance()
+        {
+            return new EPListParamBuilder();
+        }
+
+        public EPListParamBuilder setAtcCode(String atcCode) {
+            this.atcCode=atcCode;
+            return this;
+        }
+        public EPListParamBuilder setAtcName(String atcName) {
+            this.atcName=atcName;
+            return this;
+        }
+        public EPListParamBuilder setDoseFormCode(String doseFormCode) {
+            this.doseFormCode=doseFormCode;
+            return this;
+        }
+        public EPListParamBuilder setDoseFormName(String doseFormName) {
+            this.doseFormName=doseFormName;
+            return this;
+        }
+        public EPListParamBuilder setStrength(String strength) {
+            this.strength=strength;
+            return this;
+        }
+        public EPListParamBuilder setSubtitutionCode(SubstitutionCodeEnum substitutionCode) {
+            this.substitutionCode=substitutionCode;
+            return this;
+        }
+
+        public EpListParam build() {
+            return new EpListParam(
+                    true,
+                    atcCode,
+                    atcName,
+                    doseFormCode,
+                    doseFormName,
+                    strength,
+                    substitutionCode == null ? null : new EPDocumentMetaDataImpl.SimpleSubstitutionMetadata(substitutionCode));
+        }
     }
 }
