@@ -3,6 +3,7 @@ package tr.com.srdc.epsos.ws.server.xca.impl.eP;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.domain.Property;
 import fi.kela.se.epsos.data.model.*;
+import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -70,11 +71,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testATCNormalFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -102,11 +99,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testATCNullFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var doseFormCode = "10219000";
         var doseFormName = "Tablet";
@@ -128,11 +121,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testDoseFormNormalFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -160,11 +149,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testDoseFormNullFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -186,11 +171,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testStrengthNormalFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -217,11 +198,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testStrengthNullFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -244,11 +221,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testSubstitutionCodeNormalFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -276,11 +249,7 @@ public class EPExtrinsicObjectBuilderTest {
 
     @Test
     public void testSubstitutionCodeNullFlow() {
-        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
-        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
-        var adhocQueryType = new AdhocQueryType();
-        adhocQueryType.getSlot().add(patientIdSlot);
-        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        AdhocQueryRequest adHocQueryRequest = buildAdhocQueryRequest();
         var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
         var atcCode = "A10AE04";
         var atcName = "insulin glargine";
@@ -351,5 +320,14 @@ public class EPExtrinsicObjectBuilderTest {
         property.setKey(key);
         property.setValue(value);
         return property;
+    }
+
+    private AdhocQueryRequest buildAdhocQueryRequest() {
+        var adHocQueryRequest = OBJECT_FACTORY_QUERY.createAdhocQueryRequest();
+        var patientIdSlot = SlotBuilder.build("$XDSDocumentEntryPatientId", "123");
+        var adhocQueryType = new AdhocQueryType();
+        adhocQueryType.getSlot().add(patientIdSlot);
+        adHocQueryRequest.setAdhocQuery(adhocQueryType);
+        return adHocQueryRequest;
     }
 }
