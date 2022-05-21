@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 
 public class CdaXSLTransformer {
 
-    private static final String MAIN_XSLT = "/resources/cda.xsl";
+    private static final String MAIN_XSLT = "cda.xsl";
     private static final String STANDARD_XSLT = "/resources/def_cda.xsl";
     private static final Path PATH = Paths.get(System.getenv("EPSOS_PROPS_PATH"), "EpsosRepository");
     private static final Logger LOGGER = LoggerFactory.getLogger(CdaXSLTransformer.class);
@@ -101,7 +101,7 @@ public class CdaXSLTransformer {
                 actionPath, path, lang);
 
         try {
-            URL xslUrl = this.getClass().getResource(xsl);
+            URL xslUrl = this.getClass().getClassLoader().getResource(xsl);
             InputStream xslStream = getClass().getClassLoader().getResourceAsStream("classpath*:" + xsl);
 
             String systemId = xslUrl.toExternalForm();
