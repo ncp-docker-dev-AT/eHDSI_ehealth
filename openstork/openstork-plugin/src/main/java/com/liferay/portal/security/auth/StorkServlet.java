@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -187,9 +188,9 @@ public class StorkServlet extends HttpServlet {
             } else {
                 result.append("&");
             }
-            result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+            result.append(URLEncoder.encode(pair.getName(), StandardCharsets.UTF_8));
             result.append("=");
-            result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+            result.append(URLEncoder.encode(pair.getValue(), StandardCharsets.UTF_8));
         }
 
         return result.toString();
@@ -218,7 +219,7 @@ public class StorkServlet extends HttpServlet {
                     if (i != 0) {
                         content.append("&");
                     }
-                    content.append(key).append("=").append(URLEncoder.encode(data.get(key), "UTF-8"));
+                    content.append(key).append("=").append(URLEncoder.encode(data.get(key), StandardCharsets.UTF_8));
                 }
                 out.writeBytes(content.toString());
 

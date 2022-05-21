@@ -9,6 +9,7 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.service.SimpleErrorHa
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.service.BdxSmpValidator;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.service.SMPConverter;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.service.SignFileService;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ehdsi.EndpointType;
 import org.oasis_open.docs.bdxr.ns.smp._2016._05.ehdsi.RedirectType;
@@ -82,6 +83,7 @@ public class SMPSignFileController {
     public ResponseEntity<SMPFileOps> createSMPFileOps(@RequestPart MultipartFile multipartFile) {
 
         SMPFileOps smpFileOps = new SMPFileOps();
+        FileUtil.initializeFolders(Constants.SMP_DIR_PATH);
         File convFile = new File(Constants.SMP_DIR_PATH + File.separator + multipartFile.getOriginalFilename());
         try {
             multipartFile.transferTo(convFile);

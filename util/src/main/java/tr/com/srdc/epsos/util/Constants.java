@@ -13,6 +13,7 @@ public class Constants {
 
     public static final String UUID_PREFIX = "urn:uuid:";
     public static final String OID_PREFIX = "urn:oid:";
+    public static final String HL7II_PREFIX = "urn:hl7ii";
 
     public static final String EP_CLASSCODE = "57833-6";
     public static final String PS_CLASSCODE = "60591-5";
