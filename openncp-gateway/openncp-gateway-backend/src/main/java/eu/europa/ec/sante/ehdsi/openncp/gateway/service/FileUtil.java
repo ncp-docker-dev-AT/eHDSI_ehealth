@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FileUtil {
 
@@ -19,7 +22,16 @@ public class FileUtil {
 
         try {
             Path path = Paths.get(folder);
+            Set<PosixFilePermission> permissions = new HashSet<>();
+            permissions.add(PosixFilePermission.OWNER_EXECUTE);
+            permissions.add(PosixFilePermission.OWNER_WRITE);
+            permissions.add(PosixFilePermission.OWNER_READ);
+            permissions.add(PosixFilePermission.GROUP_EXECUTE);
+            permissions.add(PosixFilePermission.GROUP_READ);
+            permissions.add(PosixFilePermission.OTHERS_EXECUTE);
+            permissions.add(PosixFilePermission.OTHERS_READ);
             Files.createDirectories(path);
+            Files.setPosixFilePermissions(path, permissions);
             return true;
         } catch (IOException e) {
             LOGGER.error("Failed to create directory '{}'!!!", folder);
