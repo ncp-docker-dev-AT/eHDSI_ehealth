@@ -141,22 +141,22 @@ public class FileUtil {
 
     public static String readWholeFile(File file) {
 
-        return readInpustream(file, StandardCharsets.UTF_8);
+        return readInputStream(file, StandardCharsets.UTF_8);
     }
 
     public static String readWholeFile(String filePath) {
 
-        return readInpustream(new File(filePath), StandardCharsets.UTF_8);
+        return readInputStream(new File(filePath), StandardCharsets.UTF_8);
     }
 
     public static String readWholeFile(String filePath, String encoding) {
 
-        return readInpustream(new File(filePath), Charset.forName(encoding));
+        return readInputStream(new File(filePath), Charset.forName(encoding));
     }
 
     private static String readWholeFile(URI uri) {
 
-        return readInpustream(new File(uri), StandardCharsets.UTF_8);
+        return readInputStream(new File(uri), StandardCharsets.UTF_8);
     }
 
     public static void writeToFile(File file, String content) {
@@ -175,7 +175,7 @@ public class FileUtil {
         }
     }
 
-    private static String readInpustream(File file, Charset charset) {
+    private static String readInputStream(File file, Charset charset) {
 
         try (FileInputStream fis = new FileInputStream(file)) {
             BufferedReader buf;

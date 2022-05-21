@@ -22,6 +22,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -33,7 +34,6 @@ public class SignFileService {
     private static final String C14N_METHOD = CryptographicConstant.ALGO_ID_C14N_INCL_OMIT_COMMENTS;
     private static final String OASIS_NS = "http://docs.oasis-open.org/bdxr/ns/SMP/2016/05";
     private static final String XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
-    private static Signer NATIONAL_INFRASTRUCTURE_SIGNER;
     private final Logger logger = LoggerFactory.getLogger(SignFileService.class);
     private final Environment env;
 
@@ -52,18 +52,17 @@ public class SignFileService {
      * @param signFile
      * @throws Exception
      */
-    public File signFiles(String type, String fileName, MultipartFile keystore, String keystorePassword, String keyAlias, String keyPassword,
-                          File signFile) throws Exception {
+    public File signFiles(String type, String fileName, MultipartFile keystore, String keystorePassword,
+                          String keyAlias, String keyPassword, File signFile) throws Exception {
 
-        NATIONAL_INFRASTRUCTURE_SIGNER = new Signer(keystore, keystorePassword, keyAlias, keyPassword);
+        Signer signer = new Signer(keystore, keystorePassword, keyAlias, keyPassword);
 
-        if (NATIONAL_INFRASTRUCTURE_SIGNER.isInvalidKeystore()) {
+        if (signer.isInvalidKeystore()) {
             throw new RuntimeException(env.getProperty("error.keystore.invalid"));
         }
-        if (NATIONAL_INFRASTRUCTURE_SIGNER.isInvalidKeyPair()) {
+        if (signer.isInvalidKeyPair()) {
             throw new RuntimeException(env.getProperty("error.keypair.invalid"));
         }
-
 
         // ========================================================================================
         // "National Infrastructure" creates PUT ServiceMetadata request, and signs THE WHOLE document.
@@ -72,7 +71,7 @@ public class SignFileService {
         Document docPutRequest = getDocumentBuilder().parse(signFile);
 
         Element extension = newExtension(type, docPutRequest);
-        NATIONAL_INFRASTRUCTURE_SIGNER.sign("", extension, C14N_METHOD);
+        signer.sign("", extension, C14N_METHOD);
 
         //Request is ready to send (PUT) - sample test assertions:
         String strPutRequest = marshall(docPutRequest);
@@ -110,7 +109,7 @@ public class SignFileService {
         Transformer trans = tf.newTransformer();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         trans.transform(new DOMSource(doc), new StreamResult(stream));
-        return stream.toString("UTF-8");
+        return stream.toString(StandardCharsets.UTF_8);
     }
 
     private Document parseDocument(String docContent) throws IOException, SAXException, ParserConfigurationException {
