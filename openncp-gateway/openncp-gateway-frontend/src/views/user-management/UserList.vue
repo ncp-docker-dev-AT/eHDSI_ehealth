@@ -85,7 +85,7 @@
                   @keydown="event.charCode != 32"
                   label="Password"
                   required
-                  :rules="passwordRules"
+                  :rules="passwordRulesComplexity"
                   minlength="5"
                 ></v-text-field>
               </v-col>
@@ -259,12 +259,12 @@ export default {
       resetPasswordMessage: '',
       conditions: [],
       rolesRules: [(v) => v.length > 0 || 'At least one role must be check'],
-      passwordRules: [
+      passwordRulesComplexity: [
         (v) => !!v || 'Password is required',
         (v) => v.length <= 30 || '30 Characters max',
         (v) =>
-          /^(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d]{8,30}$/.test(v) ||
-          'Password must be more than 8 characters and one Uppercase letter. '
+          this.validatePasswordRuleComplexity(v) ||
+          'Password must be at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character and no white spaces'
       ],
       emailRules: [
         (v) => !v || /.+@.+\..+/.test(v) || 'E-mail must be valid'

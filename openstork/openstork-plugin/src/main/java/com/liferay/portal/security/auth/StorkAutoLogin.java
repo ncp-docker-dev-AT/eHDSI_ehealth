@@ -39,6 +39,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -360,7 +361,7 @@ public class StorkAutoLogin implements AutoLogin {
     private String getIsoEncoding(String input) throws UnsupportedEncodingException {
 
         byte[] utf = input.getBytes();
-        byte[] b = new String(utf, "UTF-8").getBytes("ISO-8859-1");
+        byte[] b = new String(utf, StandardCharsets.UTF_8).getBytes(StandardCharsets.ISO_8859_1);
         return new String(b);
     }
 

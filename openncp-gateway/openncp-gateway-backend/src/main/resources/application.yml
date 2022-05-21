@@ -4,10 +4,17 @@ logging:
     eu.europa.ec.sante.ehdsi.openncp: info
     org.hibernate: warn
 spring:
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
   datasource:
     default:
@@ -31,6 +38,20 @@ spring:
     port: 25
     username: email@ehdsi.eu
     password: password
+    smtp:
+      auth: true
+      connectiontimeout: 5000
+      timeout: 5000
+      writetimeout: 5000
+      starttls:
+        enabled: true
+        required: false
+      ssl:
+        enable: false
+        trust: "*"
+server:
+  error:
+    include-message: always
 application:
   mail:
     from: sante-ehealth-dsi-support@ec.europa.eu

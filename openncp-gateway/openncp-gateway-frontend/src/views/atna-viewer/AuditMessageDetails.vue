@@ -81,10 +81,10 @@
               </v-col>
               <v-col>
                 <v-text-field
-                  label="Code System"
+                  label="Code System Name"
                   outlined
                   :value="
-                    message.auditMessage.eventIdentification.eventID.codeSystem
+                    message.auditMessage.eventIdentification.eventID.codeSystemName
                   "
                   disabled
                   hide-details="auto"
@@ -122,9 +122,9 @@
               </v-col>
               <v-col>
                 <v-text-field
-                  label="Code System"
+                  label="Code System Name"
                   outlined
-                  :value="eventTypeCode.codeSystem"
+                  :value="eventTypeCode.codeSystemName"
                   disabled
                   hide-details="auto"
                 />
@@ -433,8 +433,8 @@ export default {
       return [
         {
           text: 'ATNA Viewer',
-          disabled: true,
-          href: 'breadcrumbs_dashboard'
+          disabled: false,
+          to: { name: 'audits' }
         },
         {
           text: 'Audit messages list',

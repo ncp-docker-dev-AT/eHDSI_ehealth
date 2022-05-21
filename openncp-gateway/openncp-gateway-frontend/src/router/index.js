@@ -177,6 +177,15 @@ router.beforeEach((to, from, next) => {
   ) {
     next('/login')
   } else {
+    if ((from.path.indexOf('atna-viewer') === -1 && to.path.indexOf('atna-viewer/') > -1) || from.path.indexOf('atna-viewer/error-messages') > -1) {
+      store.commit('searchAtnaOpts', {
+        searchEventId: null,
+        activeParticipantId: null,
+        activeTypeCode: null,
+        searchEventStartDate: null,
+        searchEventEndDate: null
+      })
+    }
     next()
   }
 })

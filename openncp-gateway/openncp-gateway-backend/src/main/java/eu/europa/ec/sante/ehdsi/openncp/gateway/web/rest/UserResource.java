@@ -1,6 +1,8 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.web.rest;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.persistence.model.User;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.ExceptionFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.service.ExceptionType;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.service.UserService;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.web.rest.model.PasswordReset;
 import org.slf4j.Logger;
@@ -18,7 +20,6 @@ import java.util.List;
 public class UserResource {
 
     private final Logger logger = LoggerFactory.getLogger(UserResource.class);
-
     private final UserService userService;
 
     public UserResource(UserService userService) {
@@ -37,7 +38,9 @@ public class UserResource {
         long lastId = 0L;
 
         if (!userService.isValidPassword(newUser.getPassword())) {
-            logger.error("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
+            logger.error("Invalid password : Length should between 8 and 30 characters with at least one uppercase letter, " +
+                    "one lowercase letter, one number and one special character" +
+                    "and no white spaces");
             return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
         }
 
@@ -58,22 +61,6 @@ public class UserResource {
                 return ResponseEntity.badRequest().body("{ \"body\": \"Username Already exists!\", \"statusCode\": \"NOT_ACCEPTED\", \"statusCodeValue\": 403 }");
             }
         }
-        /*
-        for (Role newUserRole : newUser.getRoles()) {
-            List<Role> roles = roleService.getRoles();
-            for (Role role : roles) {
-                if(role.getId().equals(newUserRole.getId())) {
-                    LOGGER.info("[Gateway] role ID already exists! {}", newUserRole.getId());
-                    return ResponseEntity.badRequest().body("{ \"body\": \"role ID already exists!\", \"statusCode\": \"NOT_ACCEPTED\", \"statusCodeValue\": 403 }");
-                }
-                if(role.getName().equals(newUserRole.getName())) {
-                    LOGGER.info("[Gateway] Role name already exists! {}", newUserRole.getName());
-                    return ResponseEntity.badRequest().body("{ \"body\": \"Role name already exists!\", \"statusCode\": \"NOT_ACCEPTED\", \"statusCodeValue\": 403 }");
-                }
-            }
-        }
-        */
-
         newUser.setId(lastId);
         userService.createUser(newUser);
         return ResponseEntity.ok().build();
@@ -108,38 +95,37 @@ public class UserResource {
     }
 
     @PostMapping(path = "/user/reset-password/finish")
-    public ResponseEntity<Void> completePasswordReset(@Valid @RequestBody PasswordResetCommand command) {
-//        if (!command.getPassword().equals(command.getPassword_confirm())) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
+    public ResponseEntity<String> completePasswordReset(@Valid @RequestBody PasswordResetCommand command) {
+        if (!userService.isValidPassword(command.getPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("New password does not meet complexity rules");
+        }
+        
         userService.completePasswordReset(command.getToken(), command.getPassword());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping(path = "/user/reset-password/abort")
+    public ResponseEntity<Void> abortPasswordReset(@Valid @RequestBody PasswordResetCommand command) {
+        userService.abortPasswordReset(command.getToken(), command.getPassword());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PostMapping("/user/change-password")
-    public ResponseEntity changePassword(@Valid @RequestBody PasswordReset passwordReset) {
-
-//        if (!passwordReset.getPassword().equals(passwordReset.getPassword_confirm())
-//                || (passwordReset.getOldPassword() == null && passwordReset.getToken() == null)
-//                || (passwordReset.getOldPassword() != null && passwordReset.getToken() != null)) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//
-//        if(passwordReset.getOldPassword() != null){
-//            userService.changePassword(passwordReset.getUserId(), passwordReset.getOldPassword(), passwordReset.getPassword());
-//        }
-//
-//        if(passwordReset.getToken() != null){
-//            userService.changePasswordWithToken(passwordReset.getToken(), passwordReset.getPassword());
-//        }
-
+    public ResponseEntity<String> changePassword(@Valid @RequestBody PasswordReset passwordReset) {
         if (!userService.isValidPassword(passwordReset.getPassword())) {
-            logger.error("Invalid password : Length should between 8 and 30, one Uppercase and no white spaces");
-            return ResponseEntity.badRequest().body("{ \"body\": \"Invalid password\", \"statusCode\": \"BAD_REQUEST\", \"statusCodeValue\": 400 }");
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("New password does not meet complexity rules");
         }
 
-        userService.changePassword(passwordReset.getPassword(), passwordReset.getOldPassword());
-        //auditLogService.log(null, AuditLogAction.UPDATE_USER_PASSWORD);
+        if(!userService.changePassword(passwordReset.getPassword(), passwordReset.getOldPassword())) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Current password does not match");
+        }
+
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

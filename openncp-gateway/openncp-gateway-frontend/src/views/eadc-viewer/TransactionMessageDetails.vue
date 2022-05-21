@@ -14,7 +14,7 @@
       <v-tab href="#tab-home-snd-receiving">Home / Sender / Receiver</v-tab>
       <v-tab
         href="#transaction-details"
-        v-if="message.transactionData.length > 0"
+        v-if="message.transactionData && message.transactionData.length > 0"
         >Transaction details</v-tab
       >
     </v-tabs>
@@ -233,7 +233,10 @@
             </v-col>
           </v-row>
         </v-tab-item>
-        <v-tab-item value="transaction-details">
+        <v-tab-item
+          value="transaction-details"
+          v-if="message.transactionData && message.transactionData.length > 0"
+        >
           <div
             v-for="(item, i) in message.transactionData"
             :key="`transaction-data-${i}`"
@@ -292,7 +295,8 @@
 </template>
 
 <script>
-// import axios from 'axios'
+
+import axios from 'axios'
 
 export default {
   props: ['id'],
@@ -306,23 +310,10 @@ export default {
   },
   mounted () {
     this.loading = true
-    // axios
-    //   .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-    //   .then((response) => {
-    //     this.message = response.data
-    //     console.log(response)
-    //     console.log(this.message)
-    //     console.log(this.message.transactionData)
-    //     this.loading = false
-    //   })
-
-    fetch(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        this.message = data
-        console.log(this.message)
-        console.log(this.message.transationData)
-        this.transactionData = data.transactionData
+    axios
+      .get(process.env.VUE_APP_SERVER_URL + `/api/eadc/transactions/${this.id}`)
+      .then((response) => {
+        this.message = response.data
         this.loading = false
       })
   },
