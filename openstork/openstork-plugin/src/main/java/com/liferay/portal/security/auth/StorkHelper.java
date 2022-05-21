@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -234,7 +235,7 @@ public class StorkHelper {
             if (i != 0) {
                 content += "&";
             }
-            content += key + "=" + URLEncoder.encode(data.get(key), "UTF-8");
+            content += key + "=" + URLEncoder.encode(data.get(key), StandardCharsets.UTF_8);
         }
         out.writeBytes(content);
         out.flush();

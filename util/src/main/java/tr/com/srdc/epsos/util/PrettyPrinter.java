@@ -16,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class "pretty prints" an XML stream to something more human-readable.
@@ -130,7 +131,7 @@ public class PrettyPrinter extends DefaultHandler {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(new DOMSource(doc), new StreamResult(buffer));
 
-            return buffer.toString("UTF-8").replaceAll("(>)([ \t]+<)", "$1\n$2");
+            return buffer.toString(StandardCharsets.UTF_8).replaceAll("(>)([ \t]+<)", "$1\n$2");
 
         } catch (Exception ex) {
             LOGGER.error("PrettyPrint Document Exception: '{}'", ex.getMessage(), ex);

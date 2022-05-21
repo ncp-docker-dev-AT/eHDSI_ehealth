@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.smpeditor.web.rest;
 
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.error.ApiException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.cfg.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.Countries;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.SMPFields;
@@ -69,7 +70,7 @@ public class SMPGenerateFileController {
      * Generate SMPFile data and create SMP file (the file itself)
      */
     @PostMapping(value = "smpeditor/generate/smpfile")
-    public ResponseEntity generateSmpFile(@RequestBody SMPFile smpfile) throws IOException {
+    public ResponseEntity<SMPFile> generateSmpFile(@RequestBody SMPFile smpfile) throws IOException {
 
         String timeStamp;
         String fileName;
@@ -95,8 +96,7 @@ public class SMPGenerateFileController {
                 try {
                     fis = new FileInputStream(certificatePath);
                 } catch (FileNotFoundException ex) {
-                    LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("FileNotFoundException Certificate"));
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("FileNotFoundException Certificate"));
                 }
 
                 smpfile.setCertificateFile(fis);
@@ -131,13 +131,13 @@ public class SMPGenerateFileController {
 
             if (smpfields.getCertificate().isEnable()) {
                 if (smpconverter.getCertificateSubjectName() == null) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.certificate.invalid"));
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.certificate.invalid"));
                 }
                 smpfile.setCertificate(smpconverter.getCertificateSubjectName());
             }
 
             if (smpfields.getExtension().isEnable() && smpconverter.isNullExtension()) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.extension.invalid"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.extension.invalid"));
             }
 
 
@@ -166,8 +166,7 @@ public class SMPGenerateFileController {
                     }
                 }
                 if (smpfile.getCountry() == null) {
-                    String message = env.getProperty("error.redirect.href.participantID");
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+                    throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href.participantID"));
                 }
 
                 String docID = ids[1];
@@ -186,13 +185,13 @@ public class SMPGenerateFileController {
                     }
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.redirect.href"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href"));
             }
 
             // smpeditor.properties
             String smpType = documentID;
             if ("".equals(smpType)) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.redirect.href.documentID"));
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.redirect.href.documentID"));
             }
 
             // Builds final file name
@@ -211,7 +210,7 @@ public class SMPGenerateFileController {
             LOGGER.debug("\n****VALID XML File");
         } else {
             smpfile.getGeneratedFile().deleteOnExit();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.file.xsd"));
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, env.getProperty("error.file.xsd"));
         }
         return ResponseEntity.ok(smpfile);
     }
@@ -223,10 +222,8 @@ public class SMPGenerateFileController {
         response.setContentLength((int) smpfile.getGeneratedFile().length());
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(smpfile.getGeneratedFile()))) {
             FileCopyUtils.copy(inputStream, response.getOutputStream());
-        } catch (FileNotFoundException ex) {
-            LOGGER.error("\n FileNotFoundException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (IOException ex) {
-            LOGGER.error("\n IOException - '{}'", SimpleErrorHandler.printExceptionStackTrace(ex));
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "IOException");
         }
     }
 

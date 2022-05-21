@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -93,7 +94,7 @@ public class TlsClientTest0 extends ClientTest {
             AuthSSLSocketFactory f = new AuthSSLSocketFactory(key, trust);
             SSLSocket s = (SSLSocket) f.createSecureSocket("localhost", 2862);
             OutputStream out = s.getOutputStream();
-            ProvisionalMessage message = new ProvisionalMessage("This is a bad message".getBytes("UTF-8"));
+            ProvisionalMessage message = new ProvisionalMessage("This is a bad message".getBytes(StandardCharsets.UTF_8));
             ProtocolMessage sl = new ProtocolMessage(10, 5, "localhost", new UdpClientTest0.ProvLogMessage(message), "IHE_CLIENT", "ATNALOG", "1234");
             byte[] bytes = sl.toByteArray();
             out.write((String.valueOf(bytes.length) + " ").getBytes(Constants.ENC_UTF8));

@@ -70,7 +70,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws Exception {
-        fileTest("/opt/development/ehealth/cda-display-tool/xsltransformer/samples/1-1234-W5.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/EHEALTH-8147.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test

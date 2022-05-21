@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -94,13 +95,9 @@ public class EntityDataSource implements JRDataSource {
                     return ret.toString();
                 } else if (ret instanceof byte[]) {
                     try {
-                        return Base64.decodeString(new String((byte[]) ret, "UTF-8"));
+                        return Base64.decodeString(new String((byte[]) ret, StandardCharsets.UTF_8));
                     } catch (Exception e) {
-                        try {
-                            return new String((byte[]) ret, "UTF-8");
-                        } catch (UnsupportedEncodingException e1) {
-
-                        }
+                        return new String((byte[]) ret, StandardCharsets.UTF_8);
                     }
                 }
                 return ret;

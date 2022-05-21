@@ -136,17 +136,17 @@
                     <xsl:call-template name="translateTelecomCode">
                         <xsl:with-param name="code" select="$type"/>
                     </xsl:call-template>
-                    <xsl:if test="@use">
-                        <xsl:text> (</xsl:text>
-                        <xsl:call-template name="show-eHDSITelecomAddress">
-                            <xsl:with-param name="code" select="@use"/>
-                        </xsl:call-template>
-                        <xsl:text>)</xsl:text>
-                    </xsl:if>
-                    <xsl:text>: </xsl:text>
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="$value"/>
                 </xsl:if>
+                <xsl:if test="@use">
+                    <xsl:text> (</xsl:text>
+                    <xsl:call-template name="show-eHDSITelecomAddress">
+                        <xsl:with-param name="code" select="@use"/>
+                    </xsl:call-template>
+                    <xsl:text>)</xsl:text>
+                </xsl:if>
+                <xsl:text>: </xsl:text>
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="$value"/>
             </xsl:when>
             <xsl:otherwise>
                 <!-- xsl:text>Telecom information not available</xsl:text -->
@@ -187,21 +187,6 @@
             </xsl:when>
             <xsl:when test="$code='mailto'">
                 <xsl:text>Mail</xsl:text>
-            </xsl:when>
-            <xsl:when test="$code='H'">
-                <xsl:text>Home</xsl:text>
-            </xsl:when>
-            <xsl:when test="$code='HV'">
-                <xsl:text>Vacation Home</xsl:text>
-            </xsl:when>
-            <xsl:when test="$code='HP'">
-                <xsl:text>Primary Home</xsl:text>
-            </xsl:when>
-            <xsl:when test="$code='WP'">
-                <xsl:text>Work Place</xsl:text>
-            </xsl:when>
-            <xsl:when test="$code='PUB'">
-                <xsl:text>Pub</xsl:text>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$code"/>
