@@ -1,23 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.audit.server;
 
 import org.openhealthtools.openatna.net.ConnectionFactory;
@@ -32,21 +12,15 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-
-/**
- * @author Andrew Harrison
- * @version $Revision:$
- */
+import java.nio.charset.StandardCharsets;
 
 public class TcpServer implements Server {
 
-    private static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.audit.server.TcpServer");
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TcpServer.class);
     private AtnaServer atnaServer;
     private IConnectionDescription tlsConnection;
     private IServerConnection tlsConn = null;
@@ -65,7 +39,7 @@ public class TcpServer implements Server {
         running = true;
         thread = new TcpServerThread(ss);
         thread.start();
-        log.info("TLS Server running on port:" + tlsConnection.getPort());
+        LOGGER.info("TLS Server running on port:" + tlsConnection.getPort());
     }
 
     public void stop() {
@@ -73,11 +47,11 @@ public class TcpServer implements Server {
         try {
             ss.close();
         } catch (IOException e) {
-            log.warn("Unable to close Tcp server socket.", e);
+            LOGGER.warn("Unable to close Tcp server socket.", e);
         }
         thread.interrupt();
         tlsConn.closeServerConnection();
-        log.info("TLS Server shutting down...");
+        LOGGER.info("TLS Server shutting down...");
     }
 
     private class TcpServerThread extends Thread {
@@ -91,7 +65,7 @@ public class TcpServer implements Server {
         @Override
         public void run() {
             if (server == null) {
-                log.info("Server socket is null. Cannot start server.");
+                LOGGER.info("Server socket is null. Cannot start server.");
                 running = false;
                 return;
             }
@@ -99,13 +73,13 @@ public class TcpServer implements Server {
                 Socket s = null;
                 try {
                     s = server.accept();
-                    log.debug(logSocket(s));
+                    LOGGER.debug(logSocket(s));
                     atnaServer.execute(new WorkerThread(s));
                 } catch (RuntimeException e) {
                     throw (e);
                 } catch (SocketException e) {
-                    log.debug("Socket closed.");
-                    log.error("Socket Exception: {}", e.getMessage(), e);
+                    LOGGER.debug("Socket closed.");
+                    LOGGER.error("Socket Exception: {}", e.getMessage(), e);
                 } catch (IOException e) {
                     SyslogException ex = new SyslogException(e.getMessage(), e);
                     atnaServer.notifyException(ex);
@@ -121,8 +95,8 @@ public class TcpServer implements Server {
 
         private String logSocket(Socket socket) {
             InetSocketAddress local = (InetSocketAddress) socket.getLocalSocketAddress();
-            InetSocketAddress addr = (InetSocketAddress) socket.getRemoteSocketAddress();
-            return "TCP data received from:" + addr.getHostName() + ":" + addr.getPort()
+            InetSocketAddress socketAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
+            return "TCP data received from:" + socketAddress.getHostName() + ":" + socketAddress.getPort()
                     + " to:" + local.getHostName() + ":" + local.getPort();
         }
     }
@@ -156,7 +130,7 @@ public class TcpServer implements Server {
                         int length;
                         try {
                             length = Integer.parseInt(new String(b, 0, count));
-                            log.debug("length of incoming message: '{}'", length);
+                            LOGGER.debug("length of incoming message: '{}'", length);
                         } catch (NumberFormatException e) {
                             SyslogException ex = new SyslogException(e, b);
                             ex.setSourceIp(((InetSocketAddress) socket.getRemoteSocketAddress())
@@ -173,7 +147,7 @@ public class TcpServer implements Server {
                             }
                             len += curr;
                         }
-                        log.debug("read in '{}' bytes to convert to message.", len);
+                        LOGGER.debug("read in '{}' bytes to convert to message.", len);
                         SyslogMessage msg = null;
                         try {
                             msg = createMessage(bytes);
@@ -196,16 +170,11 @@ public class TcpServer implements Server {
                 ex.setSourceIp(((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().getHostAddress());
                 atnaServer.notifyException(ex);
             }
-
         }
 
         private SyslogMessage createMessage(byte[] bytes) throws SyslogException {
-            if (log.isDebugEnabled()) {
-                try {
-                    log.debug("creating message from bytes: " + new String(bytes, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-
-                }
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("creating message from bytes: " + new String(bytes, StandardCharsets.UTF_8));
             }
             return SyslogMessageFactory.getFactory().read(new ByteArrayInputStream(bytes));
         }
