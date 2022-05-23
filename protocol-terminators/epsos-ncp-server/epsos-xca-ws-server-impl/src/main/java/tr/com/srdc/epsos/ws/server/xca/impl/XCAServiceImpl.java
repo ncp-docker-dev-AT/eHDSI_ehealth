@@ -980,7 +980,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                         registryErrorList.getRegistryError().add(createErrorMessage("1101", "No ePrescriptions are registered for the given patient.", "", true));
                         response.setRegistryErrorList(registryErrorList);
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        response.setStatus(AdhocQueryResponseStatus.FAILURE);
                     } else {
 
                         // Multiple prescriptions mean multiple PDF and XML files, multiple ExtrinsicObjects and associations
