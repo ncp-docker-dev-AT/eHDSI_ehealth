@@ -9,6 +9,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -319,7 +320,7 @@ public class KeystoreManager {
         if (dns != null && dns.length() > 0) {
             String[] dn = dns.split("&");
             for (String s : dn) {
-                String decoded = URLDecoder.decode(s, "UTF-8");
+                String decoded = URLDecoder.decode(s, StandardCharsets.UTF_8);
                 if (decoded.length() > 0) {
                     authorizedDNs.add(decoded);
                 }
@@ -375,7 +376,7 @@ public class KeystoreManager {
         if (authorizedDNs.size() > 0) {
             StringBuilder sb = new StringBuilder();
             for (String dn : authorizedDNs) {
-                sb.append(URLEncoder.encode(dn, "UTF-8")).append("&");
+                sb.append(URLEncoder.encode(dn, StandardCharsets.UTF_8)).append("&");
             }
             props.setProperty("authorizedDNs", sb.toString());
         }

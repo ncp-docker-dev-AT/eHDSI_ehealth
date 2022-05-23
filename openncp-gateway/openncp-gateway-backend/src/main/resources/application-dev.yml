@@ -1,7 +1,6 @@
 logging:
   level:
     org.hibernate: info
-server:
   servlet:
     context-path: /openncp-gateway-backend
   port: 8080

@@ -433,8 +433,8 @@ export default {
       return [
         {
           text: 'ATNA Viewer',
-          disabled: true,
-          href: 'breadcrumbs_dashboard'
+          disabled: false,
+          to: { name: 'audits' }
         },
         {
           text: 'Audit messages list',

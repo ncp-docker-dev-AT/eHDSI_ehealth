@@ -29,7 +29,6 @@ public class SMPFile {
     private String serviceDescription;
     private String technicalContactUrl;
     private String technicalInformationUrl;
-    private String extensionContent;
     private String extension;
     @JsonIgnore
     private FileInputStream certificateFile;
@@ -63,14 +62,6 @@ public class SMPFile {
 
     public void setTechnicalInformationUrl(String TechnicalInformationUrl) {
         this.technicalInformationUrl = TechnicalInformationUrl;
-    }
-
-    public String getExtensionContent() {
-        return extensionContent;
-    }
-
-    public void setExtensionContent(String ExtensionContent) {
-        this.extensionContent = ExtensionContent;
     }
 
     public String getHref() {
