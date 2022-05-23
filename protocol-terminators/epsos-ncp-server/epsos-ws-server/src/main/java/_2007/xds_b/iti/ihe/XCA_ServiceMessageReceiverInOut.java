@@ -16,7 +16,6 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -231,13 +230,13 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
 
     private List<String> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
         ArrayList<String> list = new ArrayList<>();
-        if(wrappedParam != null) {
+        if (wrappedParam != null) {
             wrappedParam.getAdhocQuery().getSlot().forEach(slot -> {
-                if(StringUtils.equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME, slot.getName())) {
-                    if(slot.getValueList() != null && slot.getValueList().getValue().size() > 0) {
+                if (StringUtils.equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME, slot.getName())) {
+                    if (slot.getValueList() != null && slot.getValueList().getValue().size() > 0) {
                         for (int i = 0; i < slot.getValueList().getValue().size(); i++) {
                             String item = StringUtils.substringBetween(slot.getValueList().getValue().get(i), "('", "^^");
-                            if(StringUtils.isNotBlank(item)) {
+                            if (StringUtils.isNotBlank(item)) {
                                 list.add(item);
                             }
                         }

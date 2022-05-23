@@ -33,6 +33,10 @@ public class ValidatorUtil {
     public static final String EHDSI_ASSERTION_HCP_IDENTITY;
     public static final String EHDSI_ASSERTION_NOK;
     public static final String EHDSI_ASSERTION_TRC;
+    public static final String EHDSI_XDS_ORCD_LIST_REQUEST_XCA;
+    public static final String EHDSI_XDS_ORCD_LIST_RESPONSE_XCA;
+    public static final String EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA;
+    public static final String EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA;
     public static final String EHDSI_XDS_OS_LIST_REQUEST_XCA;
     public static final String EHDSI_XDS_CS_PUT_REQUEST;
     public static final String EHDSI_XDS_PS_LIST_REQUEST_XCA;
@@ -94,6 +98,10 @@ public class ValidatorUtil {
             EHDSI_XDS_CS_PUT_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_CS_PUT_RESPONSE");
             EHDSI_XDS_PROVIDE_DATA_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PROVIDE_DATA_RESPONSE");
             EHDSI_XDS_FETCH_DOC_QUERY_REQUEST = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_REQUEST");
+            EHDSI_XDS_ORCD_LIST_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ORCD_LIST_REQUEST_XCA");
+            EHDSI_XDS_ORCD_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ORCD_LIST_RESPONSE_XCA");
+            EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA");
+            EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA");
             EHDSI_XDS_OS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_OS_LIST_RESPONSE_XCA");
             EHDSI_XDS_PS_LIST_RESPONSE_XCA = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_PS_LIST_RESPONSE_XCA");
             EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE = (String) GazelleConfiguration.getInstance().getConfiguration().getProperty("EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE");
@@ -233,7 +241,7 @@ public class ValidatorUtil {
     /**
      * This method will look into an XDR message and obtain the proper model to validate it at Gazelle
      *
-     * @param message the XDR message to be validated
+     * @param message    the XDR message to be validated
      * @param classCodes
      * @return the proper model to be used in the validation
      */
@@ -273,7 +281,7 @@ public class ValidatorUtil {
     /**
      * This method will look into an XCA message and obtain the proper model to validate it at Gazelle.
      *
-     * @param message the XCA message to be validated
+     * @param message    the XCA message to be validated
      * @param classCodes
      * @return the proper model to be used in the validation
      */
@@ -289,20 +297,36 @@ public class ValidatorUtil {
         // Query / List operations
         // Request
         if (message.contains(QUERY_REQUEST)) {
-            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_REQUEST_XCA);
-            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_REQUEST);
             }
             result.setObjectType(ObjectType.XCA_QUERY_REQUEST.toString());
             // Response
         } else if (message.contains(QUERY_RESPONSE)) {
-            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_RESPONSE_XCA);
-            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE);
             }
@@ -310,19 +334,35 @@ public class ValidatorUtil {
         }
         // Retrieve operations
         if (message.contains(RETRIEVE_REQUEST)) {  // Request
-            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA);
-            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST);
             }
             result.setObjectType(ObjectType.XCA_RETRIEVE_REQUEST.toString());
         } else if (message.contains(RETRIEVE_RESPONSE)) { // Response
-            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA);
-            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
+            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+                result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE);
             }
@@ -332,13 +372,11 @@ public class ValidatorUtil {
     }
 
     private static boolean hasClassCode(String message, List<String> classCodes, String classCodeToMatch) {
-        if(message.contains(classCodeToMatch)) {
+        if (message.contains(classCodeToMatch)) {
             return true;
         }
-        if(classCodes != null && !classCodes.isEmpty()) {
-            if(classCodes.contains(classCodeToMatch))  {
-                return true;
-            }
+        if (classCodes != null && !classCodes.isEmpty()) {
+            return classCodes.contains(classCodeToMatch);
         }
         return false;
     }
