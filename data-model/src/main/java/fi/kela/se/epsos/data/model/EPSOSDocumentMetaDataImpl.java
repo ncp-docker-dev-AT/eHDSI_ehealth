@@ -1,6 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 
 import java.util.Date;
 
@@ -29,7 +30,7 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
         this.repositoryId = repositoryId;
         this.title = title;
         this.author = author;
-        this.confidentiality = new SimpleConfidentialityMetadata("N", "Normal");
+        this.confidentiality = new SimpleConfidentialityMetadata(SimpleConfidentialityEnum.N);
         this.language = null;
     }
 
@@ -123,23 +124,20 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
     public static class SimpleConfidentialityMetadata implements ConfidentialityMetadata {
 
-        private final String confidentialityCode;
+        private final SimpleConfidentialityEnum confidentiality;
 
-        private final String confidentialityDisplay;
-
-        public SimpleConfidentialityMetadata(String confidentialityCode, String confidentialityDisplay) {
-            this.confidentialityCode = confidentialityCode;
-            this.confidentialityDisplay = confidentialityDisplay;
+        public SimpleConfidentialityMetadata(SimpleConfidentialityEnum confidentiality) {
+            this.confidentiality = confidentiality;
         }
 
         @Override
         public String getConfidentialityCode() {
-            return confidentialityCode;
+            return confidentiality.name();
         }
 
         @Override
         public String getConfidentialityDisplay() {
-            return confidentialityDisplay;
+            return confidentiality.getDisplayName();
         }
     }
 }

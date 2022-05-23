@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
+import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.XMLUtil;
@@ -116,14 +117,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                        getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
                 EPDocumentMetaData epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                        getClinicalDocumentConfidentialityCode(xmlDoc), getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
 
@@ -159,11 +160,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 PSDocumentMetaData psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(pdfDoc), this.getClinicalDocumentConfidentialityDisplay(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
+
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
                 logger.debug("Placed PDF doc id=" + psdPdf.getId() + " into PS repository");
                 logger.debug("Placed XML doc id=" + psdXml.getId() + " into PS repository");
@@ -199,7 +201,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDHospitalDischargeReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
                 orCDDocumentHospitalDischargeReportsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
@@ -223,7 +225,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDLaboratoryResultsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
                 orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
@@ -246,7 +248,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagingReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
 
                 orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
@@ -270,7 +272,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagesDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size, authors, reasonOfHospitalisation);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
 
                 orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
@@ -305,11 +307,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 MroDocumentMetaData psdPdf = DocumentFactory.createMroDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(pdfDoc), this.getClinicalDocumentConfidentialityDisplay(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 MroDocumentMetaData psdXml = DocumentFactory.createMroDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityCode(xmlDoc), this.getClinicalDocumentConfidentialityDisplay(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
                 logger.debug("Placed XML doc id='{}' into MRO repository", psdXml.getId());
@@ -411,18 +413,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return StringUtils.trim(author);
     }
 
-    private String getClinicalDocumentConfidentialityDisplay(Document doc) {
-        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
-        var display = "";
-        for (Node node : nodeList) {
-            if (node.getAttributes().getNamedItem("displayName") != null) {
-                display = node.getAttributes().getNamedItem("displayName").getTextContent();
-                logger.debug("confidentiality displayName: '{}'", display);
-            }
-        }
-        return StringUtils.trim(display);
-    }
-
     private Date getCreationDateFromDocument(Document doc) throws ParseException {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/effectiveTime");
         Date creationDate = null;
@@ -449,17 +439,49 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         return serviceStartTime;
     }
 
-    private String getClinicalDocumentConfidentialityCode(Document doc) {
+    private SimpleConfidentialityEnum getClinicalDocumentConfidentialityEnum(Document doc) {
+        SimpleConfidentialityEnum confidentiality = SimpleConfidentialityEnum.N;
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
         var code = "";
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("code") != null) {
                 code = node.getAttributes().getNamedItem("code").getTextContent();
+                if(StringUtils.equals(code, SimpleConfidentialityEnum.N.name())) {
+                    confidentiality = SimpleConfidentialityEnum.N;
+                } else if(StringUtils.equals(code, SimpleConfidentialityEnum.R.name())) {
+                    confidentiality = SimpleConfidentialityEnum.R;
+                } else if(StringUtils.equals(code, SimpleConfidentialityEnum.V.name())) {
+                    confidentiality = SimpleConfidentialityEnum.V;
+                }
                 logger.debug("confidentiality code: '{}'", code);
             }
         }
-        return StringUtils.trim(code);
+        return confidentiality;
     }
+
+//    private String getClinicalDocumentConfidentialityCode(Document doc) {
+//        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
+//        var code = "";
+//        for (Node node : nodeList) {
+//            if (node.getAttributes().getNamedItem("code") != null) {
+//                code = node.getAttributes().getNamedItem("code").getTextContent();
+//                logger.debug("confidentiality code: '{}'", code);
+//            }
+//        }
+//        return StringUtils.trim(code);
+//    }
+
+//    private String getClinicalDocumentConfidentialityDisplay(Document doc) {
+//        List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/confidentialityCode");
+//        var display = "";
+//        for (Node node : nodeList) {
+//            if (node.getAttributes().getNamedItem("displayName") != null) {
+//                display = node.getAttributes().getNamedItem("displayName").getTextContent();
+//                logger.debug("confidentiality displayName: '{}'", display);
+//            }
+//        }
+//        return StringUtils.trim(display);
+//    }
 
     private String getClinicalDocumentLanguage(Document doc) {
         List<Node> nodeList = XMLUtil.getNodeList(doc, "ClinicalDocument/languageCode");
