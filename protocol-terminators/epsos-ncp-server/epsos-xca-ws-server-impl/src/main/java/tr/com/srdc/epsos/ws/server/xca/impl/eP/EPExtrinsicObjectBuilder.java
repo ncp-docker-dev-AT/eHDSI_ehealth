@@ -113,16 +113,13 @@ public class EPExtrinsicObjectBuilder {
         }
 
         // Substitution
-        String substitutionCode = document.getSubstitution() != null
-                ? document.getSubstitution().getSubstitutionCode()
-                : SubstitutionCodeEnum.G.name();
-        String substitutionDisplay = document.getSubstitution() != null
-                ? document.getSubstitution().getSubstitutionDisplayName()
-                : SubstitutionCodeEnum.G.getDisplayName();
-        ClassificationType substitutionClassification = ClassificationBuilder.build(
-                "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
-                substitutionCode, "2.16.840.1.113883.5.1070", substitutionDisplay);
-        eot.getClassification().add(substitutionClassification);
+        EPDocumentMetaData.SubstitutionMetaData substitutionMetaData = document.getSubstitution();
+        if (substitutionMetaData != null) {
+            ClassificationType substitutionClassification = ClassificationBuilder.build(
+                    "urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4", uuid,
+                    substitutionMetaData.getSubstitutionCode(), "2.16.840.1.113883.5.1070", substitutionMetaData.getSubstitutionDisplayName());
+            eot.getClassification().add(substitutionClassification);
+        }
 
         // Confidentiality Code
         String confidentialityCode = document.getConfidentiality() != null
