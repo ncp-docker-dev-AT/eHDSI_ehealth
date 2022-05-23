@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
         <artifactId>openncp</artifactId>
-        <version>5.2.5</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>openncp-transformation-manager</artifactId>
@@ -75,7 +75,16 @@
 						<groupId>org.apache.httpcomponents</groupId>
 						<artifactId>httpclient</artifactId>
 					</exclusion>
+                    <exclusion>
+                        <artifactId>xmlsec</artifactId>
+                        <groupId>org.apache.santuario</groupId>
+                    </exclusion>
 				</exclusions>
+        </dependency>
+        <dependency>
+            <artifactId>xmlsec</artifactId>
+            <groupId>org.apache.santuario</groupId>
+            <version>${xmlsec.version}</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -103,7 +112,7 @@
         <dependency>
             <artifactId>icu4j</artifactId>
             <groupId>com.ibm.icu</groupId>
-            <version>51.2</version>
+            <version>71.1</version>
         </dependency>
         <dependency>
             <artifactId>jdom</artifactId>

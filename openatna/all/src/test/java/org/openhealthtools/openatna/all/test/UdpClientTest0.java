@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -99,8 +100,9 @@ public class UdpClientTest0 extends ClientTest {
     @Test
     public void testProvMessage() {
         try {
-            ProvisionalMessage message = new ProvisionalMessage(prov.getBytes("UTF-8"));
-            ProtocolMessage sl = new ProtocolMessage(10, 5, "hildegard", new ProvLogMessage(message), "Spartacus", "PDQIN", "777");
+            ProvisionalMessage message = new ProvisionalMessage(prov.getBytes(StandardCharsets.UTF_8));
+            ProtocolMessage sl = new ProtocolMessage(10, 5, "hildegard", new ProvLogMessage(message),
+                    "Spartacus", "PDQIN", "777");
             InetSocketAddress addr = new InetSocketAddress("localhost", 2863);
             DatagramSocket s = new DatagramSocket();
             byte[] bytes = sl.toByteArray();
@@ -173,7 +175,7 @@ public class UdpClientTest0 extends ClientTest {
 
         public void write(OutputStream out) throws SyslogException {
             try {
-                out.write(msg.getBytes("UTF-8"));
+                out.write(msg.getBytes(StandardCharsets.UTF_8));
                 out.flush();
             } catch (IOException e) {
                 throw new SyslogException(e);

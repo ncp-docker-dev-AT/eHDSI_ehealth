@@ -11,9 +11,7 @@
 <body>
 
 <div class="main">
-    <h1>eHDSI OpenATNA Audit Message and Error Viewer</h1>
-    <p>Click <a href="<c:url value="query"/>" here</a> to view messages</p>
-    <p>Click <a href="<c:url value="errors"/>">here</a> to view errors</p>
+    <h1>eHDSI OpenATNA - Audit Repository</h1>
 </div>
 </body>
 </html>

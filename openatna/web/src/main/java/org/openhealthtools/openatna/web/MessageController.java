@@ -9,11 +9,7 @@ import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
 import org.openhealthtools.openatna.audit.persistence.model.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
-@Controller
+//@Controller
 public class MessageController {
 
     private static final String PARSE_EXCEPTION_MESSAGE = "ParseException: '{}', {}";
@@ -33,13 +29,13 @@ public class MessageController {
     private final AuditLoggerPluginManager auditLoggerPluginManager;
     private final MessageDao messageDao;
 
-    @Autowired
+    //@Autowired
     public MessageController(AuditLoggerPluginManager auditLoggerPluginManager, MessageDao messageDao) {
         this.auditLoggerPluginManager = auditLoggerPluginManager;
         this.messageDao = messageDao;
     }
 
-    @GetMapping(value = "/query")
+    //@GetMapping(value = "/query")
     public String home(ModelMap model) {
 
         logger.info("[ATNA] Query Controller");
@@ -48,7 +44,7 @@ public class MessageController {
         return "messageForm";
     }
 
-    @PostMapping(value = "/query")
+    //@PostMapping(value = "/query")
     public ModelAndView query(HttpServletRequest request, QueryBean queryBean) {
 
         try {

@@ -57,6 +57,7 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+import tr.com.srdc.epsos.ws.server.xca.impl.eP.EPExtrinsicObjectBuilder;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -378,51 +379,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return patientId;
     }
 
-    private SlotType1 makeSlot(String name, String value) {
-
-        var slotType1 = ofRim.createSlotType1();
-        slotType1.setName(name);
-        slotType1.setValueList(ofRim.createValueListType());
-        slotType1.getValueList().getValue().add(value);
-        return slotType1;
-    }
-
-    private SlotType1 makeSlot(String name, List<String> values) {
-
-        var slotType1 = ofRim.createSlotType1();
-        slotType1.setName(name);
-        slotType1.setValueList(ofRim.createValueListType());
-        values.forEach(value -> slotType1.getValueList().getValue().add(value));
-        return slotType1;
-    }
-
-    private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation, String value, String name) {
-
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        var classificationType = ofRim.createClassificationType();
-        classificationType.setId(uuid);
-        classificationType.setNodeRepresentation(nodeRepresentation);
-        classificationType.setClassificationScheme(classificationScheme);
-        classificationType.setClassifiedObject(classifiedObject);
-        classificationType.getSlot().add(makeSlot("codingScheme", value));
-
-        classificationType.setName(ofRim.createInternationalStringType());
-        classificationType.getName().getLocalizedString().add(ofRim.createLocalizedStringType());
-        classificationType.getName().getLocalizedString().get(0).setValue(name);
-        return classificationType;
-    }
-
-    private ClassificationType makeClassification(String classificationScheme, String classifiedObject, String nodeRepresentation) {
-
-        String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
-        var classificationType = ofRim.createClassificationType();
-        classificationType.setId(uuid);
-        classificationType.setNodeRepresentation(nodeRepresentation);
-        classificationType.setClassificationScheme(classificationScheme);
-        classificationType.setClassifiedObject(classifiedObject);
-        return classificationType;
-    }
-
     private ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
 
         String uuid = Constants.UUID_PREFIX + UUID.randomUUID();
@@ -500,32 +456,32 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getVersionInfo().setVersionName("1.1");
 
         // Creation Date (optional)
-        eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
+        eot.getSlot().add(SlotBuilder.build("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
 
         // Source Patient Id
-        eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+        eot.getSlot().add(SlotBuilder.build("sourcePatientId", getDocumentEntryPatientId(request)));
 
         // LanguageCode (optional)
-        eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
+        eot.getSlot().add(SlotBuilder.build("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
 
         // repositoryUniqueId (optional)
-        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+        eot.getSlot().add(SlotBuilder.build("repositoryUniqueId", repositoryId));
 
-        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
+        eot.getClassification().add(ClassificationBuilder.build(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Type code (not written in 3.4.2)
-        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Confidentiality Code
-        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
         if (isPDF) {
-            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+            eot.getClassification().add(ClassificationBuilder.build(IheConstants.FORMAT_CODE_SCHEME,
                     uuid, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.NODE_REPRESENTATION,
                     "IHE PCC", XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.PdfSourceCoded.DISPLAY_NAME));
         } else {
-            eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+            eot.getClassification().add(ClassificationBuilder.build(IheConstants.FORMAT_CODE_SCHEME,
                     uuid, nodeRepresentation, XCAConstants.EXTRINSIC_OBJECT.FormatCode.EPrescription.EpsosPivotCoded.CODING_SCHEME, displayName));
         }
 
@@ -533,11 +489,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
          * Healthcare facility code
          * TODO: Get healthcare facility info from national implementation
          */
-        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
 
         // Practice Setting code
-        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         // External Identifiers
@@ -640,63 +596,63 @@ public class XCAServiceImpl implements XCAServiceInterface {
         eot.getVersionInfo().setVersionName("1.1");
 
         // Creation Date (optional)
-        eot.getSlot().add(makeSlot("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
+        eot.getSlot().add(SlotBuilder.build("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", effectiveTime)));
 
         // Service Start time (optional)
-        eot.getSlot().add(makeSlot("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", serviceStartTime)));
+        eot.getSlot().add(SlotBuilder.build("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", serviceStartTime)));
 
         // Source Patient Id
-        eot.getSlot().add(makeSlot("sourcePatientId", getDocumentEntryPatientId(request)));
+        eot.getSlot().add(SlotBuilder.build("sourcePatientId", getDocumentEntryPatientId(request)));
 
         // Size
-        eot.getSlot().add(makeSlot("size", String.valueOf(size)));
+        eot.getSlot().add(SlotBuilder.build("size", String.valueOf(size)));
 
         // LanguageCode (optional)
-        eot.getSlot().add(makeSlot("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
+        eot.getSlot().add(SlotBuilder.build("languageCode", languageCode == null ? Constants.LANGUAGE_CODE : languageCode));
 
         // repositoryUniqueId (optional)
-        eot.getSlot().add(makeSlot("repositoryUniqueId", repositoryId));
+        eot.getSlot().add(SlotBuilder.build("repositoryUniqueId", repositoryId));
 
-        eot.getClassification().add(makeClassification(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
+        eot.getClassification().add(ClassificationBuilder.build(XDRConstants.EXTRINSIC_OBJECT.CLASS_CODE_SCHEME,
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Type code (not written in 3.4.2)
-        eot.getClassification().add(makeClassification("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f0306f51-975f-434e-a61c-c59651d33983",
                 uuid, classCode, "2.16.840.1.113883.6.1", title));
         // Confidentiality Code
-        eot.getClassification().add(makeClassification("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f4f85eac-e6cb-4883-b524-f2705394840f",
                 uuid, confidentialityCode, "2.16.840.1.113883.5.25", confidentialityDisplay));
         // FormatCode
-        eot.getClassification().add(makeClassification(IheConstants.FORMAT_CODE_SCHEME,
+        eot.getClassification().add(ClassificationBuilder.build(IheConstants.FORMAT_CODE_SCHEME,
                 uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
 
         /*
          * Healthcare facility code
          * TODO: Get healthcare facility info from national implementation
          */
-        eot.getClassification().add(makeClassification("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:f33fb8ac-18af-42cc-ae0e-ed0b0bdb91e1",
                 uuid, Constants.COUNTRY_CODE, "1.0.3166.1", Constants.COUNTRY_NAME));
 
         // Reason of hospitalisation
         if (reasonOfHospitalisation != null) {
-            eot.getClassification().add(makeClassification("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
+            eot.getClassification().add(ClassificationBuilder.build("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, reasonOfHospitalisation.getCode(), reasonOfHospitalisation.getCodingScheme(), reasonOfHospitalisation.getText()));
         }
 
         // Practice Setting code
-        eot.getClassification().add(makeClassification("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
+        eot.getClassification().add(ClassificationBuilder.build("urn:uuid:cccf5598-8b07-4b77-a05e-ae952c785ead",
                 uuid, "Not Used", "eHDSI Practice Setting Codes-Not Used", "Not Used"));
 
         for (OrCDDocumentMetaData.Author author : authors) {
-            ClassificationType classificationAuthor = makeClassification(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID,
+            ClassificationType classificationAuthor = ClassificationBuilder.build(IheConstants.CLASSIFICATION_SCHEME_AUTHOR_UUID,
                     uuid, "");
 
             if (author.getAuthorPerson() != null) {
-                SlotType1 authorPersonSlot = makeSlot(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
+                SlotType1 authorPersonSlot = SlotBuilder.build(IheConstants.AUTHOR_PERSON_STR, author.getAuthorPerson());
                 classificationAuthor.getSlot().add(authorPersonSlot);
             }
 
             if (author.getAuthorSpeciality() != null && !author.getAuthorSpeciality().isEmpty()) {
-                SlotType1 authorSpecialtySlot = makeSlot(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
+                SlotType1 authorSpecialtySlot = SlotBuilder.build(IheConstants.AUTHOR_SPECIALITY_STR, author.getAuthorSpeciality());
                 classificationAuthor.getSlot().add(authorSpecialtySlot);
             }
             eot.getClassification().add(classificationAuthor);
@@ -862,7 +818,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         association.setSourceObject(source);
         association.setTargetObject(target);
         //  Gazelle does not like this information when validating. Uncomment if really needed.
-        //        association.getClassification().add(makeClassification(
+        //        association.getClassification().add(ClassificationBuilder.build(
         //                "urn:uuid:abd807a3-4432-4053-87b4-fd82c643d1f3",
         //                uuid,
         //                "epSOS pivot",
@@ -1035,12 +991,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             logger.debug("Prescription Repository ID: '{}'", prescription.getXMLDocumentMetaData().getRepositoryId());
                             String xmlUUID;
                             var eotXML = ofRim.createExtrinsicObjectType();
-                            xmlUUID = prepareExtrinsicObjectEP(request, eotXML, prescription.getXMLDocumentMetaData());
+                            xmlUUID = EPExtrinsicObjectBuilder.build(request, eotXML, prescription.getXMLDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotXML));
 
                             String pdfUUID;
                             var eotPDF = ofRim.createExtrinsicObjectType();
-                            pdfUUID = prepareExtrinsicObjectEP(request, eotPDF, prescription.getPDFDocumentMetaData());
+                            pdfUUID = EPExtrinsicObjectBuilder.build(request, eotPDF, prescription.getPDFDocumentMetaData());
                             response.getRegistryObjectList().getIdentifiable().add(ofRim.createExtrinsicObject(eotPDF));
 
                             if (StringUtils.isNotBlank(xmlUUID) && StringUtils.isNotBlank(pdfUUID)) {

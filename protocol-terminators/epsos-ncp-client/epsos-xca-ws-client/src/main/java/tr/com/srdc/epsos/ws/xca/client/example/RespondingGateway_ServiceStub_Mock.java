@@ -22,6 +22,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
@@ -116,7 +117,7 @@ public class RespondingGateway_ServiceStub_Mock {
             textData.setOptimize(true);
             document.addChild(textData);
 
-            mockResponse.getDocumentResponse().get(0).setDocument(document.getText().getBytes("UTF-8"));
+            mockResponse.getDocumentResponse().get(0).setDocument(document.getText().getBytes(StandardCharsets.UTF_8));
             documentResponse.addChild(document);
 
         } catch (Exception ex) {

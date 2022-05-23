@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
+import java.nio.charset.StandardCharsets;
 
 /*
  *  ClientConnectorServiceServiceTest Junit test case
@@ -206,7 +207,7 @@ public class TestClientConnectorService {
         String formatCode = doc.getFormatCode().getNodeRepresentation();
         logger.info("___ Document: " + doc.getUuid() + " : " + classCode + " : " + formatCode + " : "
                 + doc.getTitle() + " : " + doc.getDescription());
-        String CDA = new String(doc.getBase64Binary(), "UTF-8");
+        String CDA = new String(doc.getBase64Binary(), StandardCharsets.UTF_8);
         logger.info(CDA);
     }
 

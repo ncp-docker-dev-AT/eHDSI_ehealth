@@ -5,7 +5,7 @@
     <parent>
         <artifactId>openncp-gateway</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>5.2.5</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,9 +19,9 @@
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <passay.version>1.6.1</passay.version>
-        <poi-ooxml.version>5.2.0</poi-ooxml.version>
+        <poi-ooxml.version>5.2.2</poi-ooxml.version>
         <querydsl.version>5.0.0</querydsl.version>
-        <spring-boot.version>2.6.3</spring-boot.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <xmlbean.version>5.0.3</xmlbean.version>
     </properties>
@@ -49,7 +49,9 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <packagingExcludes>
-                        WEB-INF/lib/slf4j-simple-1.7.30.jar
+                        WEB-INF/lib/slf4j-simple-1.7.30.jar,
+<!--                        WEB-INF/lib/swagger-annotations-1.5.20.jar,-->
+<!--                        WEB-INF/lib/swagger-models-1.5.20.jar-->
                     </packagingExcludes>
                 </configuration>
             </plugin>
