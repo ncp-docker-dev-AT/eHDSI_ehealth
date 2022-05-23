@@ -135,7 +135,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     /* Validate incoming request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateXDRMessage(requestMessage, NcpSide.NCP_A);
+                        OpenNCPValidation.validateXDRMessage(requestMessage, NcpSide.NCP_A, null);
                     }
                     ProvideAndRegisterDocumentSetRequestType wrappedParam = (ProvideAndRegisterDocumentSetRequestType) fromOM(
                             msgContext.getEnvelope().getBody().getFirstElement(),
@@ -155,7 +155,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     /* Validate outgoing response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A);
+                        OpenNCPValidation.validateXDRMessage(responseMessage, NcpSide.NCP_A, null);
                     }
                     if (loggerClinical.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
                         loggerClinical.debug("Response Header:\n{}", envelope.getHeader().toString());

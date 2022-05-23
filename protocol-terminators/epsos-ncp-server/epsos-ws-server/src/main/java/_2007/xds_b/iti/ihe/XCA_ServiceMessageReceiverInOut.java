@@ -5,6 +5,7 @@ import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
+import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -15,6 +16,7 @@ import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -40,10 +42,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * XCA_ServiceMessageReceiverInOut message receiver
@@ -132,14 +131,16 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     LOGGER.info("[ITI-38] Incoming XCA List from '{}'", clientCommonName);
                     /* Validate incoming query request */
                     String requestMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
-                    }
 
                     AdhocQueryResponse adhocQueryResponse1;
                     AdhocQueryRequest wrappedParam = (AdhocQueryRequest) fromOM(
                             msgContext.getEnvelope().getBody().getFirstElement(), AdhocQueryRequest.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
+
+                    List<String> classCodes = extractClassCodesFromQueryRequest(wrappedParam);
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A, classCodes);
+                    }
 
                     adhocQueryResponse1 = skel.respondingGateway_CrossGatewayQuery(wrappedParam, sh, eventLog);
                     envelope = toEnvelope(getSOAPFactory(msgContext), adhocQueryResponse1, false);
@@ -155,7 +156,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     /* Validate outgoing query response */
                     String responseMessage = XMLUtil.prettyPrintForValidation(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A, classCodes);
                     }
 
                     if (!StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name()) && loggerClinical.isDebugEnabled()) {
@@ -169,13 +170,14 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     LOGGER.info("[ITI-39] Incoming XCA Retrieve from '{}'", clientCommonName);
                     /* Validate incoming retrieve request */
                     String requestMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(msgContext.getEnvelope().getBody().getFirstElement()));
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A);
-                    }
 
                     RetrieveDocumentSetRequestType wrappedParam = (RetrieveDocumentSetRequestType) fromOM(
                             msgContext.getEnvelope().getBody().getFirstElement(), RetrieveDocumentSetRequestType.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
+
+                    if (OpenNCPValidation.isValidationEnable()) {
+                        OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A, null);
+                    }
 
                     OMFactory factory = OMAbstractFactory.getOMFactory();
                     OMNamespace ns = factory.createOMNamespace("urn:ihe:iti:xds-b:2007", "");
@@ -201,7 +203,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     /* Validate outgoing retrieve response */
                     String responseMessage = XMLUtil.prettyPrint(XMLUtils.toDOM(envelope.getBody().getFirstElement()));
                     if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A);
+                        OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A, null);
                     }
                     serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
                     RetrieveDocumentSetResponseType responseType = (RetrieveDocumentSetResponseType) fromOM(
@@ -225,6 +227,25 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             LOGGER.error(e.getMessage(), e);
             throw AxisFault.makeFault(e);
         }
+    }
+
+    private List<String> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
+        ArrayList<String> list = new ArrayList<>();
+        if(wrappedParam != null) {
+            wrappedParam.getAdhocQuery().getSlot().forEach(slot -> {
+                if(StringUtils.equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME, slot.getName())) {
+                    if(slot.getValueList() != null && slot.getValueList().getValue().size() > 0) {
+                        for (int i = 0; i < slot.getValueList().getValue().size(); i++) {
+                            String item = StringUtils.substringBetween(slot.getValueList().getValue().get(i), "('", "^^");
+                            if(StringUtils.isNotBlank(item)) {
+                                list.add(item);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        return list;
     }
 
     private OMElement toOM(oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest param, boolean optimizeContent) throws AxisFault {

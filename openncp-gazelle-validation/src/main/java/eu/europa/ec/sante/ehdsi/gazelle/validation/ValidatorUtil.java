@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class ValidatorUtil {
 
     public static final String EHDSI_ID_SERVICE_REQUEST;
@@ -232,9 +234,10 @@ public class ValidatorUtil {
      * This method will look into an XDR message and obtain the proper model to validate it at Gazelle
      *
      * @param message the XDR message to be validated
+     * @param classCodes
      * @return the proper model to be used in the validation
      */
-    public static XdsModel obtainModelXdr(String message) {
+    public static XdsModel obtainModelXdr(String message, List<String> classCodes) {
 
         final String PROVIDE_AND_REGISTER_REQUEST = "ProvideAndRegisterDocumentSetRequest";
         final String PROVIDE_AND_REGISTER_RESPONSE = "RegistryResponse";
@@ -271,9 +274,10 @@ public class ValidatorUtil {
      * This method will look into an XCA message and obtain the proper model to validate it at Gazelle.
      *
      * @param message the XCA message to be validated
+     * @param classCodes
      * @return the proper model to be used in the validation
      */
-    public static XdsModel obtainModelXca(String message) {
+    public static XdsModel obtainModelXca(String message, List<String> classCodes) {
 
         final String QUERY_REQUEST = "AdhocQueryRequest";
         final String QUERY_RESPONSE = "AdhocQueryResponse";
@@ -285,9 +289,9 @@ public class ValidatorUtil {
         // Query / List operations
         // Request
         if (message.contains(QUERY_REQUEST)) {
-            if (message.contains(Constant.EP_CLASSCODE)) {
+            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_REQUEST_XCA);
-            } else if (message.contains(Constant.PS_CLASSCODE)) {
+            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_REQUEST);
@@ -295,9 +299,9 @@ public class ValidatorUtil {
             result.setObjectType(ObjectType.XCA_QUERY_REQUEST.toString());
             // Response
         } else if (message.contains(QUERY_RESPONSE)) {
-            if (message.contains(Constant.EP_CLASSCODE)) {
+            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_RESPONSE_XCA);
-            } else if (message.contains(Constant.PS_CLASSCODE)) {
+            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE);
@@ -306,18 +310,18 @@ public class ValidatorUtil {
         }
         // Retrieve operations
         if (message.contains(RETRIEVE_REQUEST)) {  // Request
-            if (message.contains(Constant.EP_CLASSCODE)) {
+            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA);
-            } else if (message.contains(Constant.PS_CLASSCODE)) {
+            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST);
             }
             result.setObjectType(ObjectType.XCA_RETRIEVE_REQUEST.toString());
         } else if (message.contains(RETRIEVE_RESPONSE)) { // Response
-            if (message.contains(Constant.EP_CLASSCODE)) {
+            if(hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA);
-            } else if (message.contains(Constant.PS_CLASSCODE)) {
+            } else if(hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE);
@@ -325,5 +329,17 @@ public class ValidatorUtil {
             result.setObjectType(ObjectType.XCA_RETRIEVE_RESPONSE.toString());
         }
         return result;
+    }
+
+    private static boolean hasClassCode(String message, List<String> classCodes, String classCodeToMatch) {
+        if(message.contains(classCodeToMatch)) {
+            return true;
+        }
+        if(classCodes != null && !classCodes.isEmpty()) {
+            if(classCodes.contains(classCodeToMatch))  {
+                return true;
+            }
+        }
+        return false;
     }
 }

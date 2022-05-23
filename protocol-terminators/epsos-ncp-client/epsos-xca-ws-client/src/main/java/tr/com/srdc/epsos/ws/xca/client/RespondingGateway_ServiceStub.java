@@ -341,7 +341,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Request Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B);
+                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B, classCodes);
             }
 
             // TMP
@@ -457,7 +457,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Response Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B);
+                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B, classCodes);
             }
 
             // TMP
@@ -707,7 +707,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Request Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B);
+                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B, Arrays.asList(classCode));
             }
 
             /*
@@ -819,7 +819,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Response Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B);
+                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B, Arrays.asList(classCode));
             }
 
             /*

@@ -19,6 +19,7 @@ import tr.com.srdc.epsos.util.XMLUtil;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.transform.TransformerException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class OpenNCPValidation {
 
@@ -169,10 +170,10 @@ public class OpenNCPValidation {
      * @param message
      * @param ncpSide
      */
-    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide) {
+    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide, List<String> classCodes) {
 
         LOGGER.info("[Validation Service: XCA Validator]");
-        XdsModel xdsModel = ValidatorUtil.obtainModelXca(message);
+        XdsModel xdsModel = ValidatorUtil.obtainModelXca(message, classCodes);
         validateXDSMessage(message, xdsModel, ncpSide);
     }
 
@@ -180,10 +181,10 @@ public class OpenNCPValidation {
      * @param request
      * @param ncpSide
      */
-    public static void validateXDRMessage(String request, NcpSide ncpSide) {
+    public static void validateXDRMessage(String request, NcpSide ncpSide, List<String> classCodes) {
 
         LOGGER.info("[Validation Service: XDR Validator]");
-        XdsModel xdsModel = ValidatorUtil.obtainModelXdr(request);
+        XdsModel xdsModel = ValidatorUtil.obtainModelXdr(request, classCodes);
         validateXDSMessage(request, xdsModel, ncpSide);
     }
 
