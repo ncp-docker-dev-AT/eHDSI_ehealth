@@ -6,6 +6,7 @@ import epsos.ccd.posam.tm.util.TMConfiguration;
 import epsos.ccd.posam.tm.util.XmlUtil;
 import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
@@ -32,16 +33,16 @@ public class TBase extends TestCase {
 
     }
 
-    @Override
-    protected void setUp() {
-        beanFactory = new ClassPathXmlApplicationContext("ctx_tm_test.xml");
-        tmService = (ITransformationService) beanFactory.getBean(ITransformationService.class.getName());
-        tmConfig = (TMConfiguration) beanFactory.getBean("tmConfiguration");
-    }
-
-    @Override
-    protected void tearDown() {
-    }
+//    @Override
+//    protected void setUp() {
+//        beanFactory = new ClassPathXmlApplicationContext("ctx_tm_test.xml");
+//        tmService = (ITransformationService) beanFactory.getBean(ITransformationService.class.getName());
+//        tmConfig = (TMConfiguration) beanFactory.getBean("tmConfiguration");
+//    }
+//
+//    @Override
+//    protected void tearDown() {
+//    }
 
     public ITransformationService getTmService() {
         return tmService;
