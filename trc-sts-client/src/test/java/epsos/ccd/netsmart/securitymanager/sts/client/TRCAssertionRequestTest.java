@@ -33,6 +33,7 @@ import java.util.Properties;
 import static org.junit.Assert.fail;
 
 @RunWith(JMockit.class)
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class TRCAssertionRequestTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TRCAssertionRequestTest.class);

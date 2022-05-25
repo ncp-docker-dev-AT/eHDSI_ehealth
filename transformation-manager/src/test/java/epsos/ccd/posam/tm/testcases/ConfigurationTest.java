@@ -5,6 +5,7 @@ import epsos.ccd.posam.tm.util.CodedElementList;
 import epsos.ccd.posam.tm.util.CodedElementListItem;
 import epsos.ccd.posam.tm.util.TMConfiguration;
 import epsos.ccd.posam.tm.util.TMConstants;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -22,6 +23,7 @@ import java.util.Iterator;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.5, 2010, 20 October
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class ConfigurationTest extends TBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationTest.class);

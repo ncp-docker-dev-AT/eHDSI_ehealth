@@ -3,6 +3,7 @@ package epsos.ccd.posam.tm.testcases;
 import epsos.ccd.posam.tm.service.impl.TransformationService;
 import epsos.ccd.posam.tm.util.SchematronResult;
 import epsos.ccd.posam.tm.util.Validator;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -17,6 +18,7 @@ import java.io.File;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.5, 2010, 20 October
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class SchematronTest extends TBase {
 
     static final String resources = "src/test/resources/samples/schPassed/";
