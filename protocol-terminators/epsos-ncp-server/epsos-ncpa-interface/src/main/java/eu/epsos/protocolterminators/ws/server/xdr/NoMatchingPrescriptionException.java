@@ -20,14 +20,15 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.epsos.util.ErrorCode;
 
 public class NoMatchingPrescriptionException extends NIException {
 	private static final long serialVersionUID = -2746600171056013382L;
 
 	public NoMatchingPrescriptionException() {
-		super("4105", "No matching ePrescription was found");
+		super(ErrorCode.ERROR_CODE_4105.getCodeToString(), "No matching ePrescription was found");
 	}
 	public NoMatchingPrescriptionException(String message) {
-		super("4105", message);
+		super(ErrorCode.ERROR_CODE_4105.getCodeToString(), message);
 	}
 }

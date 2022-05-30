@@ -20,6 +20,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.epsos.util.ErrorCode;
 
 /**
  * Thrown if discard request is rejected because the issuing HCPO of 
@@ -29,9 +30,9 @@ public class NoMatchingDispensationException extends NIException {
 	private static final long serialVersionUID = 5550386714166624536L;
 
 	public NoMatchingDispensationException() {
-		super("4703", "Insufficient rights");
+		super(ErrorCode.ERROR_CODE_4703.getCodeToString(), "Insufficient rights");
 	}
 	public NoMatchingDispensationException(String message) {
-		super("4703", message);
+		super(ErrorCode.ERROR_CODE_4703.getCodeToString(), message);
 	}
 }

@@ -152,7 +152,7 @@ public class SAML2Validator {
             //TODO: Next of Kin assertion should be checked
         } catch (IOException | UnmarshallingException | SAXException e) {
             LOGGER.error("", e);
-            throw new InsufficientRightsException(4703);
+            throw new InsufficientRightsException();
         }
 
         return sigCountryCode;
@@ -216,7 +216,7 @@ public class SAML2Validator {
             //TODO: Next of Kin assertion should be checked
         } catch (IOException | UnmarshallingException | SAXException e) {
             LOGGER.error("", e);
-            throw new InsufficientRightsException(4703);
+            throw new InsufficientRightsException();
         }
 
         return sigCountryCode;
@@ -236,7 +236,7 @@ public class SAML2Validator {
         }
 
         LOGGER.info("checkTRCAdviceIdReferenceAgainstHCPId: ReferenceId does not match. Throw InsufficientRightsException.");
-        throw new InsufficientRightsException(1002);
+        throw new InsufficientRightsException();
     }
 
     /**

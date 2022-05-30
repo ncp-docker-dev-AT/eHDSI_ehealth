@@ -1,15 +1,15 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
+import eu.epsos.util.ErrorCode;
+
 public class AssertionValidationException extends Exception {
 
     private static final long serialVersionUID = -6478057187366024151L;
-    private String message;
-    private String code;
+    private ErrorCode errorCode;
 
     public AssertionValidationException() {
         super();
-        this.message = "Assertion is not valid. ";
-        this.code = "1001";
+        this.errorCode = ErrorCode.ERROR_CODE_1001;
     }
 
     public AssertionValidationException(String message) {
@@ -18,18 +18,16 @@ public class AssertionValidationException extends Exception {
 
     @Override
     public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        return errorCode.getMessage();
     }
 
     public String getCode() {
-        return code;
+        return errorCode.getCodeToString();
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
+
+
 }

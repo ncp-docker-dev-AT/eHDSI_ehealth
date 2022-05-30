@@ -5,6 +5,7 @@ import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
+import eu.epsos.protocolterminators.ws.server.exception.NoConsentException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
@@ -358,7 +359,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
-            InsufficientRightsException e = new InsufficientRightsException(4701);
+            NoConsentException e = new NoConsentException(null);
             registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
 
@@ -505,7 +506,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
-            InsufficientRightsException e = new InsufficientRightsException(4701);
+            NoConsentException e = new NoConsentException(null);
             registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
         }
         if (!registryErrorList.getRegistryError().isEmpty()) {
