@@ -19,7 +19,6 @@ import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;

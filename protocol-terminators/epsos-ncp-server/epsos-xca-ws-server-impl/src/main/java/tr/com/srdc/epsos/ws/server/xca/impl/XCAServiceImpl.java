@@ -836,23 +836,31 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return Constants.OID_PREFIX + Constants.HOME_COMM_ID;
     }
 
-    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
+    private void addErrorMessage(RegistryErrorList registryErrorList, ErrorCode errorCode, String codeContext, String value, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(errorCode, codeContext, value, severity));
+    }
+
+    private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, String errorCode, String codeContext, String value, RegistryErrorSeverity severity) {
+        registryErrorList.addChild(createErrorOMMessage(ons, errorCode, codeContext, value, severity));
+    }
+
+    private RegistryError createErrorMessage(ErrorCode errorCode, String codeContext, String value, RegistryErrorSeverity severity) {
 
         var registryError = ofRs.createRegistryError();
-        registryError.setErrorCode(errorCode);
+        registryError.setErrorCode(errorCode != null? errorCode.getCodeToString(): "");
         registryError.setLocation(getLocation());
-        registryError.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
+        registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
         registryError.setValue(value);
         return registryError;
     }
 
-    private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String value, boolean isWarning) {
+    private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String value, RegistryErrorSeverity severity) {
 
         var registryError = omFactory.createOMElement("RegistryError", ons);
         registryError.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
         registryError.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
-        String aux = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error");
+        String aux = severity != null? severity.getText() : null ;
         registryError.addAttribute(omFactory.createOMAttribute("severity", null, aux));
         // EHNCP-1131
         registryError.addAttribute(omFactory.createOMAttribute("location", null, getLocation()));
@@ -869,6 +877,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         String sigCountryCode = null;
         Element shElement = null;
+        String responseStatus = AdhocQueryResponseStatus.FAILURE;
         // What's being requested: eP or PS?
         List<String> classCodeValues = getDocumentEntryClassCodes(request);
         var registryErrorList = ofRs.createRegistryErrorList();
@@ -881,34 +890,37 @@ public class XCAServiceImpl implements XCAServiceInterface {
             sigCountryCode = SAML2Validator.validateXCAHeader(shElement, classCodeValues.get(0));
         } catch (InsufficientRightsException e) {
             logger.debug(e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            addErrorMessage(registryErrorList, e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (AssertionValidationException e) {
             logger.debug(e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            addErrorMessage(registryErrorList, e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
-            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            addErrorMessage(registryErrorList, null, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             throw e;
         }
 
         String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
+            ErrorCode code;
+            String message;
             if (classCodeValues.contains(Constants.EP_CLASSCODE)) {
-                registryErrorList.getRegistryError().add(
-                        createErrorMessage(ErrorCode.ERROR_CODE_1101.getCodeToString(), "No ePrescriptions are registered for the given patient.", "", true));
+                code = ErrorCode.ERROR_CODE_1101;
+                message = "No ePrescriptions are registered for the given patient.";
             } else if (classCodeValues.contains(Constants.PS_CLASSCODE)) {
-                registryErrorList.getRegistryError().add(
-                        createErrorMessage(ErrorCode.ERROR_CODE_1102.getCodeToString(), "No patient summary is registered for the given patient.", "", true));
+                code = ErrorCode.ERROR_CODE_1102;
+                message = "No patient summary is registered for the given patient.";
             } else if (classCodeValues.contains(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
-                registryErrorList.getRegistryError()
-                        .add(createErrorMessage(ErrorCode.ERROR_CODE_1104.getCodeToString(), "There is no original clinical data of the requested type registered for the given patient.", "", true));
+                code = ErrorCode.ERROR_CODE_1104;
+                message = "There is no original clinical data of the requested type registered for the given patient.";
             } else {
-                registryErrorList.getRegistryError()
-                        .add(createErrorMessage(ErrorCode.ERROR_CODE_1100.getCodeToString(), "No documents are registered for the given patient.", "", true));
+                code = ErrorCode.ERROR_CODE_1100;
+                message = "No documents are registered for the given patient.";
             }
+            addErrorMessage(registryErrorList, code, message, "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
         }
         String patientId = trimDocumentEntryPatientId(fullPatientId);
         var countryCode = "";
@@ -934,12 +946,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            var insufficientRightsException = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(insufficientRightsException.getCode(), insufficientRightsException.getMessage(), "", false));
+            addErrorMessage(registryErrorList, ErrorCode.ERROR_CODE_4701, ErrorCode.ERROR_CODE_4701.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
-        if (classCodeValues == null || classCodeValues.isEmpty()) {
-            registryErrorList.getRegistryError().add(createErrorMessage("4202", "Class code missing in XCA query request.", "", false));
+        if (classCodeValues.isEmpty()) {
+            addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_4202, "Class code missing in XCA query request.", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         // Evidence for call to NI for XCA List
@@ -960,13 +971,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.error(ExceptionUtils.getStackTrace(e));
         }
 
-        // Handling of the Response Status message and Errors.
-        if (!registryErrorList.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(registryErrorList);
-            response.setStatus(AdhocQueryResponseStatus.FAILURE);
-
-        }
-
         for (String classCodeValue : classCodeValues) {
             switch (classCodeValue) {
                 case Constants.EP_CLASSCODE:
@@ -975,18 +979,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (prescriptions == null) {
 
-                        registryErrorList.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_4103.getCodeToString(), "ePrescription registry could not be accessed.", "", true));
-                        response.setRegistryErrorList(registryErrorList);
-                        response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                        addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_4103, "ePrescription registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.FAILURE;
                     } else if (prescriptions.isEmpty()) {
 
-                        registryErrorList.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_1101.getCodeToString(), "No ePrescriptions are registered for the given patient.", "", true));
-                        response.setRegistryErrorList(registryErrorList);
-                        response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                        addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_1101, "No ePrescriptions are registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.FAILURE;
                     } else {
 
                         // Multiple prescriptions mean multiple PDF and XML files, multiple ExtrinsicObjects and associations
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         for (DocumentAssociation<EPDocumentMetaData> prescription : prescriptions) {
 
                             logger.debug("Prescription Repository ID: '{}'", prescription.getXMLDocumentMetaData().getRepositoryId());
@@ -1012,14 +1014,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
 
-                        registryErrorList.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_1102.getCodeToString(), "No patient summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(registryErrorList);
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_1102, "No patient summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
                         PSDocumentMetaData docPdf = psDoc.getPDFDocumentMetaData();
                         PSDocumentMetaData docXml = psDoc.getXMLDocumentMetaData();
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
 
                         var xmlUUID = "";
                         if (docXml != null) {
@@ -1060,15 +1061,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
 
-                        registryErrorList.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_1100.getCodeToString(), "No MRO summary is registered for the given patient.", "", true));
-                        response.setRegistryErrorList(registryErrorList);
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        addErrorMessage(registryErrorList, ErrorCode.ERROR_CODE_1100, "No MRO summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
                         MroDocumentMetaData docPdf = mro.getPDFDocumentMetaData();
                         MroDocumentMetaData docXml = mro.getXMLDocumentMetaData();
 
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
 
                         var xmlUUID = "";
                         if (docXml != null) {
@@ -1121,11 +1121,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
 
-                    if (orCDDocumentMetaDataList == null || orCDDocumentMetaDataList.isEmpty()) {
-                        response = handleOrCDExceptionCases(response, registryErrorList, orCDDocumentMetaDataList);
+                    if (orCDDocumentMetaDataList == null) {
+                        addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_4103, "orCD registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.FAILURE;
+                    } else if (orCDDocumentMetaDataList.isEmpty()) {
+                        addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_1104, "There is no original clinical data of the requested type registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
-                        response.setStatus(AdhocQueryResponseStatus.SUCCESS);
+                        responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         for (OrCDDocumentMetaData orCDDocumentMetaData : orCDDocumentMetaDataList) {
                             logger.debug("OrCD Document Repository ID: '{}'", orCDDocumentMetaData.getRepositoryId());
                             buildOrCDExtrinsicObject(request, response, orCDDocumentMetaData);
@@ -1134,9 +1138,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     break;
 
                 default:
-                    registryErrorList.getRegistryError().add(createErrorMessage("4202", "Class code not supported for XCA query(" + classCodeValue + ").", "", false));
-                    response.setRegistryErrorList(registryErrorList);
-                    response.setStatus(AdhocQueryResponseStatus.FAILURE);
+                    addErrorMessage(registryErrorList,ErrorCode.ERROR_CODE_4202, "Class code not supported for XCA query(" + classCodeValue + ").", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                    responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     break;
             }
 
@@ -1147,6 +1150,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 // Is this fatal?
             }
         }
+
+        response.setRegistryErrorList(registryErrorList);
+        response.setStatus(responseStatus);
     }
 
     private List<OrCDDocumentMetaData> getOrCDDocumentMetaDataList(String classCode, SearchCriteria searchCriteria)
@@ -1196,19 +1202,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         }
     }
 
-    private AdhocQueryResponse handleOrCDExceptionCases(AdhocQueryResponse response, RegistryErrorList rel, List<OrCDDocumentMetaData> orCDDocumentMetaDataList) {
-        if (orCDDocumentMetaDataList == null) {
-            rel.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_4103.getCodeToString(), "orCD registry could not be accessed.", "", true));
-            response.setRegistryErrorList(rel);
-            response.setStatus(AdhocQueryResponseStatus.FAILURE);
-        } else if (orCDDocumentMetaDataList.isEmpty()) {
-            rel.getRegistryError().add(createErrorMessage(ErrorCode.ERROR_CODE_1104.getCodeToString(), "There is no original clinical data of the requested type registered for the given patient.", "", true));
-            response.setRegistryErrorList(rel);
-            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-        }
-        return response;
-    }
-
     private Document transformDocument(Document doc, OMElement registryErrorList, OMElement registryResponseElement,
                                        boolean isTranscode, EventLog eventLog) {
 
@@ -1245,18 +1238,20 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             for (var i = 0; i < tmResponse.getErrors().size(); i++) {
                 ITMTSAMEror error = tmResponse.getErrors().get(i);
-
-                registryErrorList.addChild(createErrorOMMessage(ons, error.getCode(), error.getDescription(),
+                addErrorOMMessage(ons, registryErrorList,
+                        error.getDescription(),
                         "ECDATransformationHandler.Error." + operationType + "(" + error.getCode() + " / " + error.getDescription() + ")",
-                        false));
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
 
             for (var i = 0; i < tmResponse.getWarnings().size(); i++) {
                 ITMTSAMEror error = tmResponse.getWarnings().get(i);
-
-                registryErrorList.addChild(createErrorOMMessage(ons, error.getCode(), error.getDescription(),
+                addErrorOMMessage(ons, registryErrorList,
+                        error.getCode(),
+                        error.getDescription(),
                         "ECDATransformationHandler.Error." + operationType + "(" + error.getCode() + " / " + error.getDescription() + ")",
-                        true));
+                        RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
             }
 
             returnDoc = tmResponse.getResponseCDA();
@@ -1323,9 +1318,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 if (countryCode != null) {
                     logger.info("Found the client country code via the signature certificate.");
                 } else {
-                    var insufficientRightsException = new InsufficientRightsException();
-                    registryErrorList.addChild(createErrorOMMessage(omNamespace, insufficientRightsException.getCode(),
-                            insufficientRightsException.getMessage(), "", false));
+                    addErrorOMMessage(omNamespace, registryErrorList,
+                            ErrorCode.ERROR_CODE_4703.getCodeToString(),
+                            ErrorCode.ERROR_CODE_4703.getMessage(),
+                            "",
+                            RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                     break processLabel;
                 }
             }
@@ -1334,9 +1331,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-                var insufficientRightsException = new NoConsentException(null);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, insufficientRightsException.getCode(),
-                        insufficientRightsException.getMessage(), "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                        ErrorCode.ERROR_CODE_4701.getCodeToString(),
+                        ErrorCode.ERROR_CODE_4701.getMessage(),
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }
 
@@ -1367,7 +1366,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 //  TODO: EHNCP-2055 Inconsistency in handling patient id
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
+                 addErrorOMMessage(omNamespace, registryErrorList,
+                        e.getCode(),
+                        e.getMessage(),
+                        "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }
 
@@ -1392,7 +1394,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                    logger.error(ExceptionUtils.getStackTrace(e));
 //                }
                 logger.error("[National Connector] No document returned by the National Infrastructure");
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, "XDSMissingDocument", "Requested document not found.", "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                        "XDSMissingDocument",
+                        "Requested document not found.",
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }
 
@@ -1423,15 +1429,27 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 SAML2Validator.validateXCAHeader(soapHeaderElement, classCodeValue);
             } catch (InsufficientRightsException e) {
                 logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                        e.getCode(),
+                        e.getMessage(),
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             } catch (AssertionValidationException e) {
                 logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, e.getCode(), e.getMessage(), "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                        e.getCode(),
+                        e.getMessage(),
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             } catch (SMgrException e) {
                 logger.error("SMgrException: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, "", e.getMessage(), "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                        "",
+                        e.getMessage(),
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }
 
@@ -1484,7 +1502,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                             if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
 
-                                registryErrorList.addChild(createErrorOMMessage(omNamespace, ErrorCode.ERROR_CODE_4203.getCodeToString(), ErrorCode.ERROR_CODE_4203.getMessage(), "", false));
+                                addErrorOMMessage(omNamespace, registryErrorList,
+                                        ErrorCode.ERROR_CODE_4203.getCodeToString(),
+                                        ErrorCode.ERROR_CODE_4203.getMessage(),
+                                        "",
+                                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                                 // If the error is FATAL flag failure has been set to true
                                 failure = true;
                                 break;
@@ -1518,7 +1540,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
             } catch (Exception e) {
                 failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                registryErrorList.addChild(createErrorOMMessage(omNamespace, "", e.getMessage(), "", false));
+                addErrorOMMessage(omNamespace, registryErrorList,
+                       "",
+                        e.getMessage(),
+                        "",
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
         }
 
@@ -1591,7 +1617,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
             element = (OMElement) it.next();
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
-                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR)) {
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText())) {
                 logger.debug("Error has been detected for Element: '{}'", element.getText());
                 onlyWarnings = false;
             }
@@ -1618,50 +1644,48 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         var adhocQueryResponse = ofQuery.createAdhocQueryResponse();
         var registryErrorList = ofRs.createRegistryErrorList();
-        var registryError = ofRs.createRegistryError();
 
         // Create Registry Object List
         adhocQueryResponse.setRegistryObjectList(ofRim.createRegistryObjectListType());
-
-        Writer result = new StringWriter();
-        var printWriter = new PrintWriter(result);
-        e.printStackTrace(printWriter);
-        registryError.setLocation(result.toString().trim());
 
         List<String> classCodeValues = getDocumentEntryClassCodes(request);
 
         for (String classCodeValue : classCodeValues) {
             switch (classCodeValue) {
                 case Constants.EP_CLASSCODE:
-                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-                    registryError.setErrorCode(ErrorCode.ERROR_CODE_1101.getCodeToString());
-                    registryError.setValue("No ePrescriptions are registered for the given patient.");
-                    registryError.setCodeContext("The XDS repository does not contain any ePrescription related to the current patient");
+                    addErrorMessage(registryErrorList,
+                            ErrorCode.ERROR_CODE_1101,
+                            "The XDS repository does not contain any ePrescription related to the current patient",
+                            "No ePrescriptions are registered for the given patient.",
+                            RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
                 case Constants.PS_CLASSCODE:
-                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-                    registryError.setErrorCode(ErrorCode.ERROR_CODE_1102.getCodeToString());
-                    registryError.setValue("No patient summary is registered for the given patient.");
-                    registryError.setCodeContext("The XDS repository does not contain any Patient Summary related to the current patient");
+                    addErrorMessage(registryErrorList,
+                            ErrorCode.ERROR_CODE_1102,
+                            "The XDS repository does not contain any Patient Summary related to the current patient",
+                            "No patient summary is registered for the given patient.",
+                            RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
                 case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                 case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-                    registryError.setErrorCode(ErrorCode.ERROR_CODE_1104.getCodeToString());
-                    registryError.setValue("No original clinical document of the requested type is registered for the given patient.");
-                    registryError.setCodeContext("The XDS repository does not contain any OrCD of the requested type related to the current patient");
+                    addErrorMessage(registryErrorList,
+                            ErrorCode.ERROR_CODE_1104,
+                            "The XDS repository does not contain any OrCD of the requested type related to the current patient",
+                            "No original clinical document of the requested type is registered for the given patient.",
+                            RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
                 default:
-                    registryError.setSeverity(RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
-                    registryError.setErrorCode(ErrorCode.ERROR_CODE_1100.getCodeToString());
-                    registryError.setValue("No documents are registered for the given patient.");
-                    registryError.setCodeContext("The XDS repository does not contain any documents related to the current patient");
+                    addErrorMessage(registryErrorList,
+                            ErrorCode.ERROR_CODE_1100,
+                            "The XDS repository does not contain any documents related to the current patient",
+                            "No documents are registered for the given patient.",
+                            RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
             }
-            registryErrorList.getRegistryError().add(registryError);
         }
+
         adhocQueryResponse.setRegistryErrorList(registryErrorList);
         // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
         adhocQueryResponse.setStatus(AdhocQueryResponseStatus.SUCCESS);

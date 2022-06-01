@@ -1,7 +1,5 @@
 package eu.epsos.util;
 
-import bsh.StringUtil;
-
 import java.util.Arrays;
 
 public enum ErrorCode {
