@@ -24,7 +24,7 @@
                   select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']"/>
 
     <xsl:variable name="strength"
-                  select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:quantity"/>
+                  select="$activeIngredient/epsos:quantity"/>
 
 
     <xsl:template name="show-fpn">
