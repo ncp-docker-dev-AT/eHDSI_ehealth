@@ -281,6 +281,12 @@ export default {
             })
           // this.xml = response.data
         })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
+        })
     },
     download (xml) {
       axios
@@ -297,6 +303,12 @@ export default {
           document.body.appendChild(link)
           link.click()
           this.loading = false
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     },
     upload () {
@@ -317,8 +329,6 @@ export default {
               if (response.data.statusCode === 200) {
                 this.uploaded = true
                 this.success('Upload is done ')
-              } else {
-                this.error('An error occurs. The operations is not completed! ')
               }
               this.loading = false
             })
@@ -328,6 +338,12 @@ export default {
                 err.response.data.message
               )
             })
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     },
     setSmpType (smpType) {
@@ -356,6 +372,12 @@ export default {
             )
           })
           this.loading = false
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     }
   }
