@@ -5,7 +5,7 @@
       <v-icon right dark> mdi-cloud-check </v-icon>
     </v-btn>
     <v-snackbar v-model="snackbar" :color="snackbarMod" top>
-      {{ snackbarText }}
+      <span v-html="snackbarText"></span>
       <template>
         <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
       </template>
@@ -47,7 +47,10 @@ export default {
           this.success('Synchronisation has been done!')
         })
         .catch((err) => {
-          this.error('An error occurs. The operations is not completed! ', err)
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     }
   },
