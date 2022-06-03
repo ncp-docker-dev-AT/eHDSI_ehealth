@@ -1,7 +1,5 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.epsos.util.ErrorCode;
-
 public class InvalidFieldException extends AssertionValidationException {
 
     private static final long serialVersionUID = 8922552840552468444L;
@@ -15,7 +13,7 @@ public class InvalidFieldException extends AssertionValidationException {
 
     @Override
     public String getMessage() {
-        return this.getErrorCode().getMessage() + messageDetailed;
+        return this.getEhdsiCode().getMessage() + messageDetailed;
     }
 
 }

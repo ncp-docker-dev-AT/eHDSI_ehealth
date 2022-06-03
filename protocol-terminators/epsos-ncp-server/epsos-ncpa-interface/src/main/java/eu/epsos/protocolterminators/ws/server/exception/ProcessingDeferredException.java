@@ -1,12 +1,12 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.epsos.util.ErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 
 public class ProcessingDeferredException extends NIException {
 
 	private static final long serialVersionUID = 4872216168488255110L;
 
 	public ProcessingDeferredException(String message) {
-		super(ErrorCode.ERROR_CODE_2201.getCodeToString(), message);
+		super(EhdsiCode.EHDSI_ERROR_2201, message);
 	}
 }

@@ -1,13 +1,13 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.epsos.util.ErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 
 public class NoDataException extends NIException {
 
 	private static final long serialVersionUID = -6429013545938611399L;
 
 	public NoDataException(String message) {
-		super(ErrorCode.ERROR_CODE_1102.getCodeToString(), message);
+		super(EhdsiCode.EHDSI_ERROR_1102, message);
 	}
 
 }

@@ -4,7 +4,7 @@ import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
-import eu.epsos.util.ErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
@@ -41,7 +41,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -722,7 +721,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         fillOutputMessage(outputMessage, null, null, "OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, ErrorCode.ERROR_CODE_4703.getCode() + " : Either the security policy of country A or a privacy " +
+                        fillOutputMessage(outputMessage, EhdsiCode.EHDSI_ERROR_4703.getCode() + " : Either the security policy of country A or a privacy " +
                                 "policy of the patient (that was given in country A) does not allow the requested operation " +
                                 "to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");

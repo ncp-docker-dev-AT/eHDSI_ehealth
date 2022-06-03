@@ -5,7 +5,7 @@ import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
-import eu.epsos.util.ErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -51,7 +51,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
         } catch (TransformerException e) {
             logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
-            throw new NationalInfrastructureException(ErrorCode.ERROR_CODE_4106);
+            throw new NationalInfrastructureException(EhdsiCode.EHDSI_ERROR_4106);
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.debug("eDispensation document content: '{}'", dispensation);
@@ -59,19 +59,19 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
 
         if (dispensation == null || dispensation.isEmpty()) {
 
-            throw new NationalInfrastructureException(ErrorCode.ERROR_CODE_4106);
+            throw new NationalInfrastructureException(EhdsiCode.EHDSI_ERROR_4106);
         }
 
         if (StringUtils.contains(dispensation, "NO_MATCHING_EP")) {
 
             logger.error("Tried to submit dispensation with no matching ePrescription.");
-            throw new NationalInfrastructureException(ErrorCode.ERROR_CODE_4105);
+            throw new NationalInfrastructureException(EhdsiCode.EHDSI_ERROR_4105);
         }
 
         if (StringUtils.contains(dispensation, "INVALID_DISPENSE")) {
 
             logger.error("Tried to submit already dispensed ePrescription.");
-            throw new NationalInfrastructureException(ErrorCode.ERROR_CODE_4106);
+            throw new NationalInfrastructureException(EhdsiCode.EHDSI_ERROR_4106);
         }
     }
 

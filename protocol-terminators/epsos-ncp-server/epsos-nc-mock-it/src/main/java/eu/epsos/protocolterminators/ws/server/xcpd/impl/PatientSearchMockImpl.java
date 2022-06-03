@@ -3,6 +3,7 @@ package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             File rootDir = new File(patientFile + patientId.getRoot());
             //  Patient ID 999999 will throw an Exception from National Connector
             if (StringUtils.equals(patientId.getExtension(), "999999")) {
-                throw new NIException("EU-0000", "Mocked Patient Repository not working");
+                throw new NIException(EhdsiCode.EHDSI_ERROR_GENERIC, "Mocked Patient Repository not working");
             }
 
             if (rootDir.exists()) {

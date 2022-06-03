@@ -10,6 +10,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -90,10 +91,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
         this.ofRs = ofRs;
     }
 
-    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, String location, boolean isWarning) {
+    private RegistryError createErrorMessage(EhdsiCode ehdsiCode, String codeContext, String value, String location, boolean isWarning) {
 
         RegistryError registryError = ofRs.createRegistryError();
-        registryError.setErrorCode(errorCode);
+        registryError.setErrorCode(ehdsiCode.getCodeToString());
         registryError.setLocation(location);
         registryError.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
         registryError.setCodeContext(codeContext);
@@ -101,9 +102,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return registryError;
     }
 
-    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, boolean isWarning) {
+    private RegistryError createErrorMessage(EhdsiCode ehdsiCode, String codeContext, String value, boolean isWarning) {
 
-        return createErrorMessage(errorCode, codeContext, value, getLocation(), isWarning);
+        return createErrorMessage(ehdsiCode, codeContext, value, getLocation(), isWarning);
     }
 
     /**
@@ -332,13 +333,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -360,7 +361,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         }
 
         RegistryResponseType response = new RegistryResponseType();
@@ -424,14 +425,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
             documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
 
         } catch (NationalInfrastructureException e) {
-            logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
+            logger.error("DocumentSubmitException: '{}'-'{}'", e.getEhdsiCode(), e.getMessage());
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", documentId, false));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         if (registryErrorList.getRegistryError().isEmpty()) {
@@ -474,13 +475,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -507,7 +508,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         }
         if (!registryErrorList.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(registryErrorList);
@@ -583,14 +584,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                        logger.error(ExceptionUtils.getStackTrace(e));
 //                    }
                 } catch (NationalInfrastructureException e) {
-                    logger.error("DocumentSubmitException: '{}'-'{}'", e.getCode(), e.getMessage());
-                    registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", documentId, false));
+                    logger.error("DocumentSubmitException: '{}'-'{}'", e.getEhdsiCode(), e.getMessage());
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", documentId, false));
                 } catch (NIException e) {
                     logger.error("NIException: '{}'", e.getMessage());
-                    registryErrorList.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
-                    registryErrorList.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+                    registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
                 }
             }
             if (!registryErrorList.getRegistryError().isEmpty()) {
@@ -674,13 +675,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -757,10 +758,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                }
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {
@@ -810,13 +811,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
             sigCountryCode = validateXDRHeader(shElement, Constants.HCER_CLASSCODE);
         } catch (InsufficientRightsException e) {
             logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (AssertionValidationException e) {
             logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -847,13 +848,13 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getCode(), e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getCodeContext(), e.getMessage(), false));
+                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getCodeContext(), e.getMessage(), false));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage("", e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {
@@ -918,25 +919,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (result.isEmpty()) {
             logger.warn("No class code was found in request object.");
         }
-        return result;
-    }
-
-    /**
-     * @param dPe
-     * @return
-     */
-    private DocumentProcessingException normalizeDocProcException(DocumentProcessingException dPe) {
-
-        final String REPOSITORY_INTERNAL_ERROR = "XDSRepositoryError";
-        DocumentProcessingException result = new DocumentProcessingException();
-
-        if (StringUtils.equals(dPe.getMessage(), "DOCUMENT TRANSLATION FAILED.")) {
-            result.setCode(REPOSITORY_INTERNAL_ERROR);
-            result.setCodeSystem(null);
-            result.setMessage("An error has occurred during the document translation.");
-            result.setStackTrace(dPe.getStackTrace());
-        }
-
         return result;
     }
 

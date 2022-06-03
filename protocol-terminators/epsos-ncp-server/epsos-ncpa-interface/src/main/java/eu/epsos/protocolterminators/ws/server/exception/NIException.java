@@ -1,19 +1,21 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+
 public class NIException extends Exception {
 
     private static final long serialVersionUID = 2148051521948531853L;
-    private String code;
+    private EhdsiCode ehdsiCode;
     private String codeSystem;
     private String message;
 
-    public NIException(String code, String message) {
-        this.code = code;
+    public NIException(EhdsiCode ehdsiCode, String message) {
+        this.ehdsiCode = ehdsiCode;
         this.message = message;
     }
 
-    public NIException(String code, String message, String codeSystem) {
-        this(code, message);
+    public NIException(EhdsiCode ehdsiCode, String message, String codeSystem) {
+        this(ehdsiCode, message);
         this.codeSystem = codeSystem;
     }
 
@@ -34,11 +36,12 @@ public class NIException extends Exception {
         this.message = message;
     }
 
-    public String getCode() {
-        return code;
+
+    public EhdsiCode getEhdsiCode() {
+        return ehdsiCode;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setEhdsiCode(EhdsiCode ehdsiCode) {
+        this.ehdsiCode = ehdsiCode;
     }
 }
