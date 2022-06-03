@@ -94,7 +94,7 @@
       </v-row>
 
       <v-snackbar v-model="snackbar" :color="snackbarMod" top>
-        {{ snackbarText }}
+        <span v-html="snackbarText"></span>
         <template>
           <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
         </template>
@@ -170,6 +170,12 @@ export default {
           this.showSignedXml = false
           this.uploaded = true
         })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
+        })
     },
     update () {
       this.dataset.country = this.$store.getters.country.toLowerCase()
@@ -186,8 +192,11 @@ export default {
           this.success('SMP File was successfully generated')
           this.loading = false
         })
-        .catch((_) => {
-          this.error('An error occurs. The operations is not completed! ')
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
       this.showXml = true
       this.showSignedXml = false
@@ -218,13 +227,20 @@ export default {
                   this.showSignedXml = true
                   this.loading = false
                 })
-                .catch((_) => {
+                .catch((err) => {
                   this.error(
-                    'An error occurs. The operations is not completed! '
+                    'An error occurs. The operations is not completed! <br/>' +
+                    err.response.data.message
                   )
                 })
             })
           // this.xml = response.data
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     },
     download (xml) {
@@ -242,6 +258,12 @@ export default {
           document.body.appendChild(link)
           link.click()
           this.loading = false
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     },
     upload () {
@@ -262,14 +284,21 @@ export default {
               if (response.data.statusCode === 200) {
                 this.signedXmluploaded = true
                 this.success('Upload is done ')
-              } else {
-                this.error('An error occurs. The operations is not completed! ')
               }
               this.loading = false
             })
-            .catch((_) => {
-              this.error('An error occurs. The operations is not completed! ')
+            .catch((err) => {
+              this.error(
+                'An error occurs. The operations is not completed! <br/>' +
+                err.response.data.message
+              )
             })
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     }
   }
