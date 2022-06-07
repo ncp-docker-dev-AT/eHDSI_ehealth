@@ -10,7 +10,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -91,10 +91,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
         this.ofRs = ofRs;
     }
 
-    private RegistryError createErrorMessage(EhdsiCode ehdsiCode, String codeContext, String value, String location, boolean isWarning) {
+    private RegistryError createErrorMessage(EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, String location, boolean isWarning) {
 
         RegistryError registryError = ofRs.createRegistryError();
-        registryError.setErrorCode(ehdsiCode.getCodeToString());
+        registryError.setErrorCode(ehdsiErrorCode.getCodeToString());
         registryError.setLocation(location);
         registryError.setSeverity("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:" + (isWarning ? "Warning" : "Error"));
         registryError.setCodeContext(codeContext);
@@ -102,9 +102,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return registryError;
     }
 
-    private RegistryError createErrorMessage(EhdsiCode ehdsiCode, String codeContext, String value, boolean isWarning) {
+    private RegistryError createErrorMessage(EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, boolean isWarning) {
 
-        return createErrorMessage(ehdsiCode, codeContext, value, getLocation(), isWarning);
+        return createErrorMessage(ehdsiErrorCode, codeContext, value, getLocation(), isWarning);
     }
 
     /**
@@ -339,7 +339,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -432,7 +432,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         if (registryErrorList.getRegistryError().isEmpty()) {
@@ -481,7 +481,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -591,7 +591,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
-                    registryErrorList.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+                    registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
                 }
             }
             if (!registryErrorList.getRegistryError().isEmpty()) {
@@ -681,7 +681,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -761,7 +761,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {
@@ -817,7 +817,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", false));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+            rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
         }
 
         String patientId = getPatientId(request);
@@ -854,7 +854,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getCodeContext(), e.getMessage(), false));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
+                rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", false));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {

@@ -1,7 +1,7 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhiErrorCode;
 
 /**
  * This class represents an Exception occurred due to document transformation (translation/transcoding) issues.
@@ -12,16 +12,16 @@ public class DocumentTransformationException extends Exception {
 
     private static long serialVersionUID = 1L;
 
-    private EhiCode ehiCode;
+    private EhiErrorCode ehiErrorCode;
 
-    private EhdsiCode ehdsiCode;
+    private EhdsiErrorCode ehdsiErrorCode;
 
     private String codeContext;
 
-    public DocumentTransformationException(EhiCode ehiCode, EhdsiCode ehdsiCode, String codeContext, String message) {
+    public DocumentTransformationException(EhiErrorCode ehiErrorCode, EhdsiErrorCode ehdsiErrorCode, String codeContext, String message) {
         super(message);
-        this.ehiCode = ehiCode;
-        this.ehdsiCode = ehdsiCode;
+        this.ehiErrorCode = ehiErrorCode;
+        this.ehdsiErrorCode = ehdsiErrorCode;
         this.codeContext = codeContext;
     }
 
@@ -39,12 +39,12 @@ public class DocumentTransformationException extends Exception {
         serialVersionUID = aSerialVersionUID;
     }
 
-    public EhiCode getEhiCode() {
-        return ehiCode;
+    public EhiErrorCode getEhiCode() {
+        return ehiErrorCode;
     }
 
-    public EhdsiCode getEhdsiCode() {
-        return ehdsiCode;
+    public EhdsiErrorCode getEhdsiCode() {
+        return ehdsiErrorCode;
     }
 
     /**

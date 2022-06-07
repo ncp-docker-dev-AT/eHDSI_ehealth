@@ -1,7 +1,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 
 public class DocumentProcessingException extends NIException {
 
@@ -12,6 +12,6 @@ public class DocumentProcessingException extends NIException {
     }
 
     public DocumentProcessingException(String message) {
-        super(EhdsiCode.EHDSI_ERROR_4106, message);
+        super(EhdsiErrorCode.EHDSI_ERROR_4106, message);
     }
 }

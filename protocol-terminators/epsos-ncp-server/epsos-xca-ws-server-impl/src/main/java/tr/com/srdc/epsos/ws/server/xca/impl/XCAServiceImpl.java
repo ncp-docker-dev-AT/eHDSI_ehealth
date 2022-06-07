@@ -9,7 +9,7 @@ import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
@@ -25,6 +25,7 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.openncp.util.UUIDHelper;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhiErrorCode;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
@@ -832,12 +833,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return Constants.OID_PREFIX + Constants.HOME_COMM_ID;
     }
 
-    private void addErrorMessage(RegistryErrorList registryErrorList, EhdsiCode ehdsiCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(ehdsiCode.getCodeToString(), codeContext, value, severity));
+    private void addErrorMessage(RegistryErrorList registryErrorList, EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(ehdsiErrorCode.getCodeToString(), codeContext, value, severity));
     }
 
-    private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, EhdsiCode ehdsiCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, ehdsiCode.getCodeToString(), codeContext, value, severity));
+    private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
+        registryErrorList.addChild(createErrorOMMessage(ons, ehdsiErrorCode.getCodeToString(), codeContext, value, severity));
     }
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ITMTSAMEror error, String operationType, RegistryErrorSeverity severity) {
@@ -899,29 +900,29 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.debug(e.getMessage(), e);
             addErrorMessage(registryErrorList, e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
-            addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             throw e;
         }
 
         String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
-            EhdsiCode code;
+            EhdsiErrorCode code;
             String message;
             if (classCodeValues.contains(Constants.EP_CLASSCODE)) {
-                code = EhdsiCode.EHDSI_ERROR_1101;
+                code = EhdsiErrorCode.EHDSI_ERROR_1101;
                 message = "No ePrescriptions are registered for the given patient.";
             } else if (classCodeValues.contains(Constants.PS_CLASSCODE)) {
-                code = EhdsiCode.EHDSI_ERROR_1102;
+                code = EhdsiErrorCode.EHDSI_ERROR_1102;
                 message = "No patient summary is registered for the given patient.";
             } else if (classCodeValues.contains(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_LABORATORY_RESULTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)
                     || classCodeValues.contains(Constants.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
-                code = EhdsiCode.EHDSI_ERROR_1104;
+                code = EhdsiErrorCode.EHDSI_ERROR_1104;
                 message = "There is no original clinical data of the requested type registered for the given patient.";
             } else {
-                code = EhdsiCode.EHDSI_ERROR_1100;
+                code = EhdsiErrorCode.EHDSI_ERROR_1100;
                 message = "No documents are registered for the given patient.";
             }
             addErrorMessage(registryErrorList, code, message, "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
@@ -950,11 +951,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_4701, EhdsiCode.EHDSI_ERROR_4701.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4701, EhdsiErrorCode.EHDSI_ERROR_4701.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         if (classCodeValues.isEmpty()) {
-            addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_4202, "Class code missing in XCA query request.", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4202, "Class code missing in XCA query request.", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         // Evidence for call to NI for XCA List
@@ -983,11 +984,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (prescriptions == null) {
 
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_4103, "ePrescription registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4103, "ePrescription registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.FAILURE;
                     } else if (prescriptions.isEmpty()) {
 
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_1101, "No ePrescriptions are registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_1101, "No ePrescriptions are registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.FAILURE;
                     } else {
 
@@ -1018,7 +1019,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
 
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_1102, "No patient summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_1102, "No patient summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
@@ -1065,7 +1066,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                     if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
 
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_1100, "No MRO summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_1100, "No MRO summary is registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
@@ -1126,10 +1127,10 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
 
                     if (orCDDocumentMetaDataList == null) {
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_4103, "orCD registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4103, "orCD registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.FAILURE;
                     } else if (orCDDocumentMetaDataList.isEmpty()) {
-                        addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_1104, "There is no original clinical data of the requested type registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                        addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_1104, "There is no original clinical data of the requested type registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     } else {
 
@@ -1142,7 +1143,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     break;
 
                 default:
-                    addErrorMessage(registryErrorList, EhdsiCode.EHDSI_ERROR_4202, "Class code not supported for XCA query(" + classCodeValue + ").", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                    addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4202, "Class code not supported for XCA query(" + classCodeValue + ").", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                     responseStatus = AdhocQueryResponseStatus.SUCCESS;
                     break;
             }
@@ -1319,8 +1320,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     logger.info("Found the client country code via the signature certificate.");
                 } else {
                     addErrorOMMessage(omNamespace, registryErrorList,
-                            EhdsiCode.EHDSI_ERROR_4703,
-                            EhdsiCode.EHDSI_ERROR_4703.getMessage(),
+                            EhdsiErrorCode.EHDSI_ERROR_4703,
+                            EhdsiErrorCode.EHDSI_ERROR_4703.getMessage(),
                             "",
                             RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                     break processLabel;
@@ -1332,8 +1333,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiCode.EHDSI_ERROR_4701,
-                        EhdsiCode.EHDSI_ERROR_4701.getMessage(),
+                        EhdsiErrorCode.EHDSI_ERROR_4701,
+                        EhdsiErrorCode.EHDSI_ERROR_4701.getMessage(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
@@ -1395,8 +1396,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                }
                 logger.error("[National Connector] No document returned by the National Infrastructure");
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiCode.EHDSI_ERROR_GENERIC,
-                        "XDSMissingDocument",
+                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
+                        EhiErrorCode.XDSMissingDocument.name(),
                         "Requested document not found.",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
@@ -1446,7 +1447,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             } catch (SMgrException e) {
                 logger.error("SMgrException: '{}'", e.getMessage(), e);
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiCode.EHDSI_ERROR_GENERIC,
+                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
                         e.getMessage(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
@@ -1503,8 +1504,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
 
                                 addErrorOMMessage(omNamespace, registryErrorList,
-                                        EhdsiCode.EHDSI_ERROR_4203,
-                                        EhdsiCode.EHDSI_ERROR_4203.getMessage(),
+                                        EhdsiErrorCode.EHDSI_ERROR_4203,
+                                        EhdsiErrorCode.EHDSI_ERROR_4203.getMessage(),
                                         "",
                                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                                 // If the error is FATAL flag failure has been set to true
@@ -1541,7 +1542,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiCode.EHDSI_ERROR_GENERIC,
+                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
                         e.getMessage(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
@@ -1595,7 +1596,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 OMElement errorCode = errors.next();
                 logger.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
-                if (!StringUtils.equals(EhdsiCode.EHDSI_ERROR_4203.getCodeToString(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                if (!StringUtils.equals(EhdsiErrorCode.EHDSI_ERROR_4203.getCodeToString(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
                     errors.remove();
                 }
             }
@@ -1654,14 +1655,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
             switch (classCodeValue) {
                 case Constants.EP_CLASSCODE:
                     addErrorMessage(registryErrorList,
-                            EhdsiCode.EHDSI_ERROR_1101,
+                            EhdsiErrorCode.EHDSI_ERROR_1101,
                             "The XDS repository does not contain any ePrescription related to the current patient",
                             "No ePrescriptions are registered for the given patient.",
                             RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
                 case Constants.PS_CLASSCODE:
                     addErrorMessage(registryErrorList,
-                            EhdsiCode.EHDSI_ERROR_1102,
+                            EhdsiErrorCode.EHDSI_ERROR_1102,
                             "The XDS repository does not contain any Patient Summary related to the current patient",
                             "No patient summary is registered for the given patient.",
                             RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
@@ -1671,14 +1672,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
                     addErrorMessage(registryErrorList,
-                            EhdsiCode.EHDSI_ERROR_1104,
+                            EhdsiErrorCode.EHDSI_ERROR_1104,
                             "The XDS repository does not contain any OrCD of the requested type related to the current patient",
                             "No original clinical document of the requested type is registered for the given patient.",
                             RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                     break;
                 default:
                     addErrorMessage(registryErrorList,
-                            EhdsiCode.EHDSI_ERROR_1100,
+                            EhdsiErrorCode.EHDSI_ERROR_1100,
                             "The XDS repository does not contain any documents related to the current patient",
                             "No documents are registered for the given patient.",
                             RegistryErrorSeverity.ERROR_SEVERITY_WARNING);

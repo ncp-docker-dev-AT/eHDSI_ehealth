@@ -1,15 +1,15 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NationalInfrastructureException extends NIException {
 
-    public NationalInfrastructureException(EhdsiCode ehdsiCode) {
+    public NationalInfrastructureException(EhdsiErrorCode ehdsiErrorCode) {
 
-        super(ehdsiCode, ehdsiCode.getMessage());
+        super(ehdsiErrorCode, ehdsiErrorCode.getMessage());
         Logger logger = LoggerFactory.getLogger(NationalInfrastructureException.class);
-        logger.error("NationalInfrastructureException: '{}': '{}'", ehdsiCode.getCode(), ehdsiCode.getMessage());
+        logger.error("NationalInfrastructureException: '{}': '{}'", ehdsiErrorCode.getCode(), ehdsiErrorCode.getMessage());
     }
 }

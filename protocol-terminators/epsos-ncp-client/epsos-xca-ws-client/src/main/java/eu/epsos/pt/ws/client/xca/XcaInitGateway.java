@@ -6,7 +6,7 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -242,8 +242,8 @@ public class XcaInitGateway {
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
                     if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity)
-                            || errorCode.equals(EhdsiCode.EHDSI_ERROR_1101.getCodeToString())
-                            || errorCode.equals(EhdsiCode.EHDSI_ERROR_1102.getCodeToString())) {
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1101.getCodeToString())
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1102.getCodeToString())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }

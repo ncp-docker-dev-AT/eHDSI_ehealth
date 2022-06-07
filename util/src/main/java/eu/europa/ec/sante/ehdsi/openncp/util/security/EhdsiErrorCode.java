@@ -2,7 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.util.security;
 
 import java.util.Arrays;
 
-public enum EhdsiCode {
+public enum EhdsiErrorCode {
 
     EHDSI_ERROR_1001(1001, "Assertion is not valid."),
     EHDSI_ERROR_1002(1002, "The given TRC Assertion does not validate against the Identity Assertion"),
@@ -122,7 +122,7 @@ public enum EhdsiCode {
 
     private final int code;
     private final String message;
-    EhdsiCode(int code, String message){
+    EhdsiErrorCode(int code, String message){
         this.code = code;
         this.message = message;
     }
@@ -140,7 +140,7 @@ public enum EhdsiCode {
     }
 
 
-    public static EhdsiCode getErrorCode(int code){
+    public static EhdsiErrorCode getErrorCode(int code){
        return Arrays.stream(values())
                .filter(errorCode -> errorCode.getCode() == code)
                .findAny()

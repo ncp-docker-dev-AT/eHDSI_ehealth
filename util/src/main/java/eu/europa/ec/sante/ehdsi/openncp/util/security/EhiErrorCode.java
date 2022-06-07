@@ -1,11 +1,12 @@
 package eu.europa.ec.sante.ehdsi.openncp.util.security;
 
-public enum EhiCode {
+public enum EhiErrorCode {
 
-    XDSRepositoryError(null);
+    XDSRepositoryError(null),
+    XDSMissingDocument(null);
 
     private final String message;
-    EhiCode(String message){
+    EhiErrorCode(String message){
         this.message = message;
     }
 

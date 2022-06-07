@@ -1,15 +1,15 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
 
 public class AssertionValidationException extends Exception {
 
     private static final long serialVersionUID = -6478057187366024151L;
-    private EhdsiCode ehdsiCode;
+    private EhdsiErrorCode ehdsiErrorCode;
 
     public AssertionValidationException() {
         super();
-        this.ehdsiCode = EhdsiCode.EHDSI_ERROR_1001;
+        this.ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_1001;
     }
 
     public AssertionValidationException(String message) {
@@ -18,14 +18,14 @@ public class AssertionValidationException extends Exception {
 
     @Override
     public String getMessage() {
-        return ehdsiCode.getMessage();
+        return ehdsiErrorCode.getMessage();
     }
 
     public String getCode() {
-        return ehdsiCode.getCodeToString();
+        return ehdsiErrorCode.getCodeToString();
     }
 
-    public EhdsiCode getEhdsiCode() {
-        return ehdsiCode;
+    public EhdsiErrorCode getEhdsiCode() {
+        return ehdsiErrorCode;
     }
 }

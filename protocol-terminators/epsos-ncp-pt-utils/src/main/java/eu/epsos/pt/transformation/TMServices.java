@@ -4,8 +4,8 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import eu.epsos.exceptions.DocumentTransformationException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiCode;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhiCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.security.EhiErrorCode;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public final class TMServices {
 
         //  If the translation process fails, an exception is thrown.
         if (!tmResponse.isStatusSuccess()) {
-            throw new DocumentTransformationException(EhiCode.XDSRepositoryError, EhdsiCode.EHDSI_ERROR_GENERIC, Constants.SERVER_IP,"An error has occurred during document translation, please check the following errors:\n"
+            throw new DocumentTransformationException(EhiErrorCode.XDSRepositoryError, EhdsiErrorCode.EHDSI_ERROR_GENERIC, Constants.SERVER_IP,"An error has occurred during document translation, please check the following errors:\n"
                     + processErrors(tmResponse.getErrors()));
         }
         try {
@@ -68,7 +68,7 @@ public final class TMServices {
             //  Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(null, EhdsiCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
@@ -103,7 +103,7 @@ public final class TMServices {
         //  If the translation process fails, an exception is thrown.
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
-            throw new DocumentTransformationException(null, EhdsiCode.EHDSI_ERROR_GENERIC, "DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, "DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
         }
         try {
             //  Obtain the translated document in the Document type format, only if translation succeeds.
@@ -111,7 +111,7 @@ public final class TMServices {
             //  Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(null, EhdsiCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
         LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
         //  Return the Document as a byte array.
@@ -131,7 +131,7 @@ public final class TMServices {
             //Parse the String into a Document object.
             return XMLUtil.parseContent(docString);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new DocumentTransformationException(null, EhdsiCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
     }
 
