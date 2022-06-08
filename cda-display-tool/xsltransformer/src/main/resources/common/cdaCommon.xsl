@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:epsos="urn:epsos-org:ep:medication"
+                xmlns:pharm="urn:hl7-org:pharm"
                 version="2.0">
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
@@ -594,8 +594,8 @@
     <xsl:template name="show-strength">
         <xsl:param name="node"/>
 
-        <xsl:variable name="numerator" select="$node/epsos:numerator"/>
-        <xsl:variable name="denominator" select="$node/epsos:denominator"/>
+        <xsl:variable name="numerator" select="$node/pharm:numerator"/>
+        <xsl:variable name="denominator" select="$node/pharm:denominator"/>
         <xsl:variable name="numeratorValue" select="$numerator/@value"/>
         <xsl:variable name="numeratorUnit">
             <xsl:call-template name="show-eHDSIUnit">
@@ -603,7 +603,7 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="denominatorValue" select="$denominator/@value"/>
-        <xsl:variable name="medStrengthOriginalText" select="$node/epsos:translation/epsos:originalText"/>
+        <xsl:variable name="medStrengthOriginalText" select="$node/pharm:translation/pharm:originalText"/>
         <xsl:variable name="denominatorUnit">
             <xsl:call-template name="supportUCUMAnnotations">
                 <xsl:with-param name="value" select="$denominator/@unit"/>
