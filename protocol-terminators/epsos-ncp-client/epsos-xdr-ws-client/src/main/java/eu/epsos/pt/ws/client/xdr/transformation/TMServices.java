@@ -4,7 +4,7 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 import eu.epsos.exceptions.DocumentTransformationException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

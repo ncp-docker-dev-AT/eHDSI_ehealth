@@ -1,7 +1,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 
 public class DocumentProcessingException extends NIException {
 

@@ -6,7 +6,7 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;

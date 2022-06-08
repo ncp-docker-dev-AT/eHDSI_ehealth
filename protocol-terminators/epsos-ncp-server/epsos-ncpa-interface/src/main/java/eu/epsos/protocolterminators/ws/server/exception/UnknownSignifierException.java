@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 
 public class UnknownSignifierException extends NIException {
 

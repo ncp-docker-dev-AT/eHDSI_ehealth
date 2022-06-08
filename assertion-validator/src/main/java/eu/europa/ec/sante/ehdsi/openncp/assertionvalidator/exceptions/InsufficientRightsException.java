@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 
 public class InsufficientRightsException extends Exception {
 

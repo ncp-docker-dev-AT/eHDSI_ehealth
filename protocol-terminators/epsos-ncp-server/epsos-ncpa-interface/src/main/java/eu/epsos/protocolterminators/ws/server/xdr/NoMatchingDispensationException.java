@@ -20,7 +20,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 
 /**
  * Thrown if discard request is rejected because the issuing HCPO of 

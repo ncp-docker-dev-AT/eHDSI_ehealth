@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.security.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
 
 public class NoSignatureException extends NIException {
 	private static final long serialVersionUID = -2813019150881427805L;
