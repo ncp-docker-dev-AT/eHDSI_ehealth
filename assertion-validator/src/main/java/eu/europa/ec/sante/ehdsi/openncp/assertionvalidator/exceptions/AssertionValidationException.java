@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 
 public class AssertionValidationException extends Exception {
 

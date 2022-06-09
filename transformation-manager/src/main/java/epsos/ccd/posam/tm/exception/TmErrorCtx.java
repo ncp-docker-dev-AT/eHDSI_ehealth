@@ -1,7 +1,7 @@
 package epsos.ccd.posam.tm.exception;
 
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
-import eu.europa.ec.sante.ehdsi.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 
 public class TmErrorCtx implements ITMTSAMEror {
 

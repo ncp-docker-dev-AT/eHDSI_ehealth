@@ -1,9 +1,9 @@
 package epsos.ccd.posam.tm.response;
 
-import eu.europa.ec.sante.ehdsi.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.exception.TMException;
 import epsos.ccd.posam.tm.util.TMConstants;
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;

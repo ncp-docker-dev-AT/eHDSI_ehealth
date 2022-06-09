@@ -6,8 +6,9 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
-import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -38,6 +39,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * XCA Initiating Gateway
@@ -54,9 +56,7 @@ public class XcaInitGateway {
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
 
-    private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
-            "2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
-            "4512");
+    private static final List<String> TM_ERROR_CODES = Arrays.stream(TMError.values()).map(TMError::getCode).collect(Collectors.toList());
 
     /**
      * Private constructor to disable class instantiation.
@@ -273,6 +273,6 @@ public class XcaInitGateway {
      * @return True | false according the Error Codes List.
      */
     private static boolean checkTransformationErrors(String errorCode) {
-        return ERROR_CODES.contains(errorCode);
+        return TM_ERROR_CODES.contains(errorCode);
     }
 }

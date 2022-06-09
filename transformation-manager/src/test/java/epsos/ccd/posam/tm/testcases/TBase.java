@@ -1,10 +1,10 @@
 package epsos.ccd.posam.tm.testcases;
 
-import eu.europa.ec.sante.ehdsi.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tm.util.TMConfiguration;
 import epsos.ccd.posam.tm.util.XmlUtil;
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import junit.framework.TestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

@@ -1,13 +1,13 @@
 package epsos.ccd.posam.tm.service.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
-import eu.europa.ec.sante.ehdsi.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.exception.TMException;
 import epsos.ccd.posam.tm.exception.TmErrorCtx;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tm.util.*;
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;

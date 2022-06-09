@@ -3,7 +3,7 @@ package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
-import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

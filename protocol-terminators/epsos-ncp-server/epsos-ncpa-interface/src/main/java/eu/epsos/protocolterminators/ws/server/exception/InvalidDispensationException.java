@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 
 public class InvalidDispensationException extends NIException {
 	private static final long serialVersionUID = -4968105055699416626L;

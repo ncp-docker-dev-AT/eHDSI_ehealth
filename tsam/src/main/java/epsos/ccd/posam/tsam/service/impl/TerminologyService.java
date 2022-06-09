@@ -14,7 +14,7 @@ import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
 import java.util.HashMap;
 
-import eu.europa.ec.sante.ehdsi.error.TSAMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

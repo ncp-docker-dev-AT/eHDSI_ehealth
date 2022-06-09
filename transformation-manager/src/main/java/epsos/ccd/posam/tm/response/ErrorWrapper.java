@@ -1,6 +1,6 @@
 package epsos.ccd.posam.tm.response;
 
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 
 public class ErrorWrapper {
 

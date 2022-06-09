@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
 
 public class PatientAuthenticationRequiredException extends NIException {
 	private static final long serialVersionUID = -159689601257832448L;

@@ -1,6 +1,6 @@
 package epsos.ccd.posam.tsam.exception;
 
-import eu.europa.ec.sante.ehdsi.error.TSAMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 
 /**
  * @author Roman Repiscak

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
-import eu.europa.ec.sante.ehdsi.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
-import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 
 /**
  * Negative test scenarios for method translate 

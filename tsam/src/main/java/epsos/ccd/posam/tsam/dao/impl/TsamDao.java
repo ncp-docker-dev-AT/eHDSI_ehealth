@@ -5,7 +5,7 @@ import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.*;
 import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
-import eu.europa.ec.sante.ehdsi.error.TSAMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
