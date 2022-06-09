@@ -1,4 +1,4 @@
-package eu.europa.ec.sante.ehdsi.openncp.util.error;
+package eu.europa.ec.sante.ehdsi.constant.error;
 
 import java.util.Arrays;
 

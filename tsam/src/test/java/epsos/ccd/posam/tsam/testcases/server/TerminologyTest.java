@@ -1,7 +1,7 @@
 package epsos.ccd.posam.tsam.testcases.server;
 
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
-import epsos.ccd.posam.tsam.exception.TSAMError;
+import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.error.TSAMError;
 import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;

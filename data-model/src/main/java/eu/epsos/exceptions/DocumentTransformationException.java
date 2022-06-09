@@ -1,7 +1,7 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhiErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhiErrorCode;
 
 /**
  * This class represents an Exception occurred due to document transformation (translation/transcoding) issues.

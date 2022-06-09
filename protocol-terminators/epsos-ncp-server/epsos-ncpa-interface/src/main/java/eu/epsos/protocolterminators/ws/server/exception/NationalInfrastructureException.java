@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -34,5 +34,10 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-constant</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

@@ -2,6 +2,7 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
@@ -112,7 +113,7 @@ public final class XdrDocumentSource {
             LOGGER.error("errorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
                     errorCode, codeContext, location, severity, value);
 
-            if (StringUtils.equals("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error", severity)) {
+            if (StringUtils.equals(RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText(), severity)) {
                 stringBuilder.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                 hasError = true;
             }

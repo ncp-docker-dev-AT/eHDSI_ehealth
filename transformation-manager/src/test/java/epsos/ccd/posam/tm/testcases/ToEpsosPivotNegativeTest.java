@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
-import epsos.ccd.posam.tm.exception.TMError;
+import eu.europa.ec.sante.ehdsi.error.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.error.ITMTSAMEror;
 
 /**
  * Negative test scenarios for method toEpsosPivot

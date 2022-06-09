@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
 
 public class WeakAuthenticationException extends NIException {
 	private static final long serialVersionUID = -3723212345611879399L;

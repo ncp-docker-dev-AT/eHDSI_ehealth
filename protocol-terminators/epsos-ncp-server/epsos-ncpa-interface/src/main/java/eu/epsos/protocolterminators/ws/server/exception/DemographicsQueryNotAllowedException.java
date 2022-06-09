@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhdsiXcpdErrorCode;
 
 public class DemographicsQueryNotAllowedException extends NIException {
 	private static final long serialVersionUID = -1360702816426111325L;

@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tsam.service.impl;
 
 import epsos.ccd.posam.tsam.dao.ITsamDao;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.CodeSystem;
 import epsos.ccd.posam.tsam.model.CodeSystemConcept;
@@ -14,6 +13,8 @@ import epsos.ccd.posam.tsam.util.CodedElement;
 import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
 import java.util.HashMap;
+
+import eu.europa.ec.sante.ehdsi.error.TSAMError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

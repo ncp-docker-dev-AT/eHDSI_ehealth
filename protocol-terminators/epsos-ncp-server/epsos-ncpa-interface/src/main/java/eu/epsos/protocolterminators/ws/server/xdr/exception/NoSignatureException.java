@@ -1,7 +1,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr.exception;
 
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
-import eu.europa.ec.sante.ehdsi.openncp.util.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.error.EhdsiErrorCode;
 
 public class NoSignatureException extends DocumentProcessingException {
 	private static final long serialVersionUID = -3360716186178697692L;
