@@ -149,6 +149,7 @@
     </xsl:template>
 
     <xsl:template match="n1:targetSiteCode" mode="targetsitecode">
+        //Ideally needs to be bound with a value set, but for now nothing is available.
         <xsl:value-of select="@displayName"/>
     </xsl:template>
 </xsl:stylesheet>
