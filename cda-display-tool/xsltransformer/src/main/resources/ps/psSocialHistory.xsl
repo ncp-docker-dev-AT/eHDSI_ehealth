@@ -96,7 +96,7 @@
             </td>
             <td>
                 <!-- Observation Value -->
-                <xsl:apply-templates select="n1:value"/>
+                <xsl:apply-templates select="n1:value" mode="socialhistoryobservationvalue"/>
             </td>
         </tr>
     </xsl:template>
@@ -119,7 +119,7 @@
         </xsl:call-template>
     </xsl:template>
 
-    <xsl:template match="n1:value">
+    <xsl:template match="n1:value" mode="socialhistoryobservationvalue">
         <xsl:call-template name="show-PQ">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
