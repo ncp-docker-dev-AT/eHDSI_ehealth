@@ -172,7 +172,7 @@
         <xsl:variable name="medCode"
                       select="n1:code/@code"/>
         <xsl:variable name="medReason"
-                      select="n1:entryRelationship[@typeCode='RSON']"/>
+                      select="n1:entryRelationship[@typeCode='RSON']/n1:observation"/>
 
 
         <!-- nullflavored act -->
@@ -252,7 +252,7 @@
                                     <!-- Medication Reason -->
                                     <xsl:call-template name="show-eHDSIIllnessandDisorder">
                                         <xsl:with-param name="node"
-                                                        select="n1:value"/>
+                                                        select="$medReason/n1:value"/>
                                     </xsl:call-template>
                                 </td>
                             </tr>
