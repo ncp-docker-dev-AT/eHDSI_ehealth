@@ -1170,6 +1170,12 @@ Although being real choices for the different diseases and conditions, the selec
                             <text><reference value="#pro-1"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20141020"/>
+                            <targetSiteCode code="76552005" codeSystem="2.16.840.1.113883.6.96" displayName="skin structure of shoulder">
+                                <qualifier>
+                                    <name code="272741003" displayName="Laterality"/>
+                                    <value code="7771000" displayName="Left"/>
+                                </qualifier>
+                            </targetSiteCode>
                         </procedure>
                     </entry>
                     <entry>
