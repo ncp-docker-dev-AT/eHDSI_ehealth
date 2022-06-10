@@ -15,6 +15,7 @@
     <xsl:import href="psSocialHistory.xsl"/>
     <xsl:import href="psPregnancyHistory.xsl"/>
     <xsl:import href="psVitalSigns.xsl"/>
+    <xsl:import href="psAdvanceDirectives.xsl"/>
     <xsl:import href="psOtherSection.xsl"/>
 
     <xsl:variable name="originalNarrativeTableTitle">
@@ -117,6 +118,8 @@
                         <xsl:call-template name="pregnancyHistory"/>
                         <!-- eHDSI Vital Signs -->
                         <xsl:call-template name="vitalSigns"/>
+                        <!-- eHDSI Vital Signs -->
+                        <xsl:call-template name="advanceDirectives"/>
                         <!-- All other sections -->
                         <xsl:call-template name="otherSections"/>
                     </div>
