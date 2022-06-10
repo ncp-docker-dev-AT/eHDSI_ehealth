@@ -7,7 +7,7 @@ import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
-import eu.europa.ec.sante.ehdsi.openncp.util.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;

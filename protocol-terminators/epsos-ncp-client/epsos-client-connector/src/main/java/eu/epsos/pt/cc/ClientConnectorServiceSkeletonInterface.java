@@ -4,7 +4,7 @@ import epsos.openncp.protocolterminator.clientconnector.*;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XDRException;
-import eu.europa.ec.sante.ehdsi.openncp.util.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 
 import java.text.ParseException;
