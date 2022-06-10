@@ -1,8 +1,5 @@
 package eu.epsos.pt.cc;
 
-import epsos.openncp.protocolterminator.clientconnector.GeneralFault;
-import epsos.openncp.protocolterminator.clientconnector.GeneralFaultDocument;
-import epsos.openncp.pt.client.GeneralFaultMessage;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.exceptions.XDRException;
@@ -65,16 +62,7 @@ public class ClientConnectorServiceUtils {
             errorCode = throwable.getMessage();
         }
 
-        GeneralFault generalFault = GeneralFault.Factory.newInstance();
-        generalFault.setFaultMessage(faultMessage);
-
-        GeneralFaultDocument generalFaultDocument = GeneralFaultDocument.Factory.newInstance();
-        generalFaultDocument.setGeneralFault(generalFault);
-
-        GeneralFaultMessage exception = new GeneralFaultMessage(errorCode, throwable);
-        exception.setFaultMessage(generalFaultDocument);
-
-        axisFault = new AxisFault(errorCode, exception);
+        axisFault = new AxisFault(errorCode);
         axisFault.setDetail(response);
 
         return axisFault;
