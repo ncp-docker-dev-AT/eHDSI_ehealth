@@ -8,8 +8,8 @@ public class NationalInfrastructureException extends NIException {
 
     public NationalInfrastructureException(EhdsiErrorCode ehdsiErrorCode) {
 
-        super(ehdsiErrorCode, ehdsiErrorCode.getMessage());
+        super(ehdsiErrorCode, ehdsiErrorCode.getDescription());
         Logger logger = LoggerFactory.getLogger(NationalInfrastructureException.class);
-        logger.error("NationalInfrastructureException: '{}': '{}'", ehdsiErrorCode.getCode(), ehdsiErrorCode.getMessage());
+        logger.error("NationalInfrastructureException: '{}': '{}'", ehdsiErrorCode.getCode(), ehdsiErrorCode.getDescription());
     }
 }

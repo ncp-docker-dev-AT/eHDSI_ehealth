@@ -6,7 +6,7 @@ public abstract class ExceptionWithContext extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private ErrorCode errorCode;
+    private final ErrorCode errorCode;
     private String context;
 
     public ExceptionWithContext(String message, ErrorCode errorCode) {
@@ -29,4 +29,7 @@ public abstract class ExceptionWithContext extends Exception {
         return context;
     }
 
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

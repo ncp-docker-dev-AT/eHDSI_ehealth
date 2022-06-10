@@ -13,7 +13,7 @@ public class InvalidFieldException extends AssertionValidationException {
 
     @Override
     public String getMessage() {
-        return this.getEhdsiCode().getMessage() + messageDetailed;
+        return this.getEhdsiCode().getDescription() + messageDetailed;
     }
 
 }

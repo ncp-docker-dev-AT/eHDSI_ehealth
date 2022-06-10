@@ -18,7 +18,7 @@ public class AssertionValidationException extends Exception {
 
     @Override
     public String getMessage() {
-        return ehdsiErrorCode.getMessage();
+        return ehdsiErrorCode.getDescription();
     }
 
     public String getCode() {

@@ -19,7 +19,6 @@ public class ClientConnectorServiceUtils {
     public static final String TASK_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
     public static final String TASK_NAMESPACE_PREFIX = "soapenv";
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceUtils.class);
-    private static final String DEFAULT_ERROR_CODE = "1000";
     private static final OMFactory OM_FACTORY = OMAbstractFactory.getOMFactory();
 
     private ClientConnectorServiceUtils() {
@@ -31,7 +30,8 @@ public class ClientConnectorServiceUtils {
         if (e instanceof AxisFault) {
             return (AxisFault) e;
         }
-        String errorCode = DEFAULT_ERROR_CODE;
+        String errorMessage = "";
+        String errorCode = "";
         String faultMessage = "";
         OMElement response = null;
         Throwable throwable = e;
@@ -43,26 +43,29 @@ public class ClientConnectorServiceUtils {
         } else if (throwable instanceof NoPatientIdDiscoveredException) {
             response = OM_FACTORY.createOMElement(
                     new QName(TASK_NAMESPACE, "noPatientIdDiscoveredException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
+            errorMessage = throwable.getMessage();
             faultMessage = ((NoPatientIdDiscoveredException) throwable).getContext();
+            errorCode = ((NoPatientIdDiscoveredException) throwable).getErrorCode().getCode();
             response.setText(faultMessage);
         } else if (throwable instanceof XCAException) {
             response = OM_FACTORY.createOMElement(
                     new QName(TASK_NAMESPACE, "xcaException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
+            errorMessage = throwable.getMessage();
             faultMessage = ((XCAException) throwable).getContext();
+            errorCode = ((XCAException) throwable).getErrorCode().getCode();
             response.setText(faultMessage);
         } else if (throwable instanceof XDRException) {
             response = OM_FACTORY.createOMElement(
                     new QName(TASK_NAMESPACE, "xdrException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
+            errorMessage = throwable.getMessage();
             faultMessage = ((XDRException) throwable).getContext();
+            errorCode = ((XDRException) throwable).getErrorCode().getCode();
             response.setText(faultMessage);
         } else { //
-            errorCode = throwable.getMessage();
+            errorMessage = throwable.getMessage();
         }
 
-        axisFault = new AxisFault(errorCode);
+        axisFault = new AxisFault(errorMessage, new QName(errorCode));
         axisFault.setDetail(response);
 
         return axisFault;

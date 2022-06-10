@@ -121,18 +121,18 @@ public enum EhdsiErrorCode implements ErrorCode{
 
 
     private final String code;
-    private final String message;
-    EhdsiErrorCode(String code, String message){
+    private final String description;
+    EhdsiErrorCode(String code, String description){
         this.code = code;
-        this.message = message;
+        this.description = description;
     }
 
     public String getCode() {
         return code;
     }
 
-    public String getMessage() {
-        return message;
+    public String getDescription() {
+        return description;
     }
 
 

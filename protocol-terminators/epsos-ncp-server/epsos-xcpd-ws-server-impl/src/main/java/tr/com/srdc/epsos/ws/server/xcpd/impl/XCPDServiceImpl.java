@@ -326,7 +326,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             // Set detectedIssueEvent/triggerFor/actOrRequired/code
             CE ce = objectFactory.createCE();
             mcaimt900001UV01ActOrderRequired.setCode(ce);
-            ce.setCode(errorCode.name());
+            ce.setCode(errorCode.getCode());
             ce.setCodeSystem(errorCode.getCodeSystem());
         } else if (errorCode == EhdsiXcpdErrorCode.InsufficientRights
                 || errorCode == EhiErrorCode.AnswerNotAvailable) {
@@ -343,7 +343,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
             CD cd = objectFactory.createCD();
-            cd.setCode(errorCode.name());
+            cd.setCode(errorCode.getCode());
             cd.setCodeSystem(errorCode.getCodeSystem());
             mcaimt900001UV01DetectedIssueManagement.setCode(cd);
         }

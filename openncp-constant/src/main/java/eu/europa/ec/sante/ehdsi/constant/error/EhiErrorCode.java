@@ -20,15 +20,20 @@ public enum EhiErrorCode implements ErrorCode{
     ResponderBusy(null, "1.3.6.1.4.1.19376.1.2.27.3"),
     InternalError(null, "1.3.6.1.4.1.19376.1.2.27.3");
 
-    private final String message;
+    private final String description;
     private final String codeSystem;
-    EhiErrorCode(String message, String codeSystem){
-        this.message = message;
+    EhiErrorCode(String description, String codeSystem){
+        this.description = description;
         this.codeSystem = codeSystem;
     }
 
-    public String getMessage() {
-        return message;
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getCode() {
+        return this.name();
     }
 
     public String getCodeSystem() {
@@ -41,5 +46,7 @@ public enum EhiErrorCode implements ErrorCode{
                 .findAny()
                 .orElse(null);
     }
+
+
 
 }

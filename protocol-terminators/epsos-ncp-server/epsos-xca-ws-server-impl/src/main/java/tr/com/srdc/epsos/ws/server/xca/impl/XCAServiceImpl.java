@@ -10,7 +10,6 @@ import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
@@ -952,7 +951,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4701, EhdsiErrorCode.EHDSI_ERROR_4701.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_4701, EhdsiErrorCode.EHDSI_ERROR_4701.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         if (classCodeValues.isEmpty()) {
@@ -1322,7 +1321,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 } else {
                     addErrorOMMessage(omNamespace, registryErrorList,
                             EhdsiErrorCode.EHDSI_ERROR_4703,
-                            EhdsiErrorCode.EHDSI_ERROR_4703.getMessage(),
+                            EhdsiErrorCode.EHDSI_ERROR_4703.getDescription(),
                             "",
                             RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                     break processLabel;
@@ -1335,7 +1334,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
                 addErrorOMMessage(omNamespace, registryErrorList,
                         EhdsiErrorCode.EHDSI_ERROR_4701,
-                        EhdsiErrorCode.EHDSI_ERROR_4701.getMessage(),
+                        EhdsiErrorCode.EHDSI_ERROR_4701.getDescription(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
@@ -1506,7 +1505,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                                 addErrorOMMessage(omNamespace, registryErrorList,
                                         EhdsiErrorCode.EHDSI_ERROR_4203,
-                                        EhdsiErrorCode.EHDSI_ERROR_4203.getMessage(),
+                                        EhdsiErrorCode.EHDSI_ERROR_4203.getDescription(),
                                         "",
                                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                                 // If the error is FATAL flag failure has been set to true

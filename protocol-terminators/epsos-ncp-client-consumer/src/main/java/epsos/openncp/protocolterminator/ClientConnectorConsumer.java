@@ -2,6 +2,9 @@ package epsos.openncp.protocolterminator;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceStub;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
@@ -98,9 +101,7 @@ public class ClientConnectorConsumer {
 
             return Arrays.asList(docArray);
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -134,9 +135,7 @@ public class ClientConnectorConsumer {
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -161,9 +160,7 @@ public class ClientConnectorConsumer {
             var sayHelloResponseDocument = clientConnectorServiceStub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -205,9 +202,7 @@ public class ClientConnectorConsumer {
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -255,9 +250,7 @@ public class ClientConnectorConsumer {
 
             return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(ex.getMessage(), ex);
         }
@@ -369,9 +362,7 @@ public class ClientConnectorConsumer {
 
             return clientConnectorStub;
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         }
     }
 
@@ -443,5 +434,18 @@ public class ClientConnectorConsumer {
         if (StringUtils.isNotBlank(patientDemographics.getCountry())) {
             patientDemographics.setCountry(StringUtils.trim(patientDemographics.getCountry()));
         }
+    }
+
+    private ClientConnectorConsumerException createClientConnectorConsumerException(AxisFault axisFault){
+        String message  = axisFault.getMessage();
+        String errorCode = axisFault.getFaultCode() != null ? axisFault.getFaultCode().getLocalPart() : null;
+        String context = axisFault.getDetail() != null ? axisFault.getDetail().getText() : null;
+
+        EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.getErrorCode(errorCode);
+        EhdsiXcpdErrorCode ehdsiXcpdErrorCode = EhdsiXcpdErrorCode.getErrorCode(errorCode);
+
+        ErrorCode errorCodeEnum = ehdsiErrorCode != null? ehdsiErrorCode: ehdsiXcpdErrorCode;
+
+        return new ClientConnectorConsumerException(message, errorCodeEnum, context, axisFault);
     }
 }
