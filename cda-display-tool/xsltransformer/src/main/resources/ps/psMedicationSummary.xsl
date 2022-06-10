@@ -172,7 +172,7 @@
         <xsl:variable name="medCode"
                       select="n1:code/@code"/>
         <xsl:variable name="medReason"
-                      select="n1:entryRelationship[@typeCode='RSON']/n1:observation"/>
+                      select="n1:entryRelationship[@typeCode='RSON']"/>
 
 
         <!-- nullflavored act -->
@@ -250,10 +250,21 @@
                                 </td>
                                 <td>
                                     <!-- Medication Reason -->
-                                    <xsl:call-template name="show-eHDSIIllnessandDisorder">
-                                        <xsl:with-param name="node"
-                                                        select="$medReason/n1:value"/>
-                                    </xsl:call-template>
+                                    <xsl:for-each select="$medReason">
+                                        <xsl:choose>
+                                            <xsl:when test="n1:observation">
+                                                <xsl:call-template name="show-eHDSIIllnessandDisorder">
+                                                    <xsl:with-param name="node"
+                                                                    select="n1:observation/n1:value"/>
+                                                </xsl:call-template>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:call-template name="show-id">
+                                                    <xsl:with-param name="id" select="n1:act/n1:id"/>
+                                                </xsl:call-template>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:for-each>
                                 </td>
                             </tr>
                             <xsl:for-each select="pharm:ingredient[@classCode='ACTI']">

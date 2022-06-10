@@ -17,26 +17,13 @@
     <!-- show-id -->
     <xsl:template name="show-id">
         <xsl:param name="id"/>
-        <xsl:choose>
-            <xsl:when test="not($id)">
-                <xsl:if test="not(@nullFlavor)">
-                    <xsl:if test="@extension">
-                        <xsl:value-of select="@extension"/>
-                    </xsl:if>
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="@root"/>
-                </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:if test="not($id/@nullFlavor)">
-                    <xsl:if test="$id/@extension">
-                        <xsl:value-of select="$id/@extension"/>
-                    </xsl:if>
-                    <xsl:text> </xsl:text>
-                    <!--xsl:value-of select="$id/@root"/ -->
-                </xsl:if>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="not($id/@nullFlavor)">
+            <xsl:if test="$id/@extension">
+                <xsl:value-of select="$id/@extension"/>
+                <xsl:text> </xsl:text>
+            </xsl:if>
+            <xsl:value-of select="$id/@root"/>
+        </xsl:if>
     </xsl:template>
 
     <!-- show-name -->
