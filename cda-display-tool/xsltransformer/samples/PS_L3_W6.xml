@@ -430,18 +430,32 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <pharm:numerator xsi:type="PQ" value="100" unit="ug"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="H03AA01" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-1"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
                                                 <!-- epsos:name>levothyroxine sodium</pharm:name -->
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
                                 </manufacturedProduct>
                             </consumable>
+                            <entryRelationship typeCode="RSON">
+                                <observation classCode="OBS" moodCode="EVN">
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.41"/>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
+                                    <id root="2.999.1.1.1"/>
+                                    <code code="64572001" codeSystem="2.16.840.1.113883.6.96"/>
+                                    <text>
+                                        <reference value="#medreason-1"/>
+                                    </text>
+                                    <statusCode code="completed"/>
+                                    <effectiveTime value="19950101"/>
+                                    <value code="E03" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"/>
+                                </observation>
+                            </entryRelationship>
                         </substanceAdministration>
                     </entry>
                     <entry>
@@ -486,26 +500,26 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <pharm:numerator xsi:type="PQ" value="5" unit="mg"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C09AA05" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-3"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
                                                 <pharm:numerator xsi:type="PQ" value="5" unit="mg"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C08CA02" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-4"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
                                 </manufacturedProduct>
@@ -547,13 +561,13 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <pharm:numerator xsi:type="PQ" value="100" unit="[IU]"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="mL"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-5"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
                                 </manufacturedProduct>
@@ -602,23 +616,23 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <pharm:numerator xsi:type="PQ" value="500" unit="mg"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="J01CA04" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-7"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
                                                 <pharm:numerator xsi:type="PQ" value="125" unit="mg"/>
                                                 <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code nullFlavor="OTH"/>
                                                 <pharm:name>clavulanic acid</pharm:name>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
                                 </manufacturedProduct>
@@ -676,26 +690,26 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <pharm:numerator xsi:type="PQ" value="2.5" unit="mg"/>
                                                 <pharm:denominator xsi:type="PQ" value="2.5" unit="mL"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03AC02" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-10"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
                                                 <numerator xsi:type="PQ" value="0.5" unit="mg"/>
                                                 <denominator xsi:type="PQ" value="2.5" unit="mL"/>
                                             </pharm:quantity>
-                                            <pharm:ingredient classCode="MMAT" determinerCode="KIND">
+                                            <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03BB01" codeSystem="2.16.840.1.113883.6.73">
                                                     <pharm:originalText>
                                                         <pharm:reference value="#ecode-11"/>
                                                     </pharm:originalText>
                                                 </pharm:code>
-                                            </pharm:ingredient>
+                                            </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
                                 </manufacturedProduct>
