@@ -96,7 +96,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
     private RegistryError createErrorMessage(EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, String location, RegistryErrorSeverity severity) {
 
         RegistryError registryError = ofRs.createRegistryError();
-        registryError.setErrorCode(ehdsiErrorCode.getCodeToString());
+        registryError.setErrorCode(ehdsiErrorCode.getCode());
         registryError.setLocation(location);
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);

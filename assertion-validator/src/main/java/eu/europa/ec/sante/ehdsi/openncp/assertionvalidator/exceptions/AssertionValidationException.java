@@ -22,7 +22,7 @@ public class AssertionValidationException extends Exception {
     }
 
     public String getCode() {
-        return ehdsiErrorCode.getCodeToString();
+        return ehdsiErrorCode.getCode();
     }
 
     public EhdsiErrorCode getEhdsiCode() {

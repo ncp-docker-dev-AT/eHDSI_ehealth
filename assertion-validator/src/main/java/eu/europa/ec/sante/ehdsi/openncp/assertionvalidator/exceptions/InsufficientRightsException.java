@@ -18,7 +18,7 @@ public class InsufficientRightsException extends Exception {
     }
 
     public String getCode() {
-        return ehdsiErrorCode.getCodeToString();
+        return ehdsiErrorCode.getCode();
     }
 
     public EhdsiErrorCode getEhdsiCode() {

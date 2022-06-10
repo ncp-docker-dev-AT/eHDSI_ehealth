@@ -1,7 +1,12 @@
 package eu.epsos.dts.xcpd;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.EhiErrorCode;
 import org.hl7.v3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
 import tr.com.srdc.epsos.data.model.PatientDemographics.Gender;
 
@@ -23,6 +28,8 @@ import java.util.List;
  * @author Marcelo Fonseca<code> - marcelo.fonseca@iuz.pt</code>
  */
 public class RespondingGateway_RequestReceiver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RespondingGateway_RequestReceiver.class);
 
     private RespondingGateway_RequestReceiver() {
     }
@@ -139,7 +146,7 @@ public class RespondingGateway_RequestReceiver {
                         }
                     }
                 } catch (ParseException pe) {
-                    throw new NoPatientIdDiscoveredException(pe);
+                    throw new NoPatientIdDiscoveredException(EhdsiErrorCode.EHDSI_ERROR_GENERIC, pe);
                 }
             }
         } else {
@@ -165,7 +172,14 @@ public class RespondingGateway_RequestReceiver {
                 }
             }
 
-            throw new NoPatientIdDiscoveredException(errorMsg, acknowledgementDetailText);
+            EhdsiXcpdErrorCode ehdsiErrorCode = EhdsiXcpdErrorCode.getErrorCode(errorMsg);
+            EhiErrorCode ehiErrorCode = EhiErrorCode.getErrorCode(errorMsg);
+
+            if(ehdsiErrorCode == null && ehiErrorCode == null){
+                LOGGER.warn("No error code found in the XCPD response : " + errorMsg);
+            }
+
+            throw new NoPatientIdDiscoveredException(errorMsg, ehdsiErrorCode != null? ehdsiErrorCode: ehiErrorCode, acknowledgementDetailText);
         }
 
         return patients;

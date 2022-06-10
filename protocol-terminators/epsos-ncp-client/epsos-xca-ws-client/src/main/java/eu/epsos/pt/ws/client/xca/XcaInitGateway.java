@@ -243,8 +243,8 @@ public class XcaInitGateway {
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
                     if (RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText().equals(severity)
-                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1101.getCodeToString())
-                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1102.getCodeToString())) {
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1101.getCode())
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1102.getCode())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }
@@ -254,12 +254,17 @@ public class XcaInitGateway {
                         continue;
                     }
 
+                    EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.getErrorCode(errorCode);
+                    if(ehdsiErrorCode == null){
+                        LOGGER.warn("No EHDSI error code found in the XCA response for : " + errorCode);
+                    }
+
                     //Throw all the remaining errors
                     if (hasError) {
                         if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("Registry Errors: '{}'", msg);
                         }
-                        throw new XCAException(errorCode, codeContext);
+                        throw new XCAException(errorCode, ehdsiErrorCode, codeContext);
                     }
                 }
             }

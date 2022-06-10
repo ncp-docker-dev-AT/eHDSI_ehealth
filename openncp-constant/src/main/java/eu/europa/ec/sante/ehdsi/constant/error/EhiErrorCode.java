@@ -1,5 +1,7 @@
 package eu.europa.ec.sante.ehdsi.constant.error;
 
+import java.util.Arrays;
+
 public enum EhiErrorCode implements ErrorCode{
 
     /*
@@ -32,4 +34,12 @@ public enum EhiErrorCode implements ErrorCode{
     public String getCodeSystem() {
         return codeSystem;
     }
+
+    public static EhiErrorCode getErrorCode(String code){
+        return Arrays.stream(values())
+                .filter(errorCode -> errorCode.name().equals(code))
+                .findAny()
+                .orElse(null);
+    }
+
 }

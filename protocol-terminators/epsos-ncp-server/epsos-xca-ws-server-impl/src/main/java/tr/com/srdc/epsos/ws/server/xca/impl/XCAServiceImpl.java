@@ -835,11 +835,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private void addErrorMessage(RegistryErrorList registryErrorList, EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(ehdsiErrorCode.getCodeToString(), codeContext, value, severity));
+        registryErrorList.getRegistryError().add(createErrorMessage(ehdsiErrorCode.getCode(), codeContext, value, severity));
     }
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, ehdsiErrorCode.getCodeToString(), codeContext, value, severity));
+        registryErrorList.addChild(createErrorOMMessage(ons, ehdsiErrorCode.getCode(), codeContext, value, severity));
     }
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ITMTSAMEror error, String operationType, RegistryErrorSeverity severity) {
@@ -1597,7 +1597,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                 OMElement errorCode = errors.next();
                 logger.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
-                if (!StringUtils.equals(EhdsiErrorCode.EHDSI_ERROR_4203.getCodeToString(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
+                if (!StringUtils.equals(EhdsiErrorCode.EHDSI_ERROR_4203.getCode(), errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
                     errors.remove();
                 }
             }

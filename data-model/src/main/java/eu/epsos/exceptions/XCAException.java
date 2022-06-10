@@ -1,5 +1,7 @@
 package eu.epsos.exceptions;
 
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+
 /**
  * Holds exceptions originated in the XCA Query / Retrieve process.
  *
@@ -8,23 +10,12 @@ package eu.epsos.exceptions;
  */
 public class XCAException extends ExceptionWithContext {
 
-    public XCAException(String message) {
-        super(message);
+    public XCAException(String message, EhdsiErrorCode ehdsiErrorCode) {
+        super(message, ehdsiErrorCode);
     }
 
-    public XCAException(String message, Throwable cause) {
-        super(message, cause);
+    public XCAException(String message, EhdsiErrorCode ehdsiErrorCode, String context) {
+        super(message, ehdsiErrorCode, context);
     }
 
-    public XCAException(Throwable cause) {
-        super(cause);
-    }
-
-    public XCAException(String message, String context) {
-        super(message, context);
-    }
-
-    public XCAException(String message, String context, Throwable cause) {
-        super(message, context, cause);
-    }
 }

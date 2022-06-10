@@ -2,6 +2,7 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
@@ -79,7 +80,7 @@ public final class XdrDocumentSource {
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException e) {
-            throw new XDRException(e);
+            throw new XDRException(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e);
         }
         return XdrResponseDts.newInstance(response);
     }
@@ -117,12 +118,14 @@ public final class XdrDocumentSource {
                 stringBuilder.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                 hasError = true;
             }
+
+            EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.getErrorCode(errorCode);
+            if(ehdsiErrorCode == null){
+                LOGGER.warn("No EHDSI error code found in the XDR response for : " + errorCode);
+            }
+
             if (hasError) {
-                if (errorCode != null && errorCode.trim().length() > 0) {
-                    throw new XDRException(errorCode, codeContext);
-                } else {
-                    throw new XDRException(codeContext);
-                }
+                    throw new XDRException(errorCode, ehdsiErrorCode, codeContext);
             }
         }
     }
