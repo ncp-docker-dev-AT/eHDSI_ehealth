@@ -1822,6 +1822,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170415"/>
+                                <high value="2022"/>
                             </effectiveTime>
                             <value xsi:type="PQ" value="0.5" unit="{pack}/d"/>
                         </observation>
