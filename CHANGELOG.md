@@ -3,7 +3,66 @@
 All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
-## [5.2.5] - 21-02-2021
+## [5.2.6] - 13-06-2022
+The OpenNCP 5.2.6 is the Wave 5 Operation Ready release.
+This version is planned to be used during the eHDSI Wave 5 Routine Operations.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/zwVGRw
+
+Main changes in this release are:<br/>
+<ul>
+<li>ePrescription List metadata handling improvement and bug fixing.</li>
+<li>CDA Display Tool: major improvement and bug fixing.</li>
+<li>XPath Coded Elements list configuration file update (to be updated also into the custom configuration folder).</li>
+<li>OpenNCP Gateway UI improvements - Previous OpenATNA UI fully deprecated</li>
+<li>Support of the OID and HL7 II identifiers for the Author and Organization.</li>
+<li>Java dependencies vulnerability fix.</li>
+</ul>
+
+### Sub-task
+    [EHEALTH-8148] - Start and end date for medical devices is not using the correct datatype
+    [EHEALTH-8151] - eHDSIUnit code system OID is not updated correctly in the CDA Display Tool
+    [EHEALTH-8185] - History of past problems section contains wrong table header
+
+### Technical Sub-task
+    [EHEALTH-8205] - Vital Signs: translated part doesn't display units
+    [EHEALTH-8207] - CDA Display Tool doesn't render all the CDA sequence element (guardian, participant, ingredients)
+    [EHEALTH-8238] - OpenNCP Spring framework vulnerability - security fix implementation
+    [EHEALTH-8395] - Ambiguous XPath for the allergies severity
+    [EHEALTH-8396] - HP (author) professional role not displayed.
+    [EHEALTH-8399] - The type of address (/addr/@use) is not properly displayed
+    [EHEALTH-8447] - Releasing OpenNCP 5.2.6 (Wave 5 Operation Ready)
+
+### Bug
+    [EHEALTH-5818] - XDS AuthorInstitution not correct HL7 XON Format
+    [EHEALTH-5860] - NCP-A doesn't block requests containing a TRCA with non-eHDSI PoU
+    [EHEALTH-6006] - hl7:doseQuantity element is not transcoded by the transformation manager
+    [EHEALTH-8037] - Document list: confidentiality allows incoherence of code and description
+    [EHEALTH-8047] - OpenATNA-Viewer UI/UX improvements
+    [EHEALTH-8048] - eP List - Issue with the substitution flag being null
+    [EHEALTH-8082] - OpenNCP-Gateway only supports alphanumeric passwords
+    [EHEALTH-8083] - OpenNCP-Gateway Reset Password allows new password not matching the criteria
+    [EHEALTH-8084] - OpenNCP-Gateway Reset Password email template needs improvements
+    [EHEALTH-8108] - Gateway - SMP Editor ISM extension maximum size supported
+    [EHEALTH-8112] - Gateway - SMP Editor ISM update doesn't work properly
+    [EHEALTH-8123] - Wrong validator used for failed Order list response
+    [EHEALTH-8124] - eP List response injects Generic substitution in case it's not provided by NI-A
+    [EHEALTH-8147] - CDA Display Tool bugfixes for Wave 5
+    [EHEALTH-8192] - ePrescription List XDS metadata cardinality not correct produce empty Classification
+    [EHEALTH-8539] - Allergies and intolerances concern XPath uses incorrect templateID in coded_element_list_ehdsi.xml
+
+### Story
+    [EHEALTH-7021] - Prefix value of "authorPerson" is not a valid XCN datatype
+    [EHEALTH-7954] - OpenNCP Gateway Backend - Pagination doesn't work properly (ATNA and eADC)
+
+### Task
+    [EHEALTH-6389] - Ignore all failing, unmaintained unit tests in OpenNCP in order in order to keep a reliable test set
+
+### Improvement
+    [EHEALTH-6660] - Remove ATNA user interface from OpenATNA module
+    [EHEALTH-8086] - Provide the definition of the EvenType document name
+    [EHEALTH-8105] - Gateway SMP Editor - creating configuration folder if not present
+
+## [5.2.5] - 21-02-2022
 The OpenNCP 5.2.5 is the Wave 5 Formal Test Event HotFix release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
 Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ

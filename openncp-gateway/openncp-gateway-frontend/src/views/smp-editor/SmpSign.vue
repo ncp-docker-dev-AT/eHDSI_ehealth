@@ -42,7 +42,7 @@
       </v-row>
 
       <v-snackbar v-model="snackbar" :color="snackbarMod" top>
-        {{ snackbarText }}
+        <span v-html="snackbarText"></span>
         <template>
           <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
         </template>
@@ -101,6 +101,12 @@ export default {
           link.click()
           this.loading = false
         })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
+        })
     },
     upload () {
       this.loading = true
@@ -120,14 +126,21 @@ export default {
               if (response.data.statusCode === 200) {
                 this.uploaded = true
                 this.success('Upload is done ')
-              } else {
-                this.error('An error occurs. The operations is not completed! ')
               }
               this.loading = false
             })
-            .catch((_) => {
-              this.error('An error occurs. The operations is not completed! ')
+            .catch((err) => {
+              this.error(
+                'An error occurs. The operations is not completed! <br/>' +
+                err.response.data.message
+              )
             })
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     },
     submitFile () {
@@ -162,12 +175,19 @@ export default {
                   this.showSignedXml = true
                   this.loading = false
                 })
-                .catch((_) => {
+                .catch((err) => {
                   this.error(
-                    'An error occurs. The operations is not completed! '
+                    'An error occurs. The operations is not completed! <br/>' +
+                    err.response.data.message
                   )
                 })
             })
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     }
   }

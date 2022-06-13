@@ -156,7 +156,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
         if (!StringUtils.equals(resourceId, PurposeOfUse.EMERGENCY.toString())
                 && !StringUtils.equals(resourceId, PurposeOfUse.TREATMENT.toString())) {
-            logger.error("InsufficientRightsException: Purpose of Use provided is not supported");
+            logger.error("InsufficientRightsException: HCP Identity Assertion XSPA Purpose of Use provided is not supported");
             throw new InsufficientRightsException();
 
         }
@@ -166,7 +166,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     /**
      * @param assertion     - SAML user assertion.
      * @param documentClass - Type of clinical document requested by the user (if available).
-     * @throws MissingFieldException       - User's assertion attribute is missing, throw exception (PoU mandatory for TRC)
+     * @throws MissingFieldException       - User's assertion attribute is missing, log warning (PoU optional for TRC)
      * @throws InsufficientRightsException - User's assertion attribute is not correct according the specification.
      */
     @Override
@@ -174,16 +174,15 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
         String resourceId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_PURPOSEOFUSE);
         if(StringUtils.isEmpty(resourceId)) {
-            logger.error("MissingFieldException: Purpose of Use is null");
-            throw new MissingFieldException("PoU is null");
+            logger.warn("Purpose of Use for TRC is not specified [optional]");
+            return;
         }
         if (!StringUtils.equals(resourceId, PurposeOfUse.EMERGENCY.toString())
                 && !StringUtils.equals(resourceId, PurposeOfUse.TREATMENT.toString())) {
-            logger.error("InsufficientRightsException: Purpose of Use provided is not supported");
+            logger.error("InsufficientRightsException: Patient Identity and TRC Assertion XSPA Purpose of Use provided is not supported: {}", resourceId);
             throw new InsufficientRightsException();
-
         }
-        logger.debug("HCP Identity Assertion XSPA Purpose of Use: '{}'", resourceId);
+        logger.debug("Patient Identity and TRC Assertion XSPA Purpose of Use: '{}'", resourceId);
     }
 
 
@@ -204,10 +203,10 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     }
 
     /**
-     * @param assertion
-     * @param documentClass
-     * @throws MissingFieldException
-     * @throws InvalidFieldException
+     * @param assertion - SAML user assertion.
+     * @param documentClass - Type of clinical document requested by the user (if available).
+     * @throws MissingFieldException - assertion attribute is missing.
+     * @throws InvalidFieldException - assertion attribute is not correct according the specification.
      */
     @Override
     public void XSPAOrganizationIdValidator(Assertion assertion, String documentClass) throws MissingFieldException, InvalidFieldException {

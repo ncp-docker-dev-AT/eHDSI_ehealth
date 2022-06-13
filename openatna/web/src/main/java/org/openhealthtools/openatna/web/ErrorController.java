@@ -6,11 +6,7 @@ import org.openhealthtools.openatna.audit.persistence.dao.ErrorDao;
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
@@ -19,19 +15,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Controller
+//@Controller
 public class ErrorController {
 
     private final Logger logger = LoggerFactory.getLogger(ErrorController.class);
 
     private final ErrorDao errorDao;
 
-    @Autowired
+    //@Autowired
     public ErrorController(ErrorDao errorDao) {
         this.errorDao = errorDao;
     }
 
-    @GetMapping(value = "/errors")
+    //@GetMapping(value = "/errors")
     public String errors(ModelMap model) {
 
         var queryBean = new QueryBean();
@@ -39,7 +35,7 @@ public class ErrorController {
         return "errorForm";
     }
 
-    @PostMapping(value = "/errors")
+    //@PostMapping(value = "/errors")
     public ModelAndView errors(QueryBean queryBean) throws AtnaPersistenceException {
 
         var modelMap = new ModelMap();

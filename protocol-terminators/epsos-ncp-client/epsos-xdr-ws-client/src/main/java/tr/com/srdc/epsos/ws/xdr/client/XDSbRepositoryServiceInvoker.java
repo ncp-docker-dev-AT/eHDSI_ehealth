@@ -375,7 +375,7 @@ public class XDSbRepositoryServiceInvoker {
         result.getExternalIdentifier().add(makeExternalIdentifier(XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME,
                 uuid, request.getCdaId(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_STR));
 
-        // Version Info not managed, since IHE simulator does not supports it, and the message is still valid at EVS.
+        // Version Info not managed, since IHE simulator does not support it, and the message is still valid at EVS.
         // result.setVersionInfo(ofRim.createVersionInfoType())
         // result.getVersionInfo().setVersionName(XDRConstants.EXTRINSIC_OBJECT.VERSION_INFO)
 
@@ -500,7 +500,7 @@ public class XDSbRepositoryServiceInvoker {
     }
 
     /**
-     * Obtains the AuthorInstitution information, namely Name and Id from the assertion.
+     * Obtains the AuthorInstitution information, namely Name and ID from the assertion.
      * And builds an HL7 V2.5 representation of the information.
      *
      * @param xdrRequest an XDR Request containing the assertion.
@@ -510,10 +510,9 @@ public class XDSbRepositoryServiceInvoker {
 
         String result;
 
-        var organization = "Hospital";
+        var organization = "General Hospital";
         var organizationId = "1.2.3.4.5.6.7.8.9.1789.45";
 
-        Assertion hcpAssertion;
         List<AttributeStatement> attrStatements;
         List<Attribute> attrs;
 
@@ -536,6 +535,9 @@ public class XDSbRepositoryServiceInvoker {
 
         if (organizationId.startsWith(Constants.OID_PREFIX)) {
             result = organization + "^^^^^^^^^" + organizationId.split(":")[2];
+        } else if (organizationId.startsWith(Constants.HL7II_PREFIX)) {
+            String[] organizationIds = organizationId.split(":");
+            result = organization + "^^^^^&" + organizationIds[2] + "&ISO^^^^" + organizationIds[3];
         } else {
             result = organization + "^^^^^^^^^" + organizationId;
         }
@@ -554,10 +556,9 @@ public class XDSbRepositoryServiceInvoker {
 
         String result;
 
-        var authorIdentifier = "Dr. Doctor";
+        var authorIdentifier = "Welby Marcus";
         var assigningAuthorityId = "1.2.3.4.5.6.7.8.9.1789.45";
 
-        Assertion hcpAssertion;
         List<AttributeStatement> attrStatements;
         List<Attribute> attrs;
 
@@ -578,9 +579,12 @@ public class XDSbRepositoryServiceInvoker {
         }
 
         if (assigningAuthorityId.startsWith(Constants.OID_PREFIX)) {
-            result = authorIdentifier + "&" + assigningAuthorityId.split(":")[2] + "&ISO";
+            result = authorIdentifier + "^^^&" + assigningAuthorityId.split(":")[2] + "&ISO";
+        } else if (assigningAuthorityId.startsWith(Constants.HL7II_PREFIX)) {
+            String[] assigningAuthorityIds = assigningAuthorityId.split(":");
+            result = authorIdentifier + "^^^&" + assigningAuthorityIds[2] + ":" + assigningAuthorityIds[3] + "&ISO";
         } else {
-            result = authorIdentifier + "&" + assigningAuthorityId + "&ISO";
+            result = authorIdentifier + "^^^&" + assigningAuthorityId + "&ISO";
         }
 
         return result;

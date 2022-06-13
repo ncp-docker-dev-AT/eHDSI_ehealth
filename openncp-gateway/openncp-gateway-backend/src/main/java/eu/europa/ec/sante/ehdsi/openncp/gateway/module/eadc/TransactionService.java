@@ -4,6 +4,8 @@ import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model.Tr
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +23,8 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<Transaction> findTransactions() {
-        return transactionRepository.findAll();
+    public Page<Transaction> findTransactions(Pageable pageable) {
+        return transactionRepository.findAll(pageable);
     }
 
     public Transaction getTransaction(String id) {

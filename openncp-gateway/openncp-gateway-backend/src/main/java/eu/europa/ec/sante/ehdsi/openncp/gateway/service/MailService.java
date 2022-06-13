@@ -19,6 +19,11 @@ import org.springframework.stereotype.Service;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Properties;
 
@@ -34,6 +39,7 @@ public class MailService implements MessageSourceAware {
     private final SmtpProperties smtpProperties;
 
     private MessageSourceAccessor messages;
+    private String resetUrl;
 
     public MailService(ApplicationProperties applicationProperties, SmtpProperties smtpProperties, JavaMailSender mailSender) {
         this.applicationProperties = applicationProperties;
@@ -85,16 +91,38 @@ public class MailService implements MessageSourceAware {
     public String sendMailFromTemplate(User user, String titleKey) {
         ConfigurationManager configurationManager = ConfigurationManagerFactory.getConfigurationManager();
         boolean mail;
-        String content = "Change your password <a href='" +
+
+        String resetUrl = "<a href='" +
                 applicationProperties.getPortal().getBaseUrl() +
                 "/#/reset?key=" +
                 user.getResetKey() +
-                "'>here</a>";
+                "'>Change OpenNCP Gateway password</a>";
+
+        String emailBody = "<html></html>";
+        String content = resetUrl;
+
+        String email = user.getUsername() + " [" + user.getEmail() + "]";
+
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("/templates/mails/passwordResetMail.html");
+        try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(streamReader)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                emailBody += line;
+            }
+        } catch (IOException e) {
+            logger.error("IOException: '{}'", e.getMessage());
+        }
+
+        emailBody = emailBody
+                    .replaceAll("\\%(USERNAME)\\%", email)
+                    .replaceAll("\\%(URL_RESET)\\%", resetUrl);
+
         try {
             mail = configurationManager.getBooleanProperty("GTW_MAIL_ENABLED");
             if (mail) {
-                String subject = messages.getMessage(titleKey, "subject");
-                sendMail(user.getEmail(), subject, content, false, true);
+                String emailSubject = messages.getMessage(titleKey, "Subject");
+                sendMail(user.getEmail(), emailSubject, emailBody, false, true);
             }
         } catch (PropertyNotFoundException e) {
             logger.error("PropertyNotFoundException: '{}'", e.getMessage());
@@ -108,6 +136,6 @@ public class MailService implements MessageSourceAware {
 
     @Async
     public String sendPasswordResetMail(User user) {
-        return sendMailFromTemplate(user, "Mail.PasswordReset.Title");
+        return sendMailFromTemplate(user, "Mail.SmpEditor.PasswordReset.Title");
     }
 }

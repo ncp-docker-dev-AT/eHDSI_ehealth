@@ -3,6 +3,7 @@ package epsos.ccd.posam.tm.testcases;
 import epsos.ccd.posam.tm.util.Validator;
 import epsos.ccd.posam.tm.util.XmlUtil;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -19,15 +20,16 @@ import java.io.File;
  *
  * @author Frantisek Rudik
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class CDAXPathTest extends TestCase {
 
     private final Logger logger = LoggerFactory.getLogger(CDAXPathTest.class);
     protected String samplesDir = ".//src//test//resources//samples//";
 
-    @Override
-    protected void setUp() {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("ctx_tm_test.xml");
-    }
+//    @Override
+//    protected void setUp() {
+//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("ctx_tm_test.xml");
+//    }
 
 
     public void testNameSpaceAwareness() {

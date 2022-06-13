@@ -397,7 +397,7 @@ public final class AdhocQueryResponseConverter {
                 var valueList = slot.getValueList().getValue();
                 if (slot.getName().equals(RIM_CODING_SCHEME) && CollectionUtils.isNotEmpty(valueList)) {
                     var codingScheme = valueList.get(0);
-                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_SUBSTITUTION_CODE_SYSTEM_OID)) {
+                    if (StringUtils.equals(StringUtils.trimToEmpty(codingScheme), EHDSI_SUBSTITUTION_CODE_SYSTEM_OID) && classificationType.getNodeRepresentation() != null) {
                         xdsDocument.setSubstitution(classificationType.getNodeRepresentation());
                     }
                 }

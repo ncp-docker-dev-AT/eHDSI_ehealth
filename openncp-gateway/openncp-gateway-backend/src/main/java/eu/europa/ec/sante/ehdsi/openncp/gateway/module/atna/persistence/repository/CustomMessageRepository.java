@@ -7,5 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface CustomMessageRepository {
 
-    Page<MessageEntity> findAllMessages(Predicate predicate, Pageable pageable);
+    Page<MessageEntity> findAllMessages(Pageable pageable);
+
+    Page<MessageEntity> searchMessages(Predicate predicate, Pageable pageable);
 }

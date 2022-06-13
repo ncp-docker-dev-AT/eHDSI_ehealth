@@ -115,7 +115,19 @@ export default {
             .then((response) => {
               this.files = response.data
             })
+            .catch((err) => {
+              this.error(
+                'An error occurs. The operations is not completed! <br/>' +
+                err.response.data.message
+              )
+            })
           this.loading = true
+        })
+        .catch((err) => {
+          this.error(
+            'An error occurs. The operations is not completed! <br/>' +
+            err.response.data.message
+          )
         })
     }
   }

@@ -18,6 +18,7 @@ import static org.junit.Assert.fail;
 /**
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class MockCertTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MockCertTest.class);

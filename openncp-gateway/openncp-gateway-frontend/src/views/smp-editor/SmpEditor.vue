@@ -39,6 +39,12 @@ export default {
         this.properties = response.data
         this.loading = false
       })
+      .catch((err) => {
+        this.error(
+          'An error occurs. The operations is not completed! <br/>' +
+          err.response.data.message
+        )
+      })
   }
 }
 </script>

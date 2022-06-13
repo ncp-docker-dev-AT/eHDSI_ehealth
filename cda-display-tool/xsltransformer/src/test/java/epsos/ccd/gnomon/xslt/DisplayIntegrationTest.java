@@ -2,6 +2,7 @@ package epsos.ccd.gnomon.xslt;
 
 import junit.framework.TestCase;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -14,6 +15,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 @RunWith(JUnit4.class)
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class DisplayIntegrationTest extends TestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DisplayTest.class);

@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Jerry Dimitriou <jerouris at netsmart.gr>
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class ConfigManTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigManTest.class);

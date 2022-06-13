@@ -287,7 +287,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
 
             /* Perform validation of request message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateXDRMessage(requestLogMsg, NcpSide.NCP_B);
+                OpenNCPValidation.validateXDRMessage(requestLogMsg, NcpSide.NCP_B, null);
             }
             /*
              * Execute Operation
@@ -394,7 +394,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
 
             /* Perform validation of response message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateXDRMessage(responseLogMsg, NcpSide.NCP_B);
+                OpenNCPValidation.validateXDRMessage(responseLogMsg, NcpSide.NCP_B, null);
             }
             /*
              * Return

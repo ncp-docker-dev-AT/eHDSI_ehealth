@@ -541,7 +541,7 @@
         <xsl:call-template name="show-code-value">
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.16.xml'"/>
-            <xsl:with-param name="codeSystem" select="'1.3.6.1.4.1.12009.10.3.1'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.8'"/>
         </xsl:call-template>
     </xsl:template>
 

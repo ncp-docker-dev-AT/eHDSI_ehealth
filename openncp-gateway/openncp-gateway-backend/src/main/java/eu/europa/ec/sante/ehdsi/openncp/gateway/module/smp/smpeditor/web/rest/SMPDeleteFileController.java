@@ -8,6 +8,7 @@ import eu.europa.ec.dynamicdiscovery.model.ParticipantIdentifier;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManager;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.StandardProperties;
+import eu.europa.ec.sante.ehdsi.openncp.gateway.error.ApiException;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.cfg.ReadSMPProperties;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.ReferenceCollection;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.smp.domain.SMPType;
@@ -70,7 +71,7 @@ public class SMPDeleteFileController {
     }
 
     @GetMapping(path = "smpeditor/smpfileinfo")
-    public ResponseEntity getFilesToDeleteInfo(String countryName) {
+    public ResponseEntity<List<ReferenceCollection>> getFilesToDeleteInfo(String countryName) {
 
         String partID = "urn:ehealth:" + countryName + ":ncp-idp";
         String partScheme = env.getProperty("ParticipantIdentifier.Scheme");
@@ -154,7 +155,7 @@ public class SMPDeleteFileController {
             return ResponseEntity.ok(referenceCollection);
         } else {
             AuditManager.handleDynamicDiscoveryQuery(smpURI.toString(), new String(encodedObjectID), "500", errorType.getBytes());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorType);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorType);
         }
     }
 
@@ -189,8 +190,7 @@ public class SMPDeleteFileController {
             uri = new URIBuilder().setScheme("https").setHost(urlServer).setPath(reference).build();
             logger.debug("\n ************** URI - {}", uri);
         } catch (URISyntaxException e) {
-            logger.error("URISyntaxException", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("URISyntaxException");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "URISyntaxException");
         }
 
         // Trust own CA and all self-signed certs
@@ -204,7 +204,7 @@ public class SMPDeleteFileController {
             response = DynamicDiscoveryService.buildHttpClient(sslcontext).execute(httpdelete);
         } catch (IOException ex) {
             logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.server.failed"));
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         /*Get response*/
@@ -227,13 +227,13 @@ public class SMPDeleteFileController {
                 byte[] encodedObjectDetail = Base64.encodeBase64(responseReason.getBytes());
                 AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         Integer.toString(responseStatus), encodedObjectDetail);
-                return ResponseEntity.status(responseStatus).body(env.getProperty("error.server.failed"));
+                throw new ApiException(HttpStatus.valueOf(responseStatus), env.getProperty("error.server.failed"));
             case 401:
                 //Audit error
                 encodedObjectDetail = Base64.encodeBase64(responseReason.getBytes());
                 AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         Integer.toString(responseStatus), encodedObjectDetail);
-                return ResponseEntity.status(responseStatus).body(env.getProperty("error.nouser"));
+                throw new ApiException(HttpStatus.valueOf(responseStatus), env.getProperty("error.nouser"));
             case 200:
             case 201:
                 //Audit Success
@@ -250,11 +250,9 @@ public class SMPDeleteFileController {
         try {
             IOUtils.copy(entity.getContent(), byteArrayOutputStream);
         } catch (IOException ex) {
-            logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("IOException response");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         } catch (UnsupportedOperationException ex) {
-            logger.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UnsupportedOperationException response");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
         byte[] bytes = byteArrayOutputStream.toByteArray();
 
@@ -275,8 +273,7 @@ public class SMPDeleteFileController {
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException ex) {
-            logger.error(ex.getClass().getName() + " - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ParserConfigurationException | IOException | SAXException ex)" + ex.getClass().getName());
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName() + " - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         /*transform xml to string in order to send in Audit*/
@@ -318,8 +315,7 @@ public class SMPDeleteFileController {
             uri = new URIBuilder().setScheme("https").setHost(urlServer).setPath(reference).build();
             logger.debug("\n ************** URI - {}", uri);
         } catch (URISyntaxException e) {
-            logger.error("URISyntaxException", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("URISyntaxException");
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "URISyntaxException");
         }
 
         // Trust own CA and all self-signed certs
@@ -329,11 +325,11 @@ public class SMPDeleteFileController {
         HttpDelete httpdelete = new HttpDelete(uri);
 
         CloseableHttpResponse response;
+
         try {
             response = DynamicDiscoveryService.buildHttpClient(sslcontext).execute(httpdelete);
-        } catch (IOException ex) {
-            logger.error("\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(env.getProperty("error.server.failed"));
+        } catch (IOException e) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "\n IOException - " + SimpleErrorHandler.printExceptionStackTrace(e));
         }
 
         //  Get response
@@ -356,21 +352,19 @@ public class SMPDeleteFileController {
                 byte[] encodedObjectDetail = Base64.encodeBase64(responseReason.getBytes());
                 AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         Integer.toString(responseStatus), encodedObjectDetail);
-                return ResponseEntity.status(responseStatus).body(env.getProperty("error.server.failed"));
+                throw new ApiException(HttpStatus.valueOf(responseStatus), env.getProperty("error.server.failed"));
             case 401:
                 //Audit error
                 encodedObjectDetail = Base64.encodeBase64(responseReason.getBytes());
                 AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         Integer.toString(responseStatus), encodedObjectDetail);
-                return ResponseEntity.status(responseStatus).body(env.getProperty("error.nouser"));
+                throw new ApiException(HttpStatus.valueOf(responseStatus), env.getProperty("error.nouser"));
             case 200:
             case 201:
                 //Audit Success
                 AuditManager.handleDynamicDiscoveryPush(remoteIp, new String(encodedObjectID),
                         null, null);
                 return ResponseEntity.ok().build();
-
-
         }
         /* Get BusinessCode and ErrorDescription from response */
 
@@ -378,12 +372,8 @@ public class SMPDeleteFileController {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try {
             IOUtils.copy(entity.getContent(), byteArrayOutputStream);
-        } catch (IOException ex) {
-            logger.error("\n IOException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("IOException response");
-        } catch (UnsupportedOperationException ex) {
-            logger.error("\n UnsupportedOperationException response - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UnsupportedOperationException response");
+        } catch (IOException | UnsupportedOperationException ex) {
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName() + " - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
         byte[] bytes = byteArrayOutputStream.toByteArray();
 
@@ -404,8 +394,7 @@ public class SMPDeleteFileController {
                 }
             }
         } catch (ParserConfigurationException | IOException | SAXException ex) {
-            logger.error(ex.getClass().getName() + " - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ParserConfigurationException | IOException | SAXException ex)" + ex.getClass().getName());
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getClass().getName() + " - " + SimpleErrorHandler.printExceptionStackTrace(ex));
         }
 
         /*transform xml to string in order to send in Audit*/

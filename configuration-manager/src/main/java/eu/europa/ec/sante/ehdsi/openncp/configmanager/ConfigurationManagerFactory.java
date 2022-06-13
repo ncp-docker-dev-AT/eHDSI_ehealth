@@ -9,15 +9,24 @@ import java.io.File;
 public class ConfigurationManagerFactory {
 
     private static ConfigurationManager configurationManager;
+    private static SessionFactory sessionFactory;
 
     private ConfigurationManagerFactory() {
     }
 
     public static ConfigurationManager getConfigurationManager() {
         if (configurationManager == null) {
-            configurationManager = new ConfigurationManagerImpl(buildSessionFactory());
+            if (sessionFactory == null) {
+                configurationManager = new ConfigurationManagerImpl(buildSessionFactory());
+            } else {
+                configurationManager = new ConfigurationManagerImpl(sessionFactory);
+            }
         }
         return configurationManager;
+    }
+
+    public static void setSessionFactory (SessionFactory sessionFactory) {
+        ConfigurationManagerFactory.sessionFactory = sessionFactory;
     }
 
     private static SessionFactory buildSessionFactory() {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>5.2.5</version>
+        <version>5.2.6</version>
     </parent>
 
     <artifactId>openatna-web</artifactId>
@@ -158,6 +158,9 @@
                                     <directory>src/main/profiled-resource/all</directory>
                                 </resource>
                             </webResources>
+                            <!-- <packagingExcludes>-->
+                            <!--     WEB-INF/lib/xercesImpl-${xerces.version}.jar,-->
+                            <!-- </packagingExcludes>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -181,6 +184,9 @@
                                 </resource>
                             </webResources>
                             <includeEmptyDirectories>false</includeEmptyDirectories>
+                            <!-- <packagingExcludes>-->
+                            <!--     WEB-INF/lib/xercesImpl-${xerces.version}.jar,-->
+                            <!-- </packagingExcludes>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -203,6 +209,9 @@
                                     <directory>src/main/profiled-resource/web</directory>
                                 </resource>
                             </webResources>
+                            <!-- <packagingExcludes>-->
+                            <!--     WEB-INF/lib/xercesImpl-${xerces.version}.jar,-->
+                            <!-- </packagingExcludes>-->
                         </configuration>
                     </plugin>
                 </plugins>

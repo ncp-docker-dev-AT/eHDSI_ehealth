@@ -1,9 +1,13 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc;
 
+import eu.europa.ec.sante.ehdsi.openncp.gateway.module.atna.persistence.model.Error;
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +30,17 @@ public class TransactionResource {
     }
 
     @GetMapping(path = "/transactions")
-    public ResponseEntity<List<Transaction>> listTransactions() {
+    public ResponseEntity<Page<Transaction>> getTransactions(
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "20") int size) {
         logger.info("[API] Listing eADC Transactions");
-        return ResponseEntity.ok(transactionService.findTransactions());
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        Page<Transaction> page = transactionService.findTransactions(pageable);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping(path = "/transactions/{id}")
-    public ResponseEntity<Transaction> listTransactions(@PathVariable String id) {
+    public ResponseEntity<Transaction> getTransactions(@PathVariable("id")  String id) {
         logger.info("[API] Retrieving Transaction: '{}'", id);
         return ResponseEntity.ok(transactionService.getTransaction(id));
     }
