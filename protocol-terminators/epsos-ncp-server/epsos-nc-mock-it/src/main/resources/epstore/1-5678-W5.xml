@@ -194,7 +194,7 @@
                                         </code>
                                         <name>ATARVITON TAB 5MG/TAB BT X30(BLIST 3X10)</name>
                                         <epsos:desc>5MG/TAB</epsos:desc>
-                                        <epsos:formCode code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" codeSystemVersion="2019-10-21" displayName="Tablet">
+                                        <epsos:formCode code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" codeSystemVersion="2022-01-18" displayName="Tablet">
                                             <epsos:translation code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1" codeSystemName="EDQM" displayName="Δισκίο">
                                                 <epsos:translation displayName="ΔΙΣΚΙΑ_"/>
                                             </epsos:translation>
@@ -218,7 +218,9 @@
                                                 <epsos:denominator unit="0" value="0" xsi:type="epsos:PQ"/>
                                             </epsos:quantity>
                                             <epsos:ingredient classCode="MMAT" determinerCode="KIND">
-                                                <epsos:code code="N05BA01" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" codeSystemVersion="2019-01" displayName="diazepam"><epsos:translation code="N05BA01" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" displayName="Diazepam"/></epsos:code>
+                                                <epsos:code code="N05BA01" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" codeSystemVersion="2022-01" displayName="diazepam">
+                                                    <epsos:translation code="N05BA01" codeSystem="2.16.840.1.113883.6.73" codeSystemName="Anatomical Therapeutic Chemical" displayName="Diazepam"/>
+                                                </epsos:code>
                                                 <epsos:name>DIAZEPAM</epsos:name>
                                             </epsos:ingredient>
                                         </epsos:ingredient>

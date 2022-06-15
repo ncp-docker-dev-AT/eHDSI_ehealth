@@ -1654,11 +1654,25 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>History of Immunization</title>
                     <text>
                         <paragraph ID="sub-6">Hepatitis B virus vaccine Engerix B (2294189) 1983-01-02</paragraph><paragraph ID="sub-7">Diphtheria + tetanus + pertussis + poliomyelitis vaccine Tetravac (2782480) 1983-01-02</paragraph><paragraph ID="sub-8">Haemophilus influenzae Type b vaccine Hiberix (2751881) 1983-01-02</paragraph><paragraph ID="sub-9">Human papillomavirus vaccine Cervarix (5055173) 1994-05-20</paragraph>
-                        <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup><thead><tr><th>Vaccination</th><th>Brand Name</th><th>Vaccination Date</th><th>Annotations</th></tr></thead><tbody><tr ID="sub-6a"><td><content ID="code-51" language="xx-XX">Hepatitis B virus
-                            vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td/></tr><tr ID="sub-7a"><td><content ID="code-53" language="xx-XX">Diphtheria + tetanus
-                            + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td/></tr><tr ID="sub-8a"><td><content ID="code-55" language="xx-XX">Haemophilus
-                            influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td/></tr><tr ID="sub-9a"><td><content ID="code-57" language="xx-XX">Human papillomavirus
-                            vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td/></tr></tbody></table></text>
+                        <table>
+                            <colgroup>
+                                <col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/><col width="8%"/>
+                            </colgroup>
+                            <thead>
+                                <tr><th>Vaccination</th><th>Brand Name</th><th>Vaccination Date</th><th>Agent</th><th>Marketing Authorization Holder</th><th>Dose number in series</th><th>Batch/lot number</th><th>Administering Center</th><th>Health Professional Identification</th><th>Country of Vaccination</th><th>Annotations</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr ID="sub-6a"><td><content ID="code-51" language="xx-XX">Hepatitis B virus
+                            vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td>Acute Hepatitis B</td><td>SmithKline Beecham Biologicals S.A</td><td>12</td><td>1</td><td>Brussels vaccination center</td><td>Gregory House</td><td>BE</td><td/></tr>
+                                <tr ID="sub-7a"><td><content ID="code-53" language="xx-XX">Diphtheria + tetanus
+                            + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                <tr ID="sub-8a"><td><content ID="code-55" language="xx-XX">Haemophilus
+                            influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                <tr ID="sub-9a"><td><content ID="code-57" language="xx-XX">Human papillomavirus
+                            vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                            </tbody>
+                        </table>
+                    </text>
                     <entry>
                         <substanceAdministration classCode="SBADM" moodCode="EVN" negationInd="false">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.19"/>
@@ -1678,9 +1692,45 @@ Although being real choices for the different diseases and conditions, the selec
                                             <originalText><reference value="#code-51"/></originalText>
                                         </code>
                                         <name>Engerix B (2294189)</name>
+                                        <lotNumberText>1</lotNumberText>
                                     </manufacturedMaterial>
+                                    <manufacturerOrganization classCode="ORG" determinerCode="INSTANCE">
+                                        <id root="2.999.7.1.1" extension="XYZ"/>
+                                        <name>SmithKline Beecham Biologicals S.A</name>
+                                    </manufacturerOrganization>
                                 </manufacturedProduct>
                             </consumable>
+                            <performer>
+                                <assignedEntity>
+                                    <id>2.999.7.1.2</id>
+                                    <assignedPerson>
+                                        <name>
+                                            <family>House</family>
+                                            <given>Gregory</given>
+                                        </name>
+                                    </assignedPerson>
+                                    <representedOrganization>
+                                        <name>Brussels vaccination center</name>
+                                        <addr>
+                                            <country>BE</country>
+                                        </addr>
+                                    </representedOrganization>
+                                </assignedEntity>
+                            </performer>
+                            <participant typeCode="IND">
+                                <participantRole classCode="AGNT">
+                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
+                                    <code code="B16" displayName="Acute hepatitis B" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10"/>
+                                </participantRole>
+                            </participant>
+                            <entryRelationship typeCode="SUBJ">
+                                <observation classCode="OBS" moodCode="EVN">
+                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.28"/>
+                                    <code code="30973-2" displayName="Dose Number" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+                                    <statusCode code="completed"/>
+                                    <value type="INT" value="12"/>
+                                </observation>
+                            </entryRelationship>
                         </substanceAdministration>
                     </entry>
                     <entry>
@@ -1703,8 +1753,18 @@ Although being real choices for the different diseases and conditions, the selec
                                         </code>
                                         <name>Tetravac (2782480)</name>
                                     </manufacturedMaterial>
+                                    <manufacturerOrganization classCode="ORG" determinerCode="INSTANCE">
+                                        <id root="2.999.7.2.1" extension="XYZ"/>
+                                        <name nullFlavor="UNK"/>
+                                    </manufacturerOrganization>
                                 </manufacturedProduct>
                             </consumable>
+                            <participant typeCode="IND">
+                                <participantRole classCode="AGNT">
+                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
+                                    <code nullFlavor="UNK"/>
+                                </participantRole>
+                            </participant>
                         </substanceAdministration>
                     </entry>
                     <entry>
@@ -1739,8 +1799,8 @@ Although being real choices for the different diseases and conditions, the selec
                             <id root="2.999.7.4"/>
                             <code code="IMMUNIZ" displayName="Immunization" codeSystem="1.3.5.1.4.1.19376.1.5.3.2"/>
                             <text><reference value="#sub-9"/></text>
-                            <statusCode code="completed"/>
-                            <effectiveTime value="19940520"/>
+                            <statusCode code="cancelled"/>
+                            <effectiveTime nullFlavor="NA"/>
                             <consumable typeCode="CSM">
                                 <manufacturedProduct>
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.18"/>
