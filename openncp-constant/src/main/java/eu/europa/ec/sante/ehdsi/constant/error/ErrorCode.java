@@ -2,12 +2,12 @@ package eu.europa.ec.sante.ehdsi.constant.error;
 
 public interface ErrorCode {
 
-    String getCode();
+    String getMessage();
 
-    String getCodeSystem();
+    String getCode();
 
     String getDescription();
 
-
+    String getCodeSystem();
 
 }

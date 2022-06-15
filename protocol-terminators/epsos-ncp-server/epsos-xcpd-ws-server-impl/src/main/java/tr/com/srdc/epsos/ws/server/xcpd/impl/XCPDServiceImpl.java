@@ -350,11 +350,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return mfmimt700711UV01Reason;
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String detail, ErrorCode errorCode) {
-        fillOutputMessage(outputMessage, detail, errorCode, "AE");
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String context, ErrorCode errorCode) {
+        fillOutputMessage(outputMessage, context, errorCode, "AE");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String detail, ErrorCode errorCode, String code) {
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String context, ErrorCode errorCode, String code) {
         if (errorCode != null) {
             outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(errorCode));
         }
@@ -362,14 +362,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         // Set queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
-        if (detail != null) {
-            logger.error(detail);
+        if (context != null) {
+            logger.error(context);
             // Set acknowledgement/acknowledgementDetail
             outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(
                     objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(objectFactory.createED());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(detail);
+            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(context);
         } else {
             logger.info("XCPD Request is valid.");
         }

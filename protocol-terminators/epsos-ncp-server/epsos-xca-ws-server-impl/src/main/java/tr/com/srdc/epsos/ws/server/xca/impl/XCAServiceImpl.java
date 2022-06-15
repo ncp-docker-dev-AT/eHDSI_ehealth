@@ -898,7 +898,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             addErrorMessage(registryErrorList, e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (AssertionValidationException e) {
             logger.debug(e.getMessage(), e);
-            addErrorMessage(registryErrorList, e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, e.getEhdsiCode(),  e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
             addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             throw e;

@@ -6,8 +6,8 @@ public class NIException extends Exception {
 
     private static final long serialVersionUID = 2148051521948531853L;
     private EhdsiErrorCode ehdsiErrorCode;
-    private String codeSystem;
     private String message;
+    private String codeSystem;
 
     public NIException(EhdsiErrorCode ehdsiErrorCode, String message) {
         this.ehdsiErrorCode = ehdsiErrorCode;

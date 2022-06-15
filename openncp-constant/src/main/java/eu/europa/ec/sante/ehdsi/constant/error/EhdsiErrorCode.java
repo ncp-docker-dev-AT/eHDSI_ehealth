@@ -2,40 +2,41 @@ package eu.europa.ec.sante.ehdsi.constant.error;
 
 import java.util.Arrays;
 
-public enum EhdsiErrorCode implements ErrorCode{
+public enum EhdsiErrorCode implements ErrorCode {
 
     EHDSI_ERROR_1001("1001", "Assertion is not valid."),
     EHDSI_ERROR_1002("1002", "The given TRC Assertion does not validate against the Identity Assertion"),
-    EHDSI_ERROR_1101("1101",  "No ePrescriptions are registered for the given patient."),
-    EHDSI_ERROR_1102("1102",  "No patient summary is registered for the given patient."),
+    EHDSI_ERROR_1101("1101", "No ePrescription is registered for the given patient. "),
+    EHDSI_ERROR_1102("1102", "No PS is registered for the given patient."),
     EHDSI_ERROR_1103("1103", "No Data for MRO"),
-    EHDSI_ERROR_1104("1104",  "No original clinical document of the requested type is registered for the given patient."),
-    EHDSI_ERROR_1100("1100",  "No documents are registered for the given patient."),
-    EHDSI_ERROR_2201("2201",  "Documents were received but not processed"),
+    EHDSI_ERROR_1104("1104", "No ORCD document is registered for the given patient."),
+    EHDSI_ERROR_1100("1100", "No documents are registered for the given patient."),
+    EHDSI_ERROR_2201("2201", "Documents were received but not processed"),
     EHDSI_ERROR_4101("4101", null),
-    EHDSI_ERROR_4102("4102",  null),
-    EHDSI_ERROR_4103("4103",  "ePrescription registry could not be accessed."),
-    EHDSI_ERROR_4104("4104",  null),
-    EHDSI_ERROR_4105("4105",  "No match"),
-    EHDSI_ERROR_4106("4106",  "Invalid Dispensation"),
-    EHDSI_ERROR_4107("4107",  "Original data missing"),
-    EHDSI_ERROR_4108("4108",  "Pivot data missing"),
-    EHDSI_ERROR_4201("4201", "Unsupported Feature"),
-    EHDSI_ERROR_4202("4202", "Unknown Signifier"),
-    EHDSI_ERROR_4203("4203", "The requested encoding cannot be provided due to a transcoding error."),
-    EHDSI_ERROR_4204("4204", "Unknown Filter"),
-    EHDSI_ERROR_4205("4205", "Unknown Option"),
-    EHDSI_ERROR_4206("4206", "Unknown Patient Identifier"),
-    EHDSI_ERROR_4701("4701", "No consent."),
-    EHDSI_ERROR_4702("4702",  "Weak Authentication"),
-    EHDSI_ERROR_4703("4703", "Insufficient rights"),
-    EHDSI_ERROR_4704("4704",  "No Signature"),
+    EHDSI_ERROR_4102("4102", null),
+    EHDSI_ERROR_4103("4103", "ePrescription registry could not be accessed."),
+    EHDSI_ERROR_4104("4104", null),
+    EHDSI_ERROR_4105("4105", "No matching ePrescription was found"),
+    EHDSI_ERROR_4106("4106", "ePrescription has already been dispensed"),
+    EHDSI_ERROR_4107("4107", "For data of the given kind the Provide Data service provider requires the service consumer to transmit the source coded PDF document."),
+    EHDSI_ERROR_4108("4108", "The service consumer did not provide the eHealth DSI pivot coded document which is requested by the Provide Data service provider for the given kind of data. "),
+    EHDSI_ERROR_4201("4201", "If PDF-coded document is requested: Country A does not provide the (optional) source coded version of the document "),
+    EHDSI_ERROR_4202("4202", "The query argument slots used by the service consumer are not supported by the service provider. "),
+    EHDSI_ERROR_4203("4203", "The requested encoding cannot be provided due to a transcoding error. "),
+    EHDSI_ERROR_4204("4204", "The service provider is unable to evaluate the given argument values"),
+    EHDSI_ERROR_4205("4205", "The service provider does not implement the On Demand Documents option as requested by the service consumer."),
+    EHDSI_ERROR_4206("4206", "The patient identifier in the query differs from the patient identifier in the TRC assertion"),
+    EHDSI_ERROR_4207("4207", "The extra parameters linked to the document identifier in the query differs from the ones in the TRC assertion"),
+    EHDSI_ERROR_4701("4701", "The patient has not given consent to the requested service."),
+    EHDSI_ERROR_4702("4702", "Country A requests a higher authentication trust level than assigned to the HP"),
+    EHDSI_ERROR_4703("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
+    EHDSI_ERROR_4704("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
 
     EHDSI_ERROR_GENERIC("4999", "Generic business error code"),
-    EHDSI_ERROR_CONNECTION_NOT_POSSIBLE ("5036", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
+    EHDSI_ERROR_CONNECTION_NOT_POSSIBLE("5036", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
 
     // 01. Ensure Health Professional (HP) Identification, Authentication and Authorization
-    EHDSI_ERROR_HPI_GENERIC ("5037", "The code can be used for HPI errors when no other HPI business code applies."),
+    EHDSI_ERROR_HPI_GENERIC("5037", "The code can be used for HPI errors when no other HPI business code applies."),
     EHDSI_WARNING_HPI_GENERIC("5038", "The code can be used for HPI warnings when no other HPI business code applies."),
 
     EHDSI_ERROR_HPI_NO_INFORMATION("5039", "No information has been provided about the HP."),
@@ -119,12 +120,16 @@ public enum EhdsiErrorCode implements ErrorCode{
     EHDSI_WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("5035", "An unexpected number of requests has been detected");
 
 
-
     private final String code;
     private final String description;
-    EhdsiErrorCode(String code, String description){
+
+    EhdsiErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public String getMessage() {
+        return this.name();
     }
 
     public String getCode() {
@@ -135,16 +140,15 @@ public enum EhdsiErrorCode implements ErrorCode{
         return description;
     }
 
-
-    public static EhdsiErrorCode getErrorCode(String code){
-       return Arrays.stream(values())
-               .filter(errorCode -> errorCode.getCode().equals(code))
-               .findAny()
-               .orElse(null);
-    }
-
-    @Override
     public String getCodeSystem() {
         return null;
     }
+
+    public static EhdsiErrorCode getErrorCode(String code) {
+        return Arrays.stream(values())
+                .filter(errorCode -> errorCode.getCode().equals(code))
+                .findAny()
+                .orElse(null);
+    }
+
 }
