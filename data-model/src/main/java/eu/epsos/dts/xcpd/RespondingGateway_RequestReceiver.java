@@ -146,7 +146,7 @@ public class RespondingGateway_RequestReceiver {
                         }
                     }
                 } catch (ParseException pe) {
-                    throw new NoPatientIdDiscoveredException(EhdsiErrorCode.EHDSI_ERROR_GENERIC, pe);
+                    throw new NoPatientIdDiscoveredException(EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, pe);
                 }
             }
         } else {

@@ -80,7 +80,7 @@ public final class XdrDocumentSource {
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException e) {
-            throw new XDRException(EhdsiErrorCode.EHDSI_ERROR_GENERIC, e);
+            throw new XDRException(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, e);
         }
         return XdrResponseDts.newInstance(response);
     }

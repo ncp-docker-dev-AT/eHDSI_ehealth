@@ -32,14 +32,14 @@ public enum EhdsiErrorCode implements ErrorCode {
     EHDSI_ERROR_4703("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
     EHDSI_ERROR_4704("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
 
-    EHDSI_ERROR_GENERIC("4999", "Generic business error code"),
     EHDSI_ERROR_CONNECTION_NOT_POSSIBLE("5036", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
 
     // 01. Ensure Health Professional (HP) Identification, Authentication and Authorization
-    EHDSI_ERROR_HPI_GENERIC("5037", "The code can be used for HPI errors when no other HPI business code applies."),
-    EHDSI_WARNING_HPI_GENERIC("5038", "The code can be used for HPI warnings when no other HPI business code applies."),
+    EHDSI_ERROR_HPI_GENERIC("5037", "Health Professional (HP) Identification generic error"),
+    EHDSI_WARNING_HPI_GENERIC("5038", "Health Professional (HP) Identification generic warning"),
 
     EHDSI_ERROR_HPI_NO_INFORMATION("5039", "No information has been provided about the HP."),
+
     EHDSI_ERROR_HPI_INSUFFICIENT_INFORMATION("5040", "Information provided about the HP is insufficient"),
     EHDSI_ERROR_HPI_HAI_NO_INFORMATION("5041", "No information has been provided about the Health Authorities Institutions and/or Healthcare Provider Organisation (HCPO) ."),
     EHDSI_ERROR_HPI_POC_NO_INFORMATION("5042", "No information has been provided about the organisation or healthcare facility where the HP is providing the treatment - Point of Care (PoC)"),
@@ -47,16 +47,16 @@ public enum EhdsiErrorCode implements ErrorCode {
 
     // 02. Ensure Patient Identification
 
-    EHDSI_ERROR_PI_GENERIC("5044", "The code can be used for PI errors when no other PI business code applies."),
-    EHDSI_WARNING_PI_GENERIC("5045", "The code can be used for PI warnings when no other PI business code applies."),
+    EHDSI_ERROR_PI_GENERIC("5044", "Patient Identification generic error"),
+    EHDSI_WARNING_PI_GENERIC("5045", "Patient Identification generic warning"),
 
     EHDSI_ERROR_PI_NO_MATCH("5046", "The identification and authentication used in the Country of Treatment (Country B) are not correctly provided or does not match any existing patient."),
     EHDSI_ERROR_PI_MULTIPLE_MATCHES("5047", "The identification and authentication used in the Country of Treatment (Country B) match multiple patients, instead of only one patient."),
 
     // 05. Make Patient Summary available to HP
 
-    EHDSI_ERROR_PS_GENERIC("5048", "The code can be used for PS errors when no other PS business code applies."),
-    EHDSI_WARNING_PS_GENERIC("5049", "The code can be used for PS warnings when no other PS business code applies."),
+    EHDSI_ERROR_PS_GENERIC("5048", "Patient Summary generic error"),
+    EHDSI_WARNING_PS_GENERIC("5049", "Patient Summary generic warning"),
 
     EHDSI_ERROR_PS_MISSING_BASIC_SECTIONS("5050", "Any or all of the 5 basic sections are missing, and no reason is communicated for this missing."),
     EHDSI_WARNING_PS_MISSING_BASIC_DATA("5051", "Any or all of the basic data set is missing."),
@@ -65,8 +65,8 @@ public enum EhdsiErrorCode implements ErrorCode {
 
     // 06. Make ePrescription available to HP
 
-    EHDSI_ERROR_EP_GENERIC("5000", "The code can be used for EP errors when no other EP business code applies."),
-    EHDSI_WARNING_EP_GENERIC("5001", "The code can be used for EP warnings when no other EP business code applies."),
+    EHDSI_ERROR_EP_GENERIC("5000", "ePrescription generic error"),
+    EHDSI_WARNING_EP_GENERIC("5001", "ePrescription generic warning"),
 
     EHDSI_WARNING_EP_MISSING_BASIC_DATA("5002", "Any or all of the basic data set is missing, and no reason is communicated for this missing."),
     EHDSI_WARNING_EP_MISSING_EXPECTED_MAPPING("5003", "A needed code mapping is missing."),
@@ -74,8 +74,8 @@ public enum EhdsiErrorCode implements ErrorCode {
 
     // 07. Handle Dispensation of medicine and Substitution
 
-    EHDSI_ERROR_ED_GENERIC("5005", "The code can be used for ED errors when no other ED business code applies."),
-    EHDSI_WARNING_ED_GENERIC("5006", "The code can be used for ED warnings when no other ED business code applies."),
+    EHDSI_ERROR_ED_GENERIC("5005", "Dispensation generic error"),
+    EHDSI_WARNING_ED_GENERIC("5006", "Dispensation generic warning"),
 
     EHDSI_ERROR_ED_NOT_DISPENSABLE_EPRESCRIPTION("5007", "The selected ePrescription is not dispensable"),
     EHDSI_ERROR_ED_SUBSTITUTION_INFORMATION_NOT_ALLOWED("5008", "Country of Affiliation has received an information of substitution when it was not allowed based on its national legislation."),
@@ -92,8 +92,8 @@ public enum EhdsiErrorCode implements ErrorCode {
 
     // 08. Make Original Clinical Documents available to HP
 
-    EHDSI_ERROR_ORCD_GENERIC("5019", "The code can be used for ORCD errors when no other ORCD business code applies."),
-    EHDSI_WARNING_ORCD_GENERIC("5020", "The code can be used for ORCD warnings when no other ORCD business code applies."),
+    EHDSI_ERROR_ORCD_GENERIC("5019", "Original Clinical Documents generic error"),
+    EHDSI_WARNING_ORCD_GENERIC("5020", "Original Clinical Documents generic error"),
 
     EHDSI_ERROR_ORCD_SERVICE_NOT_AVAILABLE("5021", "The Country of Treatment cannot contact the ORCD service of the Country of Affiliation"),
     EHDSI_WARNING_ORCD_MISSING_MANDATORY_DATA("5022", "Any or all of the mandatory elements are missing."),
@@ -102,22 +102,25 @@ public enum EhdsiErrorCode implements ErrorCode {
 
     // 09. Ensure high quality information (structured, equivalent, understandable) is exchanged between countries
 
-    EHDSI_ERROR_HQI_GENERIC("5025", "The code can be used for HQI errors when no other HQI business code applies."),
-    EHDSI_WARNING_HQI_GENERIC("5026", "The code can be used for HQI warnings when no other HQI business code applies."),
+    EHDSI_ERROR_HQI_GENERIC("5025", "High quality information error"),
+    EHDSI_WARNING_HQI_GENERIC("5026", "High quality information warning"),
 
     EHDSI_WARNING_HQI_B_INFORMATION_NOT_PROPERLY_STRUCTURED("5027", "Information provided by the Country of Treatment is not properly structured."),
     EHDSI_WARNING_HQI_A_INFORMATION_NOT_PROPERLY_STRUCTURED("5028", "Information provided by the Country of Affiliation is not properly structured."),
 
     // 10. Ensure the security, performance, traceability and auditability of the services, data and systems
 
-    EHDSI_ERROR_SEC_GENERIC("5029", "The code can be used for SEC errors when no other SEC business code applies."),
-    EHDSI_WARNING_SEC_GENERIC("5030", "The code can be used for SEC warnings when no other SEC business code applies."),
+    EHDSI_ERROR_SEC_GENERIC("5029", "SEC generic error"),
+    EHDSI_WARNING_SEC_GENERIC("5030", "SEC generic warning"),
 
     EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED("5031", "Integrity of the exchanged data cannot be ensured by the Country of Affiliation, such as with an insufficient/invalidated SAML assertions,"),
 
     EHDSI_WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT("5032", "An unexpected number of requests has been detected for one specific patient"),
     EHDSI_WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE("5034", "An unexpected number of requests has been detected from one specific Point of Care"),
-    EHDSI_WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("5035", "An unexpected number of requests has been detected");
+    EHDSI_WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("5035", "An unexpected number of requests has been detected"),
+
+    EHDSI_ERROR_TRANSLATE_GENERIC("5049", "Translation generic error"),
+    EHDSI_ERROR_INTERNAL_SERVER("5049", "Internal Server error");
 
 
     private final String code;

@@ -15,7 +15,7 @@ public class RetrieveDocumentSetRequestTypeCreator {
         RetrieveDocumentSetRequestType retrieveDocumentSetRequest = new RetrieveDocumentSetRequestType();
         DocumentRequest documentRequest = new DocumentRequest();
         if (!OidUtil.isValidHomeCommunityId(StringUtils.remove(homeCommunityId, Constants.OID_PREFIX))) {
-            throw new XCAException("Invalid message: HomeCommunity format not correct", EhdsiErrorCode.EHDSI_ERROR_GENERIC);
+            throw new XCAException("Invalid message: HomeCommunity format not correct", EhdsiErrorCode.EHDSI_WARNING_HQI_B_INFORMATION_NOT_PROPERLY_STRUCTURED);
         }
         // Check for OID prefix, and adds it if not present (The OID prefix is required, as present in ITI TF-2b: 3.38.4.1.2.1);
         if (!homeCommunityId.startsWith(Constants.OID_PREFIX)) {

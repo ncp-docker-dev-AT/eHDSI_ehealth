@@ -56,7 +56,7 @@ public final class TMServices {
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
             //If the translation process fails, an exception is thrown.
-            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, "DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_TRANSLATE_GENERIC, "DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
         }
         try {
             // Obtain the translated document in the Document type format, only if translation succeeds.
@@ -64,7 +64,7 @@ public final class TMServices {
             //Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_TRANSLATE_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
@@ -83,7 +83,7 @@ public final class TMServices {
             //Parse the String into a Document object.
             resultDoc = XMLUtil.parseContent(docString);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(null, EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         return resultDoc;

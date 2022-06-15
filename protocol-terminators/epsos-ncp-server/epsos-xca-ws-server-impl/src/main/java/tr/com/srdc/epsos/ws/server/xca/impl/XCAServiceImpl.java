@@ -900,7 +900,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.debug(e.getMessage(), e);
             addErrorMessage(registryErrorList, e.getEhdsiCode(),  e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
-            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            addErrorMessage(registryErrorList, EhdsiErrorCode.EHDSI_ERROR_INTERNAL_SERVER, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             throw e;
         }
 
@@ -1396,7 +1396,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 //                }
                 logger.error("[National Connector] No document returned by the National Infrastructure");
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
+                        EhdsiErrorCode.EHDSI_ERROR_1104,
                         EhiErrorCode.XDSMissingDocument.name(),
                         "Requested document not found.",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
@@ -1447,7 +1447,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             } catch (SMgrException e) {
                 logger.error("SMgrException: '{}'", e.getMessage(), e);
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
+                        EhdsiErrorCode.EHDSI_ERROR_SEC_GENERIC,
                         e.getMessage(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
@@ -1542,7 +1542,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 failure = true;
                 logger.error("Exception: '{}'", e.getMessage(), e);
                 addErrorOMMessage(omNamespace, registryErrorList,
-                        EhdsiErrorCode.EHDSI_ERROR_GENERIC,
+                        EhdsiErrorCode.EHDSI_ERROR_INTERNAL_SERVER,
                         e.getMessage(),
                         "",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
