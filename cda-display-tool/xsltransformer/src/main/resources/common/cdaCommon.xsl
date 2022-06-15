@@ -26,6 +26,35 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- show-performer -->
+    <xsl:template name="show-performer">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-name">
+            <xsl:with-param name="name" select="$node/n1:assignedEntity/n1:assignedPerson/n1:name"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <!-- show-author -->
+    <xsl:template name="show-author">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedPerson">
+                <xsl:call-template name="show-name">
+                    <xsl:with-param name="name" select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedPerson/n1:name"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice">
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice/n1:manufacturerModelName"/>
+                ,&#160;
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice/n1:softwareName"/>
+            </xsl:when>
+        </xsl:choose>
+        <xsl:if test="$node/n1:assignedAuthor/n1:assignedEntity/n1:representedOrganization">
+            ,&#160;
+            <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:representedOrganization/n1:name"/>
+        </xsl:if>
+    </xsl:template>
+    
     <!-- show-name -->
     <xsl:template name="show-name">
         <xsl:param name="name"/>
