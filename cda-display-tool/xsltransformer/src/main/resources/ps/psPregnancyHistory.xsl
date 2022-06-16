@@ -40,9 +40,9 @@
                         <div class="collapsible-content">
                             <div class="content-inner">
                                 <table class="translation_table">
-                                    <xsl:choose>
-                                        <xsl:when test="not(n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor)">
-                                            <tbody>
+                                    <tbody>
+                                        <xsl:choose>
+                                            <xsl:when test="not(n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor)">
                                                 <tr>
                                                     <th>
                                                         <!-- Current Pregnancy Status -->
@@ -67,18 +67,67 @@
                                                     </th>
                                                     <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code='82810-3']" mode="currentPregnancies"/>
                                                 </tr>
-                                            </tbody>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <tr>
-                                                <td>
-                                                    <xsl:call-template name="show-eHDSINullFlavor">
-                                                        <xsl:with-param name="code" select="n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor"/>
-                                                    </xsl:call-template>
-                                                </td>
-                                            </tr>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <tr>
+                                                    <td>
+                                                        <xsl:call-template name="show-eHDSINullFlavor">
+                                                            <xsl:with-param name="code" select="n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor"/>
+                                                        </xsl:call-template>
+                                                    </td>
+                                                </tr>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </tbody>
+                                </table>
+                                <table class="translation_table">
+                                    <tbody>
+                                        <tr>
+                                            <th>
+                                                <!-- History of previous pregnancies -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                History of previous pregnancies
+                                            </th>
+                                            <th>
+                                                <!-- Outcome -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Outcome
+                                            </th>
+                                            <th>
+                                                <!-- Number of children -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Number of children
+                                            </th>
+                                        </tr>
+                                        <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code!='93857-1'][@code!='82810-3']" mode="outcomeobservations"/>
+                                    </tbody>
+                                </table>
+                                <table class="translation_table">
+                                    <tbody>
+                                        <xsl:choose>
+                                            <xsl:when test="not(n1:entry/n1:observation/n1:code[@code='93857-1']/../@nullFlavor)">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>
+                                                            <!-- Outcome dates -->
+                                                            <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                            Outcome dates
+                                                        </th>
+                                                    </tr>
+                                                    <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code='93857-1']" mode="outcomedates"/>
+                                                </tbody>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <tr>
+                                                    <td>
+                                                        <xsl:call-template name="show-eHDSINullFlavor">
+                                                            <xsl:with-param name="code" select="n1:entry/n1:observation/n1:code[@code='93857-1']/../@nullFlavor"/>
+                                                        </xsl:call-template>
+                                                    </td>
+                                                </tr>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -93,22 +142,67 @@
     <xsl:template match="n1:entry/n1:observation/n1:code[@code='82810-3']" mode="currentPregnancies">
         <tr>
             <td/>
-            <!-- Observation Date -->
             <td>
+                <!-- Observation Date -->
                 <xsl:call-template name="show-IVL_TS">
                     <xsl:with-param name="node" select="../n1:effectiveTime"/>
                 </xsl:call-template>
             </td>
             <td>
                 <!-- Status -->
-                <xsl:call-template name="show-eHDSICurrentPregnancyStatus">
-                    <xsl:with-param name="node" select="../n1:value"/>
-                </xsl:call-template>
+                <xsl:choose>
+                    <xsl:when test="not(../n1:value/@nullFlavor)">
+                        <xsl:call-template name="show-eHDSICurrentPregnancyStatus">
+                            <xsl:with-param name="node" select="../n1:value"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code" select="../n1:value/@nullFlavor"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
             </td>
             <td>
                 <!-- Delivery date estimated -->
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="../n1:entryRelationship[@typeCode='COMP']/n1:observation/n1:value"/>
+                </xsl:call-template>
+            </td>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="n1:entry/n1:observation/n1:code[@code!='93857-1'][@code!='82810-3']" mode="outcomeobservations">
+        <tr>
+            <td/>
+            <td>
+                <!-- Outcome -->
+                <xsl:call-template name="show-eHDSIOutcomeOfPregnancy">
+                    <xsl:with-param name="node" select="../n1:code"/>
+                </xsl:call-template>
+            </td>
+            <td>
+                <!-- Number of children -->
+                <xsl:choose>
+                    <xsl:when test="not(../n1:value/@nullFlavor)">
+                        <xsl:value-of select="../n1:value/@value"/>
+                    </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="show-eHDSINullFlavor">
+                        <xsl:with-param name="code" select="../n1:value/@nullFlavor"/>
+                    </xsl:call-template>
+                </xsl:otherwise>
+                </xsl:choose>
+            </td>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="n1:entry/n1:observation/n1:code[@code='93857-1']" mode="outcomedates">
+        <tr>
+            <td>
+                <!-- Outcome date -->
+                <xsl:call-template name="show-TS">
+                    <xsl:with-param name="node" select="../n1:value"/>
                 </xsl:call-template>
             </td>
         </tr>
