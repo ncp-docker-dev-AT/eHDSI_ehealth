@@ -305,6 +305,16 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- eHDSICurrentPregnancyStatus -->
+    <xsl:template name="show-eHDSICurrentPregnancyStatus">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.60.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- eHDSIDisplayLabel -->
     <xsl:template name="show-eHDSIDisplayLabel">
         <xsl:param name="code"/>
@@ -412,6 +422,16 @@
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1008'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSIOutcomeOfPregnancy -->
+    <xsl:template name="show-eHDSIOutcomeOfPregnancy">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.62.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
     </xsl:template>
 
