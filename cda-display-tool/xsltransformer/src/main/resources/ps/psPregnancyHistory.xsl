@@ -41,15 +41,31 @@
                             <div class="content-inner">
                                 <table class="translation_table">
                                     <xsl:choose>
-                                        <xsl:when test="not(n1:entry/n1:observation/@nullFlavor)">
+                                        <xsl:when test="not(n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor)">
                                             <tbody>
                                                 <tr>
                                                     <th>
+                                                        <!-- Current Pregnancy Status -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Current Pregnancy Status
+                                                    </th>
+                                                    <th>
+                                                        <!-- Observation Date -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Observation Date
+                                                    </th>
+                                                    <th>
+                                                        <!-- Status -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Status
+                                                    </th>
+                                                    <th>
+                                                        <!-- Pregnancy observation code -->
                                                         <xsl:call-template name="show-eHDSIPregnancyInformation">
-                                                            <xsl:with-param name="node" select="n1:entry/n1:observation/n1:code"/>
+                                                            <xsl:with-param name="node" select="n1:entry/n1:observation/n1:code[@code='82810-3']/../n1:entryRelationship[@typeCode='COMP']/n1:observation/n1:code"/>
                                                         </xsl:call-template>
                                                     </th>
-                                                    <xsl:apply-templates select="n1:entry/n1:observation" mode="pregnancyhistory" />
+                                                    <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code='82810-3']" mode="currentPregnancies"/>
                                                 </tr>
                                             </tbody>
                                         </xsl:when>
@@ -57,7 +73,7 @@
                                             <tr>
                                                 <td>
                                                     <xsl:call-template name="show-eHDSINullFlavor">
-                                                        <xsl:with-param name="code" select="n1:entry/n1:observation/@nullFlavor"/>
+                                                        <xsl:with-param name="code" select="n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor"/>
                                                     </xsl:call-template>
                                                 </td>
                                             </tr>
@@ -74,16 +90,27 @@
         <br />
     </xsl:template>
 
-    <!-- Pregnancy History Section Entry-->
-    <xsl:template match="n1:entry/n1:observation" mode="pregnancyhistory">
-        <td>
-            <xsl:apply-templates select="n1:value"/>
-        </td>
-    </xsl:template>
-
-    <xsl:template match="n1:value">
-    <xsl:call-template name="show-TS">
-        <xsl:with-param name="node" select="."/>
-    </xsl:call-template>
+    <xsl:template match="n1:entry/n1:observation/n1:code[@code='82810-3']" mode="currentPregnancies">
+        <tr>
+            <td/>
+            <!-- Observation Date -->
+            <td>
+                <xsl:call-template name="show-IVL_TS">
+                    <xsl:with-param name="node" select="../n1:effectiveTime"/>
+                </xsl:call-template>
+            </td>
+            <td>
+                <!-- Status -->
+                <xsl:call-template name="show-eHDSICurrentPregnancyStatus">
+                    <xsl:with-param name="node" select="../n1:value"/>
+                </xsl:call-template>
+            </td>
+            <td>
+                <!-- Delivery date estimated -->
+                <xsl:call-template name="show-TS">
+                    <xsl:with-param name="node" select="../n1:entryRelationship[@typeCode='COMP']/n1:observation/n1:value"/>
+                </xsl:call-template>
+            </td>
+        </tr>
     </xsl:template>
 </xsl:stylesheet>
