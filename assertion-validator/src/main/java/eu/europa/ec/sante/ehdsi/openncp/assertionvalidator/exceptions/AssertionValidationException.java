@@ -9,7 +9,7 @@ public class AssertionValidationException extends Exception {
 
     public AssertionValidationException() {
         super();
-        this.ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_1001;
+        this.ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_NOT_VALID_ASSERTION;
     }
 
     public AssertionValidationException(String message) {

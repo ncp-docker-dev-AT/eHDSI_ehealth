@@ -10,7 +10,7 @@ package eu.europa.ec.sante.ehdsi.constant.error;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.0, 2010, 11 August
  */
-public enum TSAMError implements ITMTSAMEror {
+public enum TSAMError implements ITMTSAMEror, ErrorCode {
     // ERRORS
     /**
      * Error; Software processing error (e.g. "out of memory" )<br>
@@ -74,6 +74,12 @@ public enum TSAMError implements ITMTSAMEror {
         this.description = descripton;
     }
 
+
+    @Override
+    public String getMessage() {
+        return this.name();
+    }
+
     /**
      * @return String - code
      */
@@ -86,6 +92,11 @@ public enum TSAMError implements ITMTSAMEror {
      */
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String getCodeSystem() {
+        return null;
     }
 
     /**

@@ -33,6 +33,6 @@ public class NoMatchingDispensationException extends NIException {
 		this("Insufficient rights");
 	}
 	public NoMatchingDispensationException(String message) {
-		super(EhdsiErrorCode.EHDSI_ERROR_4703, message);
+		super(EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS, message);
 	}
 }

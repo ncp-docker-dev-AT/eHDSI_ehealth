@@ -8,7 +8,7 @@ package eu.europa.ec.sante.ehdsi.constant.error;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.8, 2010, 20 October
  */
-public enum TMError implements ITMTSAMEror {
+public enum TMError implements ITMTSAMEror, ErrorCode {
 
     // ERRORS
     /**
@@ -172,6 +172,11 @@ public enum TMError implements ITMTSAMEror {
         this.description = description;
     }
 
+    @Override
+    public String getMessage() {
+        return this.name();
+    }
+
     /**
      * @return String - code
      */
@@ -193,4 +198,10 @@ public enum TMError implements ITMTSAMEror {
     public String toString() {
         return code + ": " + description;
     }
+
+    @Override
+    public String getCodeSystem() {
+        return null;
+    }
+
 }

@@ -706,7 +706,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                         fillOutputMessage(outputMessage, null, null, "OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, EhdsiErrorCode.EHDSI_ERROR_4703.getCode() + " : Either the security policy of country A or a privacy " +
+                        fillOutputMessage(outputMessage, EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS.getCode() + " : Either the security policy of country A or a privacy " +
                                 "policy of the patient (that was given in country A) does not allow the requested operation " +
                                 "to be performed by the HCP .", EhdsiXcpdErrorCode.InsufficientRights);
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");

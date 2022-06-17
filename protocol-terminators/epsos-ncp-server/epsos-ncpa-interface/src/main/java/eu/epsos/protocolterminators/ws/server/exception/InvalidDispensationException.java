@@ -6,7 +6,7 @@ public class InvalidDispensationException extends NIException {
 	private static final long serialVersionUID = -4968105055699416626L;
 
 	public InvalidDispensationException(String code, String message) {
-		super(EhdsiErrorCode.EHDSI_ERROR_4106, message);
+		super(EhdsiErrorCode.EHDSI_ERROR_EP_ALREADY_DISPENSED, message);
 	}
 
 }

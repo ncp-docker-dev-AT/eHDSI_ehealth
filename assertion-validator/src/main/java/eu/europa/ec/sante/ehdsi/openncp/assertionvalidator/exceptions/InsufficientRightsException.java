@@ -9,7 +9,7 @@ public class InsufficientRightsException extends Exception {
     private final EhdsiErrorCode ehdsiErrorCode;
 
     public InsufficientRightsException() {
-        ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_4703;
+        ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS;
     }
 
     @Override

@@ -7,6 +7,6 @@ public class ProcessingDeferredException extends NIException {
 	private static final long serialVersionUID = 4872216168488255110L;
 
 	public ProcessingDeferredException(String message) {
-		super(EhdsiErrorCode.EHDSI_ERROR_2201, message);
+		super(EhdsiErrorCode.EHDSI_ERROR_DOCUMENT_NOT_PROCESSED, message);
 	}
 }

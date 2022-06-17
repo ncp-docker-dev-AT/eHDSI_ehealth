@@ -6,7 +6,7 @@ public class OriginalDataMissingException extends NIException {
 	private static final long serialVersionUID = 4254468101664118588L;
 
 	public OriginalDataMissingException(String code, String message) {
-		super(EhdsiErrorCode.EHDSI_ERROR_4107, message);
+		super(EhdsiErrorCode.EHDSI_ERROR_ORIGINAL_DATA_MISSING, message);
 	}
 
 }

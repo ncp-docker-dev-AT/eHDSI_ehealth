@@ -12,6 +12,6 @@ public class DocumentProcessingException extends NIException {
     }
 
     public DocumentProcessingException(String message) {
-        super(EhdsiErrorCode.EHDSI_ERROR_4106, message);
+        super(EhdsiErrorCode.EHDSI_ERROR_EP_ALREADY_DISPENSED, message);
     }
 }

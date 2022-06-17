@@ -243,8 +243,8 @@ public class XcaInitGateway {
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
                     if (RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText().equals(severity)
-                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1101.getCode())
-                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_1102.getCode())) {
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_EP_NOT_FOUND.getCode())
+                            || errorCode.equals(EhdsiErrorCode.EHDSI_ERROR_PS_NOT_FOUND.getCode())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }

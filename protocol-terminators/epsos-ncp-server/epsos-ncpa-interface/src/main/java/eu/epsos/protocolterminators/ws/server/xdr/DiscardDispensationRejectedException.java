@@ -8,7 +8,7 @@ public class DiscardDispensationRejectedException extends NIException {
     private static final long serialVersionUID = -9198359055009969925L;
 
     public DiscardDispensationRejectedException(String message) {
-        super(EhdsiErrorCode.EHDSI_ERROR_4105, message);
+        super(EhdsiErrorCode.EHDSI_ERROR_EP_NOT_MATCHING, message);
     }
 
     public DiscardDispensationRejectedException() {

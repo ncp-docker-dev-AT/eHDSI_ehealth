@@ -9,18 +9,25 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>openncp-constant</artifactId>
+    <artifactId>openncp-ncp-commons</artifactId>
     <packaging>jar</packaging>
 
-    <name>OpenNCP Constant</name>
+    <name>OpenNCP NCP Constant Commons</name>
 
     <dependencies>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!--
+        IMPORTANT : Don't add new dependency
+        this package should only contain enumerate
+        -->
+
     </dependencies>
 
 </project>

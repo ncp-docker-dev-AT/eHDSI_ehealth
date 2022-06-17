@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.sante.ehdsi</groupId>
-            <artifactId>openncp-constant</artifactId>
+            <artifactId>openncp-ncp-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

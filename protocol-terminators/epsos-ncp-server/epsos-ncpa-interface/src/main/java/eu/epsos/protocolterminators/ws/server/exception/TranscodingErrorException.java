@@ -7,6 +7,6 @@ public class TranscodingErrorException extends NIException {
     private static final long serialVersionUID = -8381001130860083595L;
 
     public TranscodingErrorException(String message) {
-        super(EhdsiErrorCode.EHDSI_ERROR_4203, message);
+        super(EhdsiErrorCode.EHDSI_ERROR_TRANSCODING_ERROR, message);
     }
 }
