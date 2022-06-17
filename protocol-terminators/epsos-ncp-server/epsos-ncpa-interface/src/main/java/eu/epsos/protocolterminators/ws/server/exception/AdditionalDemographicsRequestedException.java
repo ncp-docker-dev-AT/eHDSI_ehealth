@@ -1,11 +1,11 @@
 package eu.epsos.protocolterminators.ws.server.exception;
 
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
 
 public class AdditionalDemographicsRequestedException extends NIException {
 	private static final long serialVersionUID = -6309037590489573700L;
 
 	public AdditionalDemographicsRequestedException(String message) {
-		super(null, message, EhdsiXcpdErrorCode.AdditionalDemographicsRequested.getCodeSystem());
+		super(null, message, XcpdErrorCode.AdditionalDemographicsRequested.getCodeSystem());
 	}
 }

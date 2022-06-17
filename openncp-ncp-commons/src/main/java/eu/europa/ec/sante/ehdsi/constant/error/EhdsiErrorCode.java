@@ -29,10 +29,12 @@ public enum EhdsiErrorCode implements ErrorCode {
     EHDSI_ERROR_4207("4207", "The extra parameters linked to the document identifier in the query differs from the ones in the TRC assertion"),
     EHDSI_ERROR_NO_CONSENT("4701", "The patient has not given consent to the requested service."),
     EHDSI_ERROR_WEAK_AUTHENTICATION("4702", "Country A requests a higher authentication trust level than assigned to the HP"),
-    EHDSI_ERROR_INSUFFICENT_RIGHTS("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
+    EHDSI_ERROR_INSUFFICIENT_RIGHTS("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
     EHDSI_ERROR_NO_SIGNATURE("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
     EHDSI_ERROR_POLICY_VIOLATION("4705", "Policy violation"),
     EHDSI_ERROR_UNKNOWN_POLICY("4706", "Unknown Policy"),
+
+    //--------
 
     EHDSI_ERROR_CONNECTION_NOT_POSSIBLE("5036", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
 

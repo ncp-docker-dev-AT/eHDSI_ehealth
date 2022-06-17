@@ -14,8 +14,7 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidat
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.ehdsi.constant.error.EhiErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
@@ -310,7 +309,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        if( errorCode == EhdsiXcpdErrorCode.DemographicsQueryNotAllowed) {
+        if( errorCode == XcpdErrorCode.DemographicsQueryNotAllowed) {
             // Set detectedIssueEvent/triggerFor
             MCAIMT900001UV01Requires mcaimt900001UV01Requires = objectFactory.createMCAIMT900001UV01Requires();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(mcaimt900001UV01Requires);
@@ -328,8 +327,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             mcaimt900001UV01ActOrderRequired.setCode(ce);
             ce.setCode(errorCode.getCode());
             ce.setCodeSystem(errorCode.getCodeSystem());
-        } else if (errorCode == EhdsiXcpdErrorCode.InsufficientRights
-                || errorCode == EhiErrorCode.AnswerNotAvailable) {
+        } else if (errorCode == XcpdErrorCode.InsufficientRights
+                || errorCode == XcpdErrorCode.AnswerNotAvailable) {
             // Set detectedIssueEvent/mitigatedBy
             MCAIMT900001UV01SourceOf mcaimt900001UV01SourceOf = objectFactory.createMCAIMT900001UV01SourceOf();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(mcaimt900001UV01SourceOf);
@@ -350,28 +349,28 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return mfmimt700711UV01Reason;
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String context, ErrorCode errorCode) {
-        fillOutputMessage(outputMessage, context, errorCode, "AE");
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, ErrorCode errorCode, EhdsiErrorCode ehdsiErrorCode, String context) {
+        fillOutputMessage(outputMessage, errorCode, ehdsiErrorCode, context,  "AE");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String context, ErrorCode errorCode, String code) {
-        if (errorCode != null) {
-            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(errorCode));
-        }
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, ErrorCode errorCode, EhdsiErrorCode ehdsiErrorCode, String context, String code) {
 
         // Set queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
-        if (context != null) {
+
+        if (errorCode != null) {
+            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(errorCode));
+        }
+
+        if (ehdsiErrorCode != null) {
             logger.error(context);
             // Set acknowledgement/acknowledgementDetail
             outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(
                     objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
             outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(objectFactory.createED());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(context);
-        } else {
-            logger.info("XCPD Request is valid.");
+            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(ehdsiErrorCode.getCode() + " :" + (context != null? context : ""));
         }
     }
 
@@ -579,7 +578,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             List<PRPAMT201306UV02LivingSubjectId> livingSubjectIds = inputQBP.getParameterList().getLivingSubjectId();
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
-                fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", EhiErrorCode.AnswerNotAvailable);
+                fillOutputMessage(outputMessage, XcpdErrorCode.AnswerNotAvailable, EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, "Receiver has wrong Home Community ID.");
             } else if (!livingSubjectIds.isEmpty()) {
                 var stringBuilderNRO = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
@@ -664,7 +663,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                }
                 if (demographicsList.isEmpty()) {
                     // Preparing answer not available error
-                    fillOutputMessage(outputMessage, "No patient found.", EhiErrorCode.AnswerNotAvailable, "NF");
+
+                    fillOutputMessage(outputMessage, XcpdErrorCode.AnswerNotAvailable, EhdsiErrorCode.EHDSI_ERROR_PI_NO_MATCH, "No patient found.", "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
                 } else {
                     var countryCode = "";
@@ -701,28 +701,33 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             outputMessage.getControlActProcess().getSubject().add(getSubjectByPatientDemographic(demographicsList.get(i)));
                         }
                     }
-                    if (!demographicsList.isEmpty()) {
+                    if (demographicsList.size() == 1) {
                         // There are patient data to be sent, OK
-                        fillOutputMessage(outputMessage, null, null, "OK");
+                        fillOutputMessage(outputMessage, null, null, null,"OK");
+                    } else if (!demographicsList.isEmpty()) {
+                        fillOutputMessage(outputMessage, null, EhdsiErrorCode.EHDSI_ERROR_PI_MULTIPLE_MATCHES, "Multiple match for the patient", "OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS.getCode() + " : Either the security policy of country A or a privacy " +
+                        fillOutputMessage(outputMessage,
+                                XcpdErrorCode.InsufficientRights,
+                                EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC,
+                                 " : Either the security policy of country A or a privacy " +
                                 "policy of the patient (that was given in country A) does not allow the requested operation " +
-                                "to be performed by the HCP .", EhdsiXcpdErrorCode.InsufficientRights);
+                                "to be performed by the HCP .");
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
                     }
                 }
             } else {
                 // Preparing demographic query not allowed error
-                fillOutputMessage(outputMessage, "Queries are only available with patient identifiers", EhdsiXcpdErrorCode.DemographicsQueryNotAllowed);
+                fillOutputMessage(outputMessage, XcpdErrorCode.DemographicsQueryNotAllowed, EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC,  "Queries are only available with patient identifiers");
             }
         } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
 
-            fillOutputMessage(outputMessage, e.getMessage(), EhdsiXcpdErrorCode.InsufficientRights);
+            fillOutputMessage(outputMessage, XcpdErrorCode.InsufficientRights, EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, e.getMessage()) ;
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
 
-            fillOutputMessage(outputMessage, e.getMessage(), EhiErrorCode.AnswerNotAvailable);
+            fillOutputMessage(outputMessage, XcpdErrorCode.AnswerNotAvailable, EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, e.getMessage());
             logger.error(e.getMessage(), e);
         }
         // Set queryByParameter

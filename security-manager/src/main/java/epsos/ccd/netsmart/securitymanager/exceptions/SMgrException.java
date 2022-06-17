@@ -1,5 +1,7 @@
 package epsos.ccd.netsmart.securitymanager.exceptions;
 
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+
 import javax.xml.crypto.dsig.XMLSignatureException;
 
 /**
@@ -13,6 +15,7 @@ public class SMgrException extends XMLSignatureException {
      *
      */
     private static final long serialVersionUID = 1L;
+    private final EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
 
     /**
      * Constructor of the exception
@@ -26,6 +29,10 @@ public class SMgrException extends XMLSignatureException {
 
     public SMgrException(String exceptionMessage, Exception e) {
         super(exceptionMessage, e);
+    }
+
+    public EhdsiErrorCode getErrorCode(){
+        return ehdsiErrorCode;
     }
 
 }

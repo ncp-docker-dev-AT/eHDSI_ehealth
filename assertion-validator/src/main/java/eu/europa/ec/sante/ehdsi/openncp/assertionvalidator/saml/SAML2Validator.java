@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
@@ -77,7 +78,7 @@ public class SAML2Validator {
                 }
             }
             if (hcpAssertion == null) {
-                throw (new MissingFieldException("HCP Assertion element is required."));
+                throw (new MissingFieldException(EhdsiErrorCode.EHDSI_ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion element is required."));
             }
 
             sigCountryCode = checkHCPAssertion(hcpAssertion, null);
@@ -326,6 +327,8 @@ public class SAML2Validator {
         // Konstantin: committed changes to security manager, in order to provide better support XCA and XDR implementations
         //TODO: Improve Exception management.
         sigCountryCode = new SignatureManager().verifySAMLAssertion(assertion);
+
+        //TODO EHEALTH-6693 See if needed to incapsulate? EHDSI_ERROR_HPI_GENERIC, EHDSI_WARNING_HPI_GENERIC, EHDSI_ERROR_HPI_INSUFFICIENT_INFORMATION...
 
         return sigCountryCode;
     }

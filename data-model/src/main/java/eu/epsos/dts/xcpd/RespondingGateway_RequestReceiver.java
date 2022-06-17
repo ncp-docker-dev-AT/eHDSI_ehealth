@@ -2,7 +2,7 @@ package eu.epsos.dts.xcpd;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiXcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.EhiErrorCode;
 import org.hl7.v3.*;
 import org.slf4j.Logger;
@@ -172,7 +172,7 @@ public class RespondingGateway_RequestReceiver {
                 }
             }
 
-            EhdsiXcpdErrorCode ehdsiErrorCode = EhdsiXcpdErrorCode.getErrorCode(errorMsg);
+            XcpdErrorCode ehdsiErrorCode = XcpdErrorCode.getErrorCode(errorMsg);
             EhiErrorCode ehiErrorCode = EhiErrorCode.getErrorCode(errorMsg);
 
             if(ehdsiErrorCode == null && ehiErrorCode == null){

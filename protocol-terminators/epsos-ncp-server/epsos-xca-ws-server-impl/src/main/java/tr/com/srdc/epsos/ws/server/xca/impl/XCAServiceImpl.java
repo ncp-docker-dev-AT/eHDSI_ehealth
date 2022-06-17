@@ -1322,8 +1322,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     logger.info("Found the client country code via the signature certificate.");
                 } else {
                     addErrorOMMessage(omNamespace, registryErrorList,
-                            EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS,
-                            EhdsiErrorCode.EHDSI_ERROR_INSUFFICENT_RIGHTS.getDescription(),
+                            EhdsiErrorCode.EHDSI_ERROR_INSUFFICIENT_RIGHTS,
+                            EhdsiErrorCode.EHDSI_ERROR_INSUFFICIENT_RIGHTS.getDescription(),
                             "",
                             RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                     break processLabel;

@@ -28,4 +28,9 @@ public class AssertionValidationException extends Exception {
     public EhdsiErrorCode getEhdsiCode() {
         return ehdsiErrorCode;
     }
+
+    protected void setEhdsiCode(EhdsiErrorCode ehdsiErrorCode) {
+        this.ehdsiErrorCode = ehdsiErrorCode;
+    }
+
 }

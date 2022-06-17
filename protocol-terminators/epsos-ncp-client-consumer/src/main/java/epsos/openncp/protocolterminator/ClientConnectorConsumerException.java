@@ -8,12 +8,16 @@ public class ClientConnectorConsumerException extends Exception {
     ErrorCode errorCode;
     String context;
 
-    public ClientConnectorConsumerException(String message) {
-        super(message);
+    public ClientConnectorConsumerException(ErrorCode errorCode, String context) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+        this.context = context;
     }
 
-    public ClientConnectorConsumerException(String message, Throwable cause) {
-        super(message, cause);
+    public ClientConnectorConsumerException(ErrorCode errorCode, String context, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
+        this.context = context;
     }
 
     public ClientConnectorConsumerException(String message, ErrorCode errorCode, String context, Throwable cause) {
