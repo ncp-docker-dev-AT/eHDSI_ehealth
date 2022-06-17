@@ -582,9 +582,24 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-eHDSINullFlavor">
-                    <xsl:with-param name="code" select="$node/@nullFlavor"/>
-                </xsl:call-template>
+                <xsl:choose>
+                    <xsl:when test="$node/@nullFlavor='OTH'">
+                        <div class="tooltip-right">
+                            <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
+                            <span class="tooltiptext">
+                                <!-- TODO Concept needs to be added to eHDSIDisplayLabel value set -->
+                                Unmapped concept
+                            </span>
+                        </div>
+                        <xsl:text> </xsl:text>
+                        <i><xsl:value-of select="$node/n1:translation/@displayName"/></i>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
