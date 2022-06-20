@@ -57,8 +57,9 @@
                                             </th>
                                             <th>
                                                 <!-- Onset Date -->
-                                                <!-- TODO Needs to be added to eHDSIDisplayLabel value set -->
-                                                Onset Date
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'45'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
                                                 <!-- Functional assessment result -->
