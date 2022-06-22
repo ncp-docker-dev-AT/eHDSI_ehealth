@@ -10,9 +10,8 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -93,10 +92,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
         this.ofRs = ofRs;
     }
 
-    private RegistryError createErrorMessage(EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, String location, RegistryErrorSeverity severity) {
+    private RegistryError createErrorMessage(OpenncpErrorCode openncpErrorCode, String codeContext, String value, String location, RegistryErrorSeverity severity) {
 
         RegistryError registryError = ofRs.createRegistryError();
-        registryError.setErrorCode(ehdsiErrorCode.getCode());
+        registryError.setErrorCode(openncpErrorCode.getCode());
         registryError.setLocation(location);
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
@@ -104,9 +103,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return registryError;
     }
 
-    private RegistryError createErrorMessage(EhdsiErrorCode ehdsiErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
+    private RegistryError createErrorMessage(OpenncpErrorCode openncpErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
 
-        return createErrorMessage(ehdsiErrorCode, codeContext, value, getLocation(), severity);
+        return createErrorMessage(openncpErrorCode, codeContext, value, getLocation(), severity);
     }
 
     /**
@@ -341,7 +340,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         String patientId = getPatientId(request);
@@ -434,7 +433,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         if (registryErrorList.getRegistryError().isEmpty()) {
@@ -483,7 +482,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         String patientId = getPatientId(request);
@@ -593,7 +592,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
-                    registryErrorList.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                    registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 }
             }
             if (!registryErrorList.getRegistryError().isEmpty()) {
@@ -683,7 +682,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         String patientId = getPatientId(request);
@@ -763,7 +762,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {
@@ -819,7 +818,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         String patientId = getPatientId(request);
@@ -853,10 +852,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage( e.getErrorCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             }
         }
         if (!rel.getRegistryError().isEmpty()) {

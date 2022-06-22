@@ -20,7 +20,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 /**
  * Thrown if discard request is rejected because the issuing HCPO of 
@@ -33,6 +33,6 @@ public class NoMatchingDispensationException extends NIException {
 		this("Insufficient rights");
 	}
 	public NoMatchingDispensationException(String message) {
-		super(EhdsiErrorCode.EHDSI_ERROR_INSUFFICIENT_RIGHTS, message);
+		super(OpenncpErrorCode.ERROR_INSUFFICIENT_RIGHTS, message);
 	}
 }

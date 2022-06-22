@@ -1,7 +1,6 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.EhiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 /**
  * This class represents an Exception occurred due to document transformation (translation/transcoding) issues.
@@ -12,16 +11,13 @@ public class DocumentTransformationException extends Exception {
 
     private static long serialVersionUID = 1L;
 
-    private EhiErrorCode ehiErrorCode;
-
-    private EhdsiErrorCode ehdsiErrorCode;
+    private OpenncpErrorCode openncpErrorCode;
 
     private String codeContext;
 
-    public DocumentTransformationException(EhiErrorCode ehiErrorCode, EhdsiErrorCode ehdsiErrorCode, String codeContext, String message) {
+    public DocumentTransformationException(OpenncpErrorCode openncpErrorCode, String codeContext, String message) {
         super(message);
-        this.ehiErrorCode = ehiErrorCode;
-        this.ehdsiErrorCode = ehdsiErrorCode;
+        this.openncpErrorCode = openncpErrorCode;
         this.codeContext = codeContext;
     }
 
@@ -39,12 +35,9 @@ public class DocumentTransformationException extends Exception {
         serialVersionUID = aSerialVersionUID;
     }
 
-    public EhiErrorCode getEhiCode() {
-        return ehiErrorCode;
-    }
 
-    public EhdsiErrorCode getEhdsiCode() {
-        return ehdsiErrorCode;
+    public OpenncpErrorCode getErrorCode() {
+        return openncpErrorCode;
     }
 
     /**

@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 public class XSDValidationException extends Exception {
 	/**
@@ -10,7 +10,7 @@ public class XSDValidationException extends Exception {
 
 	private String message;
 
-	private EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
+	private OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
 
 	public XSDValidationException(String message) {
 		super();
@@ -26,6 +26,6 @@ public class XSDValidationException extends Exception {
 	}
 
 	public String getCode() {
-		return ehdsiErrorCode.getCode();
+		return openncpErrorCode.getCode();
 	}
 }

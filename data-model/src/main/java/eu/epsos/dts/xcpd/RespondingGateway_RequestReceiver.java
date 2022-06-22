@@ -1,9 +1,9 @@
 package eu.epsos.dts.xcpd;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.EhiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import org.hl7.v3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +146,7 @@ public class RespondingGateway_RequestReceiver {
                         }
                     }
                 } catch (ParseException pe) {
-                    throw new NoPatientIdDiscoveredException(EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, pe);
+                    throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, pe);
                 }
             }
         } else {
@@ -173,13 +173,13 @@ public class RespondingGateway_RequestReceiver {
             }
 
             XcpdErrorCode ehdsiErrorCode = XcpdErrorCode.getErrorCode(errorMsg);
-            EhiErrorCode ehiErrorCode = EhiErrorCode.getErrorCode(errorMsg);
+            IheErrorCode iheErrorCode = IheErrorCode.getErrorCode(errorMsg);
 
-            if(ehdsiErrorCode == null && ehiErrorCode == null){
+            if(ehdsiErrorCode == null && iheErrorCode == null){
                 LOGGER.warn("No error code found in the XCPD response : " + errorMsg);
             }
 
-            throw new NoPatientIdDiscoveredException(errorMsg, ehdsiErrorCode != null? ehdsiErrorCode: ehiErrorCode, acknowledgementDetailText);
+            throw new NoPatientIdDiscoveredException(errorMsg, ehdsiErrorCode != null? ehdsiErrorCode: iheErrorCode, acknowledgementDetailText);
         }
 
         return patients;

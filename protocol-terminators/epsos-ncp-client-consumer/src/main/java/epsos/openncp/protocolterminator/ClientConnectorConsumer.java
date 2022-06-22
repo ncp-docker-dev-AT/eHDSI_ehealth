@@ -2,7 +2,7 @@ package epsos.openncp.protocolterminator;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceStub;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
@@ -103,7 +103,7 @@ public class ClientConnectorConsumer {
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_INTERNAL_SERVER, ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex);
         }
     }
 
@@ -137,7 +137,7 @@ public class ClientConnectorConsumer {
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_PI_GENERIC, ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_PI_GENERIC, ex.getMessage(), ex);
         }
     }
 
@@ -162,7 +162,7 @@ public class ClientConnectorConsumer {
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_INTERNAL_SERVER, ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex);
         }
     }
 
@@ -204,7 +204,7 @@ public class ClientConnectorConsumer {
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_INTERNAL_SERVER, ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex);
         }
     }
 
@@ -252,7 +252,7 @@ public class ClientConnectorConsumer {
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_ED_GENERIC, ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_ED_GENERIC, ex.getMessage(), ex);
         }
     }
 
@@ -266,7 +266,7 @@ public class ClientConnectorConsumer {
                                Map<AssertionEnum, Assertion> assertions) throws Exception {
 
         if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "HCP Assertion expired");
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "HCP Assertion expired");
         }
 
         var omFactory = OMAbstractFactory.getSOAP12Factory();
@@ -276,14 +276,14 @@ public class ClientConnectorConsumer {
         if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
             var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
             if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Next of Kin Assertion is expired");
+                throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Next of Kin Assertion is expired");
             }
             omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         }
         if (assertions.containsKey(AssertionEnum.TREATMENT)) {
             var assertion = assertions.get(AssertionEnum.TREATMENT);
             if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Treatment Confirmation Assertion is expired");
+                throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Treatment Confirmation Assertion is expired");
             }
             omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         }
@@ -314,7 +314,7 @@ public class ClientConnectorConsumer {
             return builder.build();
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | CertificateException |
                 IOException | KeyManagementException e) {
-            throw new ClientConnectorConsumerException(EhdsiErrorCode.EHDSI_ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "SSL Context cannot be initialized: " + e.getMessage(), e);
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "SSL Context cannot be initialized: " + e.getMessage(), e);
         }
     }
 
@@ -441,10 +441,10 @@ public class ClientConnectorConsumer {
         String errorCode = axisFault.getFaultCode() != null ? axisFault.getFaultCode().getLocalPart() : null;
         String context = axisFault.getDetail() != null ? axisFault.getDetail().getText() : null;
 
-        EhdsiErrorCode ehdsiErrorCode = EhdsiErrorCode.getErrorCode(errorCode);
+        OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.getErrorCode(errorCode);
         XcpdErrorCode xcpdErrorCode = XcpdErrorCode.getErrorCode(errorCode);
 
-        ErrorCode errorCodeEnum = ehdsiErrorCode != null? ehdsiErrorCode: xcpdErrorCode;
+        ErrorCode errorCodeEnum = openncpErrorCode != null? openncpErrorCode : xcpdErrorCode;
 
         return new ClientConnectorConsumerException(message, errorCodeEnum, context, axisFault);
     }

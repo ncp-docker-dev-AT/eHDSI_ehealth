@@ -1,7 +1,7 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 public class DocumentProcessingException extends NIException {
 
@@ -12,6 +12,6 @@ public class DocumentProcessingException extends NIException {
     }
 
     public DocumentProcessingException(String message) {
-        super(EhdsiErrorCode.EHDSI_ERROR_EP_ALREADY_DISPENSED, message);
+        super(OpenncpErrorCode.ERROR_EP_ALREADY_DISPENSED, message);
     }
 }

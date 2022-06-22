@@ -1,28 +1,28 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.EhdsiErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 public class InsufficientRightsException extends Exception {
 
     private static final long serialVersionUID = -7973928727557097260L;
 
-    private final EhdsiErrorCode ehdsiErrorCode;
+    private final OpenncpErrorCode openncpErrorCode;
 
     public InsufficientRightsException() {
-        ehdsiErrorCode = EhdsiErrorCode.EHDSI_ERROR_INSUFFICIENT_RIGHTS;
+        openncpErrorCode = OpenncpErrorCode.ERROR_INSUFFICIENT_RIGHTS;
     }
 
     @Override
     public String getMessage() {
-        return ehdsiErrorCode.getDescription();
+        return openncpErrorCode.getDescription();
     }
 
     public String getCode() {
-        return ehdsiErrorCode.getCode();
+        return openncpErrorCode.getCode();
     }
 
-    public EhdsiErrorCode getEhdsiCode() {
-        return ehdsiErrorCode;
+    public OpenncpErrorCode getEhdsiCode() {
+        return openncpErrorCode;
     }
 
 }
