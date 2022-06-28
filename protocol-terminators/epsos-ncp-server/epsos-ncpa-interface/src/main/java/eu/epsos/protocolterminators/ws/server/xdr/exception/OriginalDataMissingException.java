@@ -8,6 +8,6 @@ public class OriginalDataMissingException extends DocumentProcessingException {
 
 	public OriginalDataMissingException() {
 		super("For data of the given kind the Provide Data service provider requires the service consumer to transmit the source coded PDF document.");
-		super.setEhdsiCode(OpenncpErrorCode.ERROR_ORIGINAL_DATA_MISSING);
+		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_ORIGINAL_DATA_MISSING);
 	}
 }

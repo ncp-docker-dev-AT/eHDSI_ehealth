@@ -1,6 +1,7 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
 
 /**
  * @author Luís Pinto<code> - luis.pinto@iuz.pt</code>
@@ -8,12 +9,15 @@ import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
  */
 public class NoPatientIdDiscoveredException extends ExceptionWithContext {
 
-    public NoPatientIdDiscoveredException(ErrorCode ehdsiErrorCode, Throwable cause) {
-        super(ehdsiErrorCode, cause);
+    private XcpdErrorCode xcpdErrorCode;
+
+    public NoPatientIdDiscoveredException(OpenncpErrorCode openncpErrorCode, Throwable cause) {
+        super(openncpErrorCode, cause);
     }
 
-    public NoPatientIdDiscoveredException(String message, ErrorCode ehdsiErrorCode, String context) {
-        super(message, ehdsiErrorCode, context);
+    public NoPatientIdDiscoveredException(XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String message, String context) {
+        super(openncpErrorCode, message, context);
+        this.xcpdErrorCode = xcpdErrorCode;
     }
 
 }

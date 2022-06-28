@@ -14,8 +14,8 @@ public class XDRException extends ExceptionWithContext {
         super(openncpErrorCode, e);
     }
 
-    public XDRException(String message, OpenncpErrorCode openncpErrorCode, String codeContext) {
-        super(message, openncpErrorCode, codeContext);
+    public XDRException(OpenncpErrorCode openncpErrorCode, String message, String codeContext) {
+        super(openncpErrorCode, message, codeContext);
     }
 
 }

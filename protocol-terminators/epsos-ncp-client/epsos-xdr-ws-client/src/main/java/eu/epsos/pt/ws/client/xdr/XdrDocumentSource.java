@@ -125,7 +125,7 @@ public final class XdrDocumentSource {
             }
 
             if (hasError) {
-                    throw new XDRException(errorCode, openncpErrorCode, codeContext);
+                    throw new XDRException(openncpErrorCode, codeContext, location);
             }
         }
     }

@@ -8,6 +8,6 @@ public class NoSignatureException extends DocumentProcessingException {
 
 	public NoSignatureException() {
 		super("The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP.");
-		super.setEhdsiCode(OpenncpErrorCode.ERROR_NO_SIGNATURE);
+		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_NO_SIGNATURE);
 	}
 }

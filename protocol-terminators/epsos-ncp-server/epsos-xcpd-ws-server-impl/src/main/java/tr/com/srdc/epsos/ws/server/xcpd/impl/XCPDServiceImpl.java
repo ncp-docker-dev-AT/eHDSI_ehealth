@@ -4,6 +4,7 @@ import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
+import eu.epsos.protocolterminators.ws.server.xcpd.exception.XcpdNIException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
@@ -294,7 +295,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     /**
      * Prepares a reasonOf element according to error type
      */
-    private MFMIMT700711UV01Reason getReasonOfElement(ErrorCode errorCode) {
+    private MFMIMT700711UV01Reason getReasonOfElement(XcpdErrorCode xcpdErrorCode) {
 
         var mfmimt700711UV01Reason = objectFactory.createMFMIMT700711UV01Reason();
         mfmimt700711UV01Reason.setTypeCode("RSON");
@@ -309,7 +310,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        if( errorCode == XcpdErrorCode.DemographicsQueryNotAllowed) {
+        if( xcpdErrorCode == XcpdErrorCode.DemographicsQueryNotAllowed) {
             // Set detectedIssueEvent/triggerFor
             MCAIMT900001UV01Requires mcaimt900001UV01Requires = objectFactory.createMCAIMT900001UV01Requires();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(mcaimt900001UV01Requires);
@@ -325,10 +326,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             // Set detectedIssueEvent/triggerFor/actOrRequired/code
             CE ce = objectFactory.createCE();
             mcaimt900001UV01ActOrderRequired.setCode(ce);
-            ce.setCode(errorCode.getCode());
-            ce.setCodeSystem(errorCode.getCodeSystem());
-        } else if (errorCode == XcpdErrorCode.InsufficientRights
-                || errorCode == XcpdErrorCode.AnswerNotAvailable) {
+            ce.setCode(xcpdErrorCode.getCode());
+            ce.setCodeSystem(xcpdErrorCode.getCodeSystem());
+        } else if (xcpdErrorCode == XcpdErrorCode.InsufficientRights
+                || xcpdErrorCode == XcpdErrorCode.AnswerNotAvailable) {
             // Set detectedIssueEvent/mitigatedBy
             MCAIMT900001UV01SourceOf mcaimt900001UV01SourceOf = objectFactory.createMCAIMT900001UV01SourceOf();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(mcaimt900001UV01SourceOf);
@@ -342,35 +343,46 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
             CD cd = objectFactory.createCD();
-            cd.setCode(errorCode.getCode());
-            cd.setCodeSystem(errorCode.getCodeSystem());
+            cd.setCode(xcpdErrorCode.getCode());
+            cd.setCodeSystem(xcpdErrorCode.getCodeSystem());
             mcaimt900001UV01DetectedIssueManagement.setCode(cd);
         }
         return mfmimt700711UV01Reason;
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, ErrorCode errorCode, OpenncpErrorCode openncpErrorCode, String context) {
-        fillOutputMessage(outputMessage, errorCode, openncpErrorCode, context,  "AE");
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String context) {
+        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context,  "AE");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, ErrorCode errorCode, OpenncpErrorCode openncpErrorCode, String context, String code) {
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String context, String code) {
 
         // Set queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
 
-        if (errorCode != null) {
-            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(errorCode));
+        if (xcpdErrorCode != null) {
+            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(xcpdErrorCode));
         }
 
         if (openncpErrorCode != null) {
             logger.error(context);
             // Set acknowledgement/acknowledgementDetail
-            outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(
-                    objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(objectFactory.createED());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(openncpErrorCode.getCode() + " :" + (context != null? context : ""));
+            MCCIMT000300UV01Acknowledgement acknowledgement = outputMessage.getAcknowledgement().get(0);
+            MCCIMT000300UV01AcknowledgementDetail acknowledgementDetail = objectFactory.createMCCIMT000300UV01AcknowledgementDetail();
+
+            CE codeCE = objectFactory.createCE();
+            codeCE.setCode(openncpErrorCode.getCode());
+            acknowledgementDetail.setCode(codeCE);
+
+            acknowledgementDetail.setText(objectFactory.createED());
+            acknowledgementDetail.getText().setContent(openncpErrorCode.getDescription());
+
+            ST location = objectFactory.createST();
+            location.setContent(context);
+            acknowledgementDetail.getLocation().add(location);
+
+            acknowledgement.getAcknowledgementDetail().add(acknowledgementDetail);
+            acknowledgement.getTypeCode().setCode("AE");
         }
     }
 
@@ -724,6 +736,10 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
 
             fillOutputMessage(outputMessage, XcpdErrorCode.InsufficientRights, OpenncpErrorCode.ERROR_PI_GENERIC, e.getMessage()) ;
+            logger.error(e.getMessage(), e);
+        } catch (XcpdNIException e) {
+
+            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage()) ;
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
 

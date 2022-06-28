@@ -8,6 +8,6 @@ public class ProcessingDeferredException extends DocumentProcessingException {
 
 	public ProcessingDeferredException() {
 		super("Documents were received but not processed");
-		super.setEhdsiCode(OpenncpErrorCode.ERROR_DOCUMENT_NOT_PROCESSED);
+		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_DOCUMENT_NOT_PROCESSED);
 	}
 }

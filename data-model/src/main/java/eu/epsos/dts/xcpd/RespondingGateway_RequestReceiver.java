@@ -152,18 +152,22 @@ public class RespondingGateway_RequestReceiver {
         } else {
 
             String errorMsg = null;
+            String xcpdErrorCodeValue = null;
+            String openncpErrorCodeValue = null;
+            String locationValue = null;
             MCAIMT900001UV01DetectedIssueEvent detectedIssueEvent = getDetectedIssueEvent(pRPA_IN201306UV02);
+
             String acknowledgementDetailText = getAcknowledgementDetailText(pRPA_IN201306UV02);
 
             // Tries to retrieve DetectedIssueEvent to fill error message
             if (detectedIssueEvent != null) {
                 if (detectedIssueEvent.getMitigatedBy() != null && !detectedIssueEvent.getMitigatedBy().isEmpty()) {
-                    errorMsg = detectedIssueEvent.getMitigatedBy().get(0).getDetectedIssueManagement().getCode().getCode();
+                    xcpdErrorCodeValue = detectedIssueEvent.getMitigatedBy().get(0).getDetectedIssueManagement().getCode().getCode();
                 } else if (detectedIssueEvent.getTriggerFor() != null && !detectedIssueEvent.getTriggerFor().isEmpty()) {
-                    errorMsg = detectedIssueEvent.getTriggerFor().get(0).getActOrderRequired().getCode().getCode();
-                } else {
-                    errorMsg = "UnexpectedError";
+                    xcpdErrorCodeValue = detectedIssueEvent.getTriggerFor().get(0).getActOrderRequired().getCode().getCode();
                 }
+                openncpErrorCodeValue = getAcknowledgementDetailCode(pRPA_IN201306UV02);
+                locationValue = getAcknowledgementDetailLocation(pRPA_IN201306UV02);
             } else {
                 // If DetectedIssueEvent is not present, it tries to get Acknowledgement details.
                 errorMsg = "Error: DetectedIssueEvent element or sub-element not present.";
@@ -172,14 +176,14 @@ public class RespondingGateway_RequestReceiver {
                 }
             }
 
-            XcpdErrorCode ehdsiErrorCode = XcpdErrorCode.getErrorCode(errorMsg);
-            IheErrorCode iheErrorCode = IheErrorCode.getErrorCode(errorMsg);
+            XcpdErrorCode xcpdErrorCode= XcpdErrorCode.getErrorCode(xcpdErrorCodeValue);
+            OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.getErrorCode(openncpErrorCodeValue);
 
-            if(ehdsiErrorCode == null && iheErrorCode == null){
+            if(xcpdErrorCode == null && openncpErrorCode == null){
                 LOGGER.warn("No error code found in the XCPD response : " + errorMsg);
             }
 
-            throw new NoPatientIdDiscoveredException(errorMsg, ehdsiErrorCode != null? ehdsiErrorCode: iheErrorCode, acknowledgementDetailText);
+            throw new NoPatientIdDiscoveredException(xcpdErrorCode, openncpErrorCode, acknowledgementDetailText, locationValue);
         }
 
         return patients;
@@ -192,6 +196,29 @@ public class RespondingGateway_RequestReceiver {
                 && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
                 && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent() != null) {
             return pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().getContent();
+        }
+        return null;
+    }
+
+    private static String getAcknowledgementDetailCode(final PRPAIN201306UV02 pRPA_IN201306UV02) {
+        if (pRPA_IN201306UV02 != null
+                && !pRPA_IN201306UV02.getAcknowledgement().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
+                && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getCode() != null) {
+            return pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getCode().getCode();
+        }
+        return null;
+    }
+
+    private static String getAcknowledgementDetailLocation(final PRPAIN201306UV02 pRPA_IN201306UV02) {
+        if (pRPA_IN201306UV02 != null
+                && !pRPA_IN201306UV02.getAcknowledgement().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail() != null
+                && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().isEmpty()
+                && pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getLocation() != null
+                && !pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getLocation().isEmpty() ) {
+            return pRPA_IN201306UV02.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getLocation().get(0).getContent();
         }
         return null;
     }

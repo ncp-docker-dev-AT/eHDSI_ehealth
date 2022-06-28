@@ -362,7 +362,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
         RegistryResponseType response = new RegistryResponseType();
@@ -426,11 +426,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
             documentSubmitService.cancelDispensation(discardDetails, epsosDocument);
 
         } catch (NationalInfrastructureException e) {
-            logger.error("DocumentSubmitException: '{}'-'{}'", e.getEhdsiCode(), e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", documentId, RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            logger.error("DocumentSubmitException: '{}'-'{}'", e.getOpenncpErrorCode(), e.getMessage());
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( "+ documentId +" )",  "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -509,7 +509,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
         if (!registryErrorList.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(registryErrorList);
@@ -585,11 +585,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                        logger.error(ExceptionUtils.getStackTrace(e));
 //                    }
                 } catch (NationalInfrastructureException e) {
-                    logger.error("DocumentSubmitException: '{}'-'{}'", e.getEhdsiCode(), e.getMessage());
-                    registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", documentId, RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                    logger.error("DocumentSubmitException: '{}'-'{}'", e.getOpenncpErrorCode(), e.getMessage());
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( "+ documentId +" )", "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 } catch (NIException e) {
                     logger.error("NIException: '{}'", e.getMessage());
-                    registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
                     registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -759,7 +759,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                }
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -849,7 +849,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage( e.getErrorCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));

@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 
 public class NationalInfrastructureException extends NIException {
 
-    public NationalInfrastructureException(OpenncpErrorCode openncpErrorCode) {
+    public NationalInfrastructureException(OpenncpErrorCode openncpErrorCode, String message) {
 
-        super(openncpErrorCode, openncpErrorCode.getDescription());
+        super(openncpErrorCode, message);
         Logger logger = LoggerFactory.getLogger(NationalInfrastructureException.class);
-        logger.error("NationalInfrastructureException: '{}': '{}'", openncpErrorCode.getCode(), openncpErrorCode.getDescription());
+        logger.error("NationalInfrastructureException: '{}': '{}'", openncpErrorCode.getCode(), message);
     }
 }

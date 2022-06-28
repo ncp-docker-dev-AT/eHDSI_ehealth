@@ -1,8 +1,6 @@
 package eu.epsos.pt.cc;
 
-import eu.epsos.exceptions.NoPatientIdDiscoveredException;
-import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XDRException;
+import eu.epsos.exceptions.ExceptionWithContext;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -40,26 +38,15 @@ public class ClientConnectorServiceUtils {
             throwable = ((InvocationTargetException) e).getTargetException();
         } else if (e instanceof UndeclaredThrowableException) {
             throwable = e.getCause();
-        } else if (throwable instanceof NoPatientIdDiscoveredException) {
+        } else if (throwable instanceof ExceptionWithContext) {
             response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "noPatientIdDiscoveredException", TASK_NAMESPACE_PREFIX));
+                    new QName(TASK_NAMESPACE, throwable.getClass().getSimpleName(), TASK_NAMESPACE_PREFIX));
+            // OpenNCP Error Code
+            errorCode = ((ExceptionWithContext) throwable).getOpenncpErrorCode().getCode();
+            // OpenNCP additional information
             errorMessage = throwable.getMessage();
-            faultMessage = ((NoPatientIdDiscoveredException) throwable).getContext();
-            errorCode = ((NoPatientIdDiscoveredException) throwable).getErrorCode().getCode();
-            response.setText(faultMessage);
-        } else if (throwable instanceof XCAException) {
-            response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "xcaException", TASK_NAMESPACE_PREFIX));
-            errorMessage = throwable.getMessage();
-            faultMessage = ((XCAException) throwable).getContext();
-            errorCode = ((XCAException) throwable).getErrorCode().getCode();
-            response.setText(faultMessage);
-        } else if (throwable instanceof XDRException) {
-            response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "xdrException", TASK_NAMESPACE_PREFIX));
-            errorMessage = throwable.getMessage();
-            faultMessage = ((XDRException) throwable).getContext();
-            errorCode = ((XDRException) throwable).getErrorCode().getCode();
+            // National Country additional information
+            faultMessage = ((ExceptionWithContext) throwable).getContext();
             response.setText(faultMessage);
         } else { //
             errorMessage = throwable.getMessage();

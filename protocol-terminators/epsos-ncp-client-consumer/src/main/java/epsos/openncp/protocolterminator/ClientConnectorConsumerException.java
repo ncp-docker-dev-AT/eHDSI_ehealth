@@ -1,32 +1,32 @@
 package epsos.openncp.protocolterminator;
 
-import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
 public class ClientConnectorConsumerException extends Exception {
 
 
-    ErrorCode errorCode;
+    private OpenncpErrorCode openncpErrorCode;
     String context;
 
-    public ClientConnectorConsumerException(ErrorCode errorCode, String context) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    public ClientConnectorConsumerException(OpenncpErrorCode openncpErrorCode, String message, String context) {
+        super(message);
+        this.openncpErrorCode = openncpErrorCode;
         this.context = context;
     }
 
-    public ClientConnectorConsumerException(ErrorCode errorCode, String context, Throwable cause) {
-        super(errorCode.getMessage(), cause);
-        this.errorCode = errorCode;
-        this.context = context;
-    }
-
-    public ClientConnectorConsumerException(String message, ErrorCode errorCode, String context, Throwable cause) {
+    public ClientConnectorConsumerException(OpenncpErrorCode openncpErrorCode, String message, String context, Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
+        this.openncpErrorCode = openncpErrorCode;
         this.context = context;
+    }
+
+    public OpenncpErrorCode getOpenncpErrorCode() {
+        return openncpErrorCode;
     }
 
     public String getContext() {
         return context;
     }
+
+
 }

@@ -8,6 +8,6 @@ public class WeakAuthenticationException extends DocumentProcessingException {
 
 	public WeakAuthenticationException() {
 		super("Country A requests a higher authentication trust level than assigned to the HP (e.g. password-based login is not accepted for the requested operation).");
-		super.setEhdsiCode(OpenncpErrorCode.ERROR_WEAK_AUTHENTICATION);
+		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_WEAK_AUTHENTICATION);
 	}
 }

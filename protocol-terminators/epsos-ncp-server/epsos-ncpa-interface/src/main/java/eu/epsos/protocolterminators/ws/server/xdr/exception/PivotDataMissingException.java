@@ -8,6 +8,6 @@ public class PivotDataMissingException extends DocumentProcessingException {
 
 	public PivotDataMissingException() {
 		super("The service consumer did not provide the epSOS pivot coded document which is requested by the Provide Data service provider for the given kind of data.");
-		super.setEhdsiCode(OpenncpErrorCode.ERROR_PIVOT_MISSING);
+		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_PIVOT_MISSING);
 	}
 }

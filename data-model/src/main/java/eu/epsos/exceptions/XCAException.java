@@ -10,12 +10,8 @@ import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
  */
 public class XCAException extends ExceptionWithContext {
 
-    public XCAException(String message, OpenncpErrorCode openncpErrorCode) {
-        super(message, openncpErrorCode);
-    }
-
-    public XCAException(String message, OpenncpErrorCode openncpErrorCode, String context) {
-        super(message, openncpErrorCode, context);
+    public XCAException(OpenncpErrorCode openncpErrorCode, String message,  String context) {
+        super(openncpErrorCode, message, context);
     }
 
 }
