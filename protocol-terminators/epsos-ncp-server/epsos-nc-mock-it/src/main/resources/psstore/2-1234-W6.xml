@@ -28,7 +28,7 @@ Although being real choices for the different diseases and conditions, the selec
     <recordTarget>
         <patientRole>
             <!-- Primary Patient Identifier -->
-            <id root="2.999" extension="PRT00000010"/>
+            <id extension="2-1234-W6" root="2.16.17.710.850.1000.990.1.1000"/>
             <addr>
                 <streetAddressLine>155, Avenida da Liberdade</streetAddressLine>
                 <postalCode>1250-141</postalCode>
@@ -1666,13 +1666,13 @@ Although being real choices for the different diseases and conditions, the selec
                             </thead>
                             <tbody>
                                 <tr ID="sub-6a"><td><content ID="code-51" language="xx-XX">Hepatitis B virus
-                            vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td>Acute Hepatitis B</td><td>SmithKline Beecham Biologicals S.A</td><td>12</td><td>1</td><td>Brussels vaccination center</td><td>Gregory House</td><td>BE</td><td/></tr>
+                                    vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td>Acute Hepatitis B</td><td>SmithKline Beecham Biologicals S.A</td><td>12</td><td>1</td><td>Brussels vaccination center</td><td>Gregory House</td><td>BE</td><td/></tr>
                                 <tr ID="sub-7a"><td><content ID="code-53" language="xx-XX">Diphtheria + tetanus
-                            + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                                 <tr ID="sub-8a"><td><content ID="code-55" language="xx-XX">Haemophilus
-                            influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                                 <tr ID="sub-9a"><td><content ID="code-57" language="xx-XX">Human papillomavirus
-                            vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                             </tbody>
                         </table>
                     </text>
