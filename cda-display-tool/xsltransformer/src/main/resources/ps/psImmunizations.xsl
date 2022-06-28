@@ -41,53 +41,82 @@
                         <div class="collapsible-content">
                             <div class="content-inner">
                                 <xsl:choose>
-                                <xsl:when test="not (n1:entry/n1:substanceAdministration/@nullFlavor)">
-                                <table class="translation_table">
-                                    <tbody>
-                                        <tr>
-                                            <th>
-                                                <!-- Vaccination header -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'79'"/>
-                                                </xsl:call-template>
-                                            </th>
-                                            <th>
-                                                <!-- Brand name header -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'9'"/>
-                                                </xsl:call-template>
-                                            </th>
-                                            <th>
-                                                <!-- Vaccination Date header -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'80'"/>
-                                                </xsl:call-template>
-                                            </th>
-                                            <xsl:if test="n1:entry/n1:substanceAdministration/n1:entryRelationship/n1:observation[@classCode='OBS'][@moodCode='EVN']/n1:code[@codeSystem='2.16.840.1.113883.6.1'][@code ='30973-2']">
-                                                <th>
-                                                    <!-- Dose number in series -->
-                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                        <xsl:with-param name="code" select="'152'"/>
-                                                    </xsl:call-template>
-                                                </th>
-                                            </xsl:if>
-                                            <th>
-                                                <!-- Administered header -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'122'"/>
-                                                </xsl:call-template>
-                                            </th>
-                                        </tr>
-                                        <xsl:apply-templates select="n1:entry/n1:substanceAdministration" mode="immunizations"/>
-                                    </tbody>
-                                </table>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:call-template name="show-eHDSINullFlavor">
-                                        <xsl:with-param name="code" select="n1:entry/n1:substanceAdministration/@nullFlavor"/>
-                                    </xsl:call-template>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                                    <xsl:when test="not (n1:entry/n1:substanceAdministration/@nullFlavor)">
+                                        <table class="translation_table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>
+                                                        <!-- Vaccination header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'79'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        <!-- Brand name header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'9'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        <!-- Vaccination Date header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'80'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        <!-- Agent header -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Agent
+                                                    </th>
+                                                    <th>
+                                                        <!-- Marketing Authorization Holder header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'124'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        <!-- Dose number in series header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'152'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        <!-- Batch/lot number header -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Batch/lot number
+                                                    </th>
+                                                    <th>
+                                                        <!-- Administering Center header -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Administering Center
+                                                    </th>
+                                                    <th>
+                                                        <!-- Health Professional Identification header -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Health Professional Identification
+                                                    </th>
+                                                    <th>
+                                                        <!-- Country of Vaccination header -->
+                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                        Country of Vaccination
+                                                    </th>
+                                                    <th>
+                                                        <!-- Administered header header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'122'"/>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                </tr>
+                                                <xsl:apply-templates select="n1:entry/n1:substanceAdministration" mode="immunizations"/>
+                                            </tbody>
+                                        </table>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="show-eHDSINullFlavor">
+                                            <xsl:with-param name="code" select="n1:entry/n1:substanceAdministration/@nullFlavor"/>
+                                        </xsl:call-template>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </div>
                         </div>
                     </div>
@@ -112,8 +141,11 @@
         <xsl:variable name="vaccinationsPosition"
                       select="n1:entryRelationship/n1:observation[@classCode='OBS'][@moodCode='EVN']/n1:code[@codeSystem='2.16.840.1.113883.6.1'][@code ='30973-2']"/>
 
-        <xsl:variable name="negationInd"
-                      select="@negationInd"/>
+        <xsl:variable name="vaccinationMarketingAuthorizationHolder"
+                      select="n1:consumable/n1:manufacturedProduct/n1:manufacturerOrganization"/>
+
+        <xsl:variable name="vaccinationBatchNumber"
+                      select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:lotNumberText"/>
         <!-- End definition of variables -->
 
         <xsl:choose>
@@ -146,26 +178,118 @@
                         </xsl:call-template>
                         &#160;
                     </td>
-                    <xsl:if test="$vaccinationsPosition">
-                        <td>
-                            <!-- Dose number in series -->
+                    <td>
+                        <!-- Agent -->
+                        <xsl:for-each select="n1:participant">
                             <xsl:choose>
-                                <xsl:when test="$vaccinationsPosition/@nullFlavor">
+                                <xsl:when test="n1:participantRole/n1:code/@nullFlavor">
                                     <xsl:call-template name="show-eHDSINullFlavor">
-                                        <xsl:with-param name="code" select="$vaccinationsPosition/@nullFlavor"/>
+                                        <xsl:with-param name="code" select="n1:participantRole/n1:code/@nullFlavor"/>
                                     </xsl:call-template>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="$vaccinationsPosition/../n1:value/@value"/>
+                                    <xsl:call-template name="show-eHDSIIllnessandDisorder">
+                                        <xsl:with-param name="node" select="n1:participantRole/n1:code"/>
+                                    </xsl:call-template>
                                 </xsl:otherwise>
                             </xsl:choose>
-
-                        </td>
-                    </xsl:if>
+                        </xsl:for-each>
+                    </td>
+                    <td>
+                        <!-- Marketing Authorization Holder -->
+                        <xsl:choose>
+                            <xsl:when test="$vaccinationMarketingAuthorizationHolder/n1:name/@nullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
+                                    <xsl:with-param name="code" select="$vaccinationMarketingAuthorizationHolder/n1:name/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$vaccinationMarketingAuthorizationHolder/n1:name"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                    <td>
+                        <!-- Dose number in series -->
+                        <xsl:choose>
+                            <xsl:when test="$vaccinationsPosition/@nullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
+                                    <xsl:with-param name="code" select="$vaccinationsPosition/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$vaccinationsPosition/../n1:value/@value"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                    <td>
+                        <!-- Batch/lot number -->
+                        <xsl:choose>
+                            <xsl:when test="$vaccinationBatchNumber/@nullFlavor">
+                                <xsl:call-template name="show-eHDSINullFlavor">
+                                    <xsl:with-param name="code" select="$vaccinationBatchNumber/@nullFlavor"/>
+                                </xsl:call-template>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$vaccinationBatchNumber"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </td>
+                    <td>
+                        <!-- Administering Center -->
+                        <xsl:for-each select="n1:performer">
+                            <xsl:choose>
+                                <xsl:when test="n1:assignedEntity/@nullFlavor">
+                                    <xsl:call-template name="show-eHDSINullFlavor">
+                                        <xsl:with-param name="code" select="n1:assignedEntity/@nullFlavor"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:for-each select="n1:assignedEntity/n1:representedOrganization/n1:name">
+                                        <xsl:value-of select="text()"/>
+                                    </xsl:for-each>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            &#160;
+                        </xsl:for-each>
+                    </td>
+                    <td>
+                        <!-- Health Professional Identification -->
+                        <xsl:for-each select="n1:performer">
+                            <xsl:choose>
+                                <xsl:when test="n1:assignedEntity/@nullFlavor">
+                                    <xsl:call-template name="show-eHDSINullFlavor">
+                                        <xsl:with-param name="code" select="n1:assignedEntity/@nullFlavor"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:call-template name="show-name">
+                                        <xsl:with-param name="name" select="n1:assignedEntity/n1:assignedPerson/n1:name"/>
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            &#160;
+                        </xsl:for-each>
+                    </td>
+                    <td>
+                        <!-- Country of Vaccination -->
+                        <xsl:for-each select="n1:performer">
+                            <xsl:choose>
+                                <xsl:when test="n1:assignedEntity/@nullFlavor">
+                                    <xsl:call-template name="show-eHDSINullFlavor">
+                                        <xsl:with-param name="code" select="n1:assignedEntity/@nullFlavor"/>
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="n1:assignedEntity/n1:representedOrganization/n1:addr"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            &#160;
+                        </xsl:for-each>
+                    </td>
                     <td>
                         <!-- Administered -->
                         <xsl:choose>
-                            <xsl:when test="(not($negationInd) or $negationInd='false')">
+                            <xsl:when test="n1:statusCode/@code='completed'">
                                 <font color="green">&#10004;</font>
                             </xsl:when>
                             <xsl:otherwise>
