@@ -11,6 +11,7 @@ import org.hibernate.cfg.Configuration;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.ws.server.xca.impl.SlotBuilder;
@@ -304,7 +305,7 @@ public class EPExtrinsicObjectBuilderTest {
                 "repositoryId",
                 "ePrescription test",
                 "author",
-                new EPSOSDocumentMetaDataImpl.SimpleConfidentialityMetadata("N", "normal"),
+                new EPSOSDocumentMetaDataImpl.SimpleConfidentialityMetadata(SimpleConfidentialityEnum.N),
                 "en-EN");
         return new EPDocumentMetaDataImpl(epsosDocumentMetaData, "description", ePListParam);
     }

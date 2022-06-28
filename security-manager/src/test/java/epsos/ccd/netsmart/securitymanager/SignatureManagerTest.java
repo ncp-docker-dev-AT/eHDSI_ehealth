@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 /**
  * @author jerouris
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class SignatureManagerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureManagerTest.class);

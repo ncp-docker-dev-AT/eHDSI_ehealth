@@ -1,5 +1,6 @@
 package epsos.ccd.gnomon.xslt;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * @author karkaletsis
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class DisplayTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DisplayTest.class);
@@ -70,7 +72,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws Exception {
-        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/EHEALTH-8147.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/PS_L3_W6.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test

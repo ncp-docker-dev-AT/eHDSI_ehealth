@@ -128,22 +128,26 @@
     width: 12%;
 }
 .strength {
-    width: 12%;
+    width: 10%;
 }
 .doseform {
-    width: 12%;
+    width: 10%;
 }
 .unitsperintake {
     width: 10%;
 }
 .frequencyofintakes {
-    width: 12%;
+    width: 10%;
 }
 .routeofadministration {
-    width: 12%;
+    width: 10%;
 }
 .duration {
-    width: 16%;
+    width: 14%;
+}
+
+.medicationreason {
+    width: 10%;
 }
 
 ]]></root>

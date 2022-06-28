@@ -5,7 +5,7 @@
 
     <groupId>eu.europa.ec.sante.ehdsi</groupId>
     <artifactId>openncp</artifactId>
-    <version>5.2.6-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>OpenNCP Reference Implementation</name>
@@ -119,7 +119,7 @@
         <hikaricp.version>4.0.3</hikaricp.version>
         <httpclient.version>4.5.13</httpclient.version>
         <jasperreports.version>6.18.1</jasperreports.version>
-        <javamelody.version>1.90.0</javamelody.version>
+        <javamelody.version>1.91.0</javamelody.version>
         <javassist.version>3.12.0.GA</javassist.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-core.version>2.3.0.1</jaxb-core.version>
@@ -130,17 +130,17 @@
         <junit.version>4.13.2</junit.version>
         <logback.version>1.2.10</logback.version>
         <mail.version>1.6.2</mail.version>
-        <mariadb-connector.version>2.7.4</mariadb-connector.version>
+        <mariadb-connector.version>2.7.5</mariadb-connector.version>
         <mysql-connector.version>8.0.29</mysql-connector.version>
         <naming-java.version>0.8</naming-java.version>
         <oracle-connector.version>12.2.0.1</oracle-connector.version>
         <opensaml.version>4.0.1</opensaml.version>
         <portlet-api.version>2.0</portlet-api.version>
-        <postgresql-connector.version>42.3.5</postgresql-connector.version>
+        <postgresql-connector.version>42.3.6</postgresql-connector.version>
         <saaj-impl.version>1.3.25</saaj-impl.version>
         <saxon-he.version>10.6</saxon-he.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <slf4j.version>1.7.35</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <spring-boot.version>2.7.0</spring-boot.version>
         <spring.version>5.3.20</spring.version>
         <spring-tx.version>5.3.20</spring-tx.version>

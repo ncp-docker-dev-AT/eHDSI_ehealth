@@ -347,26 +347,46 @@
         <valueSetVersion />
         <targetLanguageCode />
     </codedElement>
-    <!-- Prescription - Dose Quantity Unit -->
-<!--    <codedElement>-->
-<!--        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/doseQuantity/@unit</elementPath>-->
-<!--        <usage>-->
-<!--            <patientSummaryCDAl3>NA</patientSummaryCDAl3>-->
-<!--            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>-->
-<!--            <ePrescriptionCDAl3>O</ePrescriptionCDAl3>-->
-<!--            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>-->
-<!--            <eDispensationCDAl3>NA</eDispensationCDAl3>-->
-<!--            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>-->
-<!--            <HCERDocCDAl3>NA</HCERDocCDAl3>-->
-<!--            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>-->
-<!--            <MRODocCDAl3>NA</MRODocCDAl3>-->
-<!--            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>-->
-<!--        </usage>-->
-<!--        &lt;!&ndash; epSOSUnits &ndash;&gt;-->
-<!--        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>-->
-<!--        <valueSetVersion />-->
-<!--        <targetLanguageCode />-->
-<!--    </codedElement>-->
+    <!-- Prescription - Dose Quantity low Unit -->
+    <codedElement>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/doseQuantity/low/@unit</elementPath>
+        <usage>
+            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- eHDSIUnit -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
+    <!-- Prescription - Dose Quantity high Unit -->
+    <codedElement>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/doseQuantity/high/@unit</elementPath>
+        <usage>
+            <patientSummaryCDAl3>NA</patientSummaryCDAl3>
+            <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+            <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
+            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+            <eDispensationCDAl3>NA</eDispensationCDAl3>
+            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+            <HCERDocCDAl3>NA</HCERDocCDAl3>
+            <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+            <MRODocCDAl3>NA</MRODocCDAl3>
+            <MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+        </usage>
+        <!-- eHDSIUnit -->
+        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>
+        <valueSetVersion />
+        <targetLanguageCode />
+    </codedElement>
     <!-- Dispensation - Route of administration -->
     <codedElement>
         <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/entryRelationship[@typeCode='REFR']/substanceAdministration/routeCode</elementPath>
@@ -510,7 +530,7 @@
     </codedElement>
     <!-- Alerts - Reaction type -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/code</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -530,7 +550,7 @@
     </codedElement>
     <!-- Alerts - Clinical manifestation -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/value</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -550,7 +570,7 @@
     </codedElement>
     <!-- Alerts - Code for problem description -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/code</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -570,7 +590,7 @@
     </codedElement>
     <!-- Alerts - Agent ID, Agent Description -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/participant[@typeCode='CSM']/participantRole[@classCode='MANU']/playingEntity[@classCode='MMAT']/code</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/participant[@typeCode='CSM']/participantRole[@classCode='MANU']/playingEntity[@classCode='MMAT']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -592,7 +612,7 @@
     </codedElement>
     <!-- Alerts - Absent Or Unknown Allergies -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='2.16.840.1.113883.10.20.1.27']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/value</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>O</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>

@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 /**
  * @author karkaletsis
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class AuditTrailUtilsTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditTrailUtilsTest.class);
