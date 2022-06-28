@@ -49,24 +49,28 @@
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Result type -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Result type
+                                                <!-- Result type Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'159'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Result value -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Result value
+                                                <!-- Result value Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'160'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Performer -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Performer
+                                                <!-- Performer Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'161'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Reporter -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Reporter
+                                                <!-- Reporter Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'162'"/>
+                                                </xsl:call-template>
                                             </th>
                                         </tr>
                                         <xsl:choose>

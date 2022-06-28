@@ -64,41 +64,46 @@
                                                         </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Agent header -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Agent
+                                                        <!-- Agent Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'5'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Marketing Authorization Holder header -->
+                                                        <!-- Marketing Authorization Holder Header -->
                                                         <xsl:call-template name="show-eHDSIDisplayLabel">
                                                             <xsl:with-param name="code" select="'124'"/>
                                                         </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Dose number in series header -->
+                                                        <!-- Dose number in series Header -->
                                                         <xsl:call-template name="show-eHDSIDisplayLabel">
                                                             <xsl:with-param name="code" select="'152'"/>
                                                         </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Batch/lot number header -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Batch/lot number
+                                                        <!-- Batch/lot number Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'169'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Administering Center header -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Administering Center
+                                                        <!-- Administering Center Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'170'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Health Professional Identification header -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Health Professional Identification
+                                                        <!-- Health Professional Identification Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'171'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Country of Vaccination header -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Country of Vaccination
+                                                        <!-- Country of Vaccination Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'172'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
                                                         <!-- Administered header header -->
