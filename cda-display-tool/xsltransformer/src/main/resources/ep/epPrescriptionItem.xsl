@@ -2,7 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:epsos="urn:epsos-org:ep:medication"
+                xmlns:pharm="urn:hl7-org:pharm"
                 version="2.0">
 
     <xsl:template match="/n1:ClinicalDocument/n1:component/n1:structuredBody/n1:component/n1:section[n1:templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.2.1']/n1:entry/n1:substanceAdministration">
@@ -25,8 +25,8 @@
         &#160;
         <xsl:value-of select="n1:name"/>
         <xsl:choose>
-            <xsl:when test="epsos:asSpecializedKind">
-                <xsl:variable name="code" select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:code"/>
+            <xsl:when test="pharm:asSpecializedKind">
+                <xsl:variable name="code" select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code"/>
                 <xsl:choose>
                     <xsl:when test="not($code/@nullFlavor)">
                         <xsl:if test="$code/@codeSystem='2.16.840.1.113883.6.73'">
@@ -44,7 +44,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text> - </xsl:text>
-                        <xsl:value-of select="epsos:asSpecializedKind/epsos:generalizedMedicineClass/epsos:name"/>
+                        <xsl:value-of select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:name"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -55,7 +55,7 @@
     <xsl:template name="package">
         <xsl:call-template name="show-package">
             <xsl:with-param name="medPackage"
-                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity"/>
+                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:capacityQuantity"/>
             <xsl:with-param name="showValue" select="'YES'"/>
         </xsl:call-template>
     </xsl:template>
@@ -282,7 +282,7 @@
 
     <xsl:template name="epPrescriptionItemDetails">
         <xsl:variable name="manufacturedMaterialStrength"
-                      select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:desc"/>
+                      select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:desc"/>
         <xsl:attribute name="id">
             <xsl:text>mytable</xsl:text>
             <xsl:value-of select="position()"/>
@@ -325,7 +325,7 @@
                                         <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
                                     </td>
                                 </tr>
-                                <xsl:if test="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder">
+                                <xsl:if test="n1:consumable/n1:manufacturedProduct/pharm:marketingAuthorizationHolder">
                                     <tr>
                                         <th>
                                             <!-- Marketing Authorization Holder -->
@@ -334,7 +334,7 @@
                                             </xsl:call-template>
                                         </th>
                                         <td>
-                                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/epsos:marketingAuthorizationHolder/epsos:name"/>
+                                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/pharm:marketingAuthorizationHolder/pharm:name"/>
                                         </td>
                                     </tr>
                                 </xsl:if>
@@ -349,7 +349,7 @@
                                         <td>
                                             <xsl:call-template name="show-manufacturedMaterialStrength">
                                                 <xsl:with-param name="parameter"
-                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:desc"/>
+                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:desc"/>
                                             </xsl:call-template>
                                         </td>
                                     </tr>
@@ -365,14 +365,14 @@
                                         <xsl:variable name="hasPackage">
                                             <xsl:call-template name="check-Parameter">
                                                 <xsl:with-param name="parameter"
-                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
+                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:capacityQuantity/@nullFlavor"/>
                                             </xsl:call-template>
                                         </xsl:variable>
                                         <xsl:choose>
                                             <xsl:when test="$hasPackage = 'false'">
                                                 <xsl:call-template name="show-eHDSINullFlavor">
                                                     <xsl:with-param name="code"
-                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@nullFlavor"/>
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:capacityQuantity/@nullFlavor"/>
                                                 </xsl:call-template>
                                             </xsl:when>
                                             <xsl:otherwise>
@@ -391,19 +391,19 @@
                                     <td>
                                         <xsl:call-template name="show-formCode">
                                             <xsl:with-param name="parameter"
-                                                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode"/>
+                                                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:formCode"/>
                                         </xsl:call-template>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>
-                                        <!-- Route of Administration -->
+                                        <!-- Route of Administration Header -->
                                         <xsl:call-template name="show-eHDSIDisplayLabel">
                                             <xsl:with-param name="code" select="'67'"/>
                                         </xsl:call-template>
                                     </th>
                                     <td>
-                                        <!-- RoA -->
+                                        <!-- Route of Administration -->
                                         <xsl:call-template name="show-eHDSIRouteOfAdministration">
                                             <xsl:with-param name="node" select="n1:routeCode"/>
                                         </xsl:call-template>
@@ -637,12 +637,12 @@
                                                 </xsl:attribute>
                                                 <xsl:attribute name="value">
                                                     <xsl:value-of
-                                                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity/@value"/>
+                                                            select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:capacityQuantity/@value"/>
                                                 </xsl:attribute>
                                             </input>
                                             <xsl:call-template name="show-package">
                                                 <xsl:with-param name="medPackage"
-                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:capacityQuantity"/>
+                                                                select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:capacityQuantity"/>
                                                 <xsl:with-param name="showValue" select="'NO'"/>
                                             </xsl:call-template>
                                         </td>
@@ -711,7 +711,7 @@
                                             <xsl:variable name="currentPackageFormName">
                                                 <xsl:call-template name="show-formCode">
                                                     <xsl:with-param name="parameter"
-                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:formCode"/>
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:formCode"/>
                                                 </xsl:call-template>
                                             </xsl:variable>
                                             <input type="hidden">
@@ -723,7 +723,7 @@
                                             <xsl:variable name="currentDoseFormName">
                                                 <xsl:call-template name="show-formCode">
                                                     <xsl:with-param name="parameter"
-                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:containerPackagedMedicine/epsos:formCode"/>
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:formCode"/>
                                                 </xsl:call-template>
                                             </xsl:variable>
                                             <input type="hidden">
@@ -736,14 +736,14 @@
                                                 <xsl:call-template name="inputform">
                                                     <xsl:with-param name="txt" select="'packaging3_'"/>
                                                     <xsl:with-param name="val"
-                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:asContent/epsos:quantity/epsos:numerator/@value"/>
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:quantity/pharm:numerator/@value"/>
                                                 </xsl:call-template>
                                             </input>
 
                                             <xsl:variable name="currentIngredient">
                                                 <xsl:call-template name="show-formCode">
                                                     <xsl:with-param name="parameter"
-                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']/epsos:ingredient/epsos:code"/>
+                                                                    select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:ingredient[@classCode='ACTI']/pharm:ingredientSubstance/pharm:code"/>
                                                 </xsl:call-template>
                                             </xsl:variable>
                                             <input type="hidden">
@@ -763,7 +763,7 @@
                                                 </xsl:attribute>
                                                 <xsl:attribute name="value">
                                                     <xsl:call-template name="show-strength">
-                                                        <xsl:with-param name="node" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI'][position()-1]/epsos:quantity"/>
+                                                        <xsl:with-param name="node" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:ingredient[@classCode='ACTI'][position()-1]/pharm:quantity"/>
                                                     </xsl:call-template>
                                                 </xsl:attribute>
                                             </input>
@@ -930,11 +930,11 @@
                 <xsl:for-each select="$activeIngredient">
                     <xsl:call-template name="show-active-ingredient">
                         <xsl:with-param name="code"
-                                        select="epsos:ingredient/epsos:code"/>
+                                        select="pharm:ingredientSubstance/pharm:code"/>
                         <xsl:with-param name="name"
-                                        select="epsos:ingredient/epsos:name"/>
+                                        select="pharm:ingredientSubstance/pharm:name"/>
                         <xsl:with-param name="strength"
-                                        select="epsos:quantity"/>
+                                        select="pharm:quantity"/>
                     </xsl:call-template>
                 </xsl:for-each>
             </tbody>
