@@ -3,6 +3,7 @@ package epsos.ccd.gnomon.xslt;
 import epsos.ccd.gnomon.xslt.util.HtmlValidator;
 import epsos.ccd.gnomon.xslt.util.PdfValidator;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class CdaXSLTransformerTest {
 
     private final Logger logger = LoggerFactory.getLogger(CdaXSLTransformerTest.class);

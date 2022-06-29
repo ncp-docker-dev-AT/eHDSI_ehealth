@@ -2,6 +2,7 @@ package epsos.ccd.posam.tm.testcases;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.junit.Ignore;
 
 
 /**  
@@ -11,6 +12,7 @@ import junit.framework.TestSuite;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.10, 2010, 20 October
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class AllTests {
 
 	public static Test suite() {

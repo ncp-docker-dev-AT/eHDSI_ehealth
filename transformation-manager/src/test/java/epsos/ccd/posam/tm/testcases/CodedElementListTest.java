@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import epsos.ccd.posam.tm.util.CodedElementList;
 import epsos.ccd.posam.tm.util.CodedElementListItem;
+import org.junit.Ignore;
 
 
 /**
@@ -15,10 +16,9 @@ import epsos.ccd.posam.tm.util.CodedElementListItem;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.0, 2010, 11 August
  */
+@Ignore("Test to revise - Exclude unit test from test execution")
 public class CodedElementListTest extends TBase {
 
-
-	
 	public void testCodedElementList() {
 		CodedElementList codedElementList = CodedElementList.getInstance();
 		assertTrue(codedElementList.isConfigurableElementIdentification());

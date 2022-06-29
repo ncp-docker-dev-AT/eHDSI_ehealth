@@ -134,7 +134,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-                        response = OrCDService.list(patientId, countryCode, Arrays.asList(documentCodes.get(0)), filterParams, assertionMap);
+                        response = OrCDService.list(patientId, countryCode, List.of(documentCodes.get(0)), filterParams, assertionMap);
                         break;
                     default:
                         throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
