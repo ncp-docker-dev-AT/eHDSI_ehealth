@@ -1,11 +1,11 @@
 package epsos.ccd.posam.tsam.testcases.server;
 
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.h2.tools.RunScript;
 import org.junit.BeforeClass;
 import org.junit.Ignore;

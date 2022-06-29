@@ -3,7 +3,6 @@ package eu.epsos.dts.xcpd;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import org.hl7.v3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
