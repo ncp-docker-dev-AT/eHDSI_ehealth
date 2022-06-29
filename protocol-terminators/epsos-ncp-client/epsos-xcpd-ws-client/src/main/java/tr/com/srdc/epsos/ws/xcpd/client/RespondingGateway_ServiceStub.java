@@ -31,7 +31,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.kernel.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
@@ -134,7 +134,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             _serviceClient.getServiceContext().getConfigurationContext()
                     .setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException | CertificateException |
-                KeyStoreException | UnrecoverableKeyException e) {
+                 KeyStoreException | UnrecoverableKeyException e) {
             throw new RuntimeException("SSL Context cannot be initialized");
         }
     }
