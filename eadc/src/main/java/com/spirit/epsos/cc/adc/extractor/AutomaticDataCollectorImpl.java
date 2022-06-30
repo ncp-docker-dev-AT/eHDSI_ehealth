@@ -94,6 +94,41 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
         this.runSqlScript(dataSourceName, sqlInsertStatementList);
     }
 
+    @Override
+    public void processTransactionFailure(String dataSourceName, Document transaction, String errorDescription) throws Exception {
+
+        logger.debug("Processing a Transaction Failure Object as Document");
+        String sqlInsertStatementList = this.extractDataAndCreateAccordingSqlInserts(transaction);
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Insert the following sql-queries:\n'{}'", sqlInsertStatementList);
+        }
+        this.runSqlScript(dataSourceName, sqlInsertStatementList);
+
+        String sqlInsertStatementError = this.createErrorSqlInserts(sqlInsertStatementList, errorDescription);
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && loggerClinical.isDebugEnabled()) {
+            loggerClinical.debug("Insert the following sql-queries:\n'{}'", sqlInsertStatementError);
+        }
+        this.runSqlScript(dataSourceName, sqlInsertStatementError);
+    }
+
+    private String extractForeignKey(String sqlInsertStatementList) {
+        return StringUtils.substringBetween(sqlInsertStatementList, "VALUES('", "'");
+    }
+
+    /**
+     * Builds the eror sql-insert-statements
+     *
+     * @param sql to retrieve the foreign key
+     * @param errorDescription
+     * @return An sql-insert-statements
+     */
+    private String createErrorSqlInserts(String sql, String errorDescription) throws Exception {
+        String foreignKey = extractForeignKey(sql);
+        String retval = "INSERT INTO eTransactionError(Transaction_FK, ErrorDescription) VALUES " +
+                "('" + foreignKey + "', '" + errorDescription + "');";
+        return retval;
+    }
+
     /**
      * Extracts data from a transaction and creates the according sql-insert-statements
      *

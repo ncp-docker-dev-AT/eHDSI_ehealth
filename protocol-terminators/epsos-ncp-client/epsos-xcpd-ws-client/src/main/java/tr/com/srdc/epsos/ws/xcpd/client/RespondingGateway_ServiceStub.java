@@ -247,6 +247,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             /* set the message context with that soap envelope */
             var messageContext = new MessageContext();
             messageContext.setEnvelope(env);
+            _messageContext = messageContext;
 
             /* add the message contxt to the operation client */
             operationClient.addMessageContext(messageContext);
@@ -262,6 +263,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 // NRO  NCPB_XCPD_REQ - LOGGER.info("XCPD Request sent. EVIDENCE NRO");
 
             } catch (Exception ex) {
+                eadcFailure(messageContext, ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -336,8 +338,11 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
-                            + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.");
+                    String err = "Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
+                            + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.";
+                    LOGGER.error(err);
+                    eadcFailure(messageContext, err);
+
                     throw e;
                 }
             }
@@ -364,6 +369,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
+                eadcFailure(messageContext, ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -450,13 +456,18 @@ public class RespondingGateway_ServiceStub extends Stub {
                     Method method = exceptionClass.getMethod("setFaultMessage", messageClass);
                     method.invoke(ex, messageObject);
 
+                    eadcFailure(_messageContext, ex.getMessage());
+
                     throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
                 } catch (Exception e) {
+                    eadcFailure(_messageContext, axisFault.getMessage());
                     // we cannot instantiate the class - throw the original Axis fault
                     throw new RuntimeException(axisFault.getMessage(), axisFault);
                 }
             }
+
+            eadcFailure(_messageContext, axisFault.getMessage());
             throw new RuntimeException(axisFault.getMessage(), axisFault);
 
         } finally {
@@ -468,6 +479,15 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
             }
         }
+    }
+
+    private void eadcFailure(MessageContext messageContext, String errorDescription) {
+        var transactionStartTime = new Date();
+        Date transactionEndTime = new Date();
+        MessageContext ctx = new MessageContext();
+        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, this._getServiceClient(), null,
+                transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY, errorDescription);
     }
 
     /**

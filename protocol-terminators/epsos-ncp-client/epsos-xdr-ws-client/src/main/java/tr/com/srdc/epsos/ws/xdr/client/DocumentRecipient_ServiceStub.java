@@ -268,6 +268,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope.getBody()));
             } catch (Exception ex) {
+                eadcFailure(messageContext, ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -358,11 +359,12 @@ public class DocumentRecipient_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    String err = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(err);
+                    eadcFailure(messageContext, err);
                     throw e;
                 }
             }
-
             MessageContext returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = returnMessageContext.getEnvelope();
             Date transactionEndTime = new Date();
@@ -389,6 +391,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
+                eadcFailure(messageContext, ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -439,13 +442,16 @@ public class DocumentRecipient_ServiceStub extends Stub {
                     Method method = exceptionClass.getMethod("setFaultMessage", messageClass);
                     method.invoke(ex, messageObject);
 
+                    eadcFailure(messageContext, ex.getMessage());
                     throw new RemoteException(ex.getMessage(), ex);
 
                 } catch (Exception e) {
                     // Class cannot be instantiated - throwing the original Axis fault
+                    eadcFailure(messageContext, e.getMessage());
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+            eadcFailure(messageContext, axisFault.getMessage());
             throw new RuntimeException(axisFault.getMessage(), axisFault);
 
         } finally {
@@ -453,6 +459,15 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 messageContext.getTransportOut().getSender().cleanup(messageContext);
             }
         }
+    }
+
+    private void eadcFailure(MessageContext messageContext, String errorDescription) {
+        var transactionStartTime = new Date();
+        Date transactionEndTime = new Date();
+        MessageContext ctx = new MessageContext();
+        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, this._getServiceClient(), null,
+                transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY, errorDescription);
     }
 
     /**

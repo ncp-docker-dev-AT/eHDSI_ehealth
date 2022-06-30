@@ -19,4 +19,13 @@ public interface AutomaticDataCollector {
      * @throws Exception  Error reported by the component.
      */
     void processTransaction(String dsName, Document transaction) throws Exception;
+
+    /**
+     * Processes a transaction, extracts data according to config.xml and stores it into the database.
+     *
+     * @param transaction The transaction-xml-structure as specified by the XML-Schema.
+     * @param dsName      The dataSourceName of the Database.
+     * @throws Exception  Error reported by the component.
+     */
+    void processTransactionFailure(String dsName, Document transaction, String errorDescription) throws Exception;
 }

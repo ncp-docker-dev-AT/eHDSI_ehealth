@@ -43,6 +43,55 @@ public class EadcUtil {
      * @param transInfo     the Transaction Info object
      * @throws Exception
      */
+    public static void invokeEadcFailure(MessageContext reqMsgContext, MessageContext rspMsgContext, Document cdaDocument,
+                                  TransactionInfo transInfo, EadcEntry.DsTypes datasource, String errorDescription) throws Exception {
+
+        StopWatch watch = new StopWatch();
+        watch.start();
+        Document reqEnv;
+        Document respEnv;
+        Transaction transaction;
+        Document transactionDocument;
+
+        reqEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        respEnv = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+        if (reqMsgContext != null && reqMsgContext.getEnvelope() != null) {
+            reqEnv.adoptNode(XMLUtils.toDOM(reqMsgContext.getEnvelope()));
+        }
+        if (rspMsgContext != null && rspMsgContext.getEnvelope() != null) {
+            respEnv.adoptNode(XMLUtils.toDOM(rspMsgContext.getEnvelope()));
+        }
+
+        transaction = buildTransaction(transInfo);
+
+        if (cdaDocument != null) {
+            transactionDocument = TransactionHelper.insertCdaInTransaction(transaction, cdaDocument);
+        } else {
+            transactionDocument = TransactionHelper.convertTransaction(transaction);
+        }
+        if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION") && LOGGER_CLINICAL.isDebugEnabled()) {
+            LOGGER_CLINICAL.debug("[EADC] XML Transaction:\n'{}'", xmlToString(transactionDocument));
+        }
+        EadcEntry eadcEntry = EadcFactory.INSTANCE.getEntry(datasource.toString(), transactionDocument, reqEnv, respEnv);
+        EadcReceiverImpl eadcReceiver = new EadcReceiverImpl();
+        eadcReceiver.processFailure(eadcEntry, errorDescription);
+
+        watch.stop();
+        LOGGER.info("[EADC] Transaction Failure Processing executed in: '{}ms'", watch.getTime());
+    }
+
+    /**
+     * This utility method will invoke eADC for a given transaction. You will need to provide the Axis Request and
+     * Response message context, together with optional document, a Transaction Info object containing transaction
+     * details and a selected data source.
+     *
+     * @param reqMsgContext the Servlet request message context
+     * @param rspMsgContext the Servlet response message context
+     * @param cdaDocument   the optional CDA document, leave as null if not necessary
+     * @param transInfo     the Transaction Info object
+     * @throws Exception
+     */
     public static void invokeEadc(MessageContext reqMsgContext, MessageContext rspMsgContext, Document cdaDocument,
                                   TransactionInfo transInfo, EadcEntry.DsTypes datasource) throws Exception {
 

@@ -104,9 +104,10 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
 
             if (axisOperation == null) {
-                throw new AxisFault(
-                        "Operation is not located, if this is Doc/lit style the SOAP-ACTION should specified via the " +
-                                "SOAP Action to use the RawXMLProvider");
+                String err = "Operation is not located, if this is Doc/lit style the SOAP-ACTION should specified via the " +
+                        "SOAP Action to use the RawXMLProvider";
+                eadcFailure(msgContext, err);
+                throw new AxisFault(err);
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
@@ -165,8 +166,10 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eDispenseCda = EadcUtilWrapper.toXmlDocument(wrappedParam.getDocument().get(0).getValue());
 
                 } else {
-                    LOGGER.error("Method not found: '{}'", methodName);
-                    throw new RuntimeException("method not found");
+                    String err = "Method not found: '" + methodName + "'";
+                    LOGGER.error(err);
+                    eadcFailure(msgContext, err);
+                    throw new RuntimeException(err);
                 }
 
                 Date endTime = new Date();
@@ -178,8 +181,19 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
             }
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            eadcFailure(msgContext, e.getMessage());
             throw AxisFault.makeFault(e);
         }
+    }
+
+    private void eadcFailure(MessageContext messageContext, String errorDescription) {
+        var transactionStartTime = new Date();
+        Date transactionEndTime = new Date();
+        MessageContext ctx = new MessageContext();
+        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, null /*this._getServiceClient()*/, null,
+                transactionStartTime, transactionEndTime, null /*this.countryCode*/, EadcEntry.DsTypes.EADC,
+                EadcUtil.Direction.INBOUND, ServiceType.DOCUMENT_EXCHANGED_RESPONSE, errorDescription);
     }
 
     private OMElement toOM(ProvideAndRegisterDocumentSetRequestType param, boolean optimizeContent) throws AxisFault {

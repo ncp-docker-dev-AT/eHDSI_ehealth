@@ -86,6 +86,41 @@ public class EadcUtilWrapper {
     }
 
     /**
+     * Main EADC Wrapper operation. It receives as input all the required information to successfully fill a transaction object.
+     *
+     * @param requestMsgCtx  the request Servlet Message Context
+     * @param responseMsgCtx the response Servlet Message Context
+     * @param serviceClient  the Axis2 Service Client
+     * @param cda            the (optional) CDA document*
+     * @param startTime      the transaction start time
+     * @param endTime        the transaction end time
+     * @param receivingIso   the country A ISO Code
+     * @param dsType         the JDBC Datasource corresponding to the IHE operation
+     * @param direction      the Operation type: INBOUND or OUTBOUND
+     * @param serviceType    the Service Type representing the action executed to prevent processing of personal data
+     */
+    public static void invokeEadcFailure(MessageContext requestMsgCtx, MessageContext responseMsgCtx, ServiceClient serviceClient,
+                                  Document cda, Date startTime, Date endTime, String receivingIso, EadcEntry.DsTypes dsType,
+                                  Direction direction, ServiceType serviceType, String errorDescription) {
+
+        new Thread(() -> {
+            var watch = new StopWatch();
+            watch.start();
+            try {
+                EadcUtil.invokeEadcFailure(requestMsgCtx, responseMsgCtx, cda, buildTransactionInfo(requestMsgCtx, responseMsgCtx,
+                        serviceClient, direction, startTime, endTime, receivingIso, serviceType), dsType, errorDescription);
+            } catch (Exception e) {
+                LOGGER.error("[EADC Failure] Invocation Failed - Exception: '{}'", e.getMessage(), e);
+            } finally {
+                watch.stop();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("EADC Failure invocation executed in: '{}ms'", watch.getTime());
+                }
+            }
+        }).start();
+    }
+
+    /**
      * Builds a Transaction Info object based on a set of information.
      *
      * @param reqMsgContext the request Servlet Message Context
@@ -185,7 +220,9 @@ public class EadcUtilWrapper {
      * @return a string representing the information presented on the specified node
      */
     private static String extractAssertionInfo(Assertion idAssertion, String expression) {
-
+        if(idAssertion == null) {
+            return null;
+        }
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (attribute.getName().equals(expression)) {
@@ -257,6 +294,9 @@ public class EadcUtilWrapper {
      */
     private static String extractAuthenticationMethodFromAssertion(Assertion idAssertion) {
 
+        if(idAssertion == null) {
+            return null;
+        }
         if (!idAssertion.getAuthnStatements().isEmpty()) {
             var authnStatement = idAssertion.getAuthnStatements().get(0);
             String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getURI();
@@ -285,6 +325,8 @@ public class EadcUtilWrapper {
      * @return String containing the assertion issuer's ISO country code
      */
     private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
+        if(idAssertion == null)
+            return null;
         return idAssertion.getIssuer().getValue().split(":")[2];
     }
 

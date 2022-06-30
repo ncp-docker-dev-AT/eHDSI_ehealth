@@ -116,8 +116,10 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             // Find the axisOperation that has been set by the Dispatch phase.
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
             if (axisOperation == null) {
-                throw new AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
-                        "should specified via the SOAP Action to use the RawXMLProvider");
+                String err = "Operation is not located, if this is doclit style the SOAP-ACTION " +
+                        "should specified via the SOAP Action to use the RawXMLProvider";
+                eadcFailure(msgContext, err);
+                throw new AxisFault(err);
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
@@ -151,8 +153,10 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     }
 
                 } else {
-                    LOGGER.error("Method not Found: '{}'", methodName);
-                    throw new RuntimeException("method not found");
+                    String err = "Method not Found: '" + methodName + "'";
+                    LOGGER.error(err);
+                    eadcFailure(msgContext, err);
+                    throw new RuntimeException(err);
                 }
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
@@ -162,10 +166,19 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                         ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {
-
             LOGGER.error(e.getMessage(), e);
+            eadcFailure(msgContext, e.getMessage());
             throw AxisFault.makeFault(e);
         }
+    }
+
+    private void eadcFailure(MessageContext messageContext, String errorDescription) {
+        var transactionStartTime = new Date();
+        Date transactionEndTime = new Date();
+        MessageContext ctx = new MessageContext();
+        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, null /*this._getServiceClient()*/, null,
+                transactionStartTime, transactionEndTime, null /*this.countryCode*/, EadcEntry.DsTypes.EADC,
+                EadcUtil.Direction.INBOUND, ServiceType.PATIENT_IDENTIFICATION_RESPONSE, errorDescription);
     }
 
     private OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent) throws AxisFault {
