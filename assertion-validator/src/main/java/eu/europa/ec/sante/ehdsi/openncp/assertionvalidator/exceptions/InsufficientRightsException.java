@@ -2,7 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
-public class InsufficientRightsException extends Exception {
+public class InsufficientRightsException extends OpenncpErrorCodeException {
 
     private static final long serialVersionUID = -7973928727557097260L;
 
@@ -21,7 +21,7 @@ public class InsufficientRightsException extends Exception {
         return openncpErrorCode.getCode();
     }
 
-    public OpenncpErrorCode getEhdsiCode() {
+    public OpenncpErrorCode getOpenncpErrorCode() {
         return openncpErrorCode;
     }
 

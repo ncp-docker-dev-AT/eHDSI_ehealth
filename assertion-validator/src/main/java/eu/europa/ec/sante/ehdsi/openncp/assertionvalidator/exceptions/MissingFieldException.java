@@ -15,12 +15,12 @@ public class MissingFieldException extends AssertionValidationException {
 
     public MissingFieldException(OpenncpErrorCode openncpErrorCode, String messageDetailed) {
         super();
-        this.setEhdsiCode(openncpErrorCode);
+        this.setOpenncpErrorCode(openncpErrorCode);
         this.messageDetailed = messageDetailed;
     }
 
     @Override
     public String getMessage() {
-        return this.getEhdsiCode().getDescription() + messageDetailed;
+        return messageDetailed;
     }
 }

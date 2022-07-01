@@ -2,7 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 
-public class XSDValidationException extends Exception {
+public class XSDValidationException extends OpenncpErrorCodeException{
 	/**
 	 * 
 	 */
@@ -25,7 +25,7 @@ public class XSDValidationException extends Exception {
 		this.message = message;
 	}
 
-	public String getCode() {
-		return openncpErrorCode.getCode();
+	public OpenncpErrorCode getOpenncpErrorCode() {
+		return openncpErrorCode;
 	}
 }

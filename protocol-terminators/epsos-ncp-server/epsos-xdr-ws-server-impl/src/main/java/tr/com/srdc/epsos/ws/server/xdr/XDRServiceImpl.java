@@ -11,6 +11,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
@@ -18,10 +19,6 @@ import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.AssertionValidationException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
@@ -96,7 +93,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryError registryError = ofRs.createRegistryError();
         registryError.setErrorCode(openncpErrorCode.getCode());
-        registryError.setLocation(location);
+        registryError.setLocation(getLocation(location));
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
         registryError.setValue(value);
@@ -105,7 +102,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private RegistryError createErrorMessage(OpenncpErrorCode openncpErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
 
-        return createErrorMessage(openncpErrorCode, codeContext, value, getLocation(), severity);
+        return createErrorMessage(openncpErrorCode, codeContext, value, null, severity);
     }
 
     /**
@@ -113,9 +110,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
      *
      * @return Home Community ID URN encoded.
      */
-    protected String getLocation() {
-
-        return "urn:oid:" + Constants.HOME_COMM_ID;
+    protected String getLocation(String location) {
+        return org.apache.commons.lang.StringUtils.isBlank(location)?  Constants.OID_PREFIX + Constants.HOME_COMM_ID : location;
     }
 
     private void prepareEventLogForDiscardMedication(EventLog eventLog, String discardId, ProvideAndRegisterDocumentSetRequestType request,
@@ -332,12 +328,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, Constants.EDD_CLASSCODE);
 
-        } catch (InsufficientRightsException e) {
-            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
-        } catch (AssertionValidationException e) {
-            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+        } catch (OpenncpErrorCodeException e) {
+            logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -430,7 +423,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( "+ documentId +" )",  "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -474,12 +467,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
 
-        } catch (InsufficientRightsException e) {
-            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
-        } catch (AssertionValidationException e) {
-            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+        } catch (OpenncpErrorCodeException e) {
+            logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
             registryErrorList.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -674,12 +664,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         try {
             sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
 
-        } catch (InsufficientRightsException e) {
-            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
-        } catch (AssertionValidationException e) {
-            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+        } catch (OpenncpErrorCodeException e) {
+            logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
+            rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -810,12 +797,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
             sigCountryCode = validateXDRHeader(shElement, Constants.HCER_CLASSCODE);
-        } catch (InsufficientRightsException e) {
-            logger.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
-        } catch (AssertionValidationException e) {
-            logger.error("AssertionValidationException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getEhdsiCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+        } catch (OpenncpErrorCodeException e) {
+            logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
+            rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(OpenncpErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -875,7 +859,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         response.setRegistryErrorList(new RegistryErrorList());
 
         RegistryError error = new RegistryError();
-        error.setErrorCode("4202");
+        error.setErrorCode(OpenncpErrorCode.ERROR_UNKNOWN_SIGNIFIER.getCode());
         error.setCodeContext("Unknown document");
         response.getRegistryErrorList().getRegistryError().add(error);
         response.setStatus(AdhocQueryResponseStatus.FAILURE);

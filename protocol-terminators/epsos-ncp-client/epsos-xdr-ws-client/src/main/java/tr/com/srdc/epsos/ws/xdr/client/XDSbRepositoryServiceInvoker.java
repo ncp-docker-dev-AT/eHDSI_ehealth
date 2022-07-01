@@ -2,6 +2,7 @@ package tr.com.srdc.epsos.ws.xdr.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.exceptions.DocumentTransformationException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.transformation.TMServices;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
@@ -54,7 +55,7 @@ public class XDSbRepositoryServiceInvoker {
      */
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode,
                                                               Map<AssertionEnum, Assertion> assertionMap, String docClassCode)
-            throws RemoteException {
+            throws RemoteException, XDRException {
 
         logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", assertionMap.get(AssertionEnum.CLINICIAN).getID(), countryCode, docClassCode);
         RegistryResponseType response;

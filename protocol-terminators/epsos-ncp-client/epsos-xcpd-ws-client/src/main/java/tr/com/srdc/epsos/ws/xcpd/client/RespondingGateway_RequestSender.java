@@ -2,6 +2,9 @@ package tr.com.srdc.epsos.ws.xcpd.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xcpd.PRPAIN201305UV022DTS;
+import eu.epsos.exceptions.NoPatientIdDiscoveredException;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
@@ -37,11 +40,16 @@ public final class RespondingGateway_RequestSender {
      */
     public static PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(final PatientDemographics patientDemographics,
                                                                        final Map<AssertionEnum, Assertion> assertionMap,
-                                                                       final String countryCode) {
+                                                                       final String countryCode) throws NoPatientIdDiscoveredException {
 
         var dynamicDiscoveryService = new DynamicDiscoveryService();
-        String endpointUrl = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
-                RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
+        String endpointUrl = null;
+        try {
+            endpointUrl = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
+                    RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
+        } catch (ConfigurationManagerException e){
+            throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, e.getMessage());
+        }
 
         String dstHomeCommunityId = OidUtil.getHomeCommunityId(countryCode.toLowerCase(Locale.ENGLISH));
         var hl7Request = PRPAIN201305UV022DTS.newInstance(patientDemographics, dstHomeCommunityId);
@@ -53,7 +61,7 @@ public final class RespondingGateway_RequestSender {
     }
 
     private static PRPAIN201306UV02 sendRequest(String endpointUrl, PRPAIN201305UV02 pRPAIN201305UV022,
-                                                Map<AssertionEnum, Assertion> assertionMap, final String countryCode) {
+                                                Map<AssertionEnum, Assertion> assertionMap, final String countryCode) throws NoPatientIdDiscoveredException {
 
         var respondingGatewayServiceStub = new RespondingGateway_ServiceStub(endpointUrl);
         // Dummy handler for any mustUnderstand

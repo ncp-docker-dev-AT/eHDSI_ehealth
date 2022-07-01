@@ -172,11 +172,6 @@ public enum TMError implements ITMTSAMEror, ErrorCode {
         this.description = description;
     }
 
-    @Override
-    public String getMessage() {
-        return this.name();
-    }
-
     /**
      * @return String - code
      */

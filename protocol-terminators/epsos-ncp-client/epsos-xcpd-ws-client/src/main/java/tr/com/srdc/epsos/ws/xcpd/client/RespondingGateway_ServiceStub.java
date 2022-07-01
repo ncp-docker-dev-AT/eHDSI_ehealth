@@ -4,10 +4,12 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -184,7 +186,7 @@ public class RespondingGateway_ServiceStub extends Stub {
      * @param assertionMap
      * @return
      */
-    public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 prpain201305UV02, Map<AssertionEnum, Assertion> assertionMap) {
+    public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 prpain201305UV02, Map<AssertionEnum, Assertion> assertionMap) throws NoPatientIdDiscoveredException {
 
         MessageContext _messageContext = null;
 
@@ -262,7 +264,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 // NRO  NCPB_XCPD_REQ - LOGGER.info("XCPD Request sent. EVIDENCE NRO");
 
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC,ex.getMessage());
             }
 
             // XCPD response end time
@@ -338,7 +340,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     LOGGER.error("Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
                             + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.");
-                    throw e;
+                    throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, e);
                 }
             }
 

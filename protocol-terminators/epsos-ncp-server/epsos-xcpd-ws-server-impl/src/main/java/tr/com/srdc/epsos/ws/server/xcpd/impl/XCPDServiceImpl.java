@@ -8,10 +8,7 @@ import eu.epsos.protocolterminators.ws.server.xcpd.exception.XcpdNIException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -731,11 +728,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 }
             } else {
                 // Preparing demographic query not allowed error
-                fillOutputMessage(outputMessage, XcpdErrorCode.DemographicsQueryNotAllowed, OpenncpErrorCode.ERROR_PI_GENERIC,  "Queries are only available with patient identifiers");
+                fillOutputMessage(outputMessage, XcpdErrorCode.DemographicsQueryNotAllowed, OpenncpErrorCode.ERROR_PI_GENERIC, "Queries are only available with patient identifiers");
             }
-        } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
+        } catch (OpenncpErrorCodeException e) {
 
-            fillOutputMessage(outputMessage, XcpdErrorCode.InsufficientRights, OpenncpErrorCode.ERROR_PI_GENERIC, e.getMessage()) ;
+            fillOutputMessage(outputMessage, XcpdErrorCode.InsufficientRights, e.getOpenncpErrorCode(), e.getMessage()) ;
             logger.error(e.getMessage(), e);
         } catch (XcpdNIException e) {
 

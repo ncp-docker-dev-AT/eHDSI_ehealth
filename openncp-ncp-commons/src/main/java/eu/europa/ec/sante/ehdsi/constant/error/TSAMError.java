@@ -75,11 +75,6 @@ public enum TSAMError implements ITMTSAMEror, ErrorCode {
     }
 
 
-    @Override
-    public String getMessage() {
-        return this.name();
-    }
-
     /**
      * @return String - code
      */

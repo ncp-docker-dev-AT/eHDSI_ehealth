@@ -54,8 +54,6 @@ public class XcaInitGateway {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
-
     private static final List<String> TM_ERROR_CODES = Arrays.stream(TMError.values()).map(TMError::getCode).collect(Collectors.toList());
 
     /**

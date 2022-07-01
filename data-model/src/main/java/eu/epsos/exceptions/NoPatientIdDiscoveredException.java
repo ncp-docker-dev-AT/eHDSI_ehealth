@@ -15,6 +15,10 @@ public class NoPatientIdDiscoveredException extends ExceptionWithContext {
         super(openncpErrorCode, cause);
     }
 
+    public NoPatientIdDiscoveredException(OpenncpErrorCode openncpErrorCode, String message) {
+        super(openncpErrorCode, message, null);
+    }
+
     public NoPatientIdDiscoveredException(XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String message, String context) {
         super(openncpErrorCode, message, context);
         this.xcpdErrorCode = xcpdErrorCode;

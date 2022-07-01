@@ -7,7 +7,7 @@ public class OriginalDataMissingException extends DocumentProcessingException {
 	private static final long serialVersionUID = -1880772107399517210L;
 
 	public OriginalDataMissingException() {
-		super("For data of the given kind the Provide Data service provider requires the service consumer to transmit the source coded PDF document.");
+		super(OpenncpErrorCode.ERROR_ORIGINAL_DATA_MISSING.getDescription());
 		this.setOpenncpErrorCode(OpenncpErrorCode.ERROR_ORIGINAL_DATA_MISSING);
 	}
 }

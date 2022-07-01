@@ -49,14 +49,14 @@ public final class TMServices {
 
         resultDoc = byteToDocument(document);
 
-        LOGGER.debug("STARTING TRANSLATING DOCUMENT TO PIVOT.");
+        LOGGER.debug("STARTING TRANSCODING DOCUMENT TO PIVOT.");
 
         tmResponse = transformationService.toEpSOSPivot(resultDoc); //Perform the translation into pivot.
 
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
-            //If the translation process fails, an exception is thrown.
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, "DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
+            //If the transcoding process fails, an exception is thrown.
+            throw new DocumentTransformationException(OpenncpErrorCode.WARNING_ED_MISSING_EXPECTED_MAPPING, OpenncpErrorCode.WARNING_ED_MISSING_EXPECTED_MAPPING.getDescription(), "DOCUMENT TRANSCODING FAILED.");
         }
         try {
             // Obtain the translated document in the Document type format, only if translation succeeds.
@@ -67,7 +67,7 @@ public final class TMServices {
             throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
-        LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
+        LOGGER.debug("TRANSCODING SUCCESSFULLY ENDED.");
         //  Return the Document as a byte array.
         return result;
     }

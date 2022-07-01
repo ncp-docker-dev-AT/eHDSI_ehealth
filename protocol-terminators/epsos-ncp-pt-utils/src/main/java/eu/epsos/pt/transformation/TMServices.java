@@ -59,7 +59,8 @@ public final class TMServices {
 
         //  If the translation process fails, an exception is thrown.
         if (!tmResponse.isStatusSuccess()) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, Constants.SERVER_IP,"( " + IheErrorCode.XDSRepositoryError.getMessage() + "): + An error has occurred during document translation, please check the following errors:\n"
+            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC,
+                    Constants.SERVER_IP,"( " + IheErrorCode.XDSRepositoryError.getCode() + "): + An error has occurred during document translation, please check the following errors:\n"
                     + processErrors(tmResponse.getErrors()));
         }
         try {

@@ -79,8 +79,8 @@ public final class XdrDocumentSource {
                 var registryErrorList = response.getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
-        } catch (RemoteException e) {
-            throw new XDRException(OpenncpErrorCode.ERROR_ED_GENERIC, e);
+        } catch (XDRException | RemoteException e) {
+            throw new XDRException(getErrorCode(docClassCode), e);
         }
         return XdrResponseDts.newInstance(response);
     }
@@ -129,4 +129,15 @@ public final class XdrDocumentSource {
             }
         }
     }
+
+    private static OpenncpErrorCode getErrorCode(String classCode){
+        switch (classCode){
+            case Constants.ED_CLASSCODE:
+                return OpenncpErrorCode.ERROR_ED_GENERIC;
+            case Constants.EDD_CLASSCODE:
+                return OpenncpErrorCode.ERROR_ED_DISCARD_FAILED;
+        }
+        return OpenncpErrorCode.ERROR_GENERIC;
+    }
+
 }

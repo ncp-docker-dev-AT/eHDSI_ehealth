@@ -140,7 +140,7 @@ public class SAML2Validator {
                 }
             }
             if (hcpAssertion == null) {
-                throw (new MissingFieldException("HCP Assertion element is required."));
+                throw (new MissingFieldException(OpenncpErrorCode.ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion element is required."));
             }
             if (trcAssertion == null) {
                 throw (new MissingFieldException("TRC Assertion element is required."));
@@ -204,7 +204,7 @@ public class SAML2Validator {
                 }
             }
             if (hcpAssertion == null) {
-                throw (new MissingFieldException("HCP Assertion element is required."));
+                throw (new MissingFieldException(OpenncpErrorCode.ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion element is required."));
             }
             if (trcAssertion == null) {
                 throw (new MissingFieldException("TRC Assertion element is required."));
@@ -281,46 +281,53 @@ public class SAML2Validator {
         return result;
     }
 
-    private static String checkHCPAssertion(Assertion assertion, String classCode) throws MissingFieldException,
-            InvalidFieldException, InsufficientRightsException, SMgrException {
+    private static String checkHCPAssertion(Assertion assertion, String classCode) throws
+            InsufficientRightsException, SMgrException, MissingFieldException, InvalidFieldException {
 
         String sigCountryCode;
 
-        RequiredFieldValidators.validateVersion(assertion);
-        RequiredFieldValidators.validateID(assertion);
-        RequiredFieldValidators.validateIssueInstant(assertion);
-        RequiredFieldValidators.validateIssuer(assertion);
-        RequiredFieldValidators.validateSubject(assertion);
-        RequiredFieldValidators.validateNameID(assertion);
-        RequiredFieldValidators.validateFormat(assertion);
-        RequiredFieldValidators.validateSubjectConfirmation(assertion);
-        RequiredFieldValidators.validateMethod(assertion);
-        RequiredFieldValidators.validateConditions(assertion);
-        RequiredFieldValidators.validateNotBefore(assertion);
-        RequiredFieldValidators.validateNotOnOrAfter(assertion);
-        RequiredFieldValidators.validateAuthnStatement(assertion);
-        RequiredFieldValidators.validateAuthnInstant(assertion);
-        RequiredFieldValidators.validateAuthnContext(assertion);
-        RequiredFieldValidators.validateAuthnContextClassRef(assertion);
-        RequiredFieldValidators.validateAttributeStatement(assertion);
-        RequiredFieldValidators.validateSignature(assertion);
 
-        FieldValueValidators.validateVersionValue(assertion);
-        FieldValueValidators.validateIssuerValue(assertion);
-        FieldValueValidators.validateNameIDValue(assertion);
-        FieldValueValidators.validateNotBeforeValue(assertion);
-        FieldValueValidators.validateNotOnOrAfterValue(assertion);
-        FieldValueValidators.validateTimeSpanForHCP(assertion);
-        FieldValueValidators.validateAuthnContextClassRefValueForHCP(assertion);
+        try {
+            RequiredFieldValidators.validateVersion(assertion);
+            RequiredFieldValidators.validateID(assertion);
+            RequiredFieldValidators.validateIssueInstant(assertion);
+            RequiredFieldValidators.validateIssuer(assertion);
+            RequiredFieldValidators.validateSubject(assertion);
+            RequiredFieldValidators.validateNameID(assertion);
+            RequiredFieldValidators.validateFormat(assertion);
+            RequiredFieldValidators.validateSubjectConfirmation(assertion);
+            RequiredFieldValidators.validateMethod(assertion);
+            RequiredFieldValidators.validateConditions(assertion);
+            RequiredFieldValidators.validateNotBefore(assertion);
+            RequiredFieldValidators.validateNotOnOrAfter(assertion);
+            RequiredFieldValidators.validateAuthnStatement(assertion);
+            RequiredFieldValidators.validateAuthnInstant(assertion);
+            RequiredFieldValidators.validateAuthnContext(assertion);
+            RequiredFieldValidators.validateAuthnContextClassRef(assertion);
+            RequiredFieldValidators.validateAttributeStatement(assertion);
+            RequiredFieldValidators.validateSignature(assertion);
 
-        policyManager.XSPASubjectValidatorForHCP(assertion, classCode);
-        policyManager.XSPARoleValidator(assertion, classCode);
-        policyManager.HealthcareFacilityValidator(assertion, classCode);
-        policyManager.PurposeOfUseValidator(assertion, classCode);
-        if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
-            policyManager.XSPAOrganizationIdValidator(assertion, classCode);
+            FieldValueValidators.validateVersionValue(assertion);
+            FieldValueValidators.validateIssuerValue(assertion);
+            FieldValueValidators.validateNameIDValue(assertion);
+            FieldValueValidators.validateNotBeforeValue(assertion);
+            FieldValueValidators.validateNotOnOrAfterValue(assertion);
+            FieldValueValidators.validateTimeSpanForHCP(assertion);
+            FieldValueValidators.validateAuthnContextClassRefValueForHCP(assertion);
+
+            policyManager.XSPASubjectValidatorForHCP(assertion, classCode);
+            policyManager.XSPARoleValidator(assertion, classCode);
+            policyManager.HealthcareFacilityValidator(assertion, classCode);
+            policyManager.PurposeOfUseValidator(assertion, classCode);
+            if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
+                policyManager.XSPAOrganizationIdValidator(assertion, classCode);
+            }
+            policyManager.XSPALocalityValidator(assertion, classCode);
+        } catch (MissingFieldException e){
+            throw new MissingFieldException(OpenncpErrorCode.ERROR_HPI_GENERIC, e.getMessage());
+        } catch (InvalidFieldException e){
+            throw new InvalidFieldException(OpenncpErrorCode.ERROR_HPI_GENERIC, e.getMessage());
         }
-        policyManager.XSPALocalityValidator(assertion, classCode);
 
         //TODO: [Mustafa, 2012.07.05] The original security manager was extended to return the two-letter country code
         // from the signature, but now in order not to change the security manager in Google Code repo, this is reverted back.

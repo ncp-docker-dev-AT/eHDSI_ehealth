@@ -18,10 +18,6 @@ public enum IheErrorCode implements ErrorCode{
         this.codeSystem = codeSystem;
     }
 
-    public String getMessage() {
-        return this.name();
-    }
-
     public String getCode() {
         return this.name();
     }

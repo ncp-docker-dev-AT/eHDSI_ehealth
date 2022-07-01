@@ -4,43 +4,13 @@ import java.util.Arrays;
 
 public enum OpenncpErrorCode implements ErrorCode {
 
-    ERROR_NOT_VALID_ASSERTION("1001", "Assertion is not valid."),
-    ERROR_NOT_VALID_TRC_ASSERTION("1002", "The given TRC Assertion does not validate against the Identity Assertion"),
-    ERROR_EP_NOT_FOUND("1101", "No ePrescription is registered for the given patient. "),
-    ERROR_PS_NOT_FOUND("1102", "No PS is registered for the given patient."),
-    ERROR_MRO_NO_DATA("1103", "No Data for MRO"),
-    ERROR_ORCD_NOT_FOUND("1104", "No ORCD document is registered for the given patient."),
-    ERROR_DOCUMENT_NOT_FOUND("1100", "No documents are registered for the given patient."),
-    ERROR_DOCUMENT_NOT_PROCESSED("2201", "Documents were received but not processed"),
-    ERROR_RENDERING_INCOMPLETE("4101", "Rendering Incomplete"),
-    ERROR_COLLECTION_INCOMPLETE("4102", "Collection incomplete "),
-    ERROR_EP_REGISTRY_NOT_ACCESSIBLE("4103", "ePrescription registry could not be accessed."),
-    ERROR_EP_NOT_AVAILABLE("4104", "Data Access Failure"),
-    ERROR_EP_NOT_MATCHING("4105", "No matching ePrescription was found"),
-    ERROR_EP_ALREADY_DISPENSED("4106", "ePrescription has already been dispensed"),
-    ERROR_ORIGINAL_DATA_MISSING("4107", "For data of the given kind the Provide Data service provider requires the service consumer to transmit the source coded PDF document."),
-    ERROR_PIVOT_MISSING("4108", "The service consumer did not provide the eHealth DSI pivot coded document which is requested by the Provide Data service provider for the given kind of data. "),
-    ERROR_UNSUPPORTED_FEATURE("4201", "If PDF-coded document is requested: Country A does not provide the (optional) source coded version of the document "),
-    ERROR_UNKNOWN_SIGNIFIER("4202", "The query argument slots used by the service consumer are not supported by the service provider. "),
-    ERROR_TRANSCODING_ERROR("4203", "The requested encoding cannot be provided due to a transcoding error. "),
-    ERROR_UNKNOWN_FILTER("4204", "The service provider is unable to evaluate the given argument values"),
-    ERROR_UNKNOWN_OPTION("4205", "The service provider does not implement the On Demand Documents option as requested by the service consumer."),
-    ERROR_UNKNOWN_PATIENT_IDENTIFIER("4206", "The patient identifier in the query differs from the patient identifier in the TRC assertion"),
-    ERROR_4207("4207", "The extra parameters linked to the document identifier in the query differs from the ones in the TRC assertion"),
-    ERROR_NO_CONSENT("4701", "The patient has not given consent to the requested service."),
-    ERROR_WEAK_AUTHENTICATION("4702", "Country A requests a higher authentication trust level than assigned to the HP"),
-    ERROR_INSUFFICIENT_RIGHTS("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
-    ERROR_NO_SIGNATURE("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
-    ERROR_POLICY_VIOLATION("4705", "Policy violation"),
-    ERROR_UNKNOWN_POLICY("4706", "Unknown Policy"),
-
     //------ Below new error defined in CP-58 --------
 
     ERROR_GENERIC("ERROR_GENERIC",""),
     WARNING_GENERIC("WARNING_GENERIC",""),
     ERROR_GENERIC_CONNECTION_NOT_POSSIBLE("ERROR_CONNECTION_NOT_POSSIBLE", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
-    ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING",""),
-    ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN",""),
+    ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING","The document requested was not found"),
+    ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN","Class code not supported"),
 
     // 01. Ensure Health Professional (HP) Identification, Authentication and Authorization
     ERROR_HPI_GENERIC("ERROR_HPI_GENERIC", "Health Professional (HP) Identification generic error"),
@@ -127,8 +97,40 @@ public enum OpenncpErrorCode implements ErrorCode {
 
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT", "An unexpected number of requests has been detected for one specific patient"),
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE", "An unexpected number of requests has been detected from one specific Point of Care"),
-    WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS", "An unexpected number of requests has been detected");
+    WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS", "An unexpected number of requests has been detected"),
 
+    // Old error code --------------------------
+
+    ERROR_NOT_VALID_ASSERTION("1001", "Assertion is not valid."),
+    ERROR_NOT_VALID_TRC_ASSERTION("1002", "The given TRC Assertion does not validate against the Identity Assertion"),
+    ERROR_EP_NOT_FOUND("1101", "No ePrescription is registered for the given patient. "),
+    ERROR_PS_NOT_FOUND("1102", "No PS is registered for the given patient."),
+    ERROR_MRO_NO_DATA("1103", "No Data for MRO"),
+    ERROR_ORCD_NOT_FOUND("1104", "No ORCD document is registered for the given patient."),
+    ERROR_DOCUMENT_NOT_FOUND("1100", "No documents are registered for the given patient."),
+    ERROR_DOCUMENT_NOT_PROCESSED("2201", "Documents were received but not processed"),
+    ERROR_RENDERING_INCOMPLETE("4101", "Rendering Incomplete"),
+    ERROR_COLLECTION_INCOMPLETE("4102", "Collection incomplete "),
+    ERROR_EP_REGISTRY_NOT_ACCESSIBLE("4103", "ePrescription registry could not be accessed."),
+    ERROR_EP_NOT_AVAILABLE("4104", "Data Access Failure"),
+    ERROR_EP_NOT_MATCHING("4105", "No matching ePrescription was found"),
+    ERROR_EP_ALREADY_DISPENSED("4106", "ePrescription has already been dispensed"),
+    ERROR_ORIGINAL_DATA_MISSING("4107", "For data of the given kind the Provide Data service provider requires the service consumer to transmit the source coded PDF document."),
+    ERROR_PIVOT_MISSING("4108", "The service consumer did not provide the eHealth DSI pivot coded document which is requested by the Provide Data service provider for the given kind of data. "),
+    ERROR_UNSUPPORTED_FEATURE("4201", "If PDF-coded document is requested: Country A does not provide the (optional) source coded version of the document "),
+    ERROR_TRANSCODING_ERROR("4203", "The requested encoding cannot be provided due to a transcoding error. "),
+    ERROR_UNKNOWN_FILTER("4204", "The service provider is unable to evaluate the given argument values"),
+    ERROR_UNKNOWN_OPTION("4205", "The service provider does not implement the On Demand Documents option as requested by the service consumer."),
+    ERROR_UNKNOWN_PATIENT_IDENTIFIER("4206", "The patient identifier in the query differs from the patient identifier in the TRC assertion"),
+    ERROR_4207("4207", "The extra parameters linked to the document identifier in the query differs from the ones in the TRC assertion"),
+    ERROR_NO_CONSENT("4701", "The patient has not given consent to the requested service."),
+    ERROR_WEAK_AUTHENTICATION("4702", "Country A requests a higher authentication trust level than assigned to the HP"),
+    ERROR_INSUFFICIENT_RIGHTS("4703", "Either the security policy of country A or a privacy policy of the patient (that was given in country A) does not allow the requested operation to be performed by the HP"),
+    ERROR_NO_SIGNATURE("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
+    ERROR_POLICY_VIOLATION("4705", "Policy violation"),
+    ERROR_UNKNOWN_POLICY("4706", "Unknown Policy"),
+
+    ERROR_UNKNOWN_SIGNIFIER("4202", "Class code not supported");
 
     private final String code;
     private final String description;
@@ -136,10 +138,6 @@ public enum OpenncpErrorCode implements ErrorCode {
     OpenncpErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
-    }
-
-    public String getMessage() {
-        return this.name();
     }
 
     public String getCode() {
