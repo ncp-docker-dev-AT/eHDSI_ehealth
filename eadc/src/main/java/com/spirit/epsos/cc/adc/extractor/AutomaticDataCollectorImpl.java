@@ -125,7 +125,10 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private String createErrorSqlInserts(String sql, String errorDescription) throws Exception {
         String foreignKey = extractForeignKey(sql);
         String retval = "INSERT INTO eTransactionError(Transaction_FK, ErrorDescription) VALUES " +
-                "('" + foreignKey + "', '" + errorDescription + "');";
+                "('" + foreignKey + "', " +
+                "'" +
+                    errorDescription.replaceAll("'", "''") +
+                "');";
         return retval;
     }
 
@@ -258,6 +261,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
             objScriptRunner.setLogWriter(null);
             objScriptRunner.setErrorLogWriter(null);
             objScriptRunner.runScript(stringReader);
+
 
         } catch (Exception exception) {
             throw new Exception("The following error occurred during an SQL operation:", exception);

@@ -191,8 +191,8 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         var transactionStartTime = new Date();
         Date transactionEndTime = new Date();
         MessageContext ctx = new MessageContext();
-        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, null /*this._getServiceClient()*/, null,
-                transactionStartTime, transactionEndTime, null /*this.countryCode*/, EadcEntry.DsTypes.EADC,
+        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, null, null,
+                transactionStartTime, transactionEndTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC,
                 EadcUtil.Direction.INBOUND, ServiceType.DOCUMENT_EXCHANGED_RESPONSE, errorDescription);
     }
 
