@@ -43,7 +43,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
-                    <xsl:when test="$showValue='YES'">
+                    <xsl:when test="$showValue">
                         <xsl:value-of select="translate(($medPackage)/@value, '.', ',')"/>
                     </xsl:when>
                 </xsl:choose>
