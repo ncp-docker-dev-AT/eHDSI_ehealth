@@ -459,7 +459,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     throw new RuntimeException(axisFault.getMessage(), axisFault);
                 }
             }
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
+            throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault");
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {

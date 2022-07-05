@@ -544,7 +544,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     }
                 }
             }
-            throw new RuntimeException(f.getMessage(), f);
+            throw new XCAException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
@@ -878,7 +878,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
+            throw new XCAException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);

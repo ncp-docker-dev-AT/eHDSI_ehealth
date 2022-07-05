@@ -79,7 +79,7 @@ public final class XdrDocumentSource {
                 var registryErrorList = response.getRegistryErrorList();
                 processRegistryErrors(registryErrorList);
             }
-        } catch (XDRException | RemoteException e) {
+        } catch (RemoteException e) {
             throw new XDRException(getErrorCode(docClassCode), e);
         }
         return XdrResponseDts.newInstance(response);
