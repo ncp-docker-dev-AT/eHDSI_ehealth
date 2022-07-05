@@ -3,6 +3,7 @@ package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
+import eu.epsos.protocolterminators.ws.server.xcpd.exception.AnswerNotAvailableException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
         if (id == null) {
             logger.info("[National Infrastructure Mock] Patient with ID: '{}' not found: ", idList.get(0));
-            return new ArrayList<>(0);
+            throw new NIException(OpenncpErrorCode.ERROR_PI_NO_MATCH, "[National Infrastructure Mock] ID: " + idList.get(0) + " not found: ");
         }
 
         // Load Patient properties file.
@@ -119,7 +120,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
         } catch (Exception e) {
             logger.error("[National Infrastructure Mock] Patient Not Found Exception: '{}'", e.getMessage(), e);
-            return new ArrayList<>(0);
+            throw new AnswerNotAvailableException("[National Infrastructure Mock] Could not load the Patient Demographics");
         }
 
         return result;

@@ -81,7 +81,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      * @param dispensationToDiscard Id of the dispensation to be discarded
      */
     @Override
-    public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) {
+    public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) throws NIException {
 
         if (logger.isInfoEnabled()) {
             logger.info("[National Infrastructure Mock] Submit Discard Dispense Document");
