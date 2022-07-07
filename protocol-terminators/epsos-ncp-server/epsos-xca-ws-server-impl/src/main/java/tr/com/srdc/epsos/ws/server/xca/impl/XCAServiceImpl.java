@@ -1544,15 +1544,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                                 OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.ERROR_TRANSCODING_ERROR;
 
-                                switch (classCodeValue){
-                                    case Constants.EP_CLASSCODE:
-                                        openncpErrorCode = OpenncpErrorCode.WARNING_EP_MISSING_EXPECTED_MAPPING;
-                                        break;
-                                    case Constants.PS_CLASSCODE:
-                                        openncpErrorCode = OpenncpErrorCode.WARNING_PS_MISSING_EXPECTED_MAPPING;
-                                        break;
-                                }
-
                                 addErrorOMMessage(omNamespace, registryErrorList,
                                         openncpErrorCode,
                                         openncpErrorCode.getDescription(),
