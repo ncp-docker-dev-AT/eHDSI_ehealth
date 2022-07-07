@@ -38,6 +38,7 @@ public enum OpenncpErrorCode implements ErrorCode {
 
     ERROR_PS_MISSING_BASIC_SECTIONS("ERROR_PS_MISSING_BASIC_SECTIONS", "Any or all of the 5 basic sections are missing, and no reason is communicated for this missing."),
     WARNING_PS_MISSING_BASIC_DATA("WARNING_PS_MISSING_BASIC_DATA", "Any or all of the basic data set is missing."),
+    ERROR_PS_MISSING_EXPECTED_MAPPING("ERROR_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_PS_MISSING_EXPECTED_MAPPING("WARNING_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_PS_MISSING_EXPECTED_TRANSLATION("EHDSI_WARNING_PS_MISSING_EXPECTED_TRANSLATION", "An expected translation of the Patient Summary is missing." ),
     ERROR_PS_PDF_FORMAT_NOT_PROVIDED("ERROR_PS_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
@@ -48,6 +49,7 @@ public enum OpenncpErrorCode implements ErrorCode {
     WARNING_EP_GENERIC("WARNING_EP_GENERIC", "ePrescription generic warning"),
 
     WARNING_EP_MISSING_BASIC_DATA("WARNING_EP_MISSING_BASIC_DATA", "Any or all of the basic data set is missing, and no reason is communicated for this missing."),
+    ERROR_EP_MISSING_EXPECTED_MAPPING("ERROR_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_EP_MISSING_EXPECTED_MAPPING("WARNING_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_EP_MISSING_EXPECTED_TRANSLATION("WARNING_EP_MISSING_EXPECTED_TRANSLATION", "An expected translation of the ePrescription is missing."),
     ERROR_EP_PDF_FORMAT_NOT_PROVIDED("ERROR_EP_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
@@ -62,6 +64,7 @@ public enum OpenncpErrorCode implements ErrorCode {
     ERROR_ED_EPRESCRIPTION_NOT_IDENTIFIABLE("ERROR_ED_EPRESCRIPTION_NOT_IDENTIFIABLE", "Some of the necessary information to allow the identification of the ePrescription and the related medicinal product are missing."),
     WARNING_ED_MISSING_BASIC_DATA("WARNING_ED_MISSING_BASIC_DATA", "Any or all of the basic data set is missing, and no reason has been communicated for this missing."),
     ERROR_ED_INFORMATION_NOT_STORE("ERROR_ED_INFORMATION_NOT_STORE", "Although the Country of Treatment authorizes the eDispensation discard action, eDispensation information could not be stored by the Country of Treatment."),
+    ERROR_ED_MISSING_EXPECTED_MAPPING("ERROR_ED_MISSING_EXPECTED_MAPPING", "An expected code is missing."),
     WARNING_ED_MISSING_EXPECTED_MAPPING("WARNING_ED_MISSING_EXPECTED_MAPPING", "An expected code is missing."),
     ERROR_ED_EDISPENSATION_ACK_NOT_RECEIVED("ERROR_ED_EDISPENSATION_ACK_NOT_RECEIVED", "A new request for available ePrescriptions has been done while the dispensation acknowledgement from Country A has not been received."),
     ERROR_ED_EPRESCRIPTION_NOT_UPDATED("ERROR_ED_EPRESCRIPTION_NOT_UPDATED", "Some of the ePrescription(s) could not be updated with the dispensed medicine information."),

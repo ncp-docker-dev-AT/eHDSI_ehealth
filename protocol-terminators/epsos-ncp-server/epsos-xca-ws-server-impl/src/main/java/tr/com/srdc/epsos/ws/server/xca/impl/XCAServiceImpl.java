@@ -1544,6 +1544,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                                 OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.ERROR_TRANSCODING_ERROR;
 
+                                switch (classCodeValue){
+                                    case Constants.EP_CLASSCODE:
+                                        openncpErrorCode = OpenncpErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
+                                        break;
+                                    case Constants.PS_CLASSCODE:
+                                        openncpErrorCode = OpenncpErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING;
+                                        break;
+                                }
+
                                 addErrorOMMessage(omNamespace, registryErrorList,
                                         openncpErrorCode,
                                         openncpErrorCode.getDescription(),
@@ -1653,9 +1662,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 OMElement errorCode = errors.next();
                 logger.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
                 List<String> list = Arrays.asList(OpenncpErrorCode.ERROR_TRANSCODING_ERROR.getCode(),
-                        OpenncpErrorCode.WARNING_EP_MISSING_EXPECTED_MAPPING.getCode(),
-                        OpenncpErrorCode.WARNING_PS_MISSING_EXPECTED_MAPPING.getCode(),
-                        OpenncpErrorCode.WARNING_ED_MISSING_EXPECTED_MAPPING.getCode());
+                        OpenncpErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING.getCode(),
+                        OpenncpErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING.getCode(),
+                        OpenncpErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getCode());
                 if(!list.contains(errorCode.getAttributeValue(QName.valueOf("errorCode")))){
                     errors.remove();
                 }

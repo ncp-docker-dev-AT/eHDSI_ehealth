@@ -56,7 +56,7 @@ public final class TMServices {
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
             //If the transcoding process fails, an exception is thrown.
-            throw new DocumentTransformationException(OpenncpErrorCode.WARNING_ED_MISSING_EXPECTED_MAPPING, OpenncpErrorCode.WARNING_ED_MISSING_EXPECTED_MAPPING.getDescription(), "DOCUMENT TRANSCODING FAILED.");
+            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING, OpenncpErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getDescription(), "DOCUMENT TRANSCODING FAILED.");
         }
         try {
             // Obtain the translated document in the Document type format, only if translation succeeds.
