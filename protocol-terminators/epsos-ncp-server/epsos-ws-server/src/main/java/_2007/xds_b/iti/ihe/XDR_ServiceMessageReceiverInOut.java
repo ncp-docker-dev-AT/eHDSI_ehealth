@@ -10,6 +10,8 @@ import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -176,15 +178,54 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
-                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
-                        endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
-                        ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
+                if(!hasTransactionErrors(envelope)) {
+                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
+                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
+                            ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
+                } else {
+                    String errorDescription = getTransactionErrorDescription(envelope);
+                    EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, eDispenseCda, startTime,
+                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
+                            ServiceType.DOCUMENT_EXCHANGED_RESPONSE, errorDescription);
+                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             eadcFailure(msgContext, e.getMessage());
             throw AxisFault.makeFault(e);
         }
+    }
+
+    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
+        Iterator<OMElement> it = envelope.getBody().getChildElements();
+        String errorDescription = null;
+        while(it.hasNext()) {
+            OMElement elementDocSet = it.next();
+            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryResponse")) {
+                String status = elementDocSet.getAttributeValue(QName.valueOf("status"));
+                if(StringUtils.equals(status, AdhocQueryResponseStatus.FAILURE)) {
+                    return true;
+                }
+            }
+            it = elementDocSet.getChildElements();
+        }
+        return false;
+    }
+
+    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
+        Iterator<OMElement> it = envelope.getBody().getChildElements();
+        String errorDescription = "unknown";
+        while(it.hasNext()) {
+            OMElement elementDocSet = it.next();
+            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+                String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+                errorDescription = cod + " [" + err + "]";
+                break;
+            }
+            it = elementDocSet.getChildElements();
+        }
+        return errorDescription;
     }
 
     private void eadcFailure(MessageContext messageContext, String errorDescription) {

@@ -10,12 +10,15 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
+import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -221,15 +224,67 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
                 Date endTime = new Date();
-                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
-                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType);
 
+                if(!hasTransactionErrors(envelope)) {
+                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                            tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType);
+                } else {
+                    String errorDescription = getTransactionErrorDescription(envelope);
+                    EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                            tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType, errorDescription);
+                }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             eadcFailure(msgContext, e.getMessage(), ServiceType.DOCUMENT_LIST_RESPONSE);
             throw AxisFault.makeFault(e);
         }
+    }
+
+    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
+        Iterator<OMElement> it = envelope.getBody().getChildElements();
+        String transactionStatus = null;
+        if(it.hasNext()) {
+            OMElement elementDocSet = it.next();
+            if(StringUtils.equals(elementDocSet.getLocalName(), "RetrieveDocumentSetResponse")) {
+                if(elementDocSet.getChildElements().hasNext()) {
+                    OMElement elementResponse = elementDocSet.getChildElements().next();
+                    if(StringUtils.equals(elementResponse.getLocalName(), "RegistryResponse")) {
+                        transactionStatus = elementResponse.getAttributeValue(QName.valueOf("status"));
+                    }
+                }
+            }
+        }
+        if (StringUtils.equals(transactionStatus, RegistryErrorSeverity.ERROR_SEVERITY_ERROR) ||
+                StringUtils.equals(transactionStatus, AdhocQueryResponseStatus.FAILURE)) {
+            return true;
+        }
+        return false;
+    }
+
+    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
+        Iterator<OMElement> it = envelope.getBody().getChildElements();
+        String errorDescription = "unknown";
+        while(it.hasNext()) {
+            OMElement elementDocSet = it.next();
+
+            /* example element
+                <RegistryError
+                        xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+                        codeContext="The requested encoding cannot be provided due to a transcoding error."
+                        errorCode="4203"
+                        severity="urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error"
+                        location="urn:oid:2.16.17.710.823.1000.990.1"/>
+            */
+            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+                String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+                errorDescription = cod + " [" + err + "]";
+                break;
+            }
+            it = elementDocSet.getChildElements();
+        }
+        return errorDescription;
     }
 
     private void eadcFailure(MessageContext messageContext, String errorDescription, ServiceType serviceType) {
