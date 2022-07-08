@@ -12,7 +12,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.kernel.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;

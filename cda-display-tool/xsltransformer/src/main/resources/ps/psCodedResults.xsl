@@ -1,5 +1,5 @@
 <?xml version="1.0"  ?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="urn:hl7-org:v3">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:n1="urn:hl7-org:v3">
 
     <xsl:variable name="codedResultsSectionCode"
                   select="'30954-2'"/>
@@ -49,10 +49,24 @@
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Blood Group -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'119'"/>
-                                                </xsl:call-template>
+                                                <!-- Result type -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Result type
+                                            </th>
+                                            <th>
+                                                <!-- Result value -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Result value
+                                            </th>
+                                            <th>
+                                                <!-- Performer -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Performer
+                                            </th>
+                                            <th>
+                                                <!-- Reporter -->
+                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
+                                                Reporter
                                             </th>
                                         </tr>
                                         <xsl:choose>
@@ -66,7 +80,8 @@
                                                 </tr>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:apply-templates select="n1:entry/n1:observation" mode="codedResults"/>
+                                                <xsl:apply-templates select="n1:entry/n1:observation" mode="codedResultsBloodGroup"/>
+                                                <xsl:apply-templates select="n1:entry/n1:organizer/n1:component/n1:observation" mode="codedResults"/>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </tbody>
@@ -81,7 +96,7 @@
         <br />
     </xsl:template>
 
-    <xsl:template match="n1:entry/n1:observation" mode="codedResults">
+    <xsl:template match="n1:entry/n1:observation" mode="codedResultsBloodGroup">
         <tr>
             <td>
                 <xsl:call-template name="show-TS">
@@ -89,8 +104,54 @@
                 </xsl:call-template>
             </td>
             <td>
+                <!-- TODO add value to value Set in MVC -->
+                <xsl:value-of select="n1:code[@code='34530-6']/@displayName"/>
+            </td>
+            <td>
                 <xsl:call-template name="show-eHDSIBloodGroup">
                     <xsl:with-param name="node" select="n1:code[@code='34530-6']/../n1:value"/>
+                </xsl:call-template>
+            </td>
+            <td/>
+            <td/>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="n1:entry/n1:organizer/n1:component/n1:observation" mode="codedResults">
+        <tr>
+            <td>
+                <xsl:call-template name="show-IVL_TS">
+                    <xsl:with-param name="node" select="n1:effectiveTime"/>
+                </xsl:call-template>
+            </td>
+            <td>
+                <!-- TODO Value set to be added in MVC -->
+                <xsl:value-of select="n1:code/@displayName"/>
+            </td>
+            <td>
+                <xsl:choose>
+                    <!-- TODO Value set to be added in MVC -->
+                    <xsl:when test="n1:value/@xsi:type='CD'">
+                       <xsl:value-of select="n1:value/@displayName"/>
+                    </xsl:when>
+                    <xsl:when test="n1:value/@xsi:type='CE'">
+                        <xsl:value-of select="n1:value/@displayName"/>
+                    </xsl:when>
+                    <xsl:when test="n1:value/@xsi:type='PQ'">
+                        <xsl:call-template name="show-PQ">
+                            <xsl:with-param name="node" select="n1:value"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                </xsl:choose>
+            </td>
+            <td>
+                <xsl:call-template name="show-performer">
+                    <xsl:with-param name="node" select="../../n1:performer"/>
+                </xsl:call-template>
+            </td>
+            <td>
+                <xsl:call-template name="show-author">
+                    <xsl:with-param name="node" select="../../n1:author"/>
                 </xsl:call-template>
             </td>
         </tr>

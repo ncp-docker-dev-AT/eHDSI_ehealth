@@ -35,7 +35,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.kernel.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
@@ -137,7 +137,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             _serviceClient.getServiceContext().getConfigurationContext()
                     .setProperty(HTTPConstants.REUSE_HTTP_CLIENT, false);
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException | CertificateException |
-                KeyStoreException | UnrecoverableKeyException e) {
+                 KeyStoreException | UnrecoverableKeyException e) {
             throw new RuntimeException("SSL Context cannot be initialized");
         }
     }
@@ -678,7 +678,7 @@ public class RespondingGateway_ServiceStub extends Stub {
              * Prepare request
              */
             _messageContext.setEnvelope(env);   // set the message context with that soap envelope
-            _operationClient.addMessageContext(_messageContext);    // add the message contxt to the operation client
+            _operationClient.addMessageContext(_messageContext);    // add the message context to the operation client
 
             /* Log soap request */
             String logRequestBody;
@@ -707,7 +707,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Request Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B, Arrays.asList(classCode));
+                OpenNCPValidation.validateCrossCommunityAccess(logRequestBody, NcpSide.NCP_B, List.of(classCode));
             }
 
             /*
@@ -819,7 +819,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             /* Validate Response Message */
             if (OpenNCPValidation.isValidationEnable()) {
-                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B, Arrays.asList(classCode));
+                OpenNCPValidation.validateCrossCommunityAccess(logResponseBody, NcpSide.NCP_B, List.of(classCode));
             }
 
             /*
