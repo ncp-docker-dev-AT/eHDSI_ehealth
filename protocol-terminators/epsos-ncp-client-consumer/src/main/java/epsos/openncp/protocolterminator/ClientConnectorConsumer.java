@@ -102,6 +102,8 @@ public class ClientConnectorConsumer {
             return Arrays.asList(docArray);
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
@@ -136,6 +138,8 @@ public class ClientConnectorConsumer {
             return Arrays.asList(pdArray);
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_PI_GENERIC, ex.getMessage(), null,  ex);
         }
@@ -161,6 +165,8 @@ public class ClientConnectorConsumer {
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
@@ -203,6 +209,8 @@ public class ClientConnectorConsumer {
 
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
@@ -251,6 +259,8 @@ public class ClientConnectorConsumer {
             return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (AxisFault axisFault) {
             throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_ED_GENERIC, ex.getMessage(), null, ex);
         }
@@ -265,8 +275,12 @@ public class ClientConnectorConsumer {
     private void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub,
                                Map<AssertionEnum, Assertion> assertions) throws Exception {
 
-        if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
-            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "HCP Assertion expired", null);
+        if (!assertions.containsKey(AssertionEnum.CLINICIAN)) {
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion expired", null);
+        }
+
+        if (AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
+            throw new ClientConnectorConsumerException(OpenncpErrorCode.ERROR_HPI_GENERIC, "HCP Assertion expired", null);
         }
 
         var omFactory = OMAbstractFactory.getSOAP12Factory();

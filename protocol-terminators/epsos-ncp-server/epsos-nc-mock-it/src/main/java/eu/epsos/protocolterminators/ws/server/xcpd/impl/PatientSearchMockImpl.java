@@ -6,6 +6,7 @@ import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDem
 import eu.epsos.protocolterminators.ws.server.xcpd.exception.AnswerNotAvailableException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.CloneUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
@@ -85,7 +86,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
 
         if (id == null) {
             logger.info("[National Infrastructure Mock] Patient with ID: '{}' not found: ", idList.get(0));
-            throw new NIException(OpenncpErrorCode.ERROR_PI_NO_MATCH, "[National Infrastructure Mock] ID: " + idList.get(0) + " not found: ");
+            return new ArrayList<>(0);
         }
 
         // Load Patient properties file.
@@ -116,6 +117,12 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
+
+            //Create an error scenario to send two patients with the same id
+            if (StringUtils.equals(idList.get(0).getExtension(), "PI_MULTIPLE_MATCHES")) {
+                result.add(patient);
+            }
+
             logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getFullId());
 
         } catch (Exception e) {

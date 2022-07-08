@@ -710,11 +710,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                             outputMessage.getControlActProcess().getSubject().add(getSubjectByPatientDemographic(demographicsList.get(i)));
                         }
                     }
-                    if (demographicsList.size() == 1) {
+                    if (!demographicsList.isEmpty()) {
                         // There are patient data to be sent, OK
                         fillOutputMessage(outputMessage, null, null, null,"OK");
-                    } else if (!demographicsList.isEmpty()) {
-                        fillOutputMessage(outputMessage, null, OpenncpErrorCode.ERROR_PI_MULTIPLE_MATCHES, "Multiple match for the patient", "OK");
                     } else {
                         // No patient data can be sent to Country B.
                         fillOutputMessage(outputMessage,

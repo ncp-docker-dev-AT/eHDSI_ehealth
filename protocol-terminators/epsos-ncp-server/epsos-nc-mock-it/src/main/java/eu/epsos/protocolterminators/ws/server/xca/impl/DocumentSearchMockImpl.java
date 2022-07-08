@@ -6,6 +6,7 @@ import eu.epsos.protocolterminators.ws.server.common.ResourceLoader;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.exception.NoMatchException;
 import eu.epsos.protocolterminators.ws.server.exception.OriginalDataMissingException;
+import eu.epsos.protocolterminators.ws.server.exception.ProcessingDeferredException;
 import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
@@ -45,6 +46,8 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode.ERROR_PS_PDF_FORMAT_NOT_PROVIDED;
 
 /**
  * @author konstantin.hypponen@kela.fi Note this is a very dirty implementation
@@ -513,6 +516,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 if(documentAssociation.getPDFDocumentMetaData() == null){
+                    OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                    ex.setOpenncpErrorCode(ERROR_PS_PDF_FORMAT_NOT_PROVIDED);
                     throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                 }
                 return documentAssociation;
@@ -536,6 +541,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 metaDatas.add(documentAssociation);
                 logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
+                if(documentAssociation.getPDFDocumentMetaData() == null){
+                    OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                    ex.setOpenncpErrorCode(OpenncpErrorCode.ERROR_EP_PDF_FORMAT_NOT_PROVIDED);
+                    throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                }
             }
         }
 
@@ -544,36 +554,41 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         NoMatchException noMatchException = new NoMatchException("[National Infrastructure Mock] No eP List Found");
-        noMatchException.setOpenncpErrorCode(OpenncpErrorCode.ERROR_PS_NOT_FOUND);
+        noMatchException.setOpenncpErrorCode(OpenncpErrorCode.ERROR_EP_NOT_FOUND);
         throw noMatchException;
     }
 
     @Override
-    public List<OrCDDocumentMetaData> getOrCDHospitalDischargeReportsDocumentList(SearchCriteria searchCriteria) {
+    public List<OrCDDocumentMetaData> getOrCDHospitalDischargeReportsDocumentList(SearchCriteria searchCriteria) throws NIException {
         logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Hospital Discharge Reports: '{}'", searchCriteria.toString());
         return getOrCDDocumentList(searchCriteria, orCDDocumentHospitalDischargeReportsMetaDatas);
     }
 
     @Override
-    public List<OrCDDocumentMetaData> getOrCDLaboratoryResultsDocumentList(SearchCriteria searchCriteria) {
+    public List<OrCDDocumentMetaData> getOrCDLaboratoryResultsDocumentList(SearchCriteria searchCriteria) throws NIException {
         logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Laboratory results: '{}'", searchCriteria.toString());
         return getOrCDDocumentList(searchCriteria, orCDDocumentLaboratoryResultsMetaDatas);
     }
 
     @Override
-    public List<OrCDDocumentMetaData> getOrCDMedicalImagingReportsDocumentList(SearchCriteria searchCriteria) {
+    public List<OrCDDocumentMetaData> getOrCDMedicalImagingReportsDocumentList(SearchCriteria searchCriteria) throws NIException {
         logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Medical Imaging Reports: '{}'", searchCriteria.toString());
         return getOrCDDocumentList(searchCriteria, orCDDocumentMedicalImagingReportsMetaDatas);
     }
 
     @Override
-    public List<OrCDDocumentMetaData> getOrCDMedicalImagesDocumentList(SearchCriteria searchCriteria) {
+    public List<OrCDDocumentMetaData> getOrCDMedicalImagesDocumentList(SearchCriteria searchCriteria) throws NIException {
         logger.info("[National Infrastructure Mock] Get Original Clinical Document List for Medical Images: '{}'", searchCriteria.toString());
         return getOrCDDocumentList(searchCriteria, orCDDocumentMedicalImagesMetaDatas);
     }
 
-    private List<OrCDDocumentMetaData> getOrCDDocumentList(SearchCriteria searchCriteria, List<OrCDDocumentMetaData> orCDMetaDataList) {
+    private List<OrCDDocumentMetaData> getOrCDDocumentList(SearchCriteria searchCriteria, List<OrCDDocumentMetaData> orCDMetaDataList) throws ProcessingDeferredException {
         List<OrCDDocumentMetaData> metaDatas = new ArrayList<>();
+
+        if(searchCriteria.getCriteriaValue(Criteria.PatientId).equals("3-ERROR-ORCD-GENERIC")){
+            ProcessingDeferredException exception = new ProcessingDeferredException("[National Infrastructure Mock] Mock error for ORCD scenario");
+            throw exception;
+        }
 
         Long maximumSize = null;
         var maximumSizeCriteriaString = searchCriteria.getCriteriaValue(Criteria.MaximumSize);
