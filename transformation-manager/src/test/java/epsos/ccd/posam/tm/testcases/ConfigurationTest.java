@@ -77,14 +77,6 @@ public class ConfigurationTest extends TBase {
         assertNotNull(eDispensationL3b);
         assertFalse(eDispensationL3b.isEmpty());
 
-        Collection<CodedElementListItem> eDispensationL1 = codedElementList
-                .geteDispensationl1();
-        assertNotNull(eDispensationL1);
-        assertFalse(eDispensationL1.isEmpty());
-
-        Collection<CodedElementListItem> eDispensationL1b = codedElementList.getList(TMConstants.EDISPENSATION1);
-        assertNotNull(eDispensationL1b);
-        assertFalse(eDispensationL1b.isEmpty());
 
         Collection<CodedElementListItem> hcerDocL3 = codedElementList.getList(TMConstants.HCER3);
         assertNotNull(hcerDocL3);
@@ -103,12 +95,11 @@ public class ConfigurationTest extends TBase {
         assertFalse(mroDocL1.isEmpty());
 
 
-        Collection<CodedElementListItem> allCodedElementItems = new ArrayList<CodedElementListItem>();
+        Collection<CodedElementListItem> allCodedElementItems = new ArrayList<>();
         allCodedElementItems.addAll(patientSummaryL1);
         allCodedElementItems.addAll(patientSummaryL3);
         allCodedElementItems.addAll(ePrescriptionL1);
         allCodedElementItems.addAll(ePrescriptionL3);
-        allCodedElementItems.addAll(eDispensationL1);
         allCodedElementItems.addAll(eDispensationL3);
         allCodedElementItems.addAll(hcerDocL1);
         allCodedElementItems.addAll(hcerDocL3);

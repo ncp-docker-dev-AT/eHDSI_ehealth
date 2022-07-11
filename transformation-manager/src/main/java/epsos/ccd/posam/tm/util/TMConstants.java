@@ -63,7 +63,6 @@ public interface TMConstants {
     String EPRESCRIPTION3 = "ePrescriptionCDAl3";
     String EPRESCRIPTION1 = "ePrescriptionCDAl1pdf";
     String EDISPENSATION3 = "eDispensationCDAl3";
-    String EDISPENSATION1 = "eDispensationCDAl1pdf";
     String HCER3 = "HCERDocCDAl3";
     String HCER1 = "HCERDocCDAl1pdf";
     String MRO3 = "MRODocCDAl3";
