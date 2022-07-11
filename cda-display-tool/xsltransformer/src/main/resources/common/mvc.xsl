@@ -261,7 +261,7 @@
         <xsl:call-template name="show-codedElement">
             <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.58.xml'"/>
-            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.4.642.4.1075'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.4.642.4.1371'"/>
         </xsl:call-template>
     </xsl:template>
 

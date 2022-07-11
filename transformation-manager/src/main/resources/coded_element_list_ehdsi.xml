@@ -13,7 +13,7 @@
             <ePrescriptionCDAl3>RNFA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>RNFA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>RNFA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>RNFA</eDispensationCDAl1pdf>
+            
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -33,7 +33,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>O</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -45,25 +44,25 @@
         <targetLanguageCode />
     </codedElement>
     <!-- Role class -->
-<!--    <codedElement>-->
-<!--        <elementPath>/ClinicalDocument/participant/associatedEntity/@classCode</elementPath>-->
-<!--        <usage>-->
-<!--            <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>-->
-<!--            <patientSummaryCDAl1pdf>RNFA</patientSummaryCDAl1pdf>-->
-<!--            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>-->
-<!--            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>-->
-<!--            <eDispensationCDAl3>NA</eDispensationCDAl3>-->
-<!--            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>-->
-<!--            <HCERDocCDAl3>RNFA</HCERDocCDAl3>-->
-<!--            <HCERDocCDAl1pdf>RNFA</HCERDocCDAl1pdf>-->
-<!--            <MRODocCDAl3>RNFA</MRODocCDAl3>-->
-<!--            <MRODocCDAl1pdf>RNFA</MRODocCDAl1pdf>-->
-<!--        </usage>-->
-<!--        &lt;!&ndash; epSOSRoleClass &ndash;&gt;-->
-<!--        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.39</valueSet>-->
-<!--        <valueSetVersion />-->
-<!--        <targetLanguageCode />-->
-<!--    </codedElement>->-->
+    <!--    <codedElement>-->
+    <!--        <elementPath>/ClinicalDocument/participant/associatedEntity/@classCode</elementPath>-->
+    <!--        <usage>-->
+    <!--            <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>-->
+    <!--            <patientSummaryCDAl1pdf>RNFA</patientSummaryCDAl1pdf>-->
+    <!--            <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>-->
+    <!--            <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>-->
+    <!--            <eDispensationCDAl3>NA</eDispensationCDAl3>-->
+    <!--            -->
+    <!--            <HCERDocCDAl3>RNFA</HCERDocCDAl3>-->
+    <!--            <HCERDocCDAl1pdf>RNFA</HCERDocCDAl1pdf>-->
+    <!--            <MRODocCDAl3>RNFA</MRODocCDAl3>-->
+    <!--            <MRODocCDAl1pdf>RNFA</MRODocCDAl1pdf>-->
+    <!--        </usage>-->
+    <!--        &lt;!&ndash; epSOSRoleClass &ndash;&gt;-->
+    <!--        <valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.39</valueSet>-->
+    <!--        <valueSetVersion />-->
+    <!--        <targetLanguageCode />-->
+    <!--    </codedElement>->-->
     <!-- Profession -->
     <codedElement>
         <elementPath>//documentationOf/serviceEvent/performer/functionCode</elementPath>
@@ -73,7 +72,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>O</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -93,7 +91,6 @@
             <ePrescriptionCDAl3>R</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>R</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>O</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>O</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -113,7 +110,6 @@
             <ePrescriptionCDAl3>R</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>R</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>R</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>R</eDispensationCDAl1pdf>
             <HCERDocCDAl3>R</HCERDocCDAl3>
             <HCERDocCDAl1pdf>R</HCERDocCDAl1pdf>
             <MRODocCDAl3>R</MRODocCDAl3>
@@ -133,7 +129,6 @@
             <ePrescriptionCDAl3>RNFA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>RNFA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>RNFA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>RNFA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>RNFA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>RNFA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -156,7 +151,6 @@
             <ePrescriptionCDAl3>RNFA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -176,7 +170,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>RNFA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -196,7 +189,6 @@
             <ePrescriptionCDAl3>R</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -216,7 +208,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>O</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -236,7 +227,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -256,7 +246,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -276,7 +265,6 @@
             <ePrescriptionCDAl3>R</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -296,7 +284,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>R</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -316,7 +303,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -336,7 +322,6 @@
             <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -356,7 +341,6 @@
             <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -376,7 +360,6 @@
             <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -396,7 +379,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>O</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -416,7 +398,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -436,7 +417,6 @@
             <ePrescriptionCDAl3>RNFA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -456,7 +436,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>RNFA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -476,7 +455,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -496,7 +474,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -517,7 +494,6 @@
             <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>NA</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -537,7 +513,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -550,14 +525,13 @@
     </codedElement>
     <!-- Alerts - Clinical manifestation -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/value</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.44']/value</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -570,14 +544,13 @@
     </codedElement>
     <!-- Alerts - Code for problem description -->
     <codedElement>
-        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/code</elementPath>
+        <elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='MFST']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.44']/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -597,7 +570,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -619,7 +591,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -639,7 +610,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>RNFA</MRODocCDAl3>
@@ -661,7 +631,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -681,7 +650,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -703,7 +671,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -723,7 +690,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -743,7 +709,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -763,7 +728,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -783,7 +747,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -803,7 +766,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -825,7 +787,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -847,7 +808,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -867,7 +827,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -887,7 +846,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
@@ -907,7 +865,6 @@
             <ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>NA</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>NA</MRODocCDAl3>
@@ -927,7 +884,6 @@
             <ePrescriptionCDAl3>O</ePrescriptionCDAl3>
             <ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
             <eDispensationCDAl3>O</eDispensationCDAl3>
-            <eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
             <HCERDocCDAl3>O</HCERDocCDAl3>
             <HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
             <MRODocCDAl3>O</MRODocCDAl3>
