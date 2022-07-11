@@ -415,9 +415,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <!-- brand name (optional) -->
                                         <name>Eutirox</name>
                                         <pharm:formCode code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
+                                            <originalText>
                                                 <pharm:reference value="#form-1"/>
-                                            </pharm:originalText>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
@@ -432,9 +432,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="H03AA01" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-1"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                                 <!-- epsos:name>levothyroxine sodium</pharm:name -->
                                             </pharm:ingredientSubstance>
@@ -482,16 +482,16 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Triapin</name>
                                         <pharm:formCode code="10226000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
+                                            <originalText>
                                                 <pharm:reference value="#form-2"/>
-                                            </pharm:originalText>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asSpecializedKind classCode="GEN">
                                             <pharm:generalizedMedicineClass classCode="MMAT">
                                                 <pharm:code code="C09BB05" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-2"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:generalizedMedicineClass>
                                         </pharm:asSpecializedKind>
@@ -502,9 +502,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C09AA05" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-3"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -515,9 +515,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C08CA02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-4"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -552,9 +552,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Tresiba</name>
                                         <pharm:formCode code="50060200" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
+                                            <originalText>
                                                 <pharm:reference value="#form-3"/>
-                                            </pharm:originalText>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
@@ -563,9 +563,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-5"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -598,16 +598,16 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Augmentin</name>
                                         <pharm:formCode code="10221000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
+                                            <originalText>
                                                 <pharm:reference value="#form-4"/>
-                                            </pharm:originalText>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asSpecializedKind classCode="GEN">
                                             <pharm:generalizedMedicineClass classCode="MMAT">
                                                 <pharm:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-6"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:generalizedMedicineClass>
                                         </pharm:asSpecializedKind>
@@ -618,9 +618,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="J01CA04" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-7"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -662,16 +662,16 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Combivent Unidose</name>
                                         <pharm:formCode code="11101000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
+                                            <originalText>
                                                 <pharm:reference value="#form-5"/>
-                                            </pharm:originalText>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
                                                 <pharm:formCode code="30057000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#form-6"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:formCode>
                                                 <pharm:capacityQuantity value="2.5" unit="mL"/>
                                             </pharm:containerPackagedProduct>
@@ -679,9 +679,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <pharm:asSpecializedKind classCode="GEN">
                                             <pharm:generalizedMedicineClass classCode="MMAT">
                                                 <pharm:code code="R03AL02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-9"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:generalizedMedicineClass>
                                         </pharm:asSpecializedKind>
@@ -692,9 +692,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03AC02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-10"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -705,9 +705,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03BB01" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
+                                                    <originalText>
                                                         <pharm:reference value="#ecode-11"/>
-                                                    </pharm:originalText>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
