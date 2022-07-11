@@ -177,9 +177,6 @@ public class CodedElementList implements InitializingBean, TMConstants {
                             case EPRESCRIPTION3:
                                 ePrescriptionl3 = addItem(docTypeElement, codedElement, ePrescriptionl3);
                                 break;
-                            case EDISPENSATION1:
-                                eDispensationl1 = addItem(docTypeElement, codedElement, eDispensationl1);
-                                break;
                             case EDISPENSATION3:
                                 eDispensationl3 = addItem(docTypeElement, codedElement, eDispensationl3);
                                 break;
@@ -205,7 +202,6 @@ public class CodedElementList implements InitializingBean, TMConstants {
 
             hmDocAndLists.put(PATIENT_SUMMARY1, patientSummaryl1);
             hmDocAndLists.put(PATIENT_SUMMARY3, patientSummaryl3);
-            hmDocAndLists.put(EDISPENSATION1, eDispensationl1);
             hmDocAndLists.put(EDISPENSATION3, eDispensationl3);
             hmDocAndLists.put(EPRESCRIPTION1, ePrescriptionl1);
             hmDocAndLists.put(EPRESCRIPTION3, ePrescriptionl3);
