@@ -32,6 +32,7 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
         CodeSystemVersion target = new CodeSystemVersion();
         target.setFullName(source.getFullName());
         target.setLocalName(source.getVersionId());
+        target.setPreviousVersionId(source.getPreviousVersionId());
         if (source.getEffectiveDate() != null) {
             target.setEffectiveDate(LocalDateTime.parse(source.getEffectiveDate()));
         }
