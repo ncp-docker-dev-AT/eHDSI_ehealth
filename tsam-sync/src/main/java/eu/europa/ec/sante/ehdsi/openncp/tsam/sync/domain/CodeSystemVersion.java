@@ -30,7 +30,7 @@ public class CodeSystemVersion {
 
     private String source;
 
-    private String previousVersionId;
+    private Long previousVersionId;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "CODE_SYSTEM_ID")
@@ -115,11 +115,11 @@ public class CodeSystemVersion {
         this.source = source;
     }
 
-    public String getPreviousVersionId() {
+    public Long getPreviousVersionId() {
         return previousVersionId;
     }
 
-    public void setPreviousVersionId(String previousVersionId) {
+    public void setPreviousVersionId(Long previousVersionId) {
         this.previousVersionId = previousVersionId;
     }
 

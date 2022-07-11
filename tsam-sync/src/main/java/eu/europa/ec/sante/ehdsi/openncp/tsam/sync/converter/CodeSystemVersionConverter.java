@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter;
 
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.CodeSystemVersion;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.CodeSystemVersionModel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class CodeSystemVersionConverter implements Converter<CodeSystemVersionMo
         CodeSystemVersion target = new CodeSystemVersion();
         target.setFullName(source.getFullName());
         target.setLocalName(source.getVersionId());
-        target.setPreviousVersionId(source.getPreviousVersionId());
+        target.setPreviousVersionId(StringUtils.isNotBlank(source.getPreviousVersionId()) ? Long.valueOf(source.getPreviousVersionId()) : null);
         if (source.getEffectiveDate() != null) {
             target.setEffectiveDate(LocalDateTime.parse(source.getEffectiveDate()));
         }
