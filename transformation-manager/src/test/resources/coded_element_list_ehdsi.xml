@@ -182,7 +182,7 @@
 	</codedElement>
 	<!-- Prescription - Active ingredient description -->
 	<codedElement>
-		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredientSubstance/code</elementPath>
 		<usage>
 			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -196,12 +196,14 @@
 		</usage>
 		<!-- eHDSIActiveIngredient -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
+		<!-- eHDSISubstance -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.61</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
 	<!-- Dispensation - Active ingredient description -->
 	<codedElement>
-		<elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
+		<elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredientSubstance/code</elementPath>
 		<usage>
 			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -215,12 +217,14 @@
 		</usage>
 		<!-- eHDSIActiveIngredient -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
+		<!-- eHDSISubstance -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.61</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
 	<!-- Medication Summary - Active ingredient description -->
 	<codedElement>
-		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredient/code</elementPath>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/ingredient[@classCode='ACTI']/ingredientSubstance/code</elementPath>
 		<usage>
 			<patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -234,6 +238,8 @@
 		</usage>
 		<!-- eHDSIActiveIngredient -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.24</valueSet>
+		<!-- eHDSISubstance -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.61</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -253,6 +259,46 @@
 		</usage>
 		<!-- eHDSIAbsentOrUnknownMedication -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.49</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Medication Summary - Dose Quantity low Unit -->
+	<codedElement>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/doseQuantity/low/@unit</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>NA</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>NA</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSIUnit -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Medication Summary - Dose Quantity high Unit -->
+	<codedElement>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/doseQuantity/high/@unit</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>NA</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>NA</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSIUnit -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.16</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -310,6 +356,26 @@
 		</usage>
 		<!-- eHDSIDoseForm -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Prescription - Timing event -->
+	<codedElement>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/effectiveTime[@xsi:type='EIVL_TS]/event</elementPath>
+		<usage>
+			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>O</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>NA</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>NA</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSITimingEvent -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.41</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -389,6 +455,46 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
+	<!-- Dispensation - Timing event -->
+	<codedElement>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/effectiveTime[@xsi:type='EIVL_TS]/event</elementPath>
+		<usage>
+			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>O</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>NA</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>NA</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSITimingEvent -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.41</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Medication Summary - Timing event -->
+	<codedElement>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/effectiveTime[@xsi:type='EIVL_TS]/event</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSITimingEvent -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.41</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
 	<!-- Medication Summary - Route of administration -->
 	<codedElement>
 		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/routeCode</elementPath>
@@ -410,7 +516,7 @@
 	</codedElement>
 	<!-- Prescription - Medicinal product package -->
 	<codedElement>
-		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedProduct/formCode</elementPath>
 		<usage>
 			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -424,12 +530,14 @@
 		</usage>
 		<!-- eHDSIPackage -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
+		<!-- eHDSIDoseForm -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
 	<!-- Dispensation - Medicinal product package -->
 	<codedElement>
-		<elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
+		<elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedProduct/formCode</elementPath>
 		<usage>
 			<patientSummaryCDAl3>NA</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -443,12 +551,14 @@
 		</usage>
 		<!-- eHDSIPackage -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
+		<!-- eHDSIDoseForm -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
 	<!-- Medication Summary - Medicinal product package -->
 	<codedElement>
-		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedMedicine/formCode</elementPath>
+		<elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asContent/containerPackagedProduct/formCode</elementPath>
 		<usage>
 			<patientSummaryCDAl3>O</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -460,8 +570,8 @@
 			<MRODocCDAl3>O</MRODocCDAl3>
 			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
 		</usage>
-		<!-- eHDSIPackage -->
-		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.3</valueSet>
+		<!-- eHDSIDoseForm -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.2</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -504,6 +614,8 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
+
+	<!-- Alerts -->
 	<!-- Alerts - Reaction type -->
 	<codedElement>
 		<elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/code</elementPath>
@@ -537,6 +649,8 @@
 			<MRODocCDAl3>RNFA</MRODocCDAl3>
 			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
 		</usage>
+		<!-- eHDSIIllnessandDisorder -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
 		<!-- eHDSIReactionAllergy -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.11</valueSet>
 		<valueSetVersion />
@@ -601,6 +715,68 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
+	<!-- Alerts - Criticality -->
+	<codedElement>
+		<elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.33']/value</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSICriticality -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.57</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Alerts - Certainty -->
+	<codedElement>
+		<elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.35']/value</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSICertainty -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.58</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Alerts - Allergy Status -->
+	<codedElement>
+		<elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.16']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.17']/entryRelationship[@typeCode='REFR']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.34']/value</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSIAllergyStatus -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.59</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+
+	<!-- Problems -->
 	<!-- Current problems / Diagnosis - Active problem -->
 	<codedElement>
 		<elementPath>//entry/act[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.15']/entryRelationship[@typeCode='SUBJ']/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/value</elementPath>
@@ -619,6 +795,8 @@
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.5</valueSet>
 		<!-- eHDSIAbsentOrUnknownProblem -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.50</valueSet>
+		<!-- eHDSIRareDiseases -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.63</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
@@ -738,7 +916,7 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
-	<!-- Vaccinations - Vaccinations -->
+	<!-- Vaccinations -->
 	<codedElement>
 		<elementPath>//entry/substanceAdministration[templateId/@root='2.16.840.1.113883.10.20.1.24'][templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.19']/consumable/manufacturedProduct/manufacturedMaterial/code</elementPath>
 		<usage>
@@ -837,9 +1015,30 @@
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
-	<!-- Pregnancy history - Type of expected date -->
+	<!-- Pregnancy History -->
+	<!-- Pregnancy Status Observation - Current Pregnancy Status -->
 	<codedElement>
-		<elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.24']/code</elementPath>
+		<elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.45']/value</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSICurrentPregnancyStatus -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.60</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Pregnancy Expected Delivery Date Observation - Pregnancy Observation code -->
+	<codedElement>
+		<elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.45']/entryRelationship/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.24']/code</elementPath>
 		<usage>
 			<patientSummaryCDAl3>O</patientSummaryCDAl3>
 			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -853,6 +1052,26 @@
 		</usage>
 		<!-- eHDSIPregnancyInformation -->
 		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.9</valueSet>
+		<valueSetVersion />
+		<targetLanguageCode />
+	</codedElement>
+	<!-- Pregnancy Outcome Observation - Outcome code -->
+	<codedElement>
+		<elementPath>//entry/observation[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.46']/code</elementPath>
+		<usage>
+			<patientSummaryCDAl3>O</patientSummaryCDAl3>
+			<patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
+			<ePrescriptionCDAl3>NA</ePrescriptionCDAl3>
+			<ePrescriptionCDAl1pdf>NA</ePrescriptionCDAl1pdf>
+			<eDispensationCDAl3>NA</eDispensationCDAl3>
+			<eDispensationCDAl1pdf>NA</eDispensationCDAl1pdf>
+			<HCERDocCDAl3>O</HCERDocCDAl3>
+			<HCERDocCDAl1pdf>NA</HCERDocCDAl1pdf>
+			<MRODocCDAl3>O</MRODocCDAl3>
+			<MRODocCDAl1pdf>NA</MRODocCDAl1pdf>
+		</usage>
+		<!-- eHDSIOutcomeOfPregnancy -->
+		<valueSet>1.3.6.1.4.1.12559.11.10.1.3.1.42.62</valueSet>
 		<valueSetVersion />
 		<targetLanguageCode />
 	</codedElement>
