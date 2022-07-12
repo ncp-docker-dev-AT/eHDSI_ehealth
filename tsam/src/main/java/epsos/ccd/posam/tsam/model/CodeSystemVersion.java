@@ -11,30 +11,27 @@ import java.util.List;
  */
 public class CodeSystemVersion {
 
-    public static final String AT_LNAME = "localName";
-    public static final String AT_CODESYSTEM = "codeSystem";
+    public static final String AT_LOCAL_NAME = "localName";
+    public static final String AT_CODE_SYSTEM = "codeSystem";
     /**
-     * A version identifier that uniquely identifies each version of a Code
-     * System
+     * A version identifier that uniquely identifies each version of a Code System
      */
     private long id;
 
     /**
-     * A name that is the official name of the code system as assigned by the
-     * terminology provider at the time of the version being issued
+     * A name that is the official name of the code system as assigned by the terminology provider at the time of
+     * the version being issued.
      */
     private String fullName;
 
     /**
-     * A name that the Code system is normally referred to for the life of this
-     * version
+     * A name that the Code system is normally referred to for the life of this version
      */
     private String localName;
 
     /**
-     * Identification of the previous version of the code system, which enables
-     * tracking of sequencing of versions, and identification of missing
-     * versions on a server instance
+     * Identification of the previous version of the code system, which enables tracking of sequencing of versions,
+     * and identification of missing versions on a server instance
      */
     private CodeSystemVersion previousVersion;
 
@@ -44,17 +41,16 @@ public class CodeSystemVersion {
     private Date effectiveDate;
 
     /**
-     * A date when the version of the Code System became available within a
-     * particular domain
+     * A date when the version of the Code System became available within a particular domain
      */
     private Date releaseDate;
 
     /**
      * A status to identify the state of the Code System Version.<br>
-     * TODO (enumeration OR catalog) List of statuses:<br>
-     * <li>current version of code system currently in use</li> <li>retired
-     * past version of code system</li> <li>not in use  prepared version which
-     * is still not in use</li>
+     * TODO (enumeration OR catalog) List of status:<br>
+     * <li>current version of code system currently in use</li>
+     * <li>retired past version of code system</li>
+     * <li>not in use  prepared version which is still not in use</li>
      */
     private String status;
 
@@ -74,7 +70,8 @@ public class CodeSystemVersion {
     private String copyright;
 
     /**
-     * An attribute that identifies the authority or source of the code system in this version. i.e. IHTSDO
+     * An attribute that identifies the authority or source of the code system in this version.
+     * (i.e. IHTSDO - International Health Terminology Standards Development Organisation).
      */
     private String source;
 
@@ -83,6 +80,7 @@ public class CodeSystemVersion {
      * Identification of a code system to which version is related
      */
     private CodeSystem codeSystem;
+
     private List<CodeSystemConcept> concepts;
 
     public long getId() {
@@ -183,5 +181,9 @@ public class CodeSystemVersion {
 
     public CodeSystemVersion getPreviousVersion() {
         return previousVersion;
+    }
+
+    public void setPreviousVersion(CodeSystemVersion previousVersion) {
+        this.previousVersion = previousVersion;
     }
 }
