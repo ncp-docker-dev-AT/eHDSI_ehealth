@@ -936,7 +936,6 @@ public class TransformationService implements ITransformationService, TMConstant
 
         level1Type = new HashMap<>();
         level1Type.put(config.getPatientSummaryCode(), PATIENT_SUMMARY1);
-        level1Type.put(config.geteDispensationCode(), EDISPENSATION1);
         level1Type.put(config.getePrescriptionCode(), EPRESCRIPTION1);
         level1Type.put(config.getHcerCode(), HCER1);
         level1Type.put(config.getMroCode(), MRO1);

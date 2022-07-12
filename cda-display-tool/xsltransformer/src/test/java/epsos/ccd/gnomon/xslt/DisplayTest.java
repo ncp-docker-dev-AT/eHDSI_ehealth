@@ -72,7 +72,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws Exception {
-        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/PS_L3_W6.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/eP_L3_W6.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test
