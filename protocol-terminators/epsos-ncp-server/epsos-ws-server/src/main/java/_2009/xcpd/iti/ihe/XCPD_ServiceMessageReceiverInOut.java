@@ -79,11 +79,12 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
     }
 
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
+        String eadcError = "";
+
+        // Start Date for eADC
+        Date startTime = new Date();
 
         try {
-            // Start Date for eADC
-            Date startTime = new Date();
-
             //  Identification of the TLS Common Name of the client.
             String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
             LOGGER.info("[ITI-55] Incoming XCPD Request from '{}'", clientCommonName);
@@ -118,7 +119,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             if (axisOperation == null) {
                 String err = "Operation is not located, if this is doclit style the SOAP-ACTION " +
                         "should specified via the SOAP Action to use the RawXMLProvider";
-                eadcFailure(msgContext, err);
+                eadcError = err;
                 throw new AxisFault(err);
             }
 
@@ -155,7 +156,7 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                 } else {
                     String err = "Method not Found: '" + methodName + "'";
                     LOGGER.error(err);
-                    eadcFailure(msgContext, err);
+                    eadcError = err;
                     throw new RuntimeException(err);
                 }
                 newMsgContext.setEnvelope(envelope);
@@ -167,18 +168,16 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            eadcFailure(msgContext, e.getMessage());
+            eadcError = e.getMessage();
             throw AxisFault.makeFault(e);
+        } finally {
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, null, startTime,
+                        new Date(), Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
+                        ServiceType.PATIENT_IDENTIFICATION_RESPONSE, eadcError);
+                eadcError = "";
+            }
         }
-    }
-
-    private void eadcFailure(MessageContext messageContext, String errorDescription) {
-        var transactionStartTime = new Date();
-        Date transactionEndTime = new Date();
-        MessageContext ctx = new MessageContext();
-        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, null, null,
-                transactionStartTime, transactionEndTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC,
-                EadcUtil.Direction.INBOUND, ServiceType.PATIENT_IDENTIFICATION_RESPONSE, errorDescription);
     }
 
     private OMElement toOM(org.hl7.v3.PRPAIN201305UV02 param, boolean optimizeContent) throws AxisFault {

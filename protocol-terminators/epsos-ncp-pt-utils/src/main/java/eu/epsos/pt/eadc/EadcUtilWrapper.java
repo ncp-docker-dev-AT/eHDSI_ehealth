@@ -15,6 +15,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -118,6 +119,55 @@ public class EadcUtilWrapper {
                 }
             }
         }).start();
+    }
+
+    public static boolean hasTransactionErrors(SOAPEnvelope envelope) {
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            while (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+
+                if (StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                    String severity = elementDocSet.getAttributeValue(QName.valueOf("severity"));
+                    if (StringUtils.equals(severity, "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error")) {
+                        return true;
+                    }
+                }
+                it = elementDocSet.getChildElements();
+            }
+        }
+
+        return false;
+    }
+
+    public static String getTransactionErrorDescription(SOAPEnvelope envelope) {
+        String errorDescription = "unknown";
+
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            while (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+
+            /* example element
+                <RegistryError
+                        xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+                        codeContext="The requested encoding cannot be provided due to a transcoding error."
+                        errorCode="4203"
+                        severity="urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error"
+                        location="urn:oid:2.16.17.710.823.1000.990.1"/>
+            */
+                if (StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                    String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+                    String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+                    errorDescription = cod + " [" + err + "]";
+                    break;
+                }
+                it = elementDocSet.getChildElements();
+            }
+        } else {
+            errorDescription = "envelope is null!";
+        }
+        return errorDescription;
     }
 
     /**

@@ -10,8 +10,6 @@ import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -94,27 +92,37 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
      */
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
 
-        try {
+        String eadcError = "";
 
-            Date startTime = new Date();
+        Date startTime = new Date();
+        Date endTime = new Date();
+
+        Document eDispenseCda = null;
+
+        // Out Envelop
+        SOAPEnvelope envelope = null;
+
+        try {
             // get the implementation class for the Web Service
             Object serviceObject = getTheImplementationObject(msgContext);
             XDR_ServiceSkeleton xdrServiceSkeleton = (XDR_ServiceSkeleton) serviceObject;
-            // Out Envelop
-            SOAPEnvelope envelope;
+
             // Find the axisOperation that has been set by the Dispatch phase.
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
 
             if (axisOperation == null) {
                 String err = "Operation is not located, if this is Doc/lit style the SOAP-ACTION should specified via the " +
                         "SOAP Action to use the RawXMLProvider";
-                eadcFailure(msgContext, err);
+
+                //eadcFailure(msgContext, err);
+                eadcError = err;
+
                 throw new AxisFault(err);
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
             String methodName;
-            Document eDispenseCda;
+
             if ((axisOperation.getName() != null) && ((methodName = JavaUtils.xmlNameToJavaIdentifier(axisOperation.getName().getLocalPart())) != null)) {
 
                 SOAPHeader soapHeader = msgContext.getEnvelope().getHeader();
@@ -170,64 +178,76 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 } else {
                     String err = "Method not found: '" + methodName + "'";
                     LOGGER.error(err);
-                    eadcFailure(msgContext, err);
+
+                    //eadcFailure(msgContext, err);
+                    eadcError = err;
+
                     throw new RuntimeException(err);
                 }
 
-                Date endTime = new Date();
+                endTime = new Date();
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
 
-                if(!hasTransactionErrors(envelope)) {
+                if(!EadcUtilWrapper.hasTransactionErrors(envelope)) {
                     EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, eDispenseCda, startTime,
                             endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
                             ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
                 } else {
-                    String errorDescription = getTransactionErrorDescription(envelope);
-                    EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, eDispenseCda, startTime,
-                            endTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
-                            ServiceType.DOCUMENT_EXCHANGED_RESPONSE, errorDescription);
+                    eadcError = EadcUtilWrapper.getTransactionErrorDescription(envelope);
                 }
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            eadcFailure(msgContext, e.getMessage());
+
+            //eadcFailure(msgContext, e.getMessage());
+            eadcError = e.getMessage();
+
             throw AxisFault.makeFault(e);
-        }
-    }
-
-    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
-        Iterator<OMElement> it = envelope.getBody().getChildElements();
-        String errorDescription = null;
-        while(it.hasNext()) {
-            OMElement elementDocSet = it.next();
-            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryResponse")) {
-                String status = elementDocSet.getAttributeValue(QName.valueOf("status"));
-                if(StringUtils.equals(status, AdhocQueryResponseStatus.FAILURE)) {
-                    return true;
-                }
+        } finally {
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, eDispenseCda, startTime, endTime,
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
+                        ServiceType.DOCUMENT_EXCHANGED_RESPONSE, eadcError);
+                eadcError = "";
             }
-            it = elementDocSet.getChildElements();
         }
-        return false;
+
     }
 
-    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
-        Iterator<OMElement> it = envelope.getBody().getChildElements();
-        String errorDescription = "unknown";
-        while(it.hasNext()) {
-            OMElement elementDocSet = it.next();
-            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
-                String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
-                String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
-                errorDescription = cod + " [" + err + "]";
-                break;
-            }
-            it = elementDocSet.getChildElements();
-        }
-        return errorDescription;
-    }
+//    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
+//        Iterator<OMElement> it = envelope.getBody().getChildElements();
+//        String errorDescription = null;
+//        while(it.hasNext()) {
+//            OMElement elementDocSet = it.next();
+//            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryResponse")) {
+//                String status = elementDocSet.getAttributeValue(QName.valueOf("status"));
+//                if(StringUtils.equals(status, AdhocQueryResponseStatus.FAILURE)) {
+//                    return true;
+//                }
+//            }
+//            it = elementDocSet.getChildElements();
+//        }
+//        return false;
+//    }
+//
+//    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
+//        Iterator<OMElement> it = envelope.getBody().getChildElements();
+//        String errorDescription = "unknown";
+//        while(it.hasNext()) {
+//            OMElement elementDocSet = it.next();
+//            if(StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+//                String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+//                String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+//                errorDescription = cod + " [" + err + "]";
+//                break;
+//            }
+//            it = elementDocSet.getChildElements();
+//        }
+//        return errorDescription;
+//    }
 
+    /*
     private void eadcFailure(MessageContext messageContext, String errorDescription) {
         var transactionStartTime = new Date();
         Date transactionEndTime = new Date();
@@ -236,6 +256,7 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                 transactionStartTime, transactionEndTime, Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC,
                 EadcUtil.Direction.INBOUND, ServiceType.DOCUMENT_EXCHANGED_RESPONSE, errorDescription);
     }
+    */
 
     private OMElement toOM(ProvideAndRegisterDocumentSetRequestType param, boolean optimizeContent) throws AxisFault {
 

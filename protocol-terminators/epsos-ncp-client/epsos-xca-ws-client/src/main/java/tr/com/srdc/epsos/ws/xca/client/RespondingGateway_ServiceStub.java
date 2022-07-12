@@ -5,7 +5,6 @@ import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
-import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
@@ -219,7 +218,10 @@ public class RespondingGateway_ServiceStub extends Stub {
                                                                   List<String> classCodes)
             throws java.rmi.RemoteException {
 
+        String eadcError = "";
+
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
         try {
             // TMP
             // XCA list request start time
@@ -315,8 +317,8 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
             } catch (Exception ex) {
-                eadcFailure(_messageContext, ex.getMessage(),
-                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+                // no ADC error if PrettyPrint or toDom fails
+                //eadcFailure(_messageContext, ex.getMessage(), Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
                 throw new RuntimeException(ex);
             }
             // NRO
@@ -428,14 +430,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    String err = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
-                    LOGGER.error(err);
-                    eadcFailure(_messageContext, err,
-                            Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw e;
                 }
             }
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -457,8 +457,6 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
-                eadcFailure(_messageContext, ex.getMessage(),
-                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
                 throw new RuntimeException(ex);
             }
 
@@ -490,10 +488,13 @@ public class RespondingGateway_ServiceStub extends Stub {
 //            }
 
             //  Invoke eADC
-            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
-
+            if(!EadcUtilWrapper.hasTransactionErrors(_returnEnv)) {
+                EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+            } else {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(_returnEnv);
+            }
             // eADC end time
             end = System.currentTimeMillis();
             LOGGER.info("XCA LIST eADC TIME: '{}' ms", (end - start) / 1000.0);
@@ -521,9 +522,9 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             return adhocQueryResponse;
 
-        } catch (AxisFault f) {
+        } catch (AxisFault axisFault) {
             // TODO A.R. Audit log SOAP Fault is still missing
-            OMElement faultElt = f.getDetail();
+            OMElement faultElt = axisFault.getDetail();
 
             if (faultElt != null) {
 
@@ -540,39 +541,84 @@ public class RespondingGateway_ServiceStub extends Stub {
                         Object messageObject = fromOM(faultElt, messageClass, null);
                         Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
                         m.invoke(ex, messageObject);
-
-                        eadcFailure(_messageContext, ex.getMessage(),
-                                Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
                         /* we cannot intantiate the class - throw the original Axis fault */
                     } catch (Exception e) {
-                        eadcFailure(_messageContext, e.getMessage(),
-                                Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+                        eadcError = e.getMessage();
                         throw new RuntimeException(e.getMessage(), e);
                     }
                 }
             }
-            eadcFailure(_messageContext, f.getMessage(),
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
-            throw new RuntimeException(f.getMessage(), f);
+            eadcError = axisFault.getMessage();
+            throw new RuntimeException(axisFault.getMessage(), axisFault);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
             }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY, eadcError);
+            }
         }
     }
 
-    private void eadcFailure(MessageContext messageContext, String errorDescription,
-                             EadcUtil.Direction direction, ServiceType serviceType) {
-        var transactionStartTime = new Date();
-        Date transactionEndTime = new Date();
-        MessageContext ctx = new MessageContext();
-        EadcUtilWrapper.invokeEadcFailure(messageContext, ctx, this._getServiceClient(), null,
-                transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                direction, serviceType, errorDescription);
+/*
+    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            String transactionStatus = null;
+            if (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+                if (org.apache.commons.lang3.StringUtils.equals(elementDocSet.getLocalName(), "AdhocQueryResponse")) {
+                    if (elementDocSet.getChildElements().hasNext()) {
+                        OMElement elementResponse = elementDocSet.getChildElements().next();
+                        if (org.apache.commons.lang3.StringUtils.equals(elementResponse.getLocalName(), "RegistryResponse")) {
+                            transactionStatus = elementResponse.getAttributeValue(QName.valueOf("status"));
+                        }
+                    }
+                }
+            }
+            if (org.apache.commons.lang3.StringUtils.equals(transactionStatus, RegistryErrorSeverity.ERROR_SEVERITY_ERROR) ||
+                    org.apache.commons.lang3.StringUtils.equals(transactionStatus, AdhocQueryResponseStatus.FAILURE)) {
+                return true;
+            }
+        }
+        return false;
     }
+
+    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
+        String errorDescription = "unknown";
+
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            while (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+
+                  // example element
+//                <RegistryError
+//                        xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+//                        codeContext="The requested encoding cannot be provided due to a transcoding error."
+//                        errorCode="4203"
+//                        severity="urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error"
+//                        location="urn:oid:2.16.17.710.823.1000.990.1"/>
+
+                if (org.apache.commons.lang3.StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                    String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+                    String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+                    errorDescription = cod + " [" + err + "]";
+                    break;
+                 }
+                 it = elementDocSet.getChildElements();
+            }
+        } else {
+            errorDescription = "envelope is null!";
+        }
+        return errorDescription;
+    }
+ */
 
     private RegisteredService getRegisteredService(List<String> classCodes) {
         RegisteredService registeredService = null;
@@ -622,7 +668,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                                                                                   Map<AssertionEnum, Assertion> assertionMap,
                                                                                   String classCode)
             throws java.rmi.RemoteException {
+
+        String eadcError = "";
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
+        Document cda = null;
+
         SOAPEnvelope env;
         try {
             OperationClient _operationClient = _serviceClient.createClient(_operations[1].getName());
@@ -725,8 +776,6 @@ public class RespondingGateway_ServiceStub extends Stub {
 //                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
             } catch (Exception ex) {
-                eadcFailure(_messageContext, ex.getMessage(),
-                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
                 throw new RuntimeException(ex);
             }
 
@@ -822,14 +871,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    String err = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
-                    LOGGER.error(err);
-                    eadcFailure(_messageContext, err,
-                            Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw e;
                 }
             }
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -862,7 +909,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
             // Invoke eADC
-            Document cda = null;
             if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
 
                 cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
@@ -897,23 +943,24 @@ public class RespondingGateway_ServiceStub extends Stub {
                     Object messageObject = fromOM(faultElt, messageClass, null);
                     Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
                     m.invoke(ex, messageObject);
-                    eadcFailure(_messageContext, ex.getMessage(),
-                            Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
                     throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
                 } catch (Exception e) {
                     // Cannot instantiate the class - throw the original Axis fault
-                    eadcFailure(_messageContext, e.getMessage(),
-                            Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+                    eadcError = e.getMessage();
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            eadcFailure(_messageContext, axisFault.getMessage(),
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+            eadcError = axisFault.getMessage();
             throw new RuntimeException(axisFault.getMessage(), axisFault);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY, eadcError);
             }
         }
     }
