@@ -59,7 +59,7 @@ public class Validator implements TMConstants {
 
     private static boolean isScannedDocument(String docType) {
 
-        return docType.equals(PATIENT_SUMMARY1) || docType.equals(EDISPENSATION1) || docType.equals(EPRESCRIPTION1)
+        return docType.equals(PATIENT_SUMMARY1) || docType.equals(EPRESCRIPTION1)
                 || docType.equals(HCER1) || docType.equals(MRO1);
     }
 
