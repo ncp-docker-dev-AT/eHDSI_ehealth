@@ -231,17 +231,53 @@
         <xsl:variable name="medPhaseLow"
                       select="$medPhase/n1:low"/>
         <!-- Every -->
-        <xsl:call-template name="show-eHDSIDisplayLabel">
-            <xsl:with-param name="code" select="'27'"/>
-        </xsl:call-template>
-        <xsl:text>&#160;</xsl:text>
-        <xsl:value-of select="$medPeriod/@value"/>
-        <xsl:text>&#160;</xsl:text>
-        <xsl:if test="$medPeriod/@unit">
-            <xsl:call-template name="show-eHDSIUnit">
-                <xsl:with-param name="code" select="$medPeriod/@unit"/>
-            </xsl:call-template>
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="$node/@institutionSpecified='true'">
+                <xsl:choose>
+                    <xsl:when test="(1 div $medPeriod/@value) &gt;= 1">
+                        <xsl:value-of select="round(1 div $medPeriod/@value)"/>
+                        <xsl:text> </xsl:text>
+                        <!-- Time(s) per -->
+                        <!-- TODO Concept to be added to eHDSIDisplayLabel value set -->
+                        Time(s) per
+                        <xsl:text> </xsl:text>
+                        <xsl:if test="$medPeriod/@unit">
+                            <xsl:call-template name="show-eHDSIUnit">
+                                <xsl:with-param name="code" select="$medPeriod/@unit"/>
+                            </xsl:call-template>
+                        </xsl:if>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>1 </xsl:text>
+                        <!-- Time(s) per -->
+                        <!-- TODO Concept to be added to eHDSIDisplayLabel value set -->
+                        Time(s) per
+                        <xsl:text> </xsl:text>
+                        <xsl:value-of select="$medPeriod/@value"/>
+                        <xsl:text> </xsl:text>
+                        <xsl:if test="$medPeriod/@unit">
+                            <xsl:call-template name="show-eHDSIUnit">
+                                <xsl:with-param name="code" select="$medPeriod/@unit"/>
+                            </xsl:call-template>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Every -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'27'"/>
+                </xsl:call-template>
+                <xsl:text>&#160;</xsl:text>
+                <xsl:value-of select="$medPeriod/@value"/>
+                <xsl:text>&#160;</xsl:text>
+                <xsl:if test="$medPeriod/@unit">
+                    <xsl:call-template name="show-eHDSIUnit">
+                        <xsl:with-param name="code" select="$medPeriod/@unit"/>
+                    </xsl:call-template>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
         <!-- if phase.width exists -->
         <xsl:if test="$medPhaseWidth">
             <xsl:text>&#160;</xsl:text>

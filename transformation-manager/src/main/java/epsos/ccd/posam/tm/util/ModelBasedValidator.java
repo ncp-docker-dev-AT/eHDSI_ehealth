@@ -122,7 +122,6 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         friendlyTypes.put(PATIENT_SUMMARY3, Validators.EPSOS_PS_FRIENDLY.getValue());
         friendlyTypes.put(PATIENT_SUMMARY1, Validators.EPSOS_PS_FRIENDLY.getValue());
         friendlyTypes.put(EDISPENSATION3, Validators.EPSOS_ED_FRIENDLY.getValue());
-        friendlyTypes.put(EDISPENSATION1, Validators.EPSOS_ED_FRIENDLY.getValue());
         friendlyTypes.put(EPRESCRIPTION3, Validators.EPSOS_EP_FRIENDLY.getValue());
         friendlyTypes.put(EPRESCRIPTION1, Validators.EPSOS_EP_FRIENDLY.getValue());
         friendlyTypes.put(HCER3, Validators.EPSOS_HCER.getValue());
@@ -134,7 +133,6 @@ public class ModelBasedValidator implements InitializingBean, TMConstants {
         pivotTypes.put(PATIENT_SUMMARY3, Validators.EPSOS_PS_PIVOT.getValue());
         pivotTypes.put(PATIENT_SUMMARY1, Validators.EPSOS_PS_PIVOT.getValue());
         pivotTypes.put(EDISPENSATION3, Validators.EPSOS_ED_PIVOT.getValue());
-        pivotTypes.put(EDISPENSATION1, Validators.EPSOS_ED_PIVOT.getValue());
         pivotTypes.put(EPRESCRIPTION3, Validators.EPSOS_EP_PIVOT.getValue());
         pivotTypes.put(EPRESCRIPTION1, Validators.EPSOS_EP_PIVOT.getValue());
         pivotTypes.put(HCER3, Validators.EPSOS_HCER.getValue());

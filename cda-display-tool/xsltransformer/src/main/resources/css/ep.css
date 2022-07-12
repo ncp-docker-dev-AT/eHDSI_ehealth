@@ -64,7 +64,7 @@ ol::after {
 }
 
 /* ---- Timeline elements ---- */
-li {
+/* li {
     position: relative;
     display: inline-block;
     float: left;
@@ -95,7 +95,7 @@ li .description {
     left: 30%;
     color: #000000;
     font: bold 12px arial;
-}
+}*/
 
 /***********************/
 /* Fieldset            */
