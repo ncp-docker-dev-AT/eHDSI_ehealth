@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ClinicalDocument xmlns="urn:hl7-org:v3" xmlns:pharm="urn:hl7-org:pharm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" classCode="DOCCLIN" moodCode="EVN">
     <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3" />
     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.1.1" />
     <id extension="3000" root="2.16.17.710.850.1000.990.1" />
-    <code code="57833-6" codeSystem="2.16.840.1.113883.6.1" displayName="Prescription for medication"/>
+    <code code="57833-6" codeSystem="2.16.840.1.113883.6.1" displayName="Prescription for medication" />
     <title>ePrescription (eHDSI/Finland)</title>
     <effectiveTime value="20191122143500+0200" />
-    <confidentialityCode code="N" displayName="normal" codeSystem="2.16.840.1.113883.5.25"/>
+    <confidentialityCode code="N" displayName="normal" codeSystem="2.16.840.1.113883.5.25" />
     <languageCode code="fi-FI" />
     <setId root="1.2.246.10.11535721.93.2009.15721892033029812" />
     <recordTarget contextControlCode="OP" typeCode="RCT">
         <patientRole classCode="PAT">
-            <id extension="1-1234-W6" root="2.16.17.710.850.1000.990.1.1000" />
+            <id extension="1-1234-W5" root="2.16.17.710.850.1000.990.1.1000" />
             <addr>
                 <country>FI</country>
             </addr>
@@ -22,14 +22,14 @@
                     <given>Kastehelmi</given>
                     <family>Kukko</family>
                 </name>
-                <administrativeGenderCode code="F" displayName="Female" codeSystem="2.16.840.1.113883.5.1"/>
+                <administrativeGenderCode code="F" displayName="Female" codeSystem="2.16.840.1.113883.5.1" />
                 <birthTime value="20000101" />
                 <languageCommunication nullFlavor="NI" />
             </patient>
         </patientRole>
     </recordTarget>
     <author>
-        <functionCode code="221" displayName="Medical doctors" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO"/>
+        <functionCode code="221" displayName="Medical doctors" codeSystem="2.16.840.1.113883.2.9.6.2.7" codeSystemName="ISCO" />
         <time value="20180831162454+0200" />
         <assignedAuthor classCode="ASSIGNED">
             <id extension="031807" root="1.2.246.537.25" />
@@ -119,7 +119,7 @@
                             <content>LANTUS</content>
                         </paragraph>
                         <paragraph>
-                            <content ID="FINSTRUCT">Tähän viesti apteekille Permanent medication. </content>
+                            <content ID="FINSTRUCT">Tähän viesti apteekille Permanent medication.</content>
                         </paragraph>
                         <paragraph>
                             <content ID="PINSTRUCT">Diabeteksen hoitoon Käytetään tarvittaessa</content>
@@ -130,75 +130,66 @@
                     </text>
                     <entry typeCode="COMP">
                         <substanceAdministration classCode="SBADM" moodCode="INT">
-                            <templateId root="2.16.840.1.113883.10.20.1.24" />
-                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.2" />
+                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7" />
+                            <templateId root="2.16.840.1.113883.10.20.1.24" />
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.7.1" />
                             <id extension="3000.1.1" root="2.16.17.710.850.1000.990.1" />
-                            <text><reference value="#eP_as_text"/></text>
+                            <text>
+                                <reference value="#eP_as_text" />
+                            </text>
                             <statusCode code="active" />
                             <effectiveTime xsi:type="IVL_TS">
-                                <low nullFlavor="UNK" />
-                                <high nullFlavor="UNK" />
+                                <low value="20220706" />
+                                <high value="20220713" />
                             </effectiveTime>
                             <effectiveTime xsi:type="PIVL_TS" institutionSpecified="true">
-                                <period value="12" unit="h"/>
+                                <period value="12" unit="h" />
                             </effectiveTime>
                             <routeCode code="20066000" displayName="Subcutaneous use" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                             <doseQuantity>
-                                <low value="1" unit="mL/d"/>
-                                <high value="1" unit="mL/d"/>
+                                <low value="3" unit="mL/d" />
+                                <high value="3" unit="mL/d" />
                             </doseQuantity>
                             <consumable typeCode="CSM">
-                                <manufacturedProduct classCode="MANU">
+                                <manufacturedProduct>
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.29" />
                                     <manufacturedMaterial classCode="MMAT" determinerCode="KIND">
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.30" />
-                                        <name>Lantus SoloStar</name>
-                                        <pharm:formCode code="50060300" displayName="Solution For injection in pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
+                                        <code code="089953" codeSystem="1.2.246.537.6.55" codeSystemName="VNR">
+                                            <originalText><reference value="#nameAsText"/></originalText>
+                                        </code>
+                                        <name>LANTUS</name>
+                                        <pharm:desc>100 U/ml</pharm:desc>
+                                        <pharm:formCode code="11201000" displayName="Solution for injection" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                         <pharm:asContent classCode="CONT">
-                                            <!-- TODO to be fixed in XSD -->
-                                            <!-- pharm:quantity unit="mL" value="3" -->
+                                            <!-- TODO to fix -->
                                             <pharm:quantity xsi:type="RTO">
-                                                <numerator xsi:type="INT" value="3"/>
-                                                <denominator xsi:type="INT" value="3"/>
+                                                <numerator xsi:type="INT" value="10"/>
+                                                <denominator xsi:type="INT" value="10"/>
                                             </pharm:quantity>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
-                                                <pharm:formCode code="30051000" displayName="Pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
-                                                <pharm:asContent classCode="CONT">
-                                                    <!-- TODO to be fixed in XSD -->
-                                                    <!-- pharm:quantity unit="1" value="5" -->
-                                                    <pharm:quantity xsi:type="RTO">
-                                                        <numerator xsi:type="INT" value="5"/>
-                                                        <denominator xsi:type="INT" value="5"/>
-                                                    </pharm:quantity>
-                                                    <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
-                                                        <pharm:code codeSystem="1.2.3" code="PCID_Lantus_Solostar" displayName="..." />
-                                                        <pharm:formCode code="30009000" displayName="Box" codeSystem="0.4.0.127.0.16.1.1.2.1" />
-                                                    </pharm:containerPackagedProduct>
-                                                </pharm:asContent>
+                                                <pharm:name>LANTUS</pharm:name>
+                                                <pharm:formCode code="11201000" displayName="Solution for injection" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                             </pharm:containerPackagedProduct>
                                         </pharm:asContent>
+                                        <pharm:asSpecializedKind classCode="GEN">
+                                            <pharm:generalizedMaterialKind classCode="MMAT" determinerCode="KIND">
+                                                <pharm:code code="A10AE04" displayName="insulin glargine" codeSystem="2.16.840.1.113883.6.73"/>
+                                                <pharm:name>insulin glargine</pharm:name>
+                                            </pharm:generalizedMaterialKind>
+                                        </pharm:asSpecializedKind>
                                         <pharm:ingredient classCode="ACTI">
-                                            <!-- TODO To be fixed -->
-                                            <!--pharm:quantity xsi:type="PQ">
-                                                <numerator value="100" unit="1" type="PQ" />
-                                                <denominator value="1" unit="mL" type="PQ" />
-                                            </pharm:quantity-->
-                                            <pharm:quantity xsi:type="RTO">
-                                                <numerator xsi:type="INT" value="100"/>
-                                                <denominator xsi:type="INT" value="1"/>
+                                            <pharm:quantity>
+                                                <numerator unit="units" value="100" xsi:type="PQ" />
+                                                <denominator unit="mL" value="1" xsi:type="PQ" />
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="A10AE04" displayName="insulin glargine" codeSystem="2.16.840.1.113883.6.73"/>
-                                                <pharm:name>insulin glargine</pharm:name>
+                                                <pharm:name>glargininsuliini</pharm:name>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                     </manufacturedMaterial>
-                                    <manufacturerOrganization classCode="ORG" determinerCode="INSTANCE">
-                                        <id root="2.99" extension="XYZ"/>
-                                        <name>Merck AB</name>
-                                    </manufacturerOrganization>
                                 </manufacturedProduct>
                             </consumable>
                             <entryRelationship typeCode="COMP">
@@ -209,7 +200,7 @@
                             </entryRelationship>
                             <entryRelationship inversionInd="true" typeCode="SUBJ">
                                 <observation classCode="OBS" moodCode="EVN">
-                                    <code code="SUBST" codeSystem="2.16.840.1.113883.5.6"/>
+                                    <code code="SUBST" codeSystem="2.16.840.1.113883.5.6" />
                                     <value code="N" codeSystem="2.16.840.1.113883.5.1070" xsi:type="CE" />
                                 </observation>
                             </entryRelationship>
@@ -218,7 +209,9 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.43" />
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3.1" />
                                     <code code="FINSTRUCT" displayName="FINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
-                                    <text><reference value="#FINSTRUCT"/></text>
+                                    <text>
+                                        <reference value="#FINSTRUCT" />
+                                    </text>
                                     <statusCode code="completed" />
                                 </act>
                             </entryRelationship>
@@ -227,7 +220,9 @@
                                     <templateId root="2.16.840.1.113883.10.20.1.49" />
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.3" />
                                     <code code="PINSTRUCT" displayName="PINSTRUCT" codeSystem="1.3.6.1.4.1.19376.1.5.3.2" codeSystemName="IHEActCode" />
-                                    <text><reference value="#PINSTRUCT"/></text>
+                                    <text>
+                                        <reference value="#PINSTRUCT" />
+                                    </text>
                                     <statusCode code="completed" />
                                 </act>
                             </entryRelationship>

@@ -50,10 +50,9 @@ public interface ITsamDao {
     CodeSystemConcept getTargetConcept(CodeSystemConcept sourceConcept) throws TSAMException;
 
     /**
-     * Retrieve CodeSystemConcept by Code and CodeSystemVersion. Method looks for concept int provided CodeSystemVersion
-     * and all its previous versions.
+     * Retrieve CodeSystemConcept by Code and CodeSystemVersion.
+     * Method looks for concept in the provided CodeSystemVersion and all its previous versions.
      *
-     * @param session
      * @param code
      * @param codeSystemVersion
      * @return
@@ -62,10 +61,20 @@ public interface ITsamDao {
     CodeSystemConcept getConcept(String code, CodeSystemVersion codeSystemVersion) throws TSAMException;
 
     /**
-     * Retrieve CodeSystemversion by LocalName and parent CodeSystem. If no version is provided (version is null),
+     * Retrieve CodeSystemConcept by Code and CodeSystemVersion IDs list.
+     * Method looks for concept which are part of the CodeSystemVersion IDs list.
+     *
+     * @param code
+     * @param codeSystemVersionIds
+     * @return
+     * @throws TSAMException
+     */
+    CodeSystemConcept getConceptByCodeSystemVersionIds(String code, List<Long> codeSystemVersionIds) throws TSAMException;
+
+    /**
+     * Retrieve CodeSystemVersion by LocalName and parent CodeSystem. If no version is provided (version is null),
      * method looks for versions of CodeSystem with status "current".
      *
-     * @param session
      * @param version
      * @param system
      * @return
@@ -76,12 +85,19 @@ public interface ITsamDao {
     /**
      * Retrieve CodeSystem by OID
      *
-     * @param session
      * @param oid
      * @return CodeSystem
      * @throws TSAMException if CodeSystem is not found
      */
     CodeSystem getCodeSystem(String oid) throws TSAMException;
+
+    /**
+     * Retrieve CodeSystemVersion IDs list by OID
+     *
+     * @param oid
+     * @return
+     */
+    List<Long> getCodeSystemVersionIds(String oid);
 
     /**
      * Method to retrieve all concepts and their current designations for selected ValueSet ana language.
