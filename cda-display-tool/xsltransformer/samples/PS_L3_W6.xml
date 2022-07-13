@@ -28,7 +28,7 @@ Although being real choices for the different diseases and conditions, the selec
     <recordTarget>
         <patientRole>
             <!-- Primary Patient Identifier -->
-            <id root="2.999" extension="PRT00000010"/>
+            <id extension="2-1234-W6" root="2.16.17.710.850.1000.990.1.1000"/>
             <addr>
                 <streetAddressLine>155, Avenida da Liberdade</streetAddressLine>
                 <postalCode>1250-141</postalCode>
@@ -415,26 +415,29 @@ Although being real choices for the different diseases and conditions, the selec
                                         <!-- brand name (optional) -->
                                         <name>Eutirox</name>
                                         <pharm:formCode code="10219000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
-                                                <pharm:reference value="#form-1"/>
-                                            </pharm:originalText>
+                                            <originalText>
+                                                <reference value="#form-1"/>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
+                                            <pharm:quantity>
+                                                <numerator xsi:type="PQ" value="1" unit="g"/>
+                                                <denominator xsi:type="PQ" value="1" unit="g"/>
+                                            </pharm:quantity>
+                                            <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="10100500" displayName="Concentrate for oral suspension" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
-                                                <pharm:capacityQuantity value="1" unit="g"/>
                                             </pharm:containerPackagedProduct>
                                         </pharm:asContent>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="100" unit="ug"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
+                                                <numerator xsi:type="PQ" value="100" unit="ug"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="H03AA01" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-1"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-1"/>
+                                                    </originalText>
                                                 </pharm:code>
                                                 <!-- epsos:name>levothyroxine sodium</pharm:name -->
                                             </pharm:ingredientSubstance>
@@ -453,7 +456,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     </text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="19950101"/>
-                                    <value code="E03" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"/>
+                                    <value xsi:type="CD" code="E03" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2"/>
                                 </observation>
                             </entryRelationship>
                         </substanceAdministration>
@@ -482,42 +485,42 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Triapin</name>
                                         <pharm:formCode code="10226000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
-                                                <pharm:reference value="#form-2"/>
-                                            </pharm:originalText>
+                                            <originalText>
+                                                <reference value="#form-2"/>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asSpecializedKind classCode="GEN">
-                                            <pharm:generalizedMedicineClass classCode="MMAT">
+                                            <pharm:generalizedMaterialKind classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C09BB05" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-2"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-2"/>
+                                                    </originalText>
                                                 </pharm:code>
-                                            </pharm:generalizedMedicineClass>
+                                            </pharm:generalizedMaterialKind>
                                         </pharm:asSpecializedKind>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="5" unit="mg"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
+                                                <numerator xsi:type="PQ" value="5" unit="mg"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C09AA05" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-3"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-3"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="5" unit="mg"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
+                                                <numerator xsi:type="PQ" value="5" unit="mg"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="C08CA02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-4"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-4"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -552,20 +555,20 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Tresiba</name>
                                         <pharm:formCode code="50060200" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
-                                                <pharm:reference value="#form-3"/>
-                                            </pharm:originalText>
+                                            <originalText>
+                                                <reference value="#form-3"/>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="100" unit="[IU]"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="mL"/>
+                                                <numerator xsi:type="PQ" value="100" unit="[IU]"/>
+                                                <denominator xsi:type="PQ" value="1" unit="mL"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="A10AE06" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-5"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-5"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -598,36 +601,36 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Augmentin</name>
                                         <pharm:formCode code="10221000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
-                                                <pharm:reference value="#form-4"/>
-                                            </pharm:originalText>
+                                            <originalText>
+                                                <reference value="#form-4"/>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asSpecializedKind classCode="GEN">
-                                            <pharm:generalizedMedicineClass classCode="MMAT">
+                                            <pharm:generalizedMaterialKind classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="J01CR02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-6"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-6"/>
+                                                    </originalText>
                                                 </pharm:code>
-                                            </pharm:generalizedMedicineClass>
+                                            </pharm:generalizedMaterialKind>
                                         </pharm:asSpecializedKind>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="500" unit="mg"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
+                                                <numerator xsi:type="PQ" value="500" unit="mg"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="J01CA04" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-7"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-7"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="125" unit="mg"/>
-                                                <pharm:denominator xsi:type="PQ" value="1" unit="1"/>
+                                                <numerator xsi:type="PQ" value="125" unit="mg"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code nullFlavor="OTH"/>
@@ -662,39 +665,42 @@ Although being real choices for the different diseases and conditions, the selec
                                         <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.32"/>
                                         <name>Combivent Unidose</name>
                                         <pharm:formCode code="11101000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                            <pharm:originalText>
-                                                <pharm:reference value="#form-5"/>
-                                            </pharm:originalText>
+                                            <originalText>
+                                                <reference value="#form-5"/>
+                                            </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
+                                            <pharm:quantity>
+                                                <numerator xsi:type="PQ" value="2.5" unit="ml"/>
+                                                <denominator xsi:type="PQ" value="2.5" unit="ml"/>
+                                            </pharm:quantity>
+                                            <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="30057000" codeSystem="0.4.0.127.0.16.1.1.2.1">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#form-6"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#form-6"/>
+                                                    </originalText>
                                                 </pharm:formCode>
-                                                <pharm:capacityQuantity value="2.5" unit="mL"/>
                                             </pharm:containerPackagedProduct>
                                         </pharm:asContent>
                                         <pharm:asSpecializedKind classCode="GEN">
-                                            <pharm:generalizedMedicineClass classCode="MMAT">
+                                            <pharm:generalizedMaterialKind classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03AL02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-9"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-9"/>
+                                                    </originalText>
                                                 </pharm:code>
-                                            </pharm:generalizedMedicineClass>
+                                            </pharm:generalizedMaterialKind>
                                         </pharm:asSpecializedKind>
                                         <pharm:ingredient classCode="ACTI">
                                             <pharm:quantity>
-                                                <pharm:numerator xsi:type="PQ" value="2.5" unit="mg"/>
-                                                <pharm:denominator xsi:type="PQ" value="2.5" unit="mL"/>
+                                                <numerator xsi:type="PQ" value="2.5" unit="mg"/>
+                                                <denominator xsi:type="PQ" value="2.5" unit="mL"/>
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03AC02" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-10"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-10"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -705,9 +711,9 @@ Although being real choices for the different diseases and conditions, the selec
                                             </pharm:quantity>
                                             <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
                                                 <pharm:code code="R03BB01" codeSystem="2.16.840.1.113883.6.73">
-                                                    <pharm:originalText>
-                                                        <pharm:reference value="#ecode-11"/>
-                                                    </pharm:originalText>
+                                                    <originalText>
+                                                        <reference value="#ecode-11"/>
+                                                    </originalText>
                                                 </pharm:code>
                                             </pharm:ingredientSubstance>
                                         </pharm:ingredient>
@@ -738,7 +744,7 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td>since 1990-01-10</td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td><td>low risk</td><td><content ID="status-1">active</content></td><td>confirmed</td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
                                 <tr><td><content ID="obs-3a"><content ID="code-10" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-4"><content ID="val-4" language="xx-XX">Diarrhea</content><br/></td><td><content ID="code-11" language="xx-XX">Lactose</content><br/></td><td>since 1983-05-05</td><td><content ID="code-13" language="xx-XX">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-2">active</content></td><td>confirmed</td><td><content ID="code-12" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
                                 <tr><td><content ID="obs-5a"><content ID="code-14" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-6"><content ID="val-6" language="xx-XX">Asthma</content><br/></td><td><content ID="code-15" language="xx-XX">acetylsalicylic acid</content><br/></td><td>from 1994 until 2010</td><td><content ID="code-17">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-3">resolved</content></td><td>confirmed</td><td><content ID="code-16" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
-                                <tr><td><content ID="obs-7a"><content ID="code-18" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-8"><content ID="val-8" language="xx-XX">Urticaria</content><br/></td><td><content ID="code-19" language="xx-XX">Latex</content><br/></td><td>since 1990-01-10</td><td><content ID="code-21">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-4">suspended</content></td><td ID="status-4">confirmed</td><td><content ID="code-20" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
+                                <tr><td><content ID="obs-7a"><content ID="code-18" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-8"><content ID="val-8" language="xx-XX">Urticaria</content><br/></td><td><content ID="code-19" language="xx-XX">Latex</content><br/></td><td>since 1990-01-10</td><td><content ID="code-21">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-4">suspended</content></td><td>confirmed</td><td><content ID="code-20" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
                             </tbody>
                         </table>
                     </text>
@@ -756,7 +762,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.17"/>
                                     <id root="2.999.2.1.1"/>
                                     <!-- eHDSIAdverseEventType -->
-                                    <code code="420134006" codeSystem="2.16.840.1.113883.6.96">
+                                    <code code="420134006" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96">
                                         <originalText><reference value="#code-6"/></originalText>
                                     </code>
                                     <text><reference value="#obs-1"/></text>
@@ -813,7 +819,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
                                             <statusCode code="completed"/>
-                                            <value code="low" displayName="Low Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
+                                            <value xsi:type="CD" code="low" displayName="Low Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Certainty -->
@@ -822,7 +828,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
                                             <statusCode code="completed"/>
-                                            <value code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1075"/>
+                                            <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Allergy Status -->
@@ -834,7 +840,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <reference value="#status-1"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value code="active" displayName="Active" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
+                                            <value xsi:type="CD" code="active" displayName="Active" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -856,7 +862,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.17"/>
                                     <id root="2.999.2.2.1"/>
                                     <!-- eHDSIAdverseEventType -->
-                                    <code code="420134006" codeSystem="2.16.840.1.113883.6.96">
+                                    <code code="420134006" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96">
                                         <originalText><reference value="#code-10"/></originalText>
                                     </code>
                                     <text><reference value="#obs-3"/></text>
@@ -911,7 +917,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
                                             <statusCode code="completed"/>
-                                            <value code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
+                                            <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Certainty -->
@@ -920,7 +926,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
                                             <statusCode code="completed"/>
-                                            <value code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1075"/>
+                                            <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Allergy Status -->
@@ -932,7 +938,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <reference value="#status-2"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value code="active" displayName="Active" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
+                                            <value xsi:type="CD"  code="active" displayName="Active" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -955,7 +961,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.17"/>
                                     <id root="2.999.2"/>
                                     <!-- eHDSIAdverseEventType -->
-                                    <code code="420134006" codeSystem="2.16.840.1.113883.6.96">
+                                    <code code="420134006" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96">
                                         <originalText><reference value="#code-14"/></originalText>
                                     </code>
                                     <text><reference value="#obs-5"/></text>
@@ -981,7 +987,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.44"/>
                                             <id root="2.999"/>
                                             <!-- observing a symptom -->
-                                            <code code="420134006" codeSystem="2.16.840.1.113883.6.96">
+                                            <code code="420134006" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96">
                                                 <originalText><reference value="#code-16"/></originalText>
                                             </code>
                                             <text><reference value="#obs-6"/></text>
@@ -1012,7 +1018,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
                                             <statusCode code="completed"/>
-                                            <value code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
+                                            <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Certainty -->
@@ -1021,7 +1027,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
                                             <statusCode code="completed"/>
-                                            <value code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1075"/>
+                                            <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Allergy Status -->
@@ -1033,7 +1039,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <reference value="#status-3"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value code="resolved" displayName="Resolved" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
+                                            <value xsi:type="CD" code="resolved" displayName="Resolved" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1061,7 +1067,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.17"/>
                                     <id root="2.999.2"/>
                                     <!-- eHDSIAdverseEventType -->
-                                    <code code="420134006" codeSystem="2.16.840.1.113883.6.96">
+                                    <code code="420134006" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96">
                                         <originalText><reference value="#code-18"/></originalText>
                                     </code>
                                     <text><reference value="#obs-7"/></text>
@@ -1118,7 +1124,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
                                             <statusCode code="completed"/>
-                                            <value code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
+                                            <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Certainty -->
@@ -1127,7 +1133,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
                                             <statusCode code="completed"/>
-                                            <value code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1075"/>
+                                            <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
                                     </entryRelationship>
                                     <!-- Allergy Status -->
@@ -1139,7 +1145,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <reference value="#status-4"/>
                                             </text>
                                             <statusCode code="completed"/>
-                                            <value code="inactive" displayName="Inctive" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
+                                            <value xsi:type="CD" code="inactive" displayName="Inctive" codeSystem="2.16.840.1.113883.4.642.4.1373"/>
                                         </observation>
                                     </entryRelationship>
                                 </observation>
@@ -1366,8 +1372,11 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="20130109"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" code="E11" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2">
-                                        <originalText><reference value="#val-12"/></originalText>
+                                    <value xsi:type="CD" nullFlavor="OTH">
+                                        <originalText>
+                                            <reference value="#ref1"/>
+                                        </originalText>
+                                        <translation code="054.3" codeSystem="2.16.840.1.113883.6.103" displayName="Meningoencefalitis herpetica" />
                                     </value>
                                 </observation>
                             </entryRelationship>
@@ -1454,39 +1463,6 @@ Although being real choices for the different diseases and conditions, the selec
                                             </value>
                                         </observation>
                                     </entryRelationship>
-                                </observation>
-                            </entryRelationship>
-                        </act>
-                    </entry>
-                    <entry>
-                        <act classCode="ACT" moodCode="EVN">
-                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.15"/>
-                            <templateId root="2.16.840.1.113883.10.20.1.27"/>
-                            <id root="2.999.4.8"/>
-                            <code code="CONC" codeSystem="2.16.840.1.113883.5.6"/>
-                            <text><reference value="#pca-7"/></text>
-
-                            <statusCode code="active"/>
-                            <effectiveTime>
-                                <low value="20220617"/>
-                            </effectiveTime>
-                            <entryRelationship typeCode="SUBJ">
-                                <observation classCode="OBS" moodCode="EVN">
-                                    <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.7"/>
-                                    <id root="2.999.4.2.1"/>
-                                    <code code="404684003" codeSystem="2.16.840.1.113883.6.96">
-                                        <originalText><reference value="#code-30"/></originalText>
-                                    </code>
-                                    <text><reference value="#obs-11"/></text>
-                                    <effectiveTime>
-                                        <low value="20220617"/>
-                                    </effectiveTime>
-                                    <value xsi:type="CD" codeSystem="2.16.840.1.113883.6.96" nullFlavor="OTH">
-                                        <originalText>
-                                            <reference value="#ref1"/>
-                                        </originalText>
-                                        <translation code="054.3" codeSystem="2.16.840.1.113883.6.103" codeSystemName="ICD-9-CM" displayName="Herpetic meningoencephalitis" />
-                                    </value>
                                 </observation>
                             </entryRelationship>
                         </act>
@@ -1696,13 +1672,13 @@ Although being real choices for the different diseases and conditions, the selec
                             </thead>
                             <tbody>
                                 <tr ID="sub-6a"><td><content ID="code-51" language="xx-XX">Hepatitis B virus
-                            vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td>Acute Hepatitis B</td><td>SmithKline Beecham Biologicals S.A</td><td>12</td><td>1</td><td>Brussels vaccination center</td><td>Gregory House</td><td>BE</td><td/></tr>
+                                    vaccine</content><br/></td><td>Engerix B (2294189)</td><td>1983-01-02</td><td>Acute Hepatitis B</td><td>SmithKline Beecham Biologicals S.A</td><td>12</td><td>1</td><td>Brussels vaccination center</td><td>Gregory House</td><td>BE</td><td/></tr>
                                 <tr ID="sub-7a"><td><content ID="code-53" language="xx-XX">Diphtheria + tetanus
-                            + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    + pertussis + poliomyelitis vaccine</content><br/></td><td>Tetravac (2782480)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                                 <tr ID="sub-8a"><td><content ID="code-55" language="xx-XX">Haemophilus
-                            influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    influenzae Type b vaccine</content><br/></td><td>Hiberix (2751881)</td><td>1983-01-02</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                                 <tr ID="sub-9a"><td><content ID="code-57" language="xx-XX">Human papillomavirus
-                            vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
+                                    vaccine</content><br/></td><td>Cervarix (5055173)</td><td>1994-05-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td/></tr>
                             </tbody>
                         </table>
                     </text>
@@ -1735,7 +1711,7 @@ Although being real choices for the different diseases and conditions, the selec
                             </consumable>
                             <performer>
                                 <assignedEntity>
-                                    <id>2.999.7.1.2</id>
+                                    <id root="2.999.7.1.2"/>
                                     <assignedPerson>
                                         <name>
                                             <family>House</family>
@@ -1752,8 +1728,8 @@ Although being real choices for the different diseases and conditions, the selec
                             </performer>
                             <participant typeCode="IND">
                                 <participantRole classCode="AGNT">
-                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
                                     <code code="B16" displayName="Acute hepatitis B" codeSystem="1.3.6.1.4.1.12559.11.10.1.3.1.44.2" codeSystemName="ICD-10"/>
+                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
                                 </participantRole>
                             </participant>
                             <entryRelationship typeCode="SUBJ">
@@ -1761,7 +1737,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.28"/>
                                     <code code="30973-2" displayName="Dose Number" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
                                     <statusCode code="completed"/>
-                                    <value type="INT" value="12"/>
+                                    <value xsi:type="INT" value="12"/>
                                 </observation>
                             </entryRelationship>
                         </substanceAdministration>
@@ -1794,8 +1770,8 @@ Although being real choices for the different diseases and conditions, the selec
                             </consumable>
                             <participant typeCode="IND">
                                 <participantRole classCode="AGNT">
-                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
                                     <code nullFlavor="UNK"/>
+                                    <playingEntity classCode="ENT" nullFlavor="UNK"/>
                                 </participantRole>
                             </participant>
                         </substanceAdministration>
@@ -1874,12 +1850,12 @@ Although being real choices for the different diseases and conditions, the selec
                             </thead>
                             <tbody>
                                 <tr ID="obs-22a"><td><content ID="code-60" language="en-GB">Livebirth</content><br/></td><td>2</td><td>2020-02-05, 2021-09-08</td></tr>
-                                <tr ID="obs-22a"><td><content ID="code-61" language="en-GB">Termination of pregnancy</content><br/></td><td>1</td><td>2010-07-03</td></tr>
+                                <tr ID="obs-22b"><td><content ID="code-61" language="en-GB">Termination of pregnancy</content><br/></td><td>1</td><td>2010-07-03</td></tr>
                             </tbody>
                         </table>
                     </text>
                     <entry>
-                        <observation>
+                        <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.45"/>
                             <code code="82810-3" codeSystem="2.16.840.1.113883.6.1"/>
                             <text>
@@ -1887,41 +1863,43 @@ Although being real choices for the different diseases and conditions, the selec
                             </text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20220615"/>
-                            <value code="77386006" displayName="Pregnant" codeSystem="2.16.840.1.113883.6.96"/>
+                            <value xsi:type="CD" code="77386006" displayName="Pregnant" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96"/>
                             <entryRelationship typeCode="COMP">
                                 <observation classCode="OBS" moodCode="EVN">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.24"/>
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.20"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13.5"/>
-                                    <id root=" " extension=" "/>
+                                    <id root="2.999.8.1"/>
                                     <code code="11778-8" codeSystem="2.16.840.1.113883.6.1" displayName="Delivery date estimated (clinical)" codeSystemName="LOINC"/>
                                     <text>
                                         <reference value="#xxx"/>
                                     </text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20150819"/>
-                                    <value type="TS" value="20230214"/>
+                                    <value xsi:type="TS" value="20230214"/>
                                 </observation>
                             </entryRelationship>
                         </observation>
                     </entry>
                     <entry>
-                        <observation>
+                        <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.46"/>
-                            <code code="281050002" displayName="Livebirth" codeSystem="2.16.840.1.113883.6.96"/>
+                            <code code="281050002" displayName="Livebirth" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96"/>
                             <statusCode code="completed"/>
-                            <value value="2"/>
-                        </observation>
-                        <observation>
-                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.46"/>
-                            <code code="57797005" displayName="Termination of pregnancy" codeSystem="2.16.840.1.113883.6.96"/>
-                            <statusCode code="completed"/>
-                            <value value="1"/>
+                            <value xsi:type="INT" value="2"/>
                         </observation>
                     </entry>
                     <entry>
-                        <observation>
+                        <observation classCode="OBS" moodCode="EVN">
+                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.46"/>
+                            <code code="57797005" displayName="Termination of pregnancy" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96"/>
+                            <statusCode code="completed"/>
+                            <value xsi:type="INT" value="1"/>
+                        </observation>
+                    </entry>
+                    <entry>
+                        <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.47"/>
                             <code code="93857-1" codeSystem="2.16.840.1.113883.6.1"/>
                             <text>
@@ -1929,9 +1907,11 @@ Although being real choices for the different diseases and conditions, the selec
                             </text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20220616"/>
-                            <value type="TS" value="20200205"/>
+                            <value xsi:type="TS" value="20200205"/>
                         </observation>
-                        <observation>
+                    </entry>
+                    <entry>
+                        <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.47"/>
                             <code code="93857-1" codeSystem="2.16.840.1.113883.6.1"/>
                             <text>
@@ -1939,7 +1919,7 @@ Although being real choices for the different diseases and conditions, the selec
                             </text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20220616"/>
-                            <value type="TS" value="20210908"/>
+                            <value xsi:type="TS" value="20210908"/>
                         </observation>
                     </entry>
                 </section>
@@ -1953,15 +1933,15 @@ Although being real choices for the different diseases and conditions, the selec
                     <code code="29762-2" displayName="Social history" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Social history</title>
                     <text>
-                        <paragraph ID="obs-22">Tobacco use and exposure: 0.5 {pack}/d since 2017-04-15</paragraph>
-                        <paragraph ID="obs-23">Alcohol intake: 4 {glass}/d since 2016-04-15</paragraph>
+                        <paragraph ID="obs-24">Tobacco use and exposure: 0.5 {pack}/d since 2017-04-15</paragraph>
+                        <paragraph ID="obs-25">Alcohol intake: 4 {glass}/d since 2016-04-15</paragraph>
                         <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
                             <thead>
                                 <tr><th>Observation Type</th><th>Observation Value</th><th>Observation Time</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-22a"><td><content ID="code-61" language="xx-XX">Tobacco use and exposure</content><br/></td><td>0.5 {pack}/d</td><td>since 2017-04-15</td></tr>
-                                <tr ID="obs-23a"><td><content ID="code-62" language="xx-XX">Alcohol intake</content><br/></td><td>4 {glass}/d</td><td>since 2016-04-15</td></tr>
+                                <tr ID="obs-24a"><td><content ID="code-63" language="xx-XX">Tobacco use and exposure</content><br/></td><td>0.5 {pack}/d</td><td>since 2017-04-15</td></tr>
+                                <tr ID="obs-25a"><td><content ID="code-64" language="xx-XX">Alcohol intake</content><br/></td><td>4 {glass}/d</td><td>since 2016-04-15</td></tr>
                             </tbody>
                         </table>
                     </text>
@@ -1974,9 +1954,9 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <id root="2.999.9.1"/>
                             <code code="229819007" codeSystem="2.16.840.1.113883.6.96">
-                                <originalText><reference value="#code-61"/></originalText>
+                                <originalText><reference value="#code-63"/></originalText>
                             </code>
-                            <text><reference value="#obs-22"/></text>
+                            <text><reference value="#obs-24"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20170415"/>
@@ -1994,9 +1974,9 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="2.16.840.1.113883.10.20.1.33"/>
                             <id root="2.999.9.1"/>
                             <code code="160573003" codeSystem="2.16.840.1.113883.6.96">
-                                <originalText><reference value="#code-62"/></originalText>
+                                <originalText><reference value="#code-64"/></originalText>
                             </code>
-                            <text><reference value="#obs-23"/></text>
+                            <text><reference value="#obs-25"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime>
                                 <low value="20160415"/>
@@ -2014,16 +1994,16 @@ Although being real choices for the different diseases and conditions, the selec
                     <code code="8716-3" displayName="Physical findings" codeSystem="2.16.840.1.113883.6.1"/>
                     <title>Physical findings</title>
                     <text>
-                        <paragraph ID="code-64">Vital Signs</paragraph>
-                        <paragraph ID="obs-24">Diastolic blood pressure: 110 mm[Hg]</paragraph>
-                        <paragraph ID="obs-25">Systolic blood pressure: 160 mm[Hg]</paragraph>
+                        <paragraph ID="code-65">Vital Signs</paragraph>
+                        <paragraph ID="obs-26">Diastolic blood pressure: 110 mm[Hg]</paragraph>
+                        <paragraph ID="obs-27">Systolic blood pressure: 160 mm[Hg]</paragraph>
                         <table><caption>Date: 2017-05-06 [ID: 2.999.10.1]</caption><colgroup><col width="40%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
                             <thead>
                                 <tr><th>Obs. Type</th><th>Obs. Value</th><th>Obs. time</th><th>Obs. ID</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-24a"><td><content ID="code-65" language="xx-XX">Diastolic blood pressure</content><br/></td><td>110 mm[Hg]</td><td>2017-05-06</td><td>2.999</td></tr>
-                                <tr ID="obs-25a"><td><content ID="code-66" language="xx-XX">Systolic blood pressure</content><br/></td><td>160 mm[Hg]</td><td>2017-05-06</td><td>2.999</td></tr>
+                                <tr ID="obs-26a"><td><content ID="code-66" language="xx-XX">Diastolic blood pressure</content><br/></td><td>110 mm[Hg]</td><td>2017-05-06</td><td>2.999</td></tr>
+                                <tr ID="obs-27a"><td><content ID="code-67" language="xx-XX">Systolic blood pressure</content><br/></td><td>160 mm[Hg]</td><td>2017-05-06</td><td>2.999</td></tr>
                             </tbody>
                         </table>
                     </text>
@@ -2035,7 +2015,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="2.16.840.1.113883.10.20.1.35"/>
                             <id root="2.999.10.1"/>
                             <code code="46680005" codeSystem="2.16.840.1.113883.6.96">
-                                <originalText><reference value="#code-64"/></originalText>
+                                <originalText><reference value="#code-65"/></originalText>
                             </code>
                             <statusCode code="completed"/>
                             <effectiveTime value="20170506"/>
@@ -2048,9 +2028,9 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <id root="2.999"/>
                                     <code code="8462-4" codeSystem="2.16.840.1.113883.6.1">
-                                        <originalText><reference value="#code-65"/></originalText>
+                                        <originalText><reference value="#code-66"/></originalText>
                                     </code>
-                                    <text><reference value="#obs-24"/></text>
+                                    <text><reference value="#obs-26"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20170506"/>
                                     <value xsi:type="PQ" value="110" unit="mm[Hg]"/>
@@ -2065,9 +2045,9 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="2.16.840.1.113883.10.20.1.31"/>
                                     <id root="2.999"/>
                                     <code code="8480-6" codeSystem="2.16.840.1.113883.6.1">
-                                        <originalText><reference value="#code-66"/></originalText>
+                                        <originalText><reference value="#code-67"/></originalText>
                                     </code>
-                                    <text><reference value="#obs-25"/></text>
+                                    <text><reference value="#obs-27"/></text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20170506"/>
                                     <value xsi:type="PQ" value="160" unit="mm[Hg]"/>
@@ -2091,15 +2071,15 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr><th>Diagnostic Date</th><th>Blood Group</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-26"><td>2019-11-22</td><td>Blood Group: O+</td></tr>
+                                <tr ID="obs-28"><td>2019-11-22</td><td>Blood Group: O+</td></tr>
                             </tbody>
                         </table>
                         <table><colgroup><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
                             <thead>
-                                <tr><th>Diagnostic Date</th><th>Result type</th><th>Result value</th><th>Performer</th><th>Reporter</th></tr>
+                                <tr><th>Diagnostic Date</th><th>Result type</th><th>Result value</th><th>Performer</th><th>Reporter</th><th>Comment</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-27"><td>2022-06-14</td><td>Magnetic resonance imaging (MRI)</td><td>Source of Measurement</td><td>Schuman Robert</td><td>Ursula Von Der Leyen, European Commission Radiology dept.</td></tr>
+                                <tr ID="obs-29"><td>2022-06-14</td><td>Magnetic resonance imaging (MRI)</td><td>Source of Measurement</td><td>Schuman Robert</td><td>Ursula Von Der Leyen, European Commission Radiology dept.</td><td ID="comment-2">Comment line</td></tr>
                             </tbody>
                         </table>
                     </text>
@@ -2110,7 +2090,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                             <id root="2.999.11.1"/>
                             <code code="34530-6" displayName="ABO and Rh group panel - Blood" codeSystem="2.16.840.1.113883.6.1"/>
-                            <text><reference value="#obs-26"/></text>
+                            <text><reference value="#obs-28"/></text>
                             <statusCode code="completed"/>
                             <effectiveTime value="20191122"/>
                             <value xsi:type="CE" code="278147001" displayName="Blood group O Rh(D) positive" codeSystem="2.16.840.1.113883.6.96" />
@@ -2123,32 +2103,32 @@ Although being real choices for the different diseases and conditions, the selec
                             <statusCode code="completed"/>
                             <performer>
                                 <assignedEntity>
-                                    <id>2.999.11.2.1</id>
+                                    <id root="2.999.11.2.1"/>
                                     <assignedPerson>
                                         <name>
                                             <family>Robert</family>
                                             <given>Schuman</given>
                                         </name>
                                     </assignedPerson>
+                                    <representedOrganization>
+                                        <name>European Commission Radiology dept.</name>
+                                    </representedOrganization>
                                 </assignedEntity>
-                                <representedOrganization>
-                                    <name>European Commission Radiology dept.</name>
-                                </representedOrganization>
                             </performer>
                             <author>
+                                <templateId root="2.16.840.1.113883.3.1937.777.11.10.151"/>
+                                <time value="20220712"/>
                                 <assignedAuthor>
-                                    <assignedEntity>
-                                        <id>2.999.11.2.2</id>
-                                        <assignedPerson>
-                                            <name>
-                                                <family>Von Der Leyen</family>
-                                                <given>Ursula</given>
-                                            </name>
-                                        </assignedPerson>
-                                        <representedOrganization>
-                                            <name>European Commission Radiology dept.</name>
-                                        </representedOrganization>
-                                    </assignedEntity>
+                                    <id root="2.999.11.2.2"/>
+                                    <assignedPerson>
+                                        <name>
+                                            <family>Von Der Leyen</family>
+                                            <given>Ursula</given>
+                                        </name>
+                                    </assignedPerson>
+                                    <representedOrganization>
+                                        <name>European Commission Radiology dept.</name>
+                                    </representedOrganization>
                                 </assignedAuthor>
                             </author>
                             <component>
@@ -2156,7 +2136,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.43"/>
                                     <id root="2.999.11.2" extension="__example only__"/>
                                     <code code="LP6406-5" displayName="Magnetic resonance imaging (MRI)" codeSystem="1.2.3.999"/>
-                                    <text><reference value="#obs-27"/></text>
+                                    <text><reference value="#obs-29"/></text>
                                     <statusCode/>
                                     <effectiveTime value="20220614" />
                                     <value xsi:type="CD" code="121112" codeSystem="1.2.840.10008.2.16.4"
@@ -2164,15 +2144,37 @@ Although being real choices for the different diseases and conditions, the selec
                                     <interpretationCode code="..." codeSystem="2.16.840.1.113883.5.83"/>
                                     <methodCode code="..." codeSystem="1.2.3.999"/>
                                     <targetSiteCode code="..." codeSystem="1.2.3.999"/>
+                                    <entryRelationship typeCode="COMP">
+                                        <act classCode="ACT" moodCode="EVN">
+                                            <templateId root="2.16.840.1.113883.10.20.1.40"/>
+                                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.2"/>
+                                            <code code="48767-8" displayName="Annotation Comment" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
+                                            <text>
+                                                <reference value="#comment-2"/>
+                                            </text>
+                                            <statusCode code="completed"/>
+                                            <author>
+                                                <time value="20220712"/>
+                                                <assignedAuthor>
+                                                    <id root="2.999.11.2.1" extension="__example only__"/>
+                                                    <addr/>
+                                                    <telecom value="" use=""/>
+                                                    <assignedPerson>
+                                                        <name/>
+                                                    </assignedPerson>
+                                                    <representedOrganization>
+                                                        <name/>
+                                                    </representedOrganization>
+                                                </assignedAuthor>
+                                            </author>
+                                        </act>
+                                    </entryRelationship>
                                     <referenceRange>
                                         <observationRange>
-                                            <value xsi:type="PQ" value=".." unit=".."/>
+                                            <value xsi:type="PQ" value="1" unit="1"/>
                                             <interpretationCode code="N" codeSystem="2.16.840.1.113883.5.83" displayName="Normal"/>
                                         </observationRange>
                                     </referenceRange>
-                                    <entryRelationship typeCode="COMP">
-                                        <!-- template 1.3.6.1.4.1.12559.11.10.1.3.1.3.43 'eHDSI Comment' (dynamic) -->
-                                    </entryRelationship>
                                 </observation>
                             </component>
                         </organizer>
@@ -2187,14 +2189,8 @@ Although being real choices for the different diseases and conditions, the selec
                     <code code="42348-3" displayName="Advance directives" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC"/>
                     <title>Advance directives</title>
                     <text>
-                        <paragraph ID="code-71">Narrative text for Advance directive section</paragraph>
+                        <paragraph ID="code-72">Narrative text for Advance directive section</paragraph>
                     </text>
-                    <author>
-                        <!-- template 2.16.840.1.113883.3.1937.777.11.10.151 'eHDSI Body Author' (dynamic) -->
-                    </author>
-                    <informant>
-                        <!-- template 2.16.840.1.113883.3.1937.777.11.10.152 'CDA Informant (Body)' (dynamic) -->
-                    </informant>
                 </section>
             </component>
             <component>
@@ -2206,30 +2202,24 @@ Although being real choices for the different diseases and conditions, the selec
                     <title>Functional Status</title>
                     <text>
                         <paragraph ID="code-62">Functional statusses</paragraph>
-                        <paragraph ID="obs-27">Bed mobility - self-performance during assessment period</paragraph>
-                        <paragraph ID="obs-28">Walking (with assistive device if used)</paragraph>
+                        <paragraph ID="obs-30">Bed mobility - self-performance during assessment period</paragraph>
+                        <paragraph ID="obs-31">Walking (with assistive device if used)</paragraph>
                         <table><caption>Date: 2022-06-13 [ID: 2.999.13]</caption><colgroup><col width="40%"/><col width="20%"/><col width="20%"/><col width="20%"/></colgroup>
                             <thead>
                                 <tr><th>Obs. time</th><th>Obs. code</th><th>Onset time</th><th>Result</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-27a"><td>2022-06-13</td><td><content ID="code-63" language="en-GB">Bed mobility - self-performance during assessment period</content><br/></td><td>2022-06-13</td><td>MILD impairment for mobility of joint
+                                <tr ID="obs-30a"><td>2022-06-13</td><td><content ID="code-73" language="en-GB">Bed mobility - self-performance during assessment period</content><br/></td><td>2022-06-13</td><td>MILD impairment for mobility of joint
                                 </td></tr>
-                                <tr ID="obs-28a"><td>2022-06-13</td><td><content ID="code-64" language="en-GB">Walking (with assistive device if used)</content><br/></td><td>2022-06-13</td><td>MILD impairment for mobility of joint
+                                <tr ID="obs-31a"><td>2022-06-13</td><td><content ID="code-74" language="en-GB">Walking (with assistive device if used)</content><br/></td><td>2022-06-13</td><td>MILD impairment for mobility of joint
                                 </td></tr>
                             </tbody>
                         </table>
                     </text>
-                    <author>
-                        <!-- template 2.16.840.1.113883.3.1937.777.11.10.151 'eHDSI Body Author' (dynamic) -->
-                    </author>
-                    <informant>
-                        <!-- template 2.16.840.1.113883.3.1937.777.11.10.152 'CDA Informant (Body)' (dynamic) -->
-                    </informant>
                     <entry>
                         <organizer classCode="CLUSTER" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.39"/>
-                            <code code="" displayName="" codeSystemName="LOINC" codeSystem="2.16.840.1.113883.6.1"/>
+                            <code code="47420-5" displayName="Functional status assessment note" codeSystemName="LOINC" codeSystem="2.16.840.1.113883.6.1"/>
                             <statusCode code="completed"/>
                             <effectiveTime value="20220613"/>
                             <component>
@@ -2239,19 +2229,21 @@ Although being real choices for the different diseases and conditions, the selec
                                     <id root="2.999.13.1"/>
                                     <code code="45588-1" displayName="Bed mobility - self-performance during assessment period" codeSystem="2.16.840.1.113883.6.1"/>
                                     <text>
-                                        <reference value="#obs-27a"/>
+                                        <reference value="#obs-30a"/>
                                     </text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20220613" />
                                     <value xsi:type="CE" code="b710.1" displayName="MILD impairment for mobility of joint" codeSystem="1.2.3" />
                                 </observation>
+                            </component>
+                            <component>
                                 <observation classCode="OBS" moodCode="EVN">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.40"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                                     <id root="2.999.13.2"/>
                                     <code code="54750-5" displayName="Walking (with assistive device if used)" codeSystem="2.16.840.1.113883.6.1"/>
                                     <text>
-                                        <reference value="#obs-28a"/>
+                                        <reference value="#obs-31a"/>
                                     </text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20220613" />
