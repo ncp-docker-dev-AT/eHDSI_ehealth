@@ -163,10 +163,9 @@
                                         <pharm:desc>100 U/ml</pharm:desc>
                                         <pharm:formCode code="11201000" displayName="Solution for injection" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                         <pharm:asContent classCode="CONT">
-                                            <!-- TODO to fix -->
-                                            <pharm:quantity xsi:type="RTO">
-                                                <numerator xsi:type="INT" value="10"/>
-                                                <denominator xsi:type="INT" value="10"/>
+                                            <pharm:quantity>
+                                                <numerator unit="1" value="10" xsi:type="PQ" />
+                                                <denominator unit="1" value="10" xsi:type="PQ" />
                                             </pharm:quantity>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:name>LANTUS</pharm:name>
