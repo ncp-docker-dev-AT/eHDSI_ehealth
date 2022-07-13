@@ -551,7 +551,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     }
                 }
             }
-            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE;
+            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE.getCode();
             throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
@@ -565,61 +565,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             }
         }
     }
-
-/*
-    private boolean hasTransactionErrors(SOAPEnvelope envelope) {
-        if(envelope != null) {
-            Iterator<OMElement> it = envelope.getBody().getChildElements();
-            String transactionStatus = null;
-            if (it.hasNext()) {
-                OMElement elementDocSet = it.next();
-                if (org.apache.commons.lang3.StringUtils.equals(elementDocSet.getLocalName(), "AdhocQueryResponse")) {
-                    if (elementDocSet.getChildElements().hasNext()) {
-                        OMElement elementResponse = elementDocSet.getChildElements().next();
-                        if (org.apache.commons.lang3.StringUtils.equals(elementResponse.getLocalName(), "RegistryResponse")) {
-                            transactionStatus = elementResponse.getAttributeValue(QName.valueOf("status"));
-                        }
-                    }
-                }
-            }
-            if (org.apache.commons.lang3.StringUtils.equals(transactionStatus, RegistryErrorSeverity.ERROR_SEVERITY_ERROR) ||
-                    org.apache.commons.lang3.StringUtils.equals(transactionStatus, AdhocQueryResponseStatus.FAILURE)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String getTransactionErrorDescription(SOAPEnvelope envelope) {
-        String errorDescription = "unknown";
-
-        if(envelope != null) {
-            Iterator<OMElement> it = envelope.getBody().getChildElements();
-            while (it.hasNext()) {
-                OMElement elementDocSet = it.next();
-
-                  // example element
-//                <RegistryError
-//                        xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
-//                        codeContext="The requested encoding cannot be provided due to a transcoding error."
-//                        errorCode="4203"
-//                        severity="urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error"
-//                        location="urn:oid:2.16.17.710.823.1000.990.1"/>
-
-                if (org.apache.commons.lang3.StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
-                    String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
-                    String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
-                    errorDescription = cod + " [" + err + "]";
-                    break;
-                 }
-                 it = elementDocSet.getChildElements();
-            }
-        } else {
-            errorDescription = "envelope is null!";
-        }
-        return errorDescription;
-    }
- */
 
     private RegisteredService getRegisteredService(List<String> classCodes) {
         RegisteredService registeredService = null;
@@ -669,7 +614,6 @@ public class RespondingGateway_ServiceStub extends Stub {
                                                                                   Map<AssertionEnum, Assertion> assertionMap,
                                                                                   String classCode)
             throws java.rmi.RemoteException, XCAException {
-            throws java.rmi.RemoteException {
 
         String eadcError = "";
         MessageContext _messageContext = null;

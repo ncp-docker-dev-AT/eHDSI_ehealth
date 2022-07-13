@@ -384,10 +384,13 @@ public class DocumentRecipient_ServiceStub extends Stub {
 
                 eDispenseCda = EadcUtilWrapper.toXmlDocument(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue());
             }
-            EadcUtilWrapper.invokeEadc(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
-
+            if(!EadcUtilWrapper.hasTransactionErrors(returnEnv)) {
+                EadcUtilWrapper.invokeEadc(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+            } else {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(returnEnv);
+            }
             //  Log SOAP response message.
             String responseLogMsg;
             try {
