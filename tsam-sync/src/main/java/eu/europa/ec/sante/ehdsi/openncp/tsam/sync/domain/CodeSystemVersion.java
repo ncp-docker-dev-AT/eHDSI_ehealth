@@ -1,14 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +29,8 @@ public class CodeSystemVersion {
     private String copyright;
 
     private String source;
+
+    private Long previousVersionId;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "CODE_SYSTEM_ID")
@@ -119,6 +113,14 @@ public class CodeSystemVersion {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Long getPreviousVersionId() {
+        return previousVersionId;
+    }
+
+    public void setPreviousVersionId(Long previousVersionId) {
+        this.previousVersionId = previousVersionId;
     }
 
     public CodeSystem getCodeSystem() {

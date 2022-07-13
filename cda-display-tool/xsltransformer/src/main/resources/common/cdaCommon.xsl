@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:epsos="urn:epsos-org:ep:medication"
+                xmlns:pharm="urn:hl7-org:pharm"
                 version="2.0">
 
     <xsl:output method="html" indent="yes" version="4.01" doctype-system="http://www.w3.org/TR/html4/strict.dtd"
@@ -17,28 +17,44 @@
     <!-- show-id -->
     <xsl:template name="show-id">
         <xsl:param name="id"/>
-        <xsl:choose>
-            <xsl:when test="not($id)">
-                <xsl:if test="not(@nullFlavor)">
-                    <xsl:if test="@extension">
-                        <xsl:value-of select="@extension"/>
-                    </xsl:if>
-                    <xsl:text> </xsl:text>
-                    <xsl:value-of select="@root"/>
-                </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:if test="not($id/@nullFlavor)">
-                    <xsl:if test="$id/@extension">
-                        <xsl:value-of select="$id/@extension"/>
-                    </xsl:if>
-                    <xsl:text> </xsl:text>
-                    <!--xsl:value-of select="$id/@root"/ -->
-                </xsl:if>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="not($id/@nullFlavor)">
+            <xsl:if test="$id/@extension">
+                <xsl:value-of select="$id/@extension"/>
+                <xsl:text> </xsl:text>
+            </xsl:if>
+            <xsl:value-of select="$id/@root"/>
+        </xsl:if>
     </xsl:template>
 
+    <!-- show-performer -->
+    <xsl:template name="show-performer">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-name">
+            <xsl:with-param name="name" select="$node/n1:assignedEntity/n1:assignedPerson/n1:name"/>
+        </xsl:call-template>
+    </xsl:template>
+    
+    <!-- show-author -->
+    <xsl:template name="show-author">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedPerson">
+                <xsl:call-template name="show-name">
+                    <xsl:with-param name="name" select="$node/n1:assignedAuthor/n1:assignedPerson/n1:name"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedAuthoringDevice">
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedAuthoringDevice/n1:manufacturerModelName"/>
+                ,&#160;
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedAuthoringDevice/n1:softwareName"/>
+            </xsl:when>
+        </xsl:choose>
+        <xsl:if test="$node/n1:assignedAuthor/n1:representedOrganization">
+            ,&#160;
+            <xsl:value-of select="$node/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
+        </xsl:if>
+    </xsl:template>
+    
     <!-- show-name -->
     <xsl:template name="show-name">
         <xsl:param name="name"/>
@@ -594,8 +610,8 @@
     <xsl:template name="show-strength">
         <xsl:param name="node"/>
 
-        <xsl:variable name="numerator" select="$node/epsos:numerator"/>
-        <xsl:variable name="denominator" select="$node/epsos:denominator"/>
+        <xsl:variable name="numerator" select="$node/pharm:numerator"/>
+        <xsl:variable name="denominator" select="$node/pharm:denominator"/>
         <xsl:variable name="numeratorValue" select="$numerator/@value"/>
         <xsl:variable name="numeratorUnit">
             <xsl:call-template name="show-eHDSIUnit">
@@ -603,7 +619,7 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="denominatorValue" select="$denominator/@value"/>
-        <xsl:variable name="medStrengthOriginalText" select="$node/epsos:translation/epsos:originalText"/>
+        <xsl:variable name="medStrengthOriginalText" select="$node/pharm:translation/pharm:originalText"/>
         <xsl:variable name="denominatorUnit">
             <xsl:call-template name="supportUCUMAnnotations">
                 <xsl:with-param name="value" select="$denominator/@unit"/>
