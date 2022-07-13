@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tsam.service.impl;
 
 import epsos.ccd.posam.tsam.dao.ITsamDao;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.CodeSystem;
 import epsos.ccd.posam.tsam.model.CodeSystemConcept;
@@ -14,11 +13,13 @@ import epsos.ccd.posam.tsam.util.CodedElement;
 import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
 import org.apache.commons.lang3.StringUtils;
+import java.util.HashMap;
+
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -185,9 +186,9 @@ public class TerminologyService implements ITerminologyService {
             } else {
                 ctx = "Code System is null and  != " + name;
             }
-            response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+            response.addWarning(TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             if (logger.isDebugEnabled()) {
-                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             }
         }
     }

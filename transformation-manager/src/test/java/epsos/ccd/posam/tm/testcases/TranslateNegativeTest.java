@@ -2,12 +2,12 @@ package epsos.ccd.posam.tm.testcases;
 
 import java.util.List;
 
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import org.junit.Ignore;
 import org.w3c.dom.Document;
 
-import epsos.ccd.posam.tm.exception.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 
 /**
  * Negative test scenarios for method translate 
@@ -27,7 +27,7 @@ public class TranslateNegativeTest extends TBase{
 
 		List<ITMTSAMEror> errors = response.getErrors();
 		assertNotNull(errors);
-		assertTrue(errors.contains(TMError.ERROR_NULL_INPUT_DOCUMENT));		
+		assertTrue(errors.contains(TMError.ERROR_NULL_INPUT_DOCUMENT));
 	}
 
 	public void testTranslateNotValidDoc() {

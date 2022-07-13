@@ -20,14 +20,16 @@
 package eu.epsos.protocolterminators.ws.server.xdr;
 
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 public class NoMatchingPrescriptionException extends NIException {
 	private static final long serialVersionUID = -2746600171056013382L;
 
-	public NoMatchingPrescriptionException() {
-		super("4105", "No matching ePrescription was found");
-	}
 	public NoMatchingPrescriptionException(String message) {
-		super("4105", message);
+		super(OpenNCPErrorCode.ERROR_EP_NOT_MATCHING, message);
 	}
+	public NoMatchingPrescriptionException() {
+		this( "No matching ePrescription was found");
+	}
+
 }

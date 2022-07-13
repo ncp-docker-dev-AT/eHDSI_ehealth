@@ -1,11 +1,6 @@
 package eu.epsos.pt.cc;
 
-import epsos.openncp.protocolterminator.clientconnector.GeneralFault;
-import epsos.openncp.protocolterminator.clientconnector.GeneralFaultDocument;
-import epsos.openncp.pt.client.GeneralFaultMessage;
-import eu.epsos.exceptions.NoPatientIdDiscoveredException;
-import eu.epsos.exceptions.XCAException;
-import eu.epsos.exceptions.XDRException;
+import eu.epsos.exceptions.ExceptionWithContext;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -22,7 +17,6 @@ public class ClientConnectorServiceUtils {
     public static final String TASK_NAMESPACE = "http://clientconnector.protocolterminator.openncp.epsos/";
     public static final String TASK_NAMESPACE_PREFIX = "soapenv";
     private static final Logger logger = LoggerFactory.getLogger(ClientConnectorServiceUtils.class);
-    private static final String DEFAULT_ERROR_CODE = "1000";
     private static final OMFactory OM_FACTORY = OMAbstractFactory.getOMFactory();
 
     private ClientConnectorServiceUtils() {
@@ -34,7 +28,8 @@ public class ClientConnectorServiceUtils {
         if (e instanceof AxisFault) {
             return (AxisFault) e;
         }
-        String errorCode = DEFAULT_ERROR_CODE;
+        String errorMessage = "";
+        String errorCode = "";
         String faultMessage = "";
         OMElement response = null;
         Throwable throwable = e;
@@ -43,38 +38,21 @@ public class ClientConnectorServiceUtils {
             throwable = ((InvocationTargetException) e).getTargetException();
         } else if (e instanceof UndeclaredThrowableException) {
             throwable = e.getCause();
-        } else if (throwable instanceof NoPatientIdDiscoveredException) {
+        } else if (throwable instanceof ExceptionWithContext) {
             response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "noPatientIdDiscoveredException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
-            faultMessage = ((NoPatientIdDiscoveredException) throwable).getContext();
-            response.setText(faultMessage);
-        } else if (throwable instanceof XCAException) {
-            response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "xcaException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
-            faultMessage = ((XCAException) throwable).getContext();
-            response.setText(faultMessage);
-        } else if (throwable instanceof XDRException) {
-            response = OM_FACTORY.createOMElement(
-                    new QName(TASK_NAMESPACE, "xdrException", TASK_NAMESPACE_PREFIX));
-            errorCode = throwable.getMessage();
-            faultMessage = ((XDRException) throwable).getContext();
+                    new QName(TASK_NAMESPACE, throwable.getClass().getSimpleName(), TASK_NAMESPACE_PREFIX));
+            // OpenNCP Error Code
+            errorCode = ((ExceptionWithContext) throwable).getOpenncpErrorCode().getCode();
+            // OpenNCP additional information
+            errorMessage = throwable.getMessage();
+            // National Country additional information
+            faultMessage = ((ExceptionWithContext) throwable).getContext();
             response.setText(faultMessage);
         } else { //
-            errorCode = throwable.getMessage();
+            errorMessage = throwable.getMessage();
         }
 
-        GeneralFault generalFault = GeneralFault.Factory.newInstance();
-        generalFault.setFaultMessage(faultMessage);
-
-        GeneralFaultDocument generalFaultDocument = GeneralFaultDocument.Factory.newInstance();
-        generalFaultDocument.setGeneralFault(generalFault);
-
-        GeneralFaultMessage exception = new GeneralFaultMessage(errorCode, throwable);
-        exception.setFaultMessage(generalFaultDocument);
-
-        axisFault = new AxisFault(errorCode, exception);
+        axisFault = new AxisFault(errorMessage, new QName(errorCode));
         axisFault.setDetail(response);
 
         return axisFault;
