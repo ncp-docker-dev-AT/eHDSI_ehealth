@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tsam.service.impl;
 
 import epsos.ccd.posam.tsam.dao.ITsamDao;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.CodeSystem;
 import epsos.ccd.posam.tsam.model.CodeSystemConcept;
