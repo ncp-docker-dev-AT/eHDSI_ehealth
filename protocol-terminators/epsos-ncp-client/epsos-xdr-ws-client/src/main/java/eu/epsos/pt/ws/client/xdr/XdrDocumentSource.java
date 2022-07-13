@@ -2,7 +2,9 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
@@ -78,7 +80,7 @@ public final class XdrDocumentSource {
                 processRegistryErrors(registryErrorList);
             }
         } catch (RemoteException e) {
-            throw new XDRException(e);
+            throw new XDRException(getErrorCode(docClassCode), e);
         }
         return XdrResponseDts.newInstance(response);
     }
@@ -112,17 +114,30 @@ public final class XdrDocumentSource {
             LOGGER.error("errorCode='{}'\ncodeContext='{}'\nlocation='{}'\nseverity='{}'\n'{}'\n",
                     errorCode, codeContext, location, severity, value);
 
-            if (StringUtils.equals("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error", severity)) {
+            if (StringUtils.equals(RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText(), severity)) {
                 stringBuilder.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                 hasError = true;
             }
+
+            OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);
+            if(openncpErrorCode == null){
+                LOGGER.warn("No EHDSI error code found in the XDR response for : " + errorCode);
+            }
+
             if (hasError) {
-                if (errorCode != null && errorCode.trim().length() > 0) {
-                    throw new XDRException(errorCode, codeContext);
-                } else {
-                    throw new XDRException(codeContext);
-                }
+                    throw new XDRException(openncpErrorCode, codeContext, location);
             }
         }
     }
+
+    private static OpenNCPErrorCode getErrorCode(String classCode){
+        switch (classCode){
+            case Constants.ED_CLASSCODE:
+                return OpenNCPErrorCode.ERROR_ED_GENERIC;
+            case Constants.EDD_CLASSCODE:
+                return OpenNCPErrorCode.ERROR_ED_DISCARD_FAILED;
+        }
+        return OpenNCPErrorCode.ERROR_GENERIC;
+    }
+
 }

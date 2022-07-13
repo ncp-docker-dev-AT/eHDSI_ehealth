@@ -83,7 +83,7 @@ public class AssertionHelper {
         } catch (MissingFieldException e) {
             // this is to get the behavior as before...
             LOGGER.error("InsufficientRightsException: '{}'", e.getMessage(), e);
-            throw new InsufficientRightsException(4703);
+            throw new InsufficientRightsException();
         }
     }
 

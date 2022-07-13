@@ -3,9 +3,9 @@ package eu.epsos.protocolterminators.ws.server.xdr.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
-import eu.epsos.protocolterminators.ws.server.exception.XDSErrorCode;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
@@ -51,7 +51,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
             dispensation = XMLUtil.prettyPrint(dispensationDocument.getDocument().getFirstChild());
         } catch (TransformerException e) {
             logger.error("TransformerException while submitDispensation(): '{}'", e.getMessage(), e);
-            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
+            throw new NationalInfrastructureException(OpenNCPErrorCode.ERROR_EP_ALREADY_DISPENSED, null);
         }
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
             loggerClinical.debug("eDispensation document content: '{}'", dispensation);
@@ -59,19 +59,19 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
 
         if (dispensation == null || dispensation.isEmpty()) {
 
-            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
+            throw new NationalInfrastructureException(OpenNCPErrorCode.ERROR_EP_ALREADY_DISPENSED, null);
         }
 
         if (StringUtils.contains(dispensation, "NO_MATCHING_EP")) {
 
             logger.error("Tried to submit dispensation with no matching ePrescription.");
-            throw new NationalInfrastructureException(XDSErrorCode.NO_MATCHING_PRESCRIPTION);
+            throw new NationalInfrastructureException(OpenNCPErrorCode.ERROR_EP_NOT_MATCHING, null);
         }
 
         if (StringUtils.contains(dispensation, "INVALID_DISPENSE")) {
 
             logger.error("Tried to submit already dispensed ePrescription.");
-            throw new NationalInfrastructureException(XDSErrorCode.INVALID_DISPENSE);
+            throw new NationalInfrastructureException(OpenNCPErrorCode.ERROR_EP_ALREADY_DISPENSED, null);
         }
     }
 
@@ -81,7 +81,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
      * @param dispensationToDiscard Id of the dispensation to be discarded
      */
     @Override
-    public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) {
+    public void cancelDispensation(DiscardDispenseDetails discardDispenseDetails, EPSOSDocument dispensationToDiscard) throws NIException {
 
         if (logger.isInfoEnabled()) {
             logger.info("[National Infrastructure Mock] Submit Discard Dispense Document");
