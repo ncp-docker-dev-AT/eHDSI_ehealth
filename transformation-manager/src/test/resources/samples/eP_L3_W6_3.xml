@@ -211,7 +211,10 @@
                                             </pharm:partProduct>
                                         </pharm:part>
                                         <pharm:part classCode="PART">
-                                            <pharm:quantity xsi:type="PQ" value="1" unit="1"/>
+                                            <pharm:quantity>
+                                                <numerator xsi:type="PQ" value="1" unit="1"/>
+                                                <denominator xsi:type="PQ" value="1" unit="1"/>
+                                            </pharm:quantity>
                                             <pharm:partProduct classCode="MMAT" determinerCode="KIND">
                                                 <pharm:asContent classCode="CONT">
                                                     <pharm:quantity>
