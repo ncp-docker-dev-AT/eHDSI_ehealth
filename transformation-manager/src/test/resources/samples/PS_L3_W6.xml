@@ -420,9 +420,12 @@ Although being real choices for the different diseases and conditions, the selec
                                             </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
+                                            <pharm:quantity>
+                                                <numerator xsi:type="PQ" value="1" unit="g"/>
+                                                <denominator xsi:type="PQ" value="1" unit="g"/>
+                                            </pharm:quantity>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="10100500" displayName="Concentrate for oral suspension" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
-                                                <pharm:capacityQuantity value="1" unit="g"/>
                                             </pharm:containerPackagedProduct>
                                         </pharm:asContent>
                                         <pharm:ingredient classCode="ACTI">
@@ -667,13 +670,16 @@ Although being real choices for the different diseases and conditions, the selec
                                             </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
+                                            <pharm:quantity>
+                                                <numerator xsi:type="PQ" value="2.5" unit="ml"/>
+                                                <denominator xsi:type="PQ" value="2.5" unit="ml"/>
+                                            </pharm:quantity>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="30057000" codeSystem="0.4.0.127.0.16.1.1.2.1">
                                                     <originalText>
                                                         <reference value="#form-6"/>
                                                     </originalText>
                                                 </pharm:formCode>
-                                                <pharm:capacityQuantity value="2.5" unit="mL"/>
                                             </pharm:containerPackagedProduct>
                                         </pharm:asContent>
                                         <pharm:asSpecializedKind classCode="GEN">
