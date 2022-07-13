@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -187,9 +186,9 @@ public class TerminologyService implements ITerminologyService {
             } else {
                 ctx = "Code System is null and  != " + name;
             }
-            response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+            response.addWarning(TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             if (logger.isDebugEnabled()) {
-                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             }
         }
     }

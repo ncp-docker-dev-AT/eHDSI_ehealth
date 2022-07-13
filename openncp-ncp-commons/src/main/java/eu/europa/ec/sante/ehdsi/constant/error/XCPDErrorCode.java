@@ -2,9 +2,7 @@ package eu.europa.ec.sante.ehdsi.constant.error;
 
 import java.util.Arrays;
 
-public enum XcpdErrorCode implements ErrorCode{
-
-
+public enum XCPDErrorCode implements ErrorCode {
 
     //EHI Error Code
     /*
@@ -15,7 +13,6 @@ public enum XcpdErrorCode implements ErrorCode{
     AnswerNotAvailable("AnswerNotAvailable", "The answer is not available. Human intervention may be needed.", "1.3.6.1.4.1.19376.1.2.27.3"),
     ResponderBusy("ResponderBusy", "The responder was not able to process the request because it is currently overloaded.", "1.3.6.1.4.1.19376.1.2.27.3"),
     InternalError("InternalError", "The responder was not able to respond due to an internal error or inconsistency.", "1.3.6.1.4.1.19376.1.2.27.3"),
-
 
     //EHDSI Error code
     /*
@@ -36,10 +33,17 @@ public enum XcpdErrorCode implements ErrorCode{
 
     private final String codeSystem;
 
-    XcpdErrorCode(String code, String description, String codeSystem){
+    XCPDErrorCode(String code, String description, String codeSystem) {
         this.code = code;
         this.description = description;
         this.codeSystem = codeSystem;
+    }
+
+    public static XCPDErrorCode getErrorCode(String code) {
+        return Arrays.stream(values())
+                .filter(errorCode -> errorCode.name().equals(code))
+                .findAny()
+                .orElse(null);
     }
 
     public String getCode() {
@@ -50,16 +54,7 @@ public enum XcpdErrorCode implements ErrorCode{
         return description;
     }
 
-
     public String getCodeSystem() {
         return codeSystem;
     }
-
-    public static XcpdErrorCode getErrorCode(String code){
-        return Arrays.stream(values())
-                .filter(errorCode -> errorCode.name().equals(code))
-                .findAny()
-                .orElse(null);
-    }
-
 }

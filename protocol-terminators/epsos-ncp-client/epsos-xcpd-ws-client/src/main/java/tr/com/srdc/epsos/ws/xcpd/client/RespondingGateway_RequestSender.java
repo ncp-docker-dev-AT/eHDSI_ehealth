@@ -3,7 +3,7 @@ package tr.com.srdc.epsos.ws.xcpd.client;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.dts.xcpd.PRPAIN201305UV022DTS;
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerException;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
@@ -48,7 +48,7 @@ public final class RespondingGateway_RequestSender {
             endpointUrl = dynamicDiscoveryService.getEndpointUrl(countryCode.toLowerCase(Locale.ENGLISH),
                     RegisteredService.PATIENT_IDENTIFICATION_SERVICE);
         } catch (ConfigurationManagerException e){
-            throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, e.getMessage());
+            throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC, e.getMessage());
         }
 
         String dstHomeCommunityId = OidUtil.getHomeCommunityId(countryCode.toLowerCase(Locale.ENGLISH));

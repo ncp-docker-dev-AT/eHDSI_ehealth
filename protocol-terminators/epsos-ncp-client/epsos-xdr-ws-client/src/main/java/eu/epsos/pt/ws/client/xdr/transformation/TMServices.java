@@ -4,7 +4,7 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import eu.epsos.exceptions.DocumentTransformationException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public final class TMServices {
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
             //If the transcoding process fails, an exception is thrown.
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING, OpenncpErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getDescription(), "DOCUMENT TRANSCODING FAILED.");
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING, OpenNCPErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getDescription(), "DOCUMENT TRANSCODING FAILED.");
         }
         try {
             // Obtain the translated document in the Document type format, only if translation succeeds.
@@ -64,7 +64,7 @@ public final class TMServices {
             //Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         LOGGER.debug("TRANSCODING SUCCESSFULLY ENDED.");
@@ -83,7 +83,7 @@ public final class TMServices {
             //Parse the String into a Document object.
             resultDoc = XMLUtil.parseContent(docString);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         return resultDoc;

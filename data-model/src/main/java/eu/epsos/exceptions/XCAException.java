@@ -1,6 +1,6 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 /**
  * Holds exceptions originated in the XCA Query / Retrieve process.
@@ -10,7 +10,7 @@ import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
  */
 public class XCAException extends ExceptionWithContext {
 
-    public XCAException(OpenncpErrorCode openncpErrorCode, String message,  String context) {
+    public XCAException(OpenNCPErrorCode openncpErrorCode, String message, String context) {
         super(openncpErrorCode, message, context);
     }
 

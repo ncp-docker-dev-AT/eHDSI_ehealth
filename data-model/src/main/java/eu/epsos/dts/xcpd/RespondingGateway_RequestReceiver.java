@@ -1,8 +1,8 @@
 package eu.epsos.dts.xcpd;
 
 import eu.epsos.exceptions.NoPatientIdDiscoveredException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 import org.hl7.v3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +145,7 @@ public class RespondingGateway_RequestReceiver {
                         }
                     }
                 } catch (ParseException pe) {
-                    throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, pe);
+                    throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC, pe);
                 }
             }
         } else {
@@ -175,8 +175,8 @@ public class RespondingGateway_RequestReceiver {
                 }
             }
 
-            XcpdErrorCode xcpdErrorCode= XcpdErrorCode.getErrorCode(xcpdErrorCodeValue);
-            OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.getErrorCode(openncpErrorCodeValue);
+            XCPDErrorCode xcpdErrorCode= XCPDErrorCode.getErrorCode(xcpdErrorCodeValue);
+            OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(openncpErrorCodeValue);
 
             if(xcpdErrorCode == null && openncpErrorCode == null){
                 LOGGER.warn("No error code found in the XCPD response : " + errorMsg);

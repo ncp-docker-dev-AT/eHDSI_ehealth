@@ -4,16 +4,15 @@ import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
-import eu.epsos.protocolterminators.ws.server.xcpd.exception.XcpdNIException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.epsos.protocolterminators.ws.server.xcpd.exception.XCPDNIException;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -292,7 +291,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     /**
      * Prepares a reasonOf element according to error type
      */
-    private MFMIMT700711UV01Reason getReasonOfElement(XcpdErrorCode xcpdErrorCode) {
+    private MFMIMT700711UV01Reason getReasonOfElement(XCPDErrorCode xcpdErrorCode) {
 
         var mfmimt700711UV01Reason = objectFactory.createMFMIMT700711UV01Reason();
         mfmimt700711UV01Reason.setTypeCode("RSON");
@@ -307,7 +306,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        if( xcpdErrorCode == XcpdErrorCode.DemographicsQueryNotAllowed) {
+        if( xcpdErrorCode == XCPDErrorCode.DemographicsQueryNotAllowed) {
             // Set detectedIssueEvent/triggerFor
             MCAIMT900001UV01Requires mcaimt900001UV01Requires = objectFactory.createMCAIMT900001UV01Requires();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(mcaimt900001UV01Requires);
@@ -325,8 +324,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             mcaimt900001UV01ActOrderRequired.setCode(ce);
             ce.setCode(xcpdErrorCode.getCode());
             ce.setCodeSystem(xcpdErrorCode.getCodeSystem());
-        } else if (xcpdErrorCode == XcpdErrorCode.InsufficientRights
-                || xcpdErrorCode == XcpdErrorCode.AnswerNotAvailable) {
+        } else if (xcpdErrorCode == XCPDErrorCode.InsufficientRights
+                || xcpdErrorCode == XCPDErrorCode.AnswerNotAvailable) {
             // Set detectedIssueEvent/mitigatedBy
             MCAIMT900001UV01SourceOf mcaimt900001UV01SourceOf = objectFactory.createMCAIMT900001UV01SourceOf();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(mcaimt900001UV01SourceOf);
@@ -347,11 +346,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return mfmimt700711UV01Reason;
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String context) {
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context) {
         fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context,  "AE");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XcpdErrorCode xcpdErrorCode, OpenncpErrorCode openncpErrorCode, String context, String code) {
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code) {
 
         // Set queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
@@ -587,7 +586,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             List<PRPAMT201306UV02LivingSubjectId> livingSubjectIds = inputQBP.getParameterList().getLivingSubjectId();
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
-                fillOutputMessage(outputMessage, XcpdErrorCode.AnswerNotAvailable, OpenncpErrorCode.ERROR_PI_GENERIC, "Receiver has wrong Home Community ID.");
+                fillOutputMessage(outputMessage, XCPDErrorCode.AnswerNotAvailable, OpenNCPErrorCode.ERROR_PI_GENERIC, "Receiver has wrong Home Community ID.");
             } else if (!livingSubjectIds.isEmpty()) {
                 var stringBuilderNRO = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
@@ -673,7 +672,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 if (demographicsList.isEmpty()) {
                     // Preparing answer not available error
 
-                    fillOutputMessage(outputMessage, XcpdErrorCode.AnswerNotAvailable, OpenncpErrorCode.ERROR_PI_NO_MATCH, "No patient found.", "NF");
+                    fillOutputMessage(outputMessage, XCPDErrorCode.AnswerNotAvailable, OpenNCPErrorCode.ERROR_PI_NO_MATCH, "No patient found.", "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
                 } else {
                     var countryCode = "";
@@ -716,8 +715,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     } else {
                         // No patient data can be sent to Country B.
                         fillOutputMessage(outputMessage,
-                                XcpdErrorCode.InsufficientRights,
-                                OpenncpErrorCode.ERROR_PI_GENERIC,
+                                XCPDErrorCode.InsufficientRights,
+                                OpenNCPErrorCode.ERROR_PI_GENERIC,
                                  " : Either the security policy of country A or a privacy " +
                                 "policy of the patient (that was given in country A) does not allow the requested operation " +
                                 "to be performed by the HCP .");
@@ -726,19 +725,19 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 }
             } else {
                 // Preparing demographic query not allowed error
-                fillOutputMessage(outputMessage, XcpdErrorCode.DemographicsQueryNotAllowed, OpenncpErrorCode.ERROR_PI_GENERIC, "Queries are only available with patient identifiers");
+                fillOutputMessage(outputMessage, XCPDErrorCode.DemographicsQueryNotAllowed, OpenNCPErrorCode.ERROR_PI_GENERIC, "Queries are only available with patient identifiers");
             }
-        } catch (OpenncpErrorCodeException e) {
+        } catch (OpenNCPErrorCodeException e) {
 
-            fillOutputMessage(outputMessage, XcpdErrorCode.InsufficientRights, e.getOpenncpErrorCode(), e.getMessage()) ;
+            fillOutputMessage(outputMessage, XCPDErrorCode.InsufficientRights, e.getErrorCode(), e.getMessage()) ;
             logger.error(e.getMessage(), e);
-        } catch (XcpdNIException e) {
+        } catch (XCPDNIException e) {
 
             fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage()) ;
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
 
-            fillOutputMessage(outputMessage, XcpdErrorCode.InternalError, OpenncpErrorCode.ERROR_PI_GENERIC, e.getMessage());
+            fillOutputMessage(outputMessage, XCPDErrorCode.InternalError, OpenNCPErrorCode.ERROR_PI_GENERIC, e.getMessage());
             logger.error(e.getMessage(), e);
         }
         // Set queryByParameter

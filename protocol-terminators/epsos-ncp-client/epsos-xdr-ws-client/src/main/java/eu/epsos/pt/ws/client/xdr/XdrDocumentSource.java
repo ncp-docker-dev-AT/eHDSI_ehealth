@@ -2,7 +2,7 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
@@ -119,7 +119,7 @@ public final class XdrDocumentSource {
                 hasError = true;
             }
 
-            OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.getErrorCode(errorCode);
+            OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);
             if(openncpErrorCode == null){
                 LOGGER.warn("No EHDSI error code found in the XDR response for : " + errorCode);
             }
@@ -130,14 +130,14 @@ public final class XdrDocumentSource {
         }
     }
 
-    private static OpenncpErrorCode getErrorCode(String classCode){
+    private static OpenNCPErrorCode getErrorCode(String classCode){
         switch (classCode){
             case Constants.ED_CLASSCODE:
-                return OpenncpErrorCode.ERROR_ED_GENERIC;
+                return OpenNCPErrorCode.ERROR_ED_GENERIC;
             case Constants.EDD_CLASSCODE:
-                return OpenncpErrorCode.ERROR_ED_DISCARD_FAILED;
+                return OpenNCPErrorCode.ERROR_ED_DISCARD_FAILED;
         }
-        return OpenncpErrorCode.ERROR_GENERIC;
+        return OpenNCPErrorCode.ERROR_GENERIC;
     }
 
 }

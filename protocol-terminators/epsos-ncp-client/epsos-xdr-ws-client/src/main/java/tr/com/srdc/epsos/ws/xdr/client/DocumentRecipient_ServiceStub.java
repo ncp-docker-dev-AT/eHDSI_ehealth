@@ -10,7 +10,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -270,7 +270,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope.getBody()));
             } catch (Exception ex) {
-                throw new XDRException(OpenncpErrorCode.ERROR_GENERIC, ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             // NRO
@@ -361,7 +361,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
-                    throw new XDRException(OpenncpErrorCode.ERROR_GENERIC, e);
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
 
@@ -391,7 +391,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
-                throw new XDRException(OpenncpErrorCode.ERROR_GENERIC, ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             /* Perform validation of response message */
@@ -445,10 +445,10 @@ public class DocumentRecipient_ServiceStub extends Stub {
 
                 } catch (Exception e) {
                     // Class cannot be instantiated - throwing the original Axis fault
-                    throw new XDRException(OpenncpErrorCode.ERROR_GENERIC, e);
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
-            throw new XDRException(OpenncpErrorCode.ERROR_GENERIC, axisFault);
+            throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, axisFault);
 
         } finally {
             if (messageContext != null && messageContext.getTransportOut() != null && messageContext.getTransportOut().getSender() != null) {

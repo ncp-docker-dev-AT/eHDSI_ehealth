@@ -9,7 +9,7 @@ import eu.epsos.protocolterminators.ws.server.exception.OriginalDataMissingExcep
 import eu.epsos.protocolterminators.ws.server.exception.ProcessingDeferredException;
 import eu.epsos.protocolterminators.ws.server.util.NationalConnectorUtil;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
@@ -47,7 +47,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode.ERROR_PS_PDF_FORMAT_NOT_PROVIDED;
+import static eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode.ERROR_PS_PDF_FORMAT_NOT_PROVIDED;
 
 /**
  * @author konstantin.hypponen@kela.fi Note this is a very dirty implementation
@@ -524,7 +524,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
         }
         NoMatchException noMatchException = new NoMatchException("[National Infrastructure Mock] No PS List Found");
-        noMatchException.setOpenncpErrorCode(OpenncpErrorCode.ERROR_PS_NOT_FOUND);
+        noMatchException.setOpenncpErrorCode(OpenNCPErrorCode.ERROR_PS_NOT_FOUND);
         throw noMatchException;
     }
 
@@ -543,7 +543,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 if(documentAssociation.getPDFDocumentMetaData() == null){
                     OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
-                    ex.setOpenncpErrorCode(OpenncpErrorCode.ERROR_EP_PDF_FORMAT_NOT_PROVIDED);
+                    ex.setOpenncpErrorCode(OpenNCPErrorCode.ERROR_EP_PDF_FORMAT_NOT_PROVIDED);
                     throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                 }
             }
@@ -554,7 +554,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         }
 
         NoMatchException noMatchException = new NoMatchException("[National Infrastructure Mock] No eP List Found");
-        noMatchException.setOpenncpErrorCode(OpenncpErrorCode.ERROR_EP_NOT_FOUND);
+        noMatchException.setOpenncpErrorCode(OpenNCPErrorCode.ERROR_EP_NOT_FOUND);
         throw noMatchException;
     }
 
@@ -631,7 +631,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
         }
 
-        throw new NIException(OpenncpErrorCode.ERROR_GENERIC, "[National Infrastructure Mock] Error Retrieving Document");
+        throw new NIException(OpenNCPErrorCode.ERROR_GENERIC, "[National Infrastructure Mock] Error Retrieving Document");
     }
 
     @Override

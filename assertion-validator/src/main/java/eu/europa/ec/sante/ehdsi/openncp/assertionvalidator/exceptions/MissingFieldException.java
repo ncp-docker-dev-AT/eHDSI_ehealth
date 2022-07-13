@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 public class MissingFieldException extends AssertionValidationException {
 	
@@ -13,7 +13,7 @@ public class MissingFieldException extends AssertionValidationException {
         this.messageDetailed = messageDetailed;
     }
 
-    public MissingFieldException(OpenncpErrorCode openncpErrorCode, String messageDetailed) {
+    public MissingFieldException(OpenNCPErrorCode openncpErrorCode, String messageDetailed) {
         super();
         this.setOpenncpErrorCode(openncpErrorCode);
         this.messageDetailed = messageDetailed;

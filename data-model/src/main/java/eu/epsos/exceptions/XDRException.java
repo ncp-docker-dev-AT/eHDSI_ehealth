@@ -1,6 +1,6 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 /**
  * Holds exceptions originated in the XDR Submit process.
@@ -10,11 +10,11 @@ import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
  */
 public class XDRException extends ExceptionWithContext {
 
-    public XDRException(OpenncpErrorCode openncpErrorCode, Throwable e) {
+    public XDRException(OpenNCPErrorCode openncpErrorCode, Throwable e) {
         super(openncpErrorCode, e);
     }
 
-    public XDRException(OpenncpErrorCode openncpErrorCode, String message, String codeContext) {
+    public XDRException(OpenNCPErrorCode openncpErrorCode, String message, String codeContext) {
         super(openncpErrorCode, message, codeContext);
     }
 

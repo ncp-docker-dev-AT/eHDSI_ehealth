@@ -1,12 +1,12 @@
 package eu.epsos.protocolterminators.ws.server.xcpd.exception;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.XcpdErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 
-public class DemographicsQueryNotAllowedException extends XcpdNIException {
+public class DemographicsQueryNotAllowedException extends XCPDNIException {
 	private static final long serialVersionUID = -1360702816426111325L;
 
 	public DemographicsQueryNotAllowedException(String message) {
-		super(XcpdErrorCode.DemographicsQueryNotAllowed, OpenncpErrorCode.ERROR_PI_GENERIC, message);
+		super(XCPDErrorCode.DemographicsQueryNotAllowed, OpenNCPErrorCode.ERROR_PI_GENERIC, message);
 	}
 }

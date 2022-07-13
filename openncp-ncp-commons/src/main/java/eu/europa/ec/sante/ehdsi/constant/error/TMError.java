@@ -198,5 +198,4 @@ public enum TMError implements ITMTSAMEror, ErrorCode {
     public String getCodeSystem() {
         return null;
     }
-
 }

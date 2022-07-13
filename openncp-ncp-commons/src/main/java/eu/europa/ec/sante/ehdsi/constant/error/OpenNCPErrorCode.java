@@ -2,15 +2,15 @@ package eu.europa.ec.sante.ehdsi.constant.error;
 
 import java.util.Arrays;
 
-public enum OpenncpErrorCode implements ErrorCode {
+public enum OpenNCPErrorCode implements ErrorCode {
 
     //------ Below new error defined in CP-58 --------
 
-    ERROR_GENERIC("ERROR_GENERIC",""),
-    WARNING_GENERIC("WARNING_GENERIC",""),
+    ERROR_GENERIC("ERROR_GENERIC", ""),
+    WARNING_GENERIC("WARNING_GENERIC", ""),
     ERROR_GENERIC_CONNECTION_NOT_POSSIBLE("ERROR_CONNECTION_NOT_POSSIBLE", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
-    ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING","The document requested was not found"),
-    ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN","Class code not supported"),
+    ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING", "The document requested was not found"),
+    ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN", "Class code not supported"),
 
     // 01. Ensure Health Professional (HP) Identification, Authentication and Authorization
     ERROR_HPI_GENERIC("ERROR_HPI_GENERIC", "Health Professional (HP) Identification generic error"),
@@ -40,7 +40,7 @@ public enum OpenncpErrorCode implements ErrorCode {
     WARNING_PS_MISSING_BASIC_DATA("WARNING_PS_MISSING_BASIC_DATA", "Any or all of the basic data set is missing."),
     ERROR_PS_MISSING_EXPECTED_MAPPING("ERROR_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_PS_MISSING_EXPECTED_MAPPING("WARNING_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
-    WARNING_PS_MISSING_EXPECTED_TRANSLATION("EHDSI_WARNING_PS_MISSING_EXPECTED_TRANSLATION", "An expected translation of the Patient Summary is missing." ),
+    WARNING_PS_MISSING_EXPECTED_TRANSLATION("EHDSI_WARNING_PS_MISSING_EXPECTED_TRANSLATION", "An expected translation of the Patient Summary is missing."),
     ERROR_PS_PDF_FORMAT_NOT_PROVIDED("ERROR_PS_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
 
     // 06. Make ePrescription available to HP
@@ -138,9 +138,16 @@ public enum OpenncpErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    OpenncpErrorCode(String code, String description) {
+    OpenNCPErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
+    }
+
+    public static OpenNCPErrorCode getErrorCode(String code) {
+        return Arrays.stream(values())
+                .filter(errorCode -> errorCode.getCode().equals(code))
+                .findAny()
+                .orElse(null);
     }
 
     public String getCode() {
@@ -154,12 +161,4 @@ public enum OpenncpErrorCode implements ErrorCode {
     public String getCodeSystem() {
         return null;
     }
-
-    public static OpenncpErrorCode getErrorCode(String code) {
-        return Arrays.stream(values())
-                .filter(errorCode -> errorCode.getCode().equals(code))
-                .findAny()
-                .orElse(null);
-    }
-
 }

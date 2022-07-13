@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 public class InvalidFieldException extends AssertionValidationException {
 
@@ -13,7 +13,7 @@ public class InvalidFieldException extends AssertionValidationException {
         this.messageDetailed = messageDetailed;
     }
 
-    public InvalidFieldException(OpenncpErrorCode openncpErrorCode, String messageDetailed) {
+    public InvalidFieldException(OpenNCPErrorCode openncpErrorCode, String messageDetailed) {
         super();
         this.setOpenncpErrorCode(openncpErrorCode);
         this.messageDetailed = messageDetailed;
@@ -21,7 +21,7 @@ public class InvalidFieldException extends AssertionValidationException {
 
     @Override
     public String getMessage() {
-        return this.getOpenncpErrorCode().getDescription() + messageDetailed;
+        return this.getErrorCode().getDescription() + messageDetailed;
     }
 
 }

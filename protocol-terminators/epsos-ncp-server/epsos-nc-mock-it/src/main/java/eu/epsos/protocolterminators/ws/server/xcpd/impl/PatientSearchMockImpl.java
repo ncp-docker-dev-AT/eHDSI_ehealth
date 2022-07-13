@@ -4,9 +4,8 @@ import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.exception.AnswerNotAvailableException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.CloneUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.data.model.PatientDemographics;
@@ -70,7 +69,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             File rootDir = new File(patientFile + patientId.getRoot());
             //  Patient ID 999999 will throw an Exception from National Connector
             if (StringUtils.equals(patientId.getExtension(), "999999")) {
-                throw new NIException(OpenncpErrorCode.ERROR_PI_GENERIC, "Mocked Patient Repository not working");
+                throw new NIException(OpenNCPErrorCode.ERROR_PI_GENERIC, "Mocked Patient Repository not working");
             }
 
             if (rootDir.exists()) {

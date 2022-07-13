@@ -1,6 +1,6 @@
 package epsos.ccd.netsmart.securitymanager.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
 import javax.xml.crypto.dsig.XMLSignatureException;
 
@@ -15,7 +15,7 @@ public class SMgrException extends XMLSignatureException {
      *
      */
     private static final long serialVersionUID = 1L;
-    private final OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
+    private final OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
 
     /**
      * Constructor of the exception
@@ -31,7 +31,7 @@ public class SMgrException extends XMLSignatureException {
         super(exceptionMessage, e);
     }
 
-    public OpenncpErrorCode getErrorCode(){
+    public OpenNCPErrorCode getErrorCode(){
         return openncpErrorCode;
     }
 

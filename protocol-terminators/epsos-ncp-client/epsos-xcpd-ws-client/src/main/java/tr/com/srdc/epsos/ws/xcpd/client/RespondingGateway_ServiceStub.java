@@ -9,7 +9,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -264,7 +264,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 // NRO  NCPB_XCPD_REQ - LOGGER.info("XCPD Request sent. EVIDENCE NRO");
 
             } catch (Exception ex) {
-                throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC,ex.getMessage());
+                throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC,ex.getMessage());
             }
 
             // XCPD response end time
@@ -340,7 +340,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     LOGGER.error("Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
                             + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.");
-                    throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_PI_GENERIC, e);
+                    throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC, e);
                 }
             }
 
@@ -459,7 +459,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     throw new RuntimeException(axisFault.getMessage(), axisFault);
                 }
             }
-            throw new NoPatientIdDiscoveredException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault");
+            throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault");
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {

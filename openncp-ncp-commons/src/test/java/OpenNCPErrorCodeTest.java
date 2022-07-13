@@ -1,16 +1,16 @@
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class OpenncpErrorCodeTest {
+public class OpenNCPErrorCodeTest {
 
     @Test
     public void testUniqueCode(){
 
-        List<String> codes = Arrays.stream(OpenncpErrorCode.values()).map(OpenncpErrorCode::getCode).collect(Collectors.toList());
+        List<String> codes = Arrays.stream(OpenNCPErrorCode.values()).map(OpenNCPErrorCode::getCode).collect(Collectors.toList());
         Set<String> codesSet = new HashSet<>(codes);
 
         List<String> duplicateCode = codesSet.stream().filter(code -> Collections.frequency(codes, code) > 1).collect(Collectors.toList());

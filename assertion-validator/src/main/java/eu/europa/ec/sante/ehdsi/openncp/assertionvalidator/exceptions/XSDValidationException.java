@@ -1,8 +1,8 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 
-public class XSDValidationException extends OpenncpErrorCodeException{
+public class XSDValidationException extends OpenNCPErrorCodeException {
 	/**
 	 * 
 	 */
@@ -10,7 +10,7 @@ public class XSDValidationException extends OpenncpErrorCodeException{
 
 	private String message;
 
-	private OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
+	private OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED;
 
 	public XSDValidationException(String message) {
 		super();
@@ -25,7 +25,7 @@ public class XSDValidationException extends OpenncpErrorCodeException{
 		this.message = message;
 	}
 
-	public OpenncpErrorCode getOpenncpErrorCode() {
+	public OpenNCPErrorCode getErrorCode() {
 		return openncpErrorCode;
 	}
 }

@@ -6,7 +6,7 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.epsos.validation.datamodel.common.NcpSide;
@@ -241,8 +241,8 @@ public class XcaInitGateway {
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
                     if (RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText().equals(severity)
-                            || errorCode.equals(OpenncpErrorCode.ERROR_EP_NOT_FOUND.getCode())
-                            || errorCode.equals(OpenncpErrorCode.ERROR_PS_NOT_FOUND.getCode())) {
+                            || errorCode.equals(OpenNCPErrorCode.ERROR_EP_NOT_FOUND.getCode())
+                            || errorCode.equals(OpenNCPErrorCode.ERROR_PS_NOT_FOUND.getCode())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }
@@ -252,7 +252,7 @@ public class XcaInitGateway {
                         continue;
                     }
 
-                    OpenncpErrorCode openncpErrorCode = OpenncpErrorCode.getErrorCode(errorCode);
+                    OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);
                     if(openncpErrorCode == null){
                         LOGGER.warn("No EHDSI error code found in the XCA response for : " + errorCode);
                     }

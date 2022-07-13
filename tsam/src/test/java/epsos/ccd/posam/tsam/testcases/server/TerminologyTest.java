@@ -66,7 +66,7 @@ public class TerminologyTest {
         assertEquals(response.getDesignation(), "diastolicky arteriovy tlak");
         assertTrue(response.getWarnings().size() > 0);
         ITMTSAMEror warn = response.getWarnings().get(0);
-        warn.getCode().equals(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH);
+        warn.getCode().equals(TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH);
         log.info(response.getDesignation());
     }
 

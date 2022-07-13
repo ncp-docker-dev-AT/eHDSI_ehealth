@@ -9,7 +9,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -316,7 +316,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
             } catch (Exception ex) {
-                throw new XCAException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), null);
+                throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null);
             }
             // NRO
 //                try {
@@ -428,7 +428,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
-                    throw new XCAException(OpenncpErrorCode.ERROR_GENERIC, e.getMessage(), null);
+                    throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, e.getMessage(), null);
                 }
             }
 
@@ -454,7 +454,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
-                throw new XCAException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), null);
+                throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null);
             }
 
             /* Validate Response Message */
@@ -544,7 +544,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     }
                 }
             }
-            throw new XCAException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
+            throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
@@ -878,7 +878,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            throw new XCAException(OpenncpErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
+            throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
@@ -1074,20 +1074,20 @@ public class RespondingGateway_ServiceStub extends Stub {
 
         return eventLog;
     }
-    public OpenncpErrorCode getErrorCode(String classCode) {
+    public OpenNCPErrorCode getErrorCode(String classCode) {
         switch (classCode) {
             case Constants.PS_CLASSCODE:
-                return OpenncpErrorCode.ERROR_PS_GENERIC;
+                return OpenNCPErrorCode.ERROR_PS_GENERIC;
             case Constants.EP_CLASSCODE:
-                return OpenncpErrorCode.ERROR_EP_GENERIC;
+                return OpenNCPErrorCode.ERROR_EP_GENERIC;
             case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
             case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
             case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                return OpenncpErrorCode.ERROR_ORCD_GENERIC;
+                return OpenNCPErrorCode.ERROR_ORCD_GENERIC;
         }
 
-        return OpenncpErrorCode.ERROR_GENERIC;
+        return OpenNCPErrorCode.ERROR_GENERIC;
     }
 
     /**

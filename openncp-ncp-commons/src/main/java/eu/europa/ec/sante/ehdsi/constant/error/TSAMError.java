@@ -4,11 +4,6 @@ package eu.europa.ec.sante.ehdsi.constant.error;
  * Enumeration for TSAM Errors & Warnings codes
  * <p>
  * Provides get/set methods for code and description
- *
- * @author Roman Repiscak
- * @author Organization: Posam
- * @author mail:frantisek.rudik@posam.sk
- * @version 1.0, 2010, 11 August
  */
 public enum TSAMError implements ITMTSAMEror, ErrorCode {
     // ERRORS
@@ -51,13 +46,14 @@ public enum TSAMError implements ITMTSAMEror, ErrorCode {
     WARNING_UNKNOWN_TARGET_LANGUAGE("2505", "Unknown Target Language"),
     WARNING_MANY_DESIGNATIONS("2506", "More than one Display Name was found in status \"Current\" and none of them has IS_PREFERRED tag set"),
     WARNING_VS_DOESNT_MATCH("2507", "ValueSet doesn't match for selected CodeSystemConcept"),
-    WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH("2508", "CodeSystem name doesn't match provided name"),
+    WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH("2508", "CodeSystem name doesn't match provided name"),
     WARNING_CONCEPT_STATUS_NOT_CURRENT("2509", "Concept STATUS is not \"Current\"");
 
     /**
      * Exception code
      */
     private final String code;
+
     /**
      * Exception description (issue - is English description/constant enough ?)
      */
@@ -66,14 +62,13 @@ public enum TSAMError implements ITMTSAMEror, ErrorCode {
     /**
      * Default enum constructor
      *
-     * @param code
-     * @param descripton
+     * @param code        - TSAM error code.
+     * @param description - Description of the error providing information about the context.
      */
-    TSAMError(String code, String descripton) {
+    TSAMError(String code, String description) {
         this.code = code;
-        this.description = descripton;
+        this.description = description;
     }
-
 
     /**
      * @return String - code

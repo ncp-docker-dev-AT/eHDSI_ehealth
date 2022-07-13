@@ -4,7 +4,7 @@ import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
 import eu.epsos.exceptions.DocumentTransformationException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenncpErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import org.apache.axis2.util.XMLUtils;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public final class TMServices {
 
         //  If the translation process fails, an exception is thrown.
         if (!tmResponse.isStatusSuccess()) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC,
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC,
                     Constants.SERVER_IP,"( " + IheErrorCode.XDSRepositoryError.getCode() + "): + An error has occurred during document translation, please check the following errors:\n"
                     + processErrors(tmResponse.getErrors()));
         }
@@ -69,7 +69,7 @@ public final class TMServices {
             //  Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
 
         LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
@@ -104,7 +104,7 @@ public final class TMServices {
         //  If the translation process fails, an exception is thrown.
         if (!tmResponse.isStatusSuccess()) {
             processErrors(tmResponse.getErrors());
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC,"DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC,"DOCUMENT TRANSLATION FAILED.", "DOCUMENT TRANSLATION FAILED.");
         }
         try {
             //  Obtain the translated document in the Document type format, only if translation succeeds.
@@ -112,7 +112,7 @@ public final class TMServices {
             //  Obtains a byte array from the translation result.
             result = XMLUtils.toOM(resultDoc.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
         LOGGER.debug("TRANSLATION SUCCESSFULLY ENDED.");
         //  Return the Document as a byte array.
@@ -132,7 +132,7 @@ public final class TMServices {
             //Parse the String into a Document object.
             return XMLUtil.parseContent(docString);
         } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new DocumentTransformationException(OpenncpErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
+            throw new DocumentTransformationException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), ex.getMessage());
         }
     }
 
