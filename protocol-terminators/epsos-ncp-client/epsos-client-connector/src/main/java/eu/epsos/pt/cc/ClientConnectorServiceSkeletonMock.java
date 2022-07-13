@@ -1,7 +1,7 @@
 package eu.epsos.pt.cc;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

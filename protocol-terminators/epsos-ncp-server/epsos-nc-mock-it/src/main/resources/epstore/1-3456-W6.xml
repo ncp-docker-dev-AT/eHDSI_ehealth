@@ -11,7 +11,7 @@
    <setId root="1.2.246.10.11535721.93.2009.15721892033029812" />
    <recordTarget contextControlCode="OP" typeCode="RCT">
       <patientRole classCode="PAT">
-         <id extension="1-1234-W5" root="2.16.17.710.850.1000.990.1.1000" />
+         <id extension="1-3456-W6" root="2.16.17.710.850.1000.990.1.1000" />
          <addr>
             <country>FI</country>
          </addr>
@@ -153,75 +153,112 @@
                            <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.29" />
                            <manufacturedMaterial>
                               <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.30" />
-                              <code codeSystem="..." code="MPID_CanestenCombi" displayName="" />
+                              <code codeSystem="1.2.3" code="MPID_CanestenCombi" displayName="MPID CanestenCombi" />
                               <name>Canesten Cream</name>
-                              //Combined dose form
+                              <!-- Combined dose form -->
                               <pharm:formCode code="14001000" displayName="Cream + pessary" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                               <pharm:asContent classCode="CONT">
-                                 <pharm:quantity value="1" unit="1" />
+                                 <!-- TODO to fix -->
+                                 <!--<pharm:quantity value="1" unit="1"/>-->
+                                 <pharm:quantity xsi:type="RTO">
+                                    <numerator xsi:type="INT" value="1"/>
+                                    <denominator xsi:type="INT" value="1"/>
+                                 </pharm:quantity>
                                  <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                     <pharm:code code="PCID_CanestenCombi"/>
                                     <pharm:formCode code="30009000" displayName="Box" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                  </pharm:containerPackagedProduct>
                               </pharm:asContent>
                               <pharm:asSpecializedKind classCode="GEN">
-                                 <pharm:generalizedMedicineClass classCode="MMAT">
+                                 <pharm:generalizedMaterialKind classCode="MMAT" determinerCode="KIND">
                                     <pharm:code code="PhPID_Identifier" codeSystem="1.999.999" displayName="Pharmaceutical Product Identifier" codeSystemName="PhPID Level 1"/>
-                                 </pharm:generalizedMedicineClass>
+                                 </pharm:generalizedMaterialKind>
                               </pharm:asSpecializedKind>
-                              <pharm:part>
-                                 <pharm:quantity unit="1" value="1" />
-                                 <pharm:partProduct classCode="PART">
+                              <pharm:part classCode="PART">
+                                 <!-- TODO to fix -->
+                                 <!--<pharm:quantity value="1" unit="1"/>-->
+                                 <pharm:quantity xsi:type="RTO">
+                                    <numerator xsi:type="INT" value="1"/>
+                                    <denominator xsi:type="INT" value="1"/>
+                                 </pharm:quantity>
+                                 <pharm:partProduct classCode="MMAT" determinerCode="KIND">
                                     <pharm:asContent classCode="CONT">
-                                       <pharm:quantity unit="g" value="20" />
-                                       <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
-                                          //ISO IDMP PCID
-                                          <pharm:code codeSystem="..." code="..." displayName="" />
+                                       <!-- TODO to fix -->
+                                       <!--<pharm:quantity value="20" unit="g"/>-->
+                                       <pharm:quantity xsi:type="RTO">
+                                          <numerator xsi:type="INT" value="20"/>
+                                          <denominator xsi:type="INT" value="20"/>
+                                       </pharm:quantity>
+                                       <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
+                                          <pharm:code codeSystem="1.2.3" code="PCID_CanestenCombi" displayName="PCID CanestenCombi" />
                                           <pharm:formCode code="10502000" displayName="Cream" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                           <pharm:asContent classCode="CONT">
-                                             <pharm:quantity unit="1" value="1" />
-                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
-                                                //ISO IDMP PCID
-                                                <pharm:code codeSystem="..." code="..." displayName="" />
+                                             <!-- TODO to fix -->
+                                             <!--<pharm:quantity value="1" unit="1"/>-->
+                                             <pharm:quantity xsi:type="RTO">
+                                                <numerator xsi:type="INT" value="1"/>
+                                                <denominator xsi:type="INT" value="1"/>
+                                             </pharm:quantity>
+                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
+                                                <pharm:code codeSystem="1.2.3" code="PCID_Canesten_Cream" displayName="PCID Canesten Cream" />
                                                 <pharm:formCode code="30067000" displayName="Tube" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                              </pharm:containerPackagedProduct>
                                           </pharm:asContent>
                                        </pharm:containerPackagedProduct>
                                     </pharm:asContent>
+                                    <pharm:ingredient classCode="ACTI">
+                                       <!-- TODO To be fixed -->
+                                       <!--pharm:quantity xsi:type="PQ">
+                                           <numerator value="100" unit="1" type="PQ" />
+                                           <denominator value="1" unit="mL" type="PQ" />
+                                       </pharm:quantity-->
+                                       <pharm:quantity xsi:type="RTO">
+                                          <numerator value="100" xsi:type="INT" />
+                                          <denominator value="1" xsi:type="INT" />
+                                       </pharm:quantity>
+                                       <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
+                                          <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
+                                          <pharm:name>clotrimazole</pharm:name>
+                                       </pharm:ingredientSubstance>
+                                    </pharm:ingredient>
                                  </pharm:partProduct>
-                                 <pharm:ingredient>
-                                    <pharm:quantity>
-                                       <pharm:numerator value="10" unit="mg" type="pharm:PQ" />
-                                       <pharm:denominator value="1" unit="g" type="pharm:PQ" />
-                                    </pharm:quantity>
-                                    <pharm:ingredientSubstance>
-                                       <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
-                                       <pharm:name>clotrimazole</pharm:name>
-                                    </pharm:ingredientSubstance>
-                                 </pharm:ingredient>
                               </pharm:part>
-                              <pharm:part>
-                                 <pharm:quantity unit="1" value="1" />
-                                 <pharm:partProduct classCode="PART">
+                              <pharm:part classCode="PART">
+                                 <!-- TODO to fix -->
+                                 <!--<pharm:quantity value="1" unit="1"/>-->
+                                 <pharm:quantity xsi:type="RTO">
+                                    <numerator xsi:type="INT" value="1"/>
+                                    <denominator xsi:type="INT" value="1"/>
+                                 </pharm:quantity>
+                                 <pharm:partProduct classCode="MMAT" determinerCode="KIND">
                                     <pharm:asContent classCode="CONT">
-                                       <pharm:quantity unit="1" value="6" />
-                                       <pharm:containerPackagedProduct classCode="CONT" determinerCode="INSTANCE">
-                                          //ISO IDMP PCID
-                                          <pharm:code codeSystem="..." code="..." displayName="" />
+                                       <!-- TODO to fix -->
+                                       <!--<pharm:quantity value="6" unit="1"/>-->
+                                       <pharm:quantity xsi:type="RTO">
+                                          <numerator xsi:type="INT" value="6"/>
+                                          <denominator xsi:type="INT" value="6"/>
+                                       </pharm:quantity>
+                                       <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
+                                          <pharm:code codeSystem="1.2.3" code="PCID_Cenesten_Pessary" displayName="PCID Cenesten Pessary" />
                                           <pharm:formCode code="10909000" displayName="Pessary" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                        </pharm:containerPackagedProduct>
                                     </pharm:asContent>
+                                    <pharm:ingredient classCode="ACTI">
+                                       <!-- TODO To be fixed -->
+                                       <!--pharm:quantity xsi:type="PQ">
+                                           <numerator value="100" unit="1" type="PQ" />
+                                           <denominator value="1" unit="mL" type="PQ" />
+                                       </pharm:quantity-->
+                                       <pharm:quantity xsi:type="RTO">
+                                          <numerator value="100" xsi:type="INT" />
+                                          <denominator value="1" xsi:type="INT" />
+                                       </pharm:quantity>
+                                       <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
+                                          <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
+                                          <pharm:name>clotrimazole</pharm:name>
+                                       </pharm:ingredientSubstance>
+                                    </pharm:ingredient>
                                  </pharm:partProduct>
-                                 <pharm:ingredient>
-                                    <pharm:quantity>
-                                       <pharm:numerator value="100" unit="mg" type="pharm:PQ" />
-                                       <pharm:denominator value="1" unit="1" type="pharm:PQ" />
-                                    </pharm:quantity>
-                                    <pharm:ingredientSubstance>
-                                       <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
-                                       <pharm:name>clotrimazole</pharm:name>
-                                    </pharm:ingredientSubstance>
-                                 </pharm:ingredient>
                               </pharm:part>
                            </manufacturedMaterial>
                         </manufacturedProduct>

@@ -4,10 +4,12 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -15,7 +17,7 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -216,7 +218,7 @@ public class RespondingGateway_ServiceStub extends Stub {
     public AdhocQueryResponse respondingGateway_CrossGatewayQuery(AdhocQueryRequest adhocQueryRequest,
                                                                   Map<AssertionEnum, Assertion> assertionMap,
                                                                   List<String> classCodes)
-            throws java.rmi.RemoteException {
+            throws java.rmi.RemoteException, XCAException {
 
         String eadcError = "";
 
@@ -317,9 +319,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logRequestBody = XMLUtil.prettyPrint(XMLUtils.toDOM(env.getBody().getFirstElement()));
             } catch (Exception ex) {
-                // no ADC error if PrettyPrint or toDom fails
-                //eadcFailure(_messageContext, ex.getMessage(), Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
-                throw new RuntimeException(ex);
+                throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null);
             }
             // NRO
 //                try {
@@ -432,7 +432,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
                     LOGGER.error(eadcError);
-                    throw e;
+                    throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, e.getMessage(), null);
                 }
             }
             _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
@@ -457,7 +457,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(_returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null);
             }
 
             /* Validate Response Message */
@@ -541,6 +541,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                         Object messageObject = fromOM(faultElt, messageClass, null);
                         Method m = exceptionClass.getMethod("setFaultMessage", messageClass);
                         m.invoke(ex, messageObject);
+
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
                         /* we cannot intantiate the class - throw the original Axis fault */
@@ -550,8 +551,8 @@ public class RespondingGateway_ServiceStub extends Stub {
                     }
                 }
             }
-            eadcError = axisFault.getMessage();
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
+            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE;
+            throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
@@ -667,6 +668,7 @@ public class RespondingGateway_ServiceStub extends Stub {
     public RetrieveDocumentSetResponseType respondingGateway_CrossGatewayRetrieve(RetrieveDocumentSetRequestType retrieveDocumentSetRequest,
                                                                                   Map<AssertionEnum, Assertion> assertionMap,
                                                                                   String classCode)
+            throws java.rmi.RemoteException, XCAException {
             throws java.rmi.RemoteException {
 
         String eadcError = "";
@@ -776,7 +778,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 //                    LOGGER.error(ExceptionUtils.getStackTrace(e));
 //                }
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XCAException(getErrorCode(classCode), ex.getMessage(), null);
             }
 
             /* Validate Request Message */
@@ -873,7 +875,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
                     LOGGER.error(eadcError);
-                    throw e;
+                    throw new XCAException(getErrorCode(classCode), e.getMessage(), null);
                 }
             }
             _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
@@ -889,7 +891,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
                 logResponseBody = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody().getFirstElement()));
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XCAException(getErrorCode(classCode), ex.getMessage(), null);
             }
 
             /* Validate Response Message */
@@ -952,7 +954,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                 }
             }
             eadcError = axisFault.getMessage();
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
+            throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
@@ -1152,6 +1154,21 @@ public class RespondingGateway_ServiceStub extends Stub {
         EventLogClientUtil.sendEventLog(eventLog);
 
         return eventLog;
+    }
+    public OpenNCPErrorCode getErrorCode(String classCode) {
+        switch (classCode) {
+            case Constants.PS_CLASSCODE:
+                return OpenNCPErrorCode.ERROR_PS_GENERIC;
+            case Constants.EP_CLASSCODE:
+                return OpenNCPErrorCode.ERROR_EP_GENERIC;
+            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                return OpenNCPErrorCode.ERROR_ORCD_GENERIC;
+        }
+
+        return OpenNCPErrorCode.ERROR_GENERIC;
     }
 
     /**

@@ -1,5 +1,7 @@
 package eu.epsos.exceptions;
 
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+
 /**
  * This class represents an Exception occurred due to document transformation (translation/transcoding) issues.
  *
@@ -8,25 +10,15 @@ package eu.epsos.exceptions;
 public class DocumentTransformationException extends Exception {
 
     private static long serialVersionUID = 1L;
-    private String errorCode;
+
+    private OpenNCPErrorCode openncpErrorCode;
+
     private String codeContext;
 
-    public DocumentTransformationException(String message) {
+    public DocumentTransformationException(OpenNCPErrorCode openncpErrorCode, String codeContext, String message) {
         super(message);
-    }
-
-    public DocumentTransformationException(String errorCode, String codeContext, String message) {
-        super(message);
-        this.errorCode = errorCode;
+        this.openncpErrorCode = openncpErrorCode;
         this.codeContext = codeContext;
-    }
-
-    public DocumentTransformationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public DocumentTransformationException(Throwable cause) {
-        super(cause);
     }
 
     /**
@@ -43,18 +35,9 @@ public class DocumentTransformationException extends Exception {
         serialVersionUID = aSerialVersionUID;
     }
 
-    /**
-     * @return the errorCode
-     */
-    public String getErrorCode() {
-        return errorCode;
-    }
 
-    /**
-     * @param errorCode the errorCode to set
-     */
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
+    public OpenNCPErrorCode getErrorCode() {
+        return openncpErrorCode;
     }
 
     /**

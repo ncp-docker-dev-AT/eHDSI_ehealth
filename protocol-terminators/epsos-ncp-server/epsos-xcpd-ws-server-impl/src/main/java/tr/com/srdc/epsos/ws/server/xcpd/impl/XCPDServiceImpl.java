@@ -4,21 +4,20 @@ import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
+import eu.epsos.protocolterminators.ws.server.xcpd.exception.XCPDNIException;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.epsos.util.EvidenceUtils;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.XSDValidationException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
+import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.v3.*;
 import org.joda.time.DateTime;
@@ -41,15 +40,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class XCPDServiceImpl implements XCPDServiceInterface {
 
-    private static final String ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED = "DemographicsQueryNotAllowed";
-    private static final String ERROR_ANSWER_NOT_AVAILABLE = "AnswerNotAvailable";
-    private static final String ERROR_INSUFFICIENT_RIGHTS = "InsufficientRights";
     private static final DatatypeFactory DATATYPE_FACTORY;
 
     static {
@@ -296,7 +291,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     /**
      * Prepares a reasonOf element according to error type
      */
-    private MFMIMT700711UV01Reason getReasonOfElement(String errorType) {
+    private MFMIMT700711UV01Reason getReasonOfElement(XCPDErrorCode xcpdErrorCode) {
 
         var mfmimt700711UV01Reason = objectFactory.createMFMIMT700711UV01Reason();
         mfmimt700711UV01Reason.setTypeCode("RSON");
@@ -311,83 +306,79 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        switch (errorType) {
-            case ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED:
-                // Set detectedIssueEvent/triggerFor
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(objectFactory.createMCAIMT900001UV01Requires());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getTypeCode().add("TRIG");
+        if( xcpdErrorCode == XCPDErrorCode.DemographicsQueryNotAllowed) {
+            // Set detectedIssueEvent/triggerFor
+            MCAIMT900001UV01Requires mcaimt900001UV01Requires = objectFactory.createMCAIMT900001UV01Requires();
+            mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(mcaimt900001UV01Requires);
+            mcaimt900001UV01Requires.getTypeCode().add("TRIG");
 
-                // Set detectedIssueEvent/triggerFor/actOrRequired
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).setActOrderRequired(objectFactory.createMCAIMT900001UV01ActOrderRequired());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getClassCode().add("ACT");
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getMoodCode().add("RQO");
+            // Set detectedIssueEvent/triggerFor/actOrRequired
+            MCAIMT900001UV01ActOrderRequired mcaimt900001UV01ActOrderRequired = objectFactory.createMCAIMT900001UV01ActOrderRequired();
 
-                // Set detectedIssueEvent/triggerFor/actOrRequired/code
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().setCode(objectFactory.createCE());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCode(ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().get(0).getActOrderRequired().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
-                break;
-            case ERROR_ANSWER_NOT_AVAILABLE:
-                // Set detectedIssueEvent/mitigatedBy
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
+            mcaimt900001UV01Requires.setActOrderRequired(mcaimt900001UV01ActOrderRequired);
+            mcaimt900001UV01ActOrderRequired.getClassCode().add("ACT");
+            mcaimt900001UV01ActOrderRequired.getMoodCode().add("RQO");
 
-                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
-                // TODO Could not set moodCode to RQO, set EVN instead
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
+            // Set detectedIssueEvent/triggerFor/actOrRequired/code
+            CE ce = objectFactory.createCE();
+            mcaimt900001UV01ActOrderRequired.setCode(ce);
+            ce.setCode(xcpdErrorCode.getCode());
+            ce.setCodeSystem(xcpdErrorCode.getCodeSystem());
+        } else if (xcpdErrorCode == XCPDErrorCode.InsufficientRights
+                || xcpdErrorCode == XCPDErrorCode.AnswerNotAvailable) {
+            // Set detectedIssueEvent/mitigatedBy
+            MCAIMT900001UV01SourceOf mcaimt900001UV01SourceOf = objectFactory.createMCAIMT900001UV01SourceOf();
+            mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(mcaimt900001UV01SourceOf);
+            mcaimt900001UV01SourceOf.setTypeCode(ActRelationshipMitigates.MITGT);
 
-                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_ANSWER_NOT_AVAILABLE);
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.19376.1.2.27.3");
-                break;
-            case ERROR_INSUFFICIENT_RIGHTS:
-                // Set detectedIssueEvent/mitigatedBy
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().add(objectFactory.createMCAIMT900001UV01SourceOf());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setTypeCode(ActRelationshipMitigates.MITGT);
+            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
+            MCAIMT900001UV01DetectedIssueManagement mcaimt900001UV01DetectedIssueManagement = objectFactory.createMCAIMT900001UV01DetectedIssueManagement();
+            mcaimt900001UV01SourceOf.setDetectedIssueManagement(mcaimt900001UV01DetectedIssueManagement);
+            mcaimt900001UV01DetectedIssueManagement.getClassCode().add("ACT");
+            mcaimt900001UV01DetectedIssueManagement.setMoodCode(XActMoodDefEvn.EVN);
 
-                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).setDetectedIssueManagement(objectFactory.createMCAIMT900001UV01DetectedIssueManagement());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getClassCode().add("ACT");
-                // TODO Could not set moodCode to RQO, set EVN instead
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setMoodCode(XActMoodDefEvn.EVN);
-
-                // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().setCode(objectFactory.createCD());
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCode(ERROR_INSUFFICIENT_RIGHTS);
-                mfmimt700711UV01Reason.getDetectedIssueEvent().getMitigatedBy().get(0).getDetectedIssueManagement().getCode().setCodeSystem("1.3.6.1.4.1.12559.11.10.1.3.2.2.1");
-                break;
-            default:
-                //  No action expected
-                break;
+            // Set detectedIssueEvent/mitigatedBy/detectedIssueManagement/code
+            CD cd = objectFactory.createCD();
+            cd.setCode(xcpdErrorCode.getCode());
+            cd.setCodeSystem(xcpdErrorCode.getCodeSystem());
+            mcaimt900001UV01DetectedIssueManagement.setCode(cd);
         }
         return mfmimt700711UV01Reason;
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String detail, String reason) {
-        fillOutputMessage(outputMessage, detail, reason, "AE");
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context) {
+        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context,  "AE");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, String detail, String reason, String errorCode) {
-        if (reason != null) {
-            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(reason));
-        }
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code) {
 
         // Set queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
-        outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(errorCode);
-        if (detail != null) {
-            logger.error(detail);
+        outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
+
+        if (xcpdErrorCode != null) {
+            outputMessage.getControlActProcess().getReasonOf().add(getReasonOfElement(xcpdErrorCode));
+        }
+
+        if (openncpErrorCode != null) {
+            logger.error(context);
             // Set acknowledgement/acknowledgementDetail
-            outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().add(
-                    objectFactory.createMCCIMT000300UV01AcknowledgementDetail());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).setText(objectFactory.createED());
-            outputMessage.getAcknowledgement().get(0).getAcknowledgementDetail().get(0).getText().setContent(detail);
-        } else {
-            logger.info("XCPD Request is valid.");
+            MCCIMT000300UV01Acknowledgement acknowledgement = outputMessage.getAcknowledgement().get(0);
+            MCCIMT000300UV01AcknowledgementDetail acknowledgementDetail = objectFactory.createMCCIMT000300UV01AcknowledgementDetail();
+
+            CE codeCE = objectFactory.createCE();
+            codeCE.setCode(openncpErrorCode.getCode());
+            acknowledgementDetail.setCode(codeCE);
+
+            acknowledgementDetail.setText(objectFactory.createED());
+            acknowledgementDetail.getText().setContent(openncpErrorCode.getDescription());
+
+            ST location = objectFactory.createST();
+            location.setContent(context);
+            acknowledgementDetail.getLocation().add(location);
+
+            acknowledgement.getAcknowledgementDetail().add(acknowledgementDetail);
+            acknowledgement.getTypeCode().setCode("AE");
         }
     }
 
@@ -595,7 +586,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
             List<PRPAMT201306UV02LivingSubjectId> livingSubjectIds = inputQBP.getParameterList().getLivingSubjectId();
             if (!receiverHomeCommID.equals(Constants.HOME_COMM_ID)) {
-                fillOutputMessage(outputMessage, "Receiver has wrong Home Community ID.", ERROR_ANSWER_NOT_AVAILABLE);
+                fillOutputMessage(outputMessage, XCPDErrorCode.AnswerNotAvailable, OpenNCPErrorCode.ERROR_PI_GENERIC, "Receiver has wrong Home Community ID.");
             } else if (!livingSubjectIds.isEmpty()) {
                 var stringBuilderNRO = new StringBuilder();
                 List<PatientId> patientIdList = new ArrayList<>();
@@ -680,7 +671,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 //                }
                 if (demographicsList.isEmpty()) {
                     // Preparing answer not available error
-                    fillOutputMessage(outputMessage, "No patient found.", ERROR_ANSWER_NOT_AVAILABLE, "NF");
+
+                    fillOutputMessage(outputMessage, XCPDErrorCode.AnswerNotAvailable, OpenNCPErrorCode.ERROR_PI_NO_MATCH, "No patient found.", "NF");
                     outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AA");
                 } else {
                     var countryCode = "";
@@ -719,26 +711,33 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     }
                     if (!demographicsList.isEmpty()) {
                         // There are patient data to be sent, OK
-                        fillOutputMessage(outputMessage, null, null, "OK");
+                        fillOutputMessage(outputMessage, null, null, null,"OK");
                     } else {
                         // No patient data can be sent to Country B.
-                        fillOutputMessage(outputMessage, "(4703) Either the security policy of country A or a privacy " +
+                        fillOutputMessage(outputMessage,
+                                XCPDErrorCode.InsufficientRights,
+                                OpenNCPErrorCode.ERROR_PI_GENERIC,
+                                 " : Either the security policy of country A or a privacy " +
                                 "policy of the patient (that was given in country A) does not allow the requested operation " +
-                                "to be performed by the HCP .", ERROR_INSUFFICIENT_RIGHTS);
+                                "to be performed by the HCP .");
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
                     }
                 }
             } else {
                 // Preparing demographic query not allowed error
-                fillOutputMessage(outputMessage, "Queries are only available with patient identifiers", ERROR_DEMOGRAPHIC_QUERY_NOT_ALLOWED);
+                fillOutputMessage(outputMessage, XCPDErrorCode.DemographicsQueryNotAllowed, OpenNCPErrorCode.ERROR_PI_GENERIC, "Queries are only available with patient identifiers");
             }
-        } catch (MissingFieldException | InvalidFieldException | InsufficientRightsException | XSDValidationException e) {
+        } catch (OpenNCPErrorCodeException e) {
 
-            fillOutputMessage(outputMessage, e.getMessage(), ERROR_INSUFFICIENT_RIGHTS);
+            fillOutputMessage(outputMessage, XCPDErrorCode.InsufficientRights, e.getErrorCode(), e.getMessage()) ;
+            logger.error(e.getMessage(), e);
+        } catch (XCPDNIException e) {
+
+            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage()) ;
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
 
-            fillOutputMessage(outputMessage, e.getMessage(), ERROR_ANSWER_NOT_AVAILABLE);
+            fillOutputMessage(outputMessage, XCPDErrorCode.InternalError, OpenNCPErrorCode.ERROR_PI_GENERIC, e.getMessage());
             logger.error(e.getMessage(), e);
         }
         // Set queryByParameter

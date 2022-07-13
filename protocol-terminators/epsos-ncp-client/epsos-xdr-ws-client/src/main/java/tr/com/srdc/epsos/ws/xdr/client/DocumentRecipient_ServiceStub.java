@@ -4,11 +4,13 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -16,7 +18,7 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
@@ -191,8 +193,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
      */
     public RegistryResponseType documentRecipient_ProvideAndRegisterDocumentSetB(ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest,
                                                                                  Map<AssertionEnum, Assertion> assertionMap)
-            throws java.rmi.RemoteException {
-
+            throws java.rmi.RemoteException, XDRException {
         MessageContext messageContext = null;
         MessageContext returnMessageContext = null;
 
@@ -278,9 +279,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope.getBody()));
             } catch (Exception ex) {
-                // no ADC error if PrettyPrint or toDom fails
-                //eadcFailure(messageContext, ex.getMessage());
-                throw new RuntimeException(ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             // NRO
@@ -372,7 +371,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
                     eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
                     LOGGER.error(eadcError);
-                    throw e;
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
             returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
@@ -400,7 +399,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             /* Perform validation of response message */
@@ -449,16 +448,17 @@ public class DocumentRecipient_ServiceStub extends Stub {
                     Object messageObject = fromOM(faultElt, messageClass);
                     Method method = exceptionClass.getMethod("setFaultMessage", messageClass);
                     method.invoke(ex, messageObject);
+
                     throw new RemoteException(ex.getMessage(), ex);
 
                 } catch (Exception e) {
                     // Class cannot be instantiated - throwing the original Axis fault
                     eadcError = e.getMessage();
-                    throw new RuntimeException(e.getMessage(), e);
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
             eadcError = axisFault.getMessage();
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
+            throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, axisFault);
         } finally {
             if (messageContext != null && messageContext.getTransportOut() != null && messageContext.getTransportOut().getSender() != null) {
                 messageContext.getTransportOut().getSender().cleanup(messageContext);
