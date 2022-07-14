@@ -68,6 +68,15 @@
                             </tr>
                         </xsl:when>
                         <xsl:otherwise>
+                            <tr>
+                                <th>
+                                    <!-- Package Size Header -->
+                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                        <xsl:with-param name="code" select="'50'"/>
+                                    </xsl:call-template>
+                                </th>
+                                <td/>
+                            </tr>
                             <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging"/>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -79,9 +88,11 @@
     <xsl:template match="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging">
         <tr>
             <th>
-                <!-- TODO this concept needs to be added to the eHDSIDisplayLabel value set -->
-                <xsl:text>Part </xsl:text>
-                <xsl:value-of select="position()"/>
+                <center>
+                    <!-- TODO this concept needs to be added to the eHDSIDisplayLabel value set -->
+                    <xsl:text>Part </xsl:text>
+                    <xsl:value-of select="position()"/>
+                </center>
             </th>
             <td>
                 <xsl:call-template name="show-package-size">
