@@ -518,7 +518,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 if(documentAssociation.getPDFDocumentMetaData() == null){
                     OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                     ex.setOpenncpErrorCode(ERROR_PS_PDF_FORMAT_NOT_PROVIDED);
-                    throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                    throw ex;
                 }
                 return documentAssociation;
             }
@@ -544,7 +544,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 if(documentAssociation.getPDFDocumentMetaData() == null){
                     OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                     ex.setOpenncpErrorCode(OpenncpErrorCode.ERROR_EP_PDF_FORMAT_NOT_PROVIDED);
-                    throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                    throw ex;
                 }
             }
         }
