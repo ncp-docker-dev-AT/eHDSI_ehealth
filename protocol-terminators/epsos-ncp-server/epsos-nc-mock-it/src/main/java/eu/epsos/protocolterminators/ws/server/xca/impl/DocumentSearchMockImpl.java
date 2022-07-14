@@ -122,21 +122,23 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
-                EPDocumentMetaData epdPdf = null;
-                try {
-                    Document pdfDoc = XMLUtil.parseContent(xmlDocString);
-                    byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
-                    wrapPDFinCDA(pdfcontents, pdfDoc);
-                    addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                    epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                            new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                            getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
-                    logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
-                    documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
-                } catch (Exception e) {
-                    logger.warn("Could not read file at '{}'", pdfFilename, e);
+                if (!StringUtils.endsWith(pdfFilename, "-NO-PDF.pdf")) {
+                    EPDocumentMetaData epdPdf = null;
+                    try {
+                        Document pdfDoc = XMLUtil.parseContent(xmlDocString);
+                        byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
+                        wrapPDFinCDA(pdfcontents, pdfDoc);
+                        addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
+                        epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
+                                getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
+                        documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
+                    } catch (Exception e) {
+                        logger.warn("Could not read file at" + pdfFilename, e);
+                    }
+                    epDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(epdXml, epdPdf));
                 }
-                epDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(epdXml, epdPdf));
             } catch (Exception e) {
                 logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
@@ -161,29 +163,30 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdXml.getClassCode(), xmlDoc));
 
-                PSDocumentMetaData psdPdf = null;
+                if (!StringUtils.endsWith(pdfFilename, "-NO-PDF.pdf")) {
+                    PSDocumentMetaData psdPdf = null;
 
-                try {
-                    Document pdfDoc = XMLUtil.parseContent(xmlDocString);
-                    byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
-                    wrapPDFinCDA(pdfcontents, pdfDoc);
-                    logger.debug("Adding format to the document's OID");
-                    addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                    psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                            new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                            this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
-                    documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
-                } catch (Exception e) {
-                    logger.warn("Could not read file at '{}'", pdfFilename, e);
+                    try {
+                        Document pdfDoc = XMLUtil.parseContent(xmlDocString);
+                        byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
+                        wrapPDFinCDA(pdfcontents, pdfDoc);
+                        logger.debug("Adding format to the document's OID");
+                        addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
+                        psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
+                                this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
+                    } catch (Exception e) {
+                        logger.warn("Could not read file at '{}'", pdfFilename, e);
+                    }
+                    psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
                 }
-                psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
                 logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
         // Mocked OrCDs fill up
-
         var author = new OrCDDocumentMetaData.Author();
         author.setAuthorPerson("AuthorPerson OrCD Test");
         author.setAuthorSpeciality(Arrays.asList("Speciality 1", "Speciality 2", "Speciality 3"));
