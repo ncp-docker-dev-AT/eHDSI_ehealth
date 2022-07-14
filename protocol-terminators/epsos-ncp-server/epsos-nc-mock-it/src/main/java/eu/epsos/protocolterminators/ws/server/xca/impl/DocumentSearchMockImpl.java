@@ -122,7 +122,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
 
-                EPDocumentMetaData  epdPdf = null;
+                EPDocumentMetaData epdPdf = null;
                 try {
                     Document pdfDoc = XMLUtil.parseContent(xmlDocString);
                     byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
@@ -133,12 +133,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                             getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
                     logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                     documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
-                } catch (Exception e){
-                    logger.warn("Could not read file at" + pdfFilename, e);
+                } catch (Exception e) {
+                    logger.warn("Could not read file at '{}'", pdfFilename, e);
                 }
                 epDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(epdXml, epdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at" + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -173,12 +173,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                             new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
                             this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
                     documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
-                } catch (Exception e){
-                    logger.warn("Could not read file at" + pdfFilename, e);
+                } catch (Exception e) {
+                    logger.warn("Could not read file at '{}'", pdfFilename, e);
                 }
                 psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -213,7 +213,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
 
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -236,7 +236,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -260,7 +260,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -284,7 +284,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -324,7 +324,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 mroDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
     }
@@ -452,11 +452,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         for (Node node : nodeList) {
             if (node.getAttributes().getNamedItem("code") != null) {
                 code = node.getAttributes().getNamedItem("code").getTextContent();
-                if(StringUtils.equals(code, SimpleConfidentialityEnum.N.name())) {
+                if (StringUtils.equals(code, SimpleConfidentialityEnum.N.name())) {
                     confidentiality = SimpleConfidentialityEnum.N;
-                } else if(StringUtils.equals(code, SimpleConfidentialityEnum.R.name())) {
+                } else if (StringUtils.equals(code, SimpleConfidentialityEnum.R.name())) {
                     confidentiality = SimpleConfidentialityEnum.R;
-                } else if(StringUtils.equals(code, SimpleConfidentialityEnum.V.name())) {
+                } else if (StringUtils.equals(code, SimpleConfidentialityEnum.V.name())) {
                     confidentiality = SimpleConfidentialityEnum.V;
                 }
                 logger.debug("confidentiality code: '{}'", code);
@@ -515,8 +515,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
-                if(documentAssociation.getPDFDocumentMetaData() == null){
-                    OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                if (documentAssociation.getPDFDocumentMetaData() == null) {
+                    OriginalDataMissingException ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                     ex.setOpenncpErrorCode(ERROR_PS_PDF_FORMAT_NOT_PROVIDED);
                     throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                 }
@@ -541,15 +541,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     && StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PatientId))) {
                 metaDatas.add(documentAssociation);
                 logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
-                if(documentAssociation.getPDFDocumentMetaData() == null){
-                    OriginalDataMissingException  ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
+                if (documentAssociation.getPDFDocumentMetaData() == null) {
+                    OriginalDataMissingException ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                     ex.setOpenncpErrorCode(OpenNCPErrorCode.ERROR_EP_PDF_FORMAT_NOT_PROVIDED);
                     throw new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
                 }
             }
         }
 
-        if(!metaDatas.isEmpty()) {
+        if (!metaDatas.isEmpty()) {
             return metaDatas;
         }
 
@@ -585,7 +585,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
     private List<OrCDDocumentMetaData> getOrCDDocumentList(SearchCriteria searchCriteria, List<OrCDDocumentMetaData> orCDMetaDataList) throws ProcessingDeferredException {
         List<OrCDDocumentMetaData> metaDatas = new ArrayList<>();
 
-        if(searchCriteria.getCriteriaValue(Criteria.PatientId).equals("3-ERROR-ORCD-GENERIC")){
+        if (searchCriteria.getCriteriaValue(Criteria.PatientId).equals("3-ERROR-ORCD-GENERIC")) {
             ProcessingDeferredException exception = new ProcessingDeferredException("[National Infrastructure Mock] Mock error for ORCD scenario");
             throw exception;
         }
