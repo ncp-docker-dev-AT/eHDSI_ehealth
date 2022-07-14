@@ -420,10 +420,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="1" unit="g"/>
-                                                <denominator xsi:type="PQ" value="1" unit="g"/>
-                                            </pharm:quantity>
+                                            <pharm:quantity xsi:type="PQ" value="1" unit="g"/>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="10100500" displayName="Concentrate for oral suspension" codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                             </pharm:containerPackagedProduct>
@@ -670,10 +667,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             </originalText>
                                         </pharm:formCode>
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="2.5" unit="ml"/>
-                                                <denominator xsi:type="PQ" value="2.5" unit="ml"/>
-                                            </pharm:quantity>
+                                            <pharm:quantity xsi:type="PQ" value="2.5" unit="ml"/>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="30057000" codeSystem="0.4.0.127.0.16.1.1.2.1">
                                                     <originalText>
