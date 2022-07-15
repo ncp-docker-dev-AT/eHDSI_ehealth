@@ -11,7 +11,7 @@
     <setId root="1.2.246.10.11535721.93.2009.15721892033029812" />
     <recordTarget contextControlCode="OP" typeCode="RCT">
         <patientRole classCode="PAT">
-            <id extension="1-1234-W5" root="2.16.17.710.850.1000.990.1.1000" />
+            <id extension="1-3456-W6" root="2.16.17.710.850.1000.990.1.1000" />
             <addr>
                 <country>FI</country>
             </addr>
@@ -158,10 +158,7 @@
                                         <!-- Combined dose form -->
                                         <pharm:formCode code="14001000" displayName="Cream + pessary" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="1" unit="1"/>
-                                                <denominator xsi:type="PQ" value="1" unit="1"/>
-                                            </pharm:quantity>
+                                            <pharm:quantity xsi:type="PQ" value="1" />
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:code code="PCID_CanestenCombi"/>
                                                 <pharm:formCode code="30009000" displayName="Box" codeSystem="0.4.0.127.0.16.1.1.2.1" />
@@ -173,66 +170,80 @@
                                             </pharm:generalizedMaterialKind>
                                         </pharm:asSpecializedKind>
                                         <pharm:part classCode="PART">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="1" unit="1"/>
-                                                <denominator xsi:type="PQ" value="1" unit="1"/>
-                                            </pharm:quantity>
-                                            <pharm:partProduct classCode="MMAT" determinerCode="KIND">
+                                            <pharm:quantity xsi:type="PQ" value="1"/>
+                                            <pharm:partProduct classCode="MMAT"
+                                                               determinerCode="KIND">
                                                 <pharm:asContent classCode="CONT">
-                                                    <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="20" unit="g"/>
-                                                        <denominator xsi:type="PQ" value="20" unit="g"/>
-                                                    </pharm:quantity>
-                                                    <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
-                                                        <pharm:code codeSystem="1.2.3" code="PCID_CanestenCombi" displayName="PCID CanestenCombi" />
-                                                        <pharm:formCode code="10502000" displayName="Cream" codeSystem="0.4.0.127.0.16.1.1.2.1" />
+                                                    <pharm:containerPackagedProduct classCode="CONT"
+                                                                                    determinerCode="KIND">
+                                                        <pharm:code codeSystem="1.2.3"
+                                                                    code="PCID_CanestenCombi"
+                                                                    displayName="PCID CanestenCombi"/>
+                                                        <pharm:formCode code="10502000"
+                                                                        displayName="Cream"
+                                                                        codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                                         <pharm:asContent classCode="CONT">
-                                                            <pharm:quantity>
-                                                                <numerator xsi:type="PQ" value="1" unit="1"/>
-                                                                <denominator xsi:type="PQ" value="1" unit="1"/>
-                                                            </pharm:quantity>
-                                                            <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
-                                                                <pharm:code codeSystem="1.2.3" code="PCID_Canesten_Cream" displayName="PCID Canesten Cream" />
-                                                                <pharm:formCode code="30067000" displayName="Tube" codeSystem="0.4.0.127.0.16.1.1.2.1" />
+                                                            <pharm:quantity xsi:type="PQ" value="20" unit="g"/>
+                                                            <pharm:containerPackagedProduct classCode="CONT"
+                                                                                            determinerCode="KIND">
+                                                                <pharm:code codeSystem="1.2.3"
+                                                                            code="PCID_Canesten_Cream"
+                                                                            displayName="PCID Canesten Cream"/>
+                                                                <pharm:formCode code="30067000"
+                                                                                displayName="Tube"
+                                                                                codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                                             </pharm:containerPackagedProduct>
                                                         </pharm:asContent>
                                                     </pharm:containerPackagedProduct>
                                                 </pharm:asContent>
                                                 <pharm:ingredient classCode="ACTI">
                                                     <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="100" unit="1" />
-                                                        <denominator xsi:type="PQ" value="1" unit="mL" />
+                                                        <numerator xsi:type="PQ"
+                                                                   value="100"
+                                                                   unit="1"/>
+                                                        <denominator xsi:type="PQ"
+                                                                     value="1"
+                                                                     unit="mL"/>
                                                     </pharm:quantity>
-                                                    <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
-                                                        <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
+                                                    <pharm:ingredientSubstance classCode="MMAT"
+                                                                               determinerCode="KIND">
+                                                        <pharm:code code="A01AB18"
+                                                                    displayName="clotrimazole"
+                                                                    codeSystem="2.16.840.1.113883.6.73"/>
                                                         <pharm:name>clotrimazole</pharm:name>
                                                     </pharm:ingredientSubstance>
                                                 </pharm:ingredient>
                                             </pharm:partProduct>
                                         </pharm:part>
                                         <pharm:part classCode="PART">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="1" unit="1"/>
-                                                <denominator xsi:type="PQ" value="1" unit="1"/>
-                                            </pharm:quantity>
-                                            <pharm:partProduct classCode="MMAT" determinerCode="KIND">
+                                            <pharm:quantity xsi:type="PQ" value="6"/>
+                                            <pharm:partProduct classCode="MMAT"
+                                                               determinerCode="KIND">
                                                 <pharm:asContent classCode="CONT">
-                                                    <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="6" unit="1"/>
-                                                        <denominator xsi:type="PQ" value="6" unit="1"/>
-                                                    </pharm:quantity>
-                                                    <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
-                                                        <pharm:code codeSystem="1.2.3" code="PCID_Cenesten_Pessary" displayName="PCID Cenesten Pessary" />
-                                                        <pharm:formCode code="10909000" displayName="Pessary" codeSystem="0.4.0.127.0.16.1.1.2.1" />
+                                                    <pharm:containerPackagedProduct classCode="CONT"
+                                                                                    determinerCode="KIND">
+                                                        <pharm:code codeSystem="1.2.3"
+                                                                    code="PCID_Cenesten_Pessary"
+                                                                    displayName="PCID Cenesten Pessary"/>
+                                                        <pharm:formCode code="10909000"
+                                                                        displayName="Pessary"
+                                                                        codeSystem="0.4.0.127.0.16.1.1.2.1"/>
                                                     </pharm:containerPackagedProduct>
                                                 </pharm:asContent>
                                                 <pharm:ingredient classCode="ACTI">
                                                     <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="100" unit="1" />
-                                                        <denominator xsi:type="PQ" value="1" unit="mL" />
+                                                        <numerator xsi:type="PQ"
+                                                                   value="100"
+                                                                   unit="1"/>
+                                                        <denominator xsi:type="PQ"
+                                                                     value="1"
+                                                                     unit="mL"/>
                                                     </pharm:quantity>
-                                                    <pharm:ingredientSubstance classCode="MMAT" determinerCode="KIND">
-                                                        <pharm:code code="A01AB18" displayName="clotrimazole" codeSystem="2.16.840.1.113883.6.73"/>
+                                                    <pharm:ingredientSubstance classCode="MMAT"
+                                                                               determinerCode="KIND">
+                                                        <pharm:code code="A01AB18"
+                                                                    displayName="clotrimazole"
+                                                                    codeSystem="2.16.840.1.113883.6.73"/>
                                                         <pharm:name>clotrimazole</pharm:name>
                                                     </pharm:ingredientSubstance>
                                                 </pharm:ingredient>

@@ -138,7 +138,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 	<xs:complexType name="COCT_MT230100UV01.Content">
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="containerPackagedProduct" type="pharm:COCT_MT230100UV01.PackagedProduct" minOccurs="1" maxOccurs="1"/>
 			<!-- HL7 Pharma extensions for the IPS: items removed from the original schema
 			<xs:element name="subjectOf1" type="pharm:COCT_MT230100UV01.Subject1" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
@@ -152,7 +153,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 	<xs:complexType name="COCT_MT230100UV01.Content1">
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="containerPackagedProduct" type="pharm:COCT_MT230100UV01.PackagedProduct" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attributeGroup ref="hl7v3:InfrastructureRootAttributes"/>
@@ -289,7 +291,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
 			<xs:element name="id" type="hl7v3:II" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="partProduct" type="pharm:COCT_MT230100UV01.Product" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="subjectOf" type="pharm:COCT_MT230100UV01.Subject6" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>

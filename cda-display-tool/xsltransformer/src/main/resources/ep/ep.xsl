@@ -54,6 +54,11 @@
                             <xsl:with-param name="code" select="'77'"/>
                         </xsl:call-template>
                     </xsl:when>
+                    <xsl:when test="not($medPackage/@unit)">
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'77'"/>
+                        </xsl:call-template>
+                    </xsl:when>
                     <xsl:otherwise>
                         <xsl:call-template name="supportUCUMAnnotations">
                             <xsl:with-param name="value" select="$medPackage/@unit"/>

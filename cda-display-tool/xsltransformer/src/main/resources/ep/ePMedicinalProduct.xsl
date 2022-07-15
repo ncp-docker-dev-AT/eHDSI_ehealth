@@ -181,7 +181,7 @@
                                     <xsl:text>part </xsl:text>
                                     <xsl:value-of select="position()"/>
                                 </th>
-                                <xsl:for-each select="pharm:ingredient">
+                                <xsl:for-each select="pharm:partProduct/pharm:ingredient">
                                     <xsl:call-template name="show-active-ingredient">
                                         <xsl:with-param name="code"
                                                         select="pharm:ingredientSubstance/pharm:code"/>
