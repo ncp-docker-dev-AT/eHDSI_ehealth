@@ -35,4 +35,26 @@ public class EadcReceiverImpl implements EadcReceiver {
 
         logger.debug("[EADC] Process entry stop");
     }
+
+    /**
+     * This method is called from the NCP - called from multiple threads in parallel.
+     */
+    @Override
+    public void processFailure(EadcEntry entry, String errorDescription) throws Exception {
+
+        logger.debug("[EADC] Process Failure entry start");
+        if (entry == null) {
+            throw new EADCException("EADCEntry == null");
+        }
+        if (entry.getData() == null) {
+            throw new EADCException("EADCEntry.data xml == null");
+        }
+        if (StringUtils.isBlank(entry.getDsName())) {
+            throw new EADCException("Null or Empty dsName");
+        }
+        automaticDataCollectorInstance.processTransactionFailure(entry.getDsName(), entry.getData(), errorDescription);
+
+        logger.debug("[EADC] Process Failure entry stop");
+    }
+
 }

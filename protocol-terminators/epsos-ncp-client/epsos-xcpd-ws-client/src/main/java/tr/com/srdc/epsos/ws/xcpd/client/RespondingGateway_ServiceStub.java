@@ -189,6 +189,15 @@ public class RespondingGateway_ServiceStub extends Stub {
     public org.hl7.v3.PRPAIN201306UV02 respondingGateway_PRPA_IN201305UV02(PRPAIN201305UV02 prpain201305UV02, Map<AssertionEnum, Assertion> assertionMap) throws NoPatientIdDiscoveredException {
 
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
+        MessageContext messageContext = null;
+
+        String eadcError = "";
+
+        // Start Date for eADC
+        Date transactionStartTime = new Date();
+        // End Date for eADC
+        Date transactionEndTime = new Date();
 
         LOGGER.info("respondingGateway_PRPA_IN201305UV02('{}', '{}'", prpain201305UV02.getId().getRoot(),
                 assertionMap.get(AssertionEnum.CLINICIAN).getID());
@@ -247,8 +256,9 @@ public class RespondingGateway_ServiceStub extends Stub {
             _serviceClient.addHeadersToEnvelope(env);
 
             /* set the message context with that soap envelope */
-            var messageContext = new MessageContext();
+            messageContext = new MessageContext();
             messageContext.setEnvelope(env);
+            _messageContext = messageContext;
 
             /* add the message contxt to the operation client */
             operationClient.addMessageContext(messageContext);
@@ -286,7 +296,7 @@ public class RespondingGateway_ServiceStub extends Stub {
             start = System.currentTimeMillis();
 
             /* execute the operation client */
-            var transactionStartTime = new Date();
+            transactionStartTime = new Date();
             try {
                 operationClient.execute(true);
             } catch (AxisFault e) {
@@ -338,15 +348,15 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
-                            + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.");
-                    throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC, e);
+                    eadcError = "Could not find configurations in the Central Services for [" + this.countryCode.toLowerCase(Locale.ENGLISH)
+                            + RegisteredService.PATIENT_IDENTIFICATION_SERVICE.getServiceName() + "], the service will fail.";
+                    LOGGER.error(eadcError);                    throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_PI_GENERIC, e);
                 }
             }
 
-            MessageContext _returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
-            Date transactionEndTime = new Date();
+            transactionEndTime = new Date();
 
             // TMP
             // Transaction end time
@@ -456,11 +466,12 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                 } catch (Exception e) {
                     // we cannot instantiate the class - throw the original Axis fault
+                    eadcError = axisFault.getMessage();
                     throw new RuntimeException(axisFault.getMessage(), axisFault);
                 }
             }
+            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE.getCode();
             throw new NoPatientIdDiscoveredException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault");
-
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 try {
@@ -468,6 +479,11 @@ public class RespondingGateway_ServiceStub extends Stub {
                 } catch (AxisFault ex) {
                     LOGGER.error(null, ex);
                 }
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        EadcUtil.Direction.OUTBOUND, ServiceType.PATIENT_IDENTIFICATION_QUERY, eadcError);
             }
         }
     }
