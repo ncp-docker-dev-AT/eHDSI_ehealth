@@ -328,7 +328,7 @@ public class AbuseDetectionService implements Job {
             Period diff = new Period(begin, end); // time elapsed between first and last request
             if(diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
                 if(sortedAllList.size() > areq_threshold) {
-                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + sortedAllList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "]");
+                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + sortedAllList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
                 }
             }
         }
@@ -354,7 +354,7 @@ public class AbuseDetectionService implements Job {
                     Period diff = new Period(begin, end); // time elapsed between first and last request
                     if(diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
                         if(sortedXcpdList.size() > upat_threshold) {
-                            LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + sortedXcpdList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "]");
+                            LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + sortedXcpdList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "seconds ]");
                         }
                     }
                 });
@@ -371,7 +371,7 @@ public class AbuseDetectionService implements Job {
             Period diff = new Period(begin, end); // time elapsed between first and last request
             if(diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
                 if(sortedPocList.size() > upoc_threshold) {
-                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + sortedPocList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "]");
+                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + sortedPocList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
                 }
             }
         }
