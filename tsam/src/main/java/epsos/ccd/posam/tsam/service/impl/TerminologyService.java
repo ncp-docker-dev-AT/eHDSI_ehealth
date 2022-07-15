@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tsam.service.impl;
 
 import epsos.ccd.posam.tsam.dao.ITsamDao;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.CodeSystem;
 import epsos.ccd.posam.tsam.model.CodeSystemConcept;
@@ -13,7 +12,10 @@ import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
 import epsos.ccd.posam.tsam.util.DebugUtils;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
+
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,15 +99,19 @@ public class TerminologyService implements ITerminologyService {
             if (logger.isDebugEnabled()) {
                 logger.debug("Searching Concept: '{}'-'{}'-'{}'-'{}'-'{}'-'{}'", code, csName, csOid, csVersion, vsOid, vsVersion);
             }
+            CodeSystemConcept concept;
             // obtain CodeSystem
-            CodeSystem system = dao.getCodeSystem(csOid);
-            checkCodeSystemName(system, csName, response);
+            CodeSystem codeSystem = dao.getCodeSystem(csOid);
+            checkCodeSystemName(codeSystem, csName, response);
 
-            // optain CodeSystemVersion
-            CodeSystemVersion codeSystemVersion = dao.getVersion(csVersion, system);
-
-            // obtain Concept
-            CodeSystemConcept concept = dao.getConcept(code, codeSystemVersion);
+            // obtain a Concept by CodeSystemVersion or if it exists in any others versions available.
+            if (StringUtils.isNotBlank(csVersion)) {
+                CodeSystemVersion codeSystemVersion = dao.getVersion(csVersion, codeSystem);
+                concept = dao.getConcept(code, codeSystemVersion);
+            } else {
+                List<Long> codeSystemVersionIds = dao.getCodeSystemVersionIds(csOid);
+                concept = dao.getConceptByCodeSystemVersionIds(code, codeSystemVersionIds);
+            }
             checkConceptStatus(concept, response);
 
             // obtain Target Concept and Designation
@@ -128,7 +134,7 @@ public class TerminologyService implements ITerminologyService {
 
                 // obtain Target Code System Version
                 CodeSystemVersion targetVersion = target.getCodeSystemVersion();
-                checkTargedVersion(targetVersion);
+                checkTargetVersion(targetVersion);
                 response.setCodeSystemVersion(targetVersion.getLocalName());
 
                 // obtain Target Code System
@@ -146,7 +152,7 @@ public class TerminologyService implements ITerminologyService {
             // TSAM Exception considered as Warning
             logger.error("TSAMException: '{}'", e.getMessage());
             response.addError(e.getReason(), localConcept.toString());
-            logger.error(localConcept + ", " + e.toString(), e);
+            logger.error(localConcept + ", " + e, e);
         } catch (Exception e) {
             // Other Exception considered as Error
             logger.error("Exception: '{}'", e.getMessage());
@@ -180,9 +186,9 @@ public class TerminologyService implements ITerminologyService {
             } else {
                 ctx = "Code System is null and  != " + name;
             }
-            response.addWarning(TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+            response.addWarning(TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             if (logger.isDebugEnabled()) {
-                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSETEM_NAME_DOESNT_MATCH, ctx);
+                logger.debug("[{}] '{}': '{}'", response.getInputCodedElement(), TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH, ctx);
             }
         }
     }
@@ -193,16 +199,16 @@ public class TerminologyService implements ITerminologyService {
      * @param version
      * @throws TSAMException
      */
-    private void checkTargedVersion(CodeSystemVersion version) throws TSAMException {
+    private void checkTargetVersion(CodeSystemVersion version) throws TSAMException {
 
-        DebugUtils.showTransactionStatus("checkTargedVersion()");
+        DebugUtils.showTransactionStatus("checkTargetVersion()");
         if (version == null) {
             throw new TSAMException(TSAMError.ERROR_EPSOS_VERSION_NOTFOUND);
         }
     }
 
     /**
-     * Checkif target CodeSystem exists, and its OID is not null
+     * Check if target CodeSystem exists, and its OID is not null
      *
      * @param codeSystem
      * @throws TSAMException
@@ -300,41 +306,37 @@ public class TerminologyService implements ITerminologyService {
     public void setConfig(TsamConfiguration config) {
         this.config = config;
     }
-    
-    public Map<CodeSystemConcept,CodeSystemConcept> getNationalCodeSystemMappedConcepts(String oid, String version) {
+
+    public Map<CodeSystemConcept, CodeSystemConcept> getNationalCodeSystemMappedConcepts(String oid, String version) {
         logger.debug("OID: {} | Version: {}", oid, version);
-        Map<CodeSystemConcept,CodeSystemConcept> mappedConcepts = null;
-        
+        Map<CodeSystemConcept, CodeSystemConcept> mappedConcepts = null;
+
         try {
-        
+
             // First we get the national CodeSystem from its OID
             CodeSystem nationalCodeSystem = dao.getCodeSystem(oid);
             logger.debug("National CodeSystem: ID: {} | OID: {} | Name: {}", nationalCodeSystem.getId(), nationalCodeSystem.getOid(), nationalCodeSystem.getName());
 
             // Then we get the national CodeSystem version
             CodeSystemVersion nationalCodeSystemVersion = dao.getVersion(version, nationalCodeSystem);
-            logger.debug("National CodeSystem version: ID: {} | FullName: {} | LocalName: {} | Status: {}", nationalCodeSystemVersion.getId(), 
+            logger.debug("National CodeSystem version: ID: {} | FullName: {} | LocalName: {} | Status: {}", nationalCodeSystemVersion.getId(),
                     nationalCodeSystemVersion.getFullName(), nationalCodeSystemVersion.getLocalName(), nationalCodeSystemVersion.getStatus());
 
             // Finally we get the concepts of that CodeSystem version
             List<CodeSystemConcept> concepts = nationalCodeSystemVersion.getConcepts();
-            concepts.stream().forEach((concept) -> {
-                logger.debug("code: {} | definition: {}", concept.getCode(), concept.getDefinition());
-            });
+            concepts.forEach(concept -> logger.debug("code: {} | definition: {}", concept.getCode(), concept.getDefinition()));
 
             // Then we get their mapped concepts
             mappedConcepts = new HashMap<>();
             for (CodeSystemConcept sourceConcept : concepts) {
                 CodeSystemConcept targetConcept = dao.getTargetConcept(sourceConcept);
-                mappedConcepts.put(sourceConcept,targetConcept);
+                mappedConcepts.put(sourceConcept, targetConcept);
             }
-            mappedConcepts.forEach((sourceConcept, targetConcept) -> {
-                logger.debug("Mapping: {} -> {}", sourceConcept.getDefinition(), targetConcept.getCode());
-            });
+            mappedConcepts.forEach((sourceConcept, targetConcept) -> logger.debug("Mapping: {} -> {}", sourceConcept.getDefinition(), targetConcept.getCode()));
         } catch (TSAMException e) {
             logger.error("TSAMException: '{}'", e.getMessage());
         }
-        
+
         return mappedConcepts;
     }
 }

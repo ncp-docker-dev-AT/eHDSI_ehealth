@@ -4,22 +4,19 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A Code System Concept defines a unitary mental representation of a real or
- * abstract thing within the context of a specific Code System; an atomic unit
- * of thought.
+ * A Code System Concept defines a unitary mental representation of a real or abstract thing within the context of
+ * a specific Code System; an atomic unit of thought.
  *
  * @author Roman Repiscak
  * @author Organization: Posam
- * @author mail:roman.repiscak@posam.sk
- * @version 1.0, 2010, 11 August
  */
 public class CodeSystemConcept {
 
-    public final static String AT_ID = "id";
-    public final static String AT_CODE = "code";
-    public final static String AT_VS_VERSIONS = "valueSetVersions";
-    public final static String AT_CS_VERSION = "codeSystemVersion";
-    public final static String AT_DESIGNATION = "designations";
+    public static final String AT_ID = "id";
+    public static final String AT_CODE = "code";
+    public static final String AT_VS_VERSIONS = "valueSetVersions";
+    public static final String AT_CS_VERSION = "codeSystemVersion";
+    public static final String AT_DESIGNATION = "designations";
 
     /**
      * An identifier that uniquely identified the Concept within Code System
@@ -27,9 +24,8 @@ public class CodeSystemConcept {
     protected long id;
 
     /**
-     * A concept code that according to terminology best practices is unique
-     * within the context of the Code System, although some code systems do
-     * allow reuse of codes over time
+     * A concept code that according to terminology best practices is unique within the context of the Code System,
+     * although some code systems do allow reuse of codes over time.
      */
     protected String code;
 
@@ -48,8 +44,7 @@ public class CodeSystemConcept {
     protected String status;
 
     /**
-     * A status date to identify the date the status was set to its current
-     * value
+     * A status date to identify the date the status was set to its current value
      */
     protected Date statusDate;
 

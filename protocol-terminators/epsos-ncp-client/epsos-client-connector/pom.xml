@@ -213,7 +213,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
-        </dependency>
+         </dependency>
     </dependencies>
 
     <build>

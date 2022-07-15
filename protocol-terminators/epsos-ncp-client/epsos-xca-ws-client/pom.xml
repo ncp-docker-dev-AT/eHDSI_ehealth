@@ -120,5 +120,6 @@
             <artifactId>serializer</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>
