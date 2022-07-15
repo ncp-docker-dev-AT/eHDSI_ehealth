@@ -41,6 +41,13 @@ public class ValidatorTest {
         Assert.assertTrue(result);
     }
 
+    @Test
+    public void testSchemaValidationeDL3() {
+        final boolean result = validateXml("src/test/resources/schema/CDA_Pharma.xsd",
+                "src/test/resources/samples/eD_L3_W6.xml");
+        Assert.assertTrue(result);
+    }
+
     private boolean validateXml(String xsdPath, String xmlPath) {
 
         try {
