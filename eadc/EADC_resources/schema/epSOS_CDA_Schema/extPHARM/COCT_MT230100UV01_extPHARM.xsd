@@ -6,7 +6,7 @@
 * XML schema for message type COCT_MT230100UV01.
 * Source information:
 *     Rendered by: Visio to MIF transform
-*     Rendered on: 
+*     Rendered on:
 * Saved in XML file by RMIM Designer in Visio at 2013-07-30T13:51:30
  Flat to Serialization Transform: $Id: MIFStaticModelFlatToSerialization.xsl 8529 2011-02-09 20:49:58Z lloyd_mckenzie $
  Fix Names Transform: $Id: FixMifNames.xsl 8355 2009-10-07 03:16:34Z lloyd_mckenzie $
@@ -26,7 +26,7 @@
   * contributions. http://www.eclipse.org/legal/epl-v10.html.
   *
   * Contributors: Health Level Seven International - initial implementation
-  ****************************************************************************************/			
+  ****************************************************************************************/
 				-->
 	<!--
 *******************************************************************************
@@ -40,13 +40,13 @@ History:
 -->
 	<xs:annotation>
 		<xs:documentation>Generated using schema builder version 3.4.12. Stylesheets:
-Saved in XML file by RMIM Designer in Visio at 2013-07-30T13:51:30
- Flat to Serialization Transform: $Id: MIFStaticModelFlatToSerialization.xsl 8529 2011-02-09 20:49:58Z lloyd_mckenzie $
- Fix Names Transform: $Id: FixMifNames.xsl 8355 2009-10-07 03:16:34Z lloyd_mckenzie $
-  Base transform: $Id: ConvertBase.xsl 8870 2011-09-14 18:32:56Z woody_beeler $
-  Package Id Conversion: $Id: TransformPackageIds.xsl 8398 2010-10-12 01:52:15Z lloyd_mckenzie $
- Flat to Serialization Transform: $Id: MIFStaticModelFlatToSerialization.xsl 7375 2009-01-26 19:26:53Z wbeeler $
-StaticMifToXsd.xsl version 2.0</xs:documentation>
+			Saved in XML file by RMIM Designer in Visio at 2013-07-30T13:51:30
+			Flat to Serialization Transform: $Id: MIFStaticModelFlatToSerialization.xsl 8529 2011-02-09 20:49:58Z lloyd_mckenzie $
+			Fix Names Transform: $Id: FixMifNames.xsl 8355 2009-10-07 03:16:34Z lloyd_mckenzie $
+			Base transform: $Id: ConvertBase.xsl 8870 2011-09-14 18:32:56Z woody_beeler $
+			Package Id Conversion: $Id: TransformPackageIds.xsl 8398 2010-10-12 01:52:15Z lloyd_mckenzie $
+			Flat to Serialization Transform: $Id: MIFStaticModelFlatToSerialization.xsl 7375 2009-01-26 19:26:53Z wbeeler $
+			StaticMifToXsd.xsl version 2.0</xs:documentation>
 	</xs:annotation>
 	<!-- HL7 Pharma extensions for the IPS: items removed from the original schema
 		<xs:include schemaLocation="../coreschemas/infrastructureRoot-r2.xsd"/>
@@ -138,7 +138,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 	<xs:complexType name="COCT_MT230100UV01.Content">
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="containerPackagedProduct" type="pharm:COCT_MT230100UV01.PackagedProduct" minOccurs="1" maxOccurs="1"/>
 			<!-- HL7 Pharma extensions for the IPS: items removed from the original schema
 			<xs:element name="subjectOf1" type="pharm:COCT_MT230100UV01.Subject1" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
@@ -152,7 +153,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 	<xs:complexType name="COCT_MT230100UV01.Content1">
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="containerPackagedProduct" type="pharm:COCT_MT230100UV01.PackagedProduct" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attributeGroup ref="hl7v3:InfrastructureRootAttributes"/>
@@ -289,7 +291,8 @@ StaticMifToXsd.xsl version 2.0</xs:documentation>
 		<xs:sequence>
 			<xs:group ref="hl7v3:InfrastructureRootElements"/>
 			<xs:element name="id" type="hl7v3:II" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="quantity" type="hl7v3:RTO" minOccurs="0" maxOccurs="1"/>
+			<!-- Manual fix by the eHDSI Solution Provider datatype hl7v3:RTO -> hl7v3:PQ -->
+			<xs:element name="quantity" type="hl7v3:PQ" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="partProduct" type="pharm:COCT_MT230100UV01.Product" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="subjectOf" type="pharm:COCT_MT230100UV01.Subject6" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>

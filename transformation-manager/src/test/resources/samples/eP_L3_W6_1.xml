@@ -11,7 +11,7 @@
     <setId root="1.2.246.10.11535721.93.2009.15721892033029812" />
     <recordTarget contextControlCode="OP" typeCode="RCT">
         <patientRole classCode="PAT">
-            <id extension="1-1234-W5" root="2.16.17.710.850.1000.990.1.1000" />
+            <id extension="1-1234-W6" root="2.16.17.710.850.1000.990.1.1000" />
             <addr>
                 <country>FI</country>
             </addr>
@@ -157,17 +157,11 @@
                                         <name>Lantus SoloStar</name>
                                         <pharm:formCode code="50060300" displayName="Solution For injection in pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="3" unit="ml"/>
-                                                <denominator xsi:type="PQ" value="3" unit="ml"/>
-                                            </pharm:quantity>
+                                            <pharm:quantity value="3" unit="ml"/>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="30051000" displayName="Pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                                 <pharm:asContent classCode="CONT">
-                                                    <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="5" unit="1"/>
-                                                        <denominator xsi:type="PQ" value="5" unit="1"/>
-                                                    </pharm:quantity>
+                                                    <pharm:quantity xsi:type="PQ" value="5"/>
                                                     <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                         <pharm:code codeSystem="1.2.3" code="PCID_Lantus_Solostar" displayName="..." />
                                                         <pharm:formCode code="30009000" displayName="Box" codeSystem="0.4.0.127.0.16.1.1.2.1" />

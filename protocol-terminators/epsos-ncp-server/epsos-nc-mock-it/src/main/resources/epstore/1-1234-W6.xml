@@ -157,17 +157,11 @@
                                         <name>Lantus SoloStar</name>
                                         <pharm:formCode code="50060300" displayName="Solution For injection in pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                         <pharm:asContent classCode="CONT">
-                                            <pharm:quantity>
-                                                <numerator xsi:type="PQ" value="3" unit="ml"/>
-                                                <denominator xsi:type="PQ" value="3" unit="ml"/>
-                                            </pharm:quantity>
+                                            <pharm:quantity value="3" unit="ml"/>
                                             <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                 <pharm:formCode code="30051000" displayName="Pre-filled syringe" codeSystem="0.4.0.127.0.16.1.1.2.1" />
                                                 <pharm:asContent classCode="CONT">
-                                                    <pharm:quantity>
-                                                        <numerator xsi:type="PQ" value="5" unit="1"/>
-                                                        <denominator xsi:type="PQ" value="5" unit="1"/>
-                                                    </pharm:quantity>
+                                                    <pharm:quantity xsi:type="PQ" value="5"/>
                                                     <pharm:containerPackagedProduct classCode="CONT" determinerCode="KIND">
                                                         <pharm:code codeSystem="1.2.3" code="PCID_Lantus_Solostar" displayName="..." />
                                                         <pharm:formCode code="30009000" displayName="Box" codeSystem="0.4.0.127.0.16.1.1.2.1" />

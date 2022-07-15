@@ -418,6 +418,7 @@
     </xsl:template>
 
     <xsl:template name="show-package-size">
+        <xsl:param name="quantity"/>
         <xsl:param name="asContent_level1"/>
         <xsl:param name="asContent_level2"/>
         <xsl:param name="asContent_level3"/>
@@ -425,6 +426,9 @@
             <xsl:choose>
                 <xsl:when test="$asContent_level3">
                     <li>
+                        <xsl:call-template name="show-package-size-quantity">
+                            <xsl:with-param name="quantity" select="$quantity"/>
+                        </xsl:call-template>
                         <xsl:call-template name="show-formCode">
                             <xsl:with-param name="parameter"
                                             select="$asContent_level3/pharm:containerPackagedProduct/pharm:formCode"/>
@@ -433,7 +437,7 @@
                             <li>
                                 <xsl:call-template name="show_quantity">
                                     <xsl:with-param name="quantity" select="$asContent_level3/pharm:quantity"/>
-                                    <xsl:with-param name="showValue" select="true()"/>
+                                    <xsl:with-param name="showValue" select="false()"/>
                                 </xsl:call-template>
                                 <xsl:text> </xsl:text>
                                 <xsl:call-template name="show-formCode">
@@ -441,31 +445,10 @@
                                                     select="$asContent_level2/pharm:containerPackagedProduct/pharm:formCode"/>
                                 </xsl:call-template>
                                 <ul>
-                                    <li>
-                                        <xsl:call-template name="show_quantity">
-                                            <xsl:with-param name="quantity" select="$asContent_level2/pharm:quantity"/>
-                                            <xsl:with-param name="showValue" select="true()"/>
-
-                                        </xsl:call-template>
-                                        <xsl:text> </xsl:text>
-                                        <xsl:call-template name="show-formCode">
-                                            <xsl:with-param name="parameter"
-                                                            select="$asContent_level1/pharm:containerPackagedProduct/pharm:formCode"/>
-                                        </xsl:call-template>
-                                        <ul>
-                                            <li>
-                                                <xsl:call-template name="show_quantity">
-                                                    <xsl:with-param name="quantity" select="$asContent_level1/pharm:quantity"/>
-                                                    <xsl:with-param name="showValue" select="true()"/>
-                                                </xsl:call-template>
-                                                <xsl:text> </xsl:text>
-                                                <xsl:call-template name="show-formCode">
-                                                    <xsl:with-param name="parameter"
-                                                                    select="$asContent_level1/../pharm:formCode"/>
-                                                </xsl:call-template>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    <xsl:call-template name="show-package-size-level2">
+                                        <xsl:with-param name="asContent_level1" select="$asContent_level1"/>
+                                        <xsl:with-param name="asContent_level2" select="$asContent_level2"/>
+                                    </xsl:call-template>
                                 </ul>
                             </li>
                         </ul>
@@ -473,62 +456,84 @@
                 </xsl:when>
                 <xsl:when test="$asContent_level2">
                     <li>
-                        <xsl:call-template name="show-formCode">
-                            <xsl:with-param name="parameter"
-                                            select="$asContent_level2/pharm:containerPackagedProduct/pharm:formCode"/>
+                        <xsl:call-template name="show-package-size-quantity">
+                            <xsl:with-param name="quantity" select="$quantity"/>
                         </xsl:call-template>
-                        <ul>
-                            <li>
-                                <xsl:call-template name="show_quantity">
-                                    <xsl:with-param name="quantity" select="$asContent_level2/pharm:quantity"/>
-                                    <xsl:with-param name="showValue" select="true()"/>
-                                </xsl:call-template>
-                                <xsl:text> </xsl:text>
-                                <xsl:call-template name="show-formCode">
-                                    <xsl:with-param name="parameter"
-                                                    select="$asContent_level1/pharm:containerPackagedProduct/pharm:formCode"/>
-                                </xsl:call-template>
-                                <ul>
-                                    <li>
-                                        <xsl:call-template name="show_quantity">
-                                            <xsl:with-param name="quantity" select="$asContent_level1/pharm:quantity"/>
-                                            <xsl:with-param name="showValue" select="true()"/>
-                                        </xsl:call-template>
-                                        <xsl:text> </xsl:text>
-                                        <xsl:call-template name="show-formCode">
-                                            <xsl:with-param name="parameter"
-                                                            select="$asContent_level1/../pharm:formCode"/>
-                                        </xsl:call-template>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                        <xsl:call-template name="show-package-size-level2">
+                            <xsl:with-param name="asContent_level1" select="$asContent_level1"/>
+                            <xsl:with-param name="asContent_level2" select="$asContent_level2"/>
+                        </xsl:call-template>
                     </li>
                 </xsl:when>
                 <xsl:otherwise>
                     <ul>
                         <li>
-                            <xsl:call-template name="show-formCode">
-                                <xsl:with-param name="parameter"
-                                                select="$asContent_level1/pharm:containerPackagedProduct/pharm:formCode"/>
+                            <xsl:call-template name="show-package-size-quantity">
+                                <xsl:with-param name="quantity" select="$quantity"/>
                             </xsl:call-template>
-                            <ul>
-                                <li>
-                                    <xsl:call-template name="show_quantity">
-                                        <xsl:with-param name="quantity" select="$asContent_level1/pharm:quantity"/>
-                                        <xsl:with-param name="showValue" select="true()"/>
-                                    </xsl:call-template>
-                                    <xsl:text> </xsl:text>
-                                    <xsl:call-template name="show-formCode">
-                                        <xsl:with-param name="parameter"
-                                                        select="$asContent_level1/../pharm:formCode"/>
-                                    </xsl:call-template>
-                                </li>
-                            </ul>
+                            <xsl:call-template name="show-package-size-level1">
+                                <xsl:with-param name="asContent" select="$asContent_level1"/>
+                            </xsl:call-template>
                         </li>
                     </ul>
                 </xsl:otherwise>
             </xsl:choose>
         </ul>
+    </xsl:template>
+
+    <xsl:template name="show-package-size-level2">
+        <xsl:param name="asContent_level1"/>
+        <xsl:param name="asContent_level2"/>
+        <xsl:call-template name="show-formCode">
+            <xsl:with-param name="parameter"
+                            select="$asContent_level2/pharm:containerPackagedProduct/pharm:formCode"/>
+        </xsl:call-template>
+        <ul>
+            <li>
+                <xsl:call-template name="show_quantity">
+                    <xsl:with-param name="quantity" select="$asContent_level2/pharm:quantity"/>
+                    <xsl:with-param name="showValue" select="true()"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
+                <xsl:call-template name="show-package-size-level1">
+                    <xsl:with-param name="asContent" select="$asContent_level1"/>
+                </xsl:call-template>
+            </li>
+        </ul>
+    </xsl:template>
+
+    <xsl:template name="show-package-size-level1">
+        <xsl:param name="asContent"/>
+        <xsl:call-template name="show-formCode">
+            <xsl:with-param name="parameter"
+                            select="$asContent/pharm:containerPackagedProduct/pharm:formCode"/>
+        </xsl:call-template>
+        <!-- Not applicable for the part case -->
+        <xsl:if test="$asContent/pharm:quantity">
+            <ul>
+                <li>
+                    <xsl:call-template name="show_quantity">
+                        <xsl:with-param name="quantity" select="$asContent/pharm:quantity"/>
+                        <xsl:with-param name="showValue" select="true()"/>
+                    </xsl:call-template>
+                    <xsl:text> </xsl:text>
+                    <xsl:call-template name="show-formCode">
+                        <xsl:with-param name="parameter"
+                                        select="$asContent/../pharm:formCode"/>
+                    </xsl:call-template>
+                </li>
+            </ul>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="show-package-size-quantity">
+        <xsl:param name="quantity"/>
+        <xsl:if test="$quantity">
+            <xsl:call-template name="show_quantity">
+                <xsl:with-param name="quantity" select="$quantity"/>
+                <xsl:with-param name="showValue" select="true()"/>
+            </xsl:call-template>
+            <xsl:text> </xsl:text>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>
