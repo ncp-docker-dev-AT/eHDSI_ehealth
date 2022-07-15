@@ -757,6 +757,9 @@
             <xsl:when test="$value='1'">
                 <xsl:value-of select="$value"/>
             </xsl:when>
+            <xsl:when test="not($value)">
+                <xsl:value-of select="1"/>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="show-eHDSIUnit">
                     <xsl:with-param name="code" select="$value"/>
