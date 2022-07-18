@@ -90,51 +90,52 @@
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Active ingredient -->
+                                                            <!-- Active ingredient Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'1'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Strength -->
+                                                            <!-- Strength Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'70'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Dose form -->
+                                                            <!-- Dose form Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'25'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Units per intake -->
+                                                            <!-- Units per intake Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'78'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Frequency of intakes -->
+                                                            <!-- Frequency of intakes Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'32'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Route of Administration -->
+                                                            <!-- Route of Administration Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'67'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Duration of treatment -->
+                                                            <!-- Duration of treatment Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'150'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!-- Medication reason -->
-                                                            <!-- TODO Add label to eHDSIDisplayLabel value set -->
-                                                            Medication reason
+                                                            <!-- Medication reason Header -->
+                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                <xsl:with-param name="code" select="'173'"/>
+                                                            </xsl:call-template>
                                                         </th>
                                                     </tr>
                                                     <xsl:apply-templates select="n1:entry/n1:substanceAdministration" mode="medicationSummary"/>
