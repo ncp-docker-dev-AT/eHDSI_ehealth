@@ -86,6 +86,7 @@ public class Constants {
     public static final String ABUSE_ALL_REQUEST_THRESHOLD;
     public static final String ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD;
     public static final String ABUSE_SCHEDULER_TIME_INTERVAL;
+    public static final String ABUSE_SCHEDULER_ENABLE;
 
     /**
      * Name of the System Variable containing the path to the folder containing the configuration files.
@@ -133,6 +134,7 @@ public class Constants {
         ABUSE_ALL_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_THRESHOLD");
         ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD");
         ABUSE_SCHEDULER_TIME_INTERVAL = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_TIME_INTERVAL");
+        ABUSE_SCHEDULER_ENABLE = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_ENABLE");
     }
 
     private Constants() {

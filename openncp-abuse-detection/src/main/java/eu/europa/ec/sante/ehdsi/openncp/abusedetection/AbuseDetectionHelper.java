@@ -1,5 +1,7 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
+import epsos.ccd.gnomon.utils.Utils;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -20,30 +22,37 @@ public class AbuseDetectionHelper {
     }
 
     public static void AbuseDetectionShutdown() throws Exception {
-        LOGGER.info("Stopping AbuseDetectionServiceFactory Service...");
+        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_TIME_INTERVAL);
+        if(schedulerEnabled == true) {
+            LOGGER.info("Stopping AbuseDetectionServiceFactory Service...");
+        }
     }
 
     public static void AbuseDetectionInit() throws Exception {
-        LOGGER.info("Initializing AbuseDetectionServiceFactory Service...");
+        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_TIME_INTERVAL);
+        if(schedulerEnabled == true) {
+            LOGGER.info("Initializing AbuseDetectionServiceFactory Service...");
 
-        //show message to know about the main thread
-        LOGGER.info(" The name of the QuartzScheduler main thread is: " + Thread.currentThread().getName());
+            //show message to know about the main thread
+            LOGGER.info(" The name of the QuartzScheduler main thread is: " + Thread.currentThread().getName());
 
-        //initialize scheduler instance from Quartz
-        scheduler = new StdSchedulerFactory().getScheduler();
+            //initialize scheduler instance from Quartz
+            scheduler = new StdSchedulerFactory().getScheduler();
 
-        //start scheduler
-        scheduler.start();
+            //start scheduler
+            scheduler.start();
 
-        //create scheduler trigger based on the time interval
-        Trigger triggerNew =  createTrigger();
+            //create scheduler trigger based on the time interval
+            Trigger triggerNew = createTrigger();
 
-        //create scheduler trigger with a cron expression
-        //Trigger triggerNew = createCronTrigger();
+            //create scheduler trigger with a cron expression
+            //Trigger triggerNew = createCronTrigger();
 
-        //schedule trigger
-        scheduleJob(triggerNew);
-
+            //schedule trigger
+            scheduleJob(triggerNew);
+        } else {
+            LOGGER.info("AbuseDetection Scheduler Disabled");
+        }
     }
 
     //create scheduleJob() method to schedule a job

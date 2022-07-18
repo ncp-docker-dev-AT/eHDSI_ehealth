@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,12 +40,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 public class AbuseDetectionService implements Job {
 
-    private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final Logger LOGGER = LoggerFactory.getLogger(AbuseDetectionService.class);
-
     private static List<AbuseEvent> abuseList = new ArrayList<>();
 
     private static long lastFileAnalyzed = -1;
@@ -144,7 +140,7 @@ public class AbuseDetectionService implements Job {
 
                     boolean evtPresent = false;
                     AbuseTransactionType transactionType = AbuseTransactionType.TRANSACTION_UNKNOWN;
-                    if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                    if (StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
                             IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
