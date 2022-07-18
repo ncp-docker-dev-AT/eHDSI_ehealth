@@ -220,7 +220,10 @@ public class RespondingGateway_ServiceStub extends Stub {
                                                                   List<String> classCodes)
             throws java.rmi.RemoteException, XCAException {
 
+        String eadcError = "";
+
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
         try {
             // TMP
             // XCA list request start time
@@ -427,12 +430,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, e.getMessage(), null);
                 }
             }
-
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -485,10 +488,13 @@ public class RespondingGateway_ServiceStub extends Stub {
 //            }
 
             //  Invoke eADC
-            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
-
+            if(!EadcUtilWrapper.hasTransactionErrors(_returnEnv)) {
+                EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+            } else {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(_returnEnv);
+            }
             // eADC end time
             end = System.currentTimeMillis();
             LOGGER.info("XCA LIST eADC TIME: '{}' ms", (end - start) / 1000.0);
@@ -516,9 +522,9 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             return adhocQueryResponse;
 
-        } catch (AxisFault f) {
+        } catch (AxisFault axisFault) {
             // TODO A.R. Audit log SOAP Fault is still missing
-            OMElement faultElt = f.getDetail();
+            OMElement faultElt = axisFault.getDetail();
 
             if (faultElt != null) {
 
@@ -540,15 +546,22 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                         /* we cannot intantiate the class - throw the original Axis fault */
                     } catch (Exception e) {
+                        eadcError = e.getMessage();
                         throw new RuntimeException(e.getMessage(), e);
                     }
                 }
             }
+            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE.getCode();
             throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY, eadcError);
             }
         }
     }
@@ -601,7 +614,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                                                                                   Map<AssertionEnum, Assertion> assertionMap,
                                                                                   String classCode)
             throws java.rmi.RemoteException, XCAException {
+
+        String eadcError = "";
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
+        Document cda = null;
+
         SOAPEnvelope env;
         try {
             OperationClient _operationClient = _serviceClient.createClient(_operations[1].getName());
@@ -799,11 +817,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw new XCAException(getErrorCode(classCode), e.getMessage(), null);
                 }
             }
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -836,7 +855,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
             // Invoke eADC
-            Document cda = null;
             if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
 
                 cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
@@ -875,13 +893,20 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                 } catch (Exception e) {
                     // Cannot instantiate the class - throw the original Axis fault
+                    eadcError = e.getMessage();
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+            eadcError = axisFault.getMessage();
             throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY, eadcError);
             }
         }
     }

@@ -140,7 +140,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     epDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(epdXml, epdPdf));
                 }
             } catch (Exception e) {
-                logger.warn("Could not read file at" + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -177,12 +177,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                                 this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
                         documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                     } catch (Exception e) {
-                        logger.warn("Could not read file at" + pdfFilename, e);
+                        logger.warn("Could not read file at '{}'", pdfFilename, e);
                     }
                     psDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
                 }
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -216,7 +216,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
 
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -239,7 +239,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -263,7 +263,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -287,7 +287,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
 
@@ -327,7 +327,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 mroDocumentMetaDatas.add(DocumentFactory.createDocumentAssociation(psdXml, psdPdf));
             } catch (Exception e) {
-                logger.warn("Could not read file at " + xmlFilename, e);
+                logger.warn("Could not read file at '{}'", xmlFilename, e);
             }
         }
     }
