@@ -318,22 +318,38 @@ public class AbuseDetectionService implements Job {
         List<AbuseEvent> sortedAllList = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
-        if(areqr > 0 && sortedAllList.size() > 1) { // Analyze ALL requests
-            LocalDateTime begin = sortedAllList.get(0).getRequestDateTime();
-            LocalDateTime end = sortedAllList.get(sortedAllList.size() - 1).getRequestDateTime();
-            Period diff = new Period(begin, end); // time elapsed between first and last request
-            if(diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
-                if(sortedAllList.size() > areq_threshold) {
-                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + sortedAllList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
+        if(areqr > 0 && sortedAllList.size() > areq_threshold) { // Analyze ALL requests
+            for(int i = 0; i < sortedAllList.size(); i++) {
+                int begin;
+                int end;
+
+                begin = i;
+                end = begin + Math.min(begin + areq_threshold - 1, sortedAllList.size() - 1 - begin);
+                LocalDateTime t1 = sortedAllList.get(begin).getRequestDateTime();
+                LocalDateTime t2 = sortedAllList.get(end).getRequestDateTime();
+                Period diff = new Period(t1, t2); // time elapsed between first and last request
+                if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
+                    int totreq = end - begin + 1;
+                    if (totreq > areq_threshold) {
+                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + areq_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedAllList.get(begin) + "] end event : [" + sortedAllList.get(end) + "]");
+                    }
                 }
             }
+            //LocalDateTime begin = sortedAllList.get(0).getRequestDateTime();
+            //LocalDateTime end = sortedAllList.get(sortedAllList.size() - 1).getRequestDateTime();
+            //Period diff = new Period(begin, end); // time elapsed between first and last request
+            //if(diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
+            //    if(sortedAllList.size() > areq_threshold) {
+            //        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + sortedAllList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
+            //    }
+            //}
         }
 
 
         List<AbuseEvent> distinctPatientIds = list.stream()
                 .filter( distinctByKey(p -> p.getPatientId()) )
                 .collect( Collectors.toList() );
-        if(upatr > 0 && sortedAllList.size() > 1) { // Analyze unique Patient requests
+        if(upatr > 0 && sortedAllList.size() > upat_threshold) { // Analyze unique Patient requests
 
             if(distinctPatientIds.size() > 0) {
                 distinctPatientIds.forEach(pat -> {
@@ -345,31 +361,63 @@ public class AbuseDetectionService implements Job {
                             .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                             .collect(Collectors.toList());
 
-                    LocalDateTime begin = sortedXcpdList.get(0).getRequestDateTime();
-                    LocalDateTime end = sortedXcpdList.get(sortedXcpdList.size() - 1).getRequestDateTime();
-                    Period diff = new Period(begin, end); // time elapsed between first and last request
-                    if(diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
-                        if(sortedXcpdList.size() > upat_threshold) {
-                            LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + sortedXcpdList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "seconds ]");
+                    for(int i = 0; i < sortedXcpdList.size(); i++) {
+                        int begin;
+                        int end;
+
+                        begin = i;
+                        end = begin + Math.min(begin + upat_threshold - 1, sortedXcpdList.size() - 1 - begin);
+                        LocalDateTime t1 = sortedXcpdList.get(begin).getRequestDateTime();
+                        LocalDateTime t2 = sortedXcpdList.get(end).getRequestDateTime();
+                        Period diff = new Period(t1, t2); // time elapsed between first and last request
+                        if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
+                            int totreq = end - begin + 1;
+                            if (totreq > upat_threshold) {
+                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + upat_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
+                            }
                         }
                     }
+//                    LocalDateTime begin = sortedXcpdList.get(0).getRequestDateTime();
+//                    LocalDateTime end = sortedXcpdList.get(sortedXcpdList.size() - 1).getRequestDateTime();
+//                    Period diff = new Period(begin, end); // time elapsed between first and last request
+//                    if(diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
+//                        if(sortedXcpdList.size() > upat_threshold) {
+//                            LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + sortedXcpdList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "seconds ]");
+//                        }
+//                    }
                 });
             }
         }
 
         List<AbuseEvent> sortedPocList = list.stream()
-                .filter(p -> p.getTransactionType().equals(AbuseTransactionType.XCA_SERVICE_REQUEST))
+                .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
-        if(upocr > 0 && sortedPocList.size() > 1) { // analyze unique POC requests
-            LocalDateTime begin = sortedPocList.get(0).getRequestDateTime();
-            LocalDateTime end = sortedPocList.get(sortedPocList.size() - 1).getRequestDateTime();
-            Period diff = new Period(begin, end); // time elapsed between first and last request
-            if(diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
-                if(sortedPocList.size() > upoc_threshold) {
-                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + sortedPocList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
+        if(upocr > 0 && sortedPocList.size() > upoc_threshold) { // analyze unique POC requests
+            for(int i = 0; i < sortedPocList.size(); i++) {
+                int begin;
+                int end;
+
+                begin = i;
+                end = begin + Math.min(begin + upoc_threshold - 1, sortedPocList.size() - 1 - begin);
+                LocalDateTime t1 = sortedPocList.get(begin).getRequestDateTime();
+                LocalDateTime t2 = sortedPocList.get(end).getRequestDateTime();
+                Period diff = new Period(t1, t2); // time elapsed between first and last request
+                if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
+                    int totreq = end - begin + 1;
+                    if (totreq > upoc_threshold) {
+                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + upoc_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedPocList.get(begin) + "] end event : [" + sortedPocList.get(end) + "]");
+                    }
                 }
             }
+//            LocalDateTime begin = sortedPocList.get(0).getRequestDateTime();
+//            LocalDateTime end = sortedPocList.get(sortedPocList.size() - 1).getRequestDateTime();
+//            Period diff = new Period(begin, end); // time elapsed between first and last request
+//            if(diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
+//                if(sortedPocList.size() > upoc_threshold) {
+//                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + sortedPocList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
+//                }
+//            }
         }
 
         // TODO: strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD

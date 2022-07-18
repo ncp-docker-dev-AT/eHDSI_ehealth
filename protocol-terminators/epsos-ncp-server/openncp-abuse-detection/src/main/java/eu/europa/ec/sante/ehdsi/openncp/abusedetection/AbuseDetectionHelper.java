@@ -1,7 +1,5 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
-import epsos.ccd.gnomon.utils.Utils;
-import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -22,14 +20,14 @@ public class AbuseDetectionHelper {
     }
 
     public static void AbuseDetectionShutdown() throws Exception {
-        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_TIME_INTERVAL);
+        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_ENABLE);
         if(schedulerEnabled == true) {
             LOGGER.info("Stopping AbuseDetectionServiceFactory Service...");
         }
     }
 
     public static void AbuseDetectionInit() throws Exception {
-        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_TIME_INTERVAL);
+        boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_ENABLE);
         if(schedulerEnabled == true) {
             LOGGER.info("Initializing AbuseDetectionServiceFactory Service...");
 
