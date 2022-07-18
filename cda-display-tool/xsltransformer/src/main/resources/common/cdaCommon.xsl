@@ -38,20 +38,20 @@
     <xsl:template name="show-author">
         <xsl:param name="node"/>
         <xsl:choose>
-            <xsl:when test="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedPerson">
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedPerson">
                 <xsl:call-template name="show-name">
-                    <xsl:with-param name="name" select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedPerson/n1:name"/>
+                    <xsl:with-param name="name" select="$node/n1:assignedAuthor/n1:assignedPerson/n1:name"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice">
-                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice/n1:manufacturerModelName"/>
+            <xsl:when test="$node/n1:assignedAuthor/n1:assignedAuthoringDevice">
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedAuthoringDevice/n1:manufacturerModelName"/>
                 ,&#160;
-                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:assignedAuthoringDevice/n1:softwareName"/>
+                <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedAuthoringDevice/n1:softwareName"/>
             </xsl:when>
         </xsl:choose>
-        <xsl:if test="$node/n1:assignedAuthor/n1:assignedEntity/n1:representedOrganization">
+        <xsl:if test="$node/n1:assignedAuthor/n1:representedOrganization">
             ,&#160;
-            <xsl:value-of select="$node/n1:assignedAuthor/n1:assignedEntity/n1:representedOrganization/n1:name"/>
+            <xsl:value-of select="$node/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
         </xsl:if>
     </xsl:template>
     
@@ -610,8 +610,8 @@
     <xsl:template name="show-strength">
         <xsl:param name="node"/>
 
-        <xsl:variable name="numerator" select="$node/pharm:numerator"/>
-        <xsl:variable name="denominator" select="$node/pharm:denominator"/>
+        <xsl:variable name="numerator" select="$node/n1:numerator"/>
+        <xsl:variable name="denominator" select="$node/n1:denominator"/>
         <xsl:variable name="numeratorValue" select="$numerator/@value"/>
         <xsl:variable name="numeratorUnit">
             <xsl:call-template name="show-eHDSIUnit">
@@ -619,7 +619,7 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="denominatorValue" select="$denominator/@value"/>
-        <xsl:variable name="medStrengthOriginalText" select="$node/pharm:translation/pharm:originalText"/>
+        <xsl:variable name="medStrengthOriginalText" select="$node/n1:translation/n1:originalText"/>
         <xsl:variable name="denominatorUnit">
             <xsl:call-template name="supportUCUMAnnotations">
                 <xsl:with-param name="value" select="$denominator/@unit"/>
@@ -651,14 +651,14 @@
                     <xsl:with-param name="code" select="'53'"/>
                 </xsl:call-template>
             </xsl:when>
+            <xsl:when test="not($numeratorValue) and not($denominatorValue)">
+                /
+            </xsl:when>
             <xsl:when test="not($denominatorValue)">
                 <xsl:value-of select="$numeratorValue"/>
                 <xsl:text> </xsl:text>
                 <xsl:value-of select="$numeratorUnit"/>
                 <xsl:text> </xsl:text>
-                /
-            </xsl:when>
-            <xsl:when test="not($numeratorValue) and not($denominatorValue)">
                 /
             </xsl:when>
             <xsl:otherwise>
@@ -756,6 +756,9 @@
             </xsl:when>
             <xsl:when test="$value='1'">
                 <xsl:value-of select="$value"/>
+            </xsl:when>
+            <xsl:when test="not($value)">
+                <xsl:value-of select="1"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="show-eHDSIUnit">

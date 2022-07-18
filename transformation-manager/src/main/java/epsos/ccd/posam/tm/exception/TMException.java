@@ -1,6 +1,7 @@
 package epsos.ccd.posam.tm.exception;
 
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 
 /**
  * Transformation Manager Exception class.<br>

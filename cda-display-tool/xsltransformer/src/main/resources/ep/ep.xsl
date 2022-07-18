@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:n1="urn:hl7-org:v3"
-                xmlns:epsos="urn:epsos-org:ep:medication"
+                xmlns:pharm="urn:hl7-org:pharm"
                 version="2.0">
 
     <xsl:import href="epPatient.xsl"/>
@@ -21,10 +21,10 @@
                   select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]"/>
 
     <xsl:variable name="activeIngredient"
-                  select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/epsos:ingredient[@classCode='ACTI']"/>
+                  select="//n1:entry/n1:substanceAdministration/n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:ingredient[@classCode='ACTI']"/>
 
     <xsl:variable name="strength"
-                  select="$activeIngredient/epsos:quantity"/>
+                  select="$activeIngredient/pharm:quantity"/>
 
 
     <xsl:template name="show-fpn">
@@ -43,13 +43,18 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
-                    <xsl:when test="$showValue='YES'">
+                    <xsl:when test="$showValue">
                         <xsl:value-of select="translate(($medPackage)/@value, '.', ',')"/>
                     </xsl:when>
                 </xsl:choose>
                 <xsl:text> </xsl:text>
                 <xsl:choose>
                     <xsl:when test="($medPackage/@unit)='1'">
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'77'"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="not($medPackage/@unit)">
                         <xsl:call-template name="show-eHDSIDisplayLabel">
                             <xsl:with-param name="code" select="'77'"/>
                         </xsl:call-template>

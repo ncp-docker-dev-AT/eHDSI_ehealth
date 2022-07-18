@@ -4,11 +4,13 @@ import com.spirit.epsos.cc.adc.EadcEntry;
 import ee.affecto.epsos.util.EventLogClientUtil;
 import ee.affecto.epsos.util.EventLogUtil;
 import epsos.ccd.gnomon.auditmanager.EventLog;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
@@ -16,7 +18,7 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.lcm._3.SubmitObjectsRequest;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
@@ -39,7 +41,7 @@ import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.OutInAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.kernel.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
@@ -191,8 +193,17 @@ public class DocumentRecipient_ServiceStub extends Stub {
      */
     public RegistryResponseType documentRecipient_ProvideAndRegisterDocumentSetB(ProvideAndRegisterDocumentSetRequestType provideAndRegisterDocumentSetRequest,
                                                                                  Map<AssertionEnum, Assertion> assertionMap)
-            throws java.rmi.RemoteException {
+            throws java.rmi.RemoteException, XDRException {
         MessageContext messageContext = null;
+        MessageContext returnMessageContext = null;
+
+        Document eDispenseCda = null;
+
+        Date transactionStartTime = new Date();
+        Date transactionEndTime = new Date();
+
+        String eadcError = "";
+
         try {
             var operationClient = _serviceClient.createClient(axisOperations[0].getName());
             operationClient.getOptions().setAction(XDRConstants.SOAP_HEADERS.REQUEST_ACTION);
@@ -268,7 +279,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 requestLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(soapEnvelope.getBody()));
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             // NRO
@@ -292,7 +303,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
             /*
              * Execute Operation
              */
-            Date transactionStartTime = new Date();
+            transactionStartTime = new Date();
             SOAPEnvelope returnEnv;
             try {
                 operationClient.execute(true);
@@ -358,26 +369,28 @@ public class DocumentRecipient_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
-                    throw e;
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
-
-            MessageContext returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            returnMessageContext = operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = returnMessageContext.getEnvelope();
-            Date transactionEndTime = new Date();
+            transactionEndTime = new Date();
 
             // Invoke eADC service.
-            Document eDispenseCda = null;
             if (!provideAndRegisterDocumentSetRequest.getDocument().isEmpty()
                     && ArrayUtils.isNotEmpty(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue())) {
 
                 eDispenseCda = EadcUtilWrapper.toXmlDocument(provideAndRegisterDocumentSetRequest.getDocument().get(0).getValue());
             }
-            EadcUtilWrapper.invokeEadc(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
-
+            if(!EadcUtilWrapper.hasTransactionErrors(returnEnv)) {
+                EadcUtilWrapper.invokeEadc(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
+            } else {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(returnEnv);
+            }
             //  Log SOAP response message.
             String responseLogMsg;
             try {
@@ -389,7 +402,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 }
                 responseLogMsg = XMLUtil.prettyPrint(XMLUtils.toDOM(returnEnv.getBody()));
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, ex);
             }
 
             /* Perform validation of response message */
@@ -443,14 +456,20 @@ public class DocumentRecipient_ServiceStub extends Stub {
 
                 } catch (Exception e) {
                     // Class cannot be instantiated - throwing the original Axis fault
-                    throw new RuntimeException(e.getMessage(), e);
+                    eadcError = e.getMessage();
+                    throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, e);
                 }
             }
-            throw new RuntimeException(axisFault.getMessage(), axisFault);
-
+            eadcError = axisFault.getMessage();
+            throw new XDRException(OpenNCPErrorCode.ERROR_GENERIC, axisFault);
         } finally {
             if (messageContext != null && messageContext.getTransportOut() != null && messageContext.getTransportOut().getSender() != null) {
                 messageContext.getTransportOut().getSender().cleanup(messageContext);
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(messageContext, returnMessageContext, this._getServiceClient(), eDispenseCda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        EadcUtil.Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY, eadcError);
             }
         }
     }

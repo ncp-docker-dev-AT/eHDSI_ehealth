@@ -3,12 +3,12 @@ package epsos.ccd.posam.tm.testcases;
 import java.io.File;
 import java.util.List;
 
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import org.junit.Ignore;
 import org.w3c.dom.Document;
 
-import epsos.ccd.posam.tm.exception.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
-import epsos.ccd.posam.tsam.exception.ITMTSAMEror;
 
 /**
  * Negative test scenarios for method toEpsosPivot

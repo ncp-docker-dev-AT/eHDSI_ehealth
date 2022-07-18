@@ -6,13 +6,16 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -36,6 +39,7 @@ import tr.com.srdc.epsos.ws.xca.client.retrieve.RetrieveDocumentSetRequestTypeCr
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * XCA Initiating Gateway
@@ -50,11 +54,7 @@ public class XcaInitGateway {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
-
-
-    private static final List<String> ERROR_CODES = Arrays.asList("2500", "2501", "2502", "2503", "2504", "2505", "2506", "2507",
-            "2508", "4500", "4501", "4502", "4503", "4504", "4505", "4506", "4507", "4508", "4509", "4510", "4511",
-            "4512");
+    private static final List<String> TM_ERROR_CODES = Arrays.stream(TMError.values()).map(TMError::getCode).collect(Collectors.toList());
 
     /**
      * Private constructor to disable class instantiation.
@@ -240,7 +240,9 @@ public class XcaInitGateway {
 
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
-                    if ("urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error".equals(severity) || errorCode.equals("1101") || errorCode.equals("1102")) {
+                    if (RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText().equals(severity)
+                            || errorCode.equals(OpenNCPErrorCode.ERROR_EP_NOT_FOUND.getCode())
+                            || errorCode.equals(OpenNCPErrorCode.ERROR_PS_NOT_FOUND.getCode())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);
                         hasError = true;
                     }
@@ -250,12 +252,17 @@ public class XcaInitGateway {
                         continue;
                     }
 
+                    OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);
+                    if(openncpErrorCode == null){
+                        LOGGER.warn("No EHDSI error code found in the XCA response for : " + errorCode);
+                    }
+
                     //Throw all the remaining errors
                     if (hasError) {
                         if (LOGGER.isErrorEnabled()) {
                             LOGGER.error("Registry Errors: '{}'", msg);
                         }
-                        throw new XCAException(errorCode, codeContext);
+                        throw new XCAException(openncpErrorCode, codeContext, location);
                     }
                 }
             }
@@ -269,6 +276,6 @@ public class XcaInitGateway {
      * @return True | false according the Error Codes List.
      */
     private static boolean checkTransformationErrors(String errorCode) {
-        return ERROR_CODES.contains(errorCode);
+        return TM_ERROR_CODES.contains(errorCode);
     }
 }
