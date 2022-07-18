@@ -45,19 +45,22 @@
                                             <xsl:when test="not(n1:entry/n1:observation/n1:code[@code='82810-3']/../@nullFlavor)">
                                                 <tr>
                                                     <th>
-                                                        <!-- Current Pregnancy Status -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Current Pregnancy Status
+                                                        <!-- Current Pregnancy Status Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'174'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Observation Date -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Observation Date
+                                                        <!-- Observation Date Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'175'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
-                                                        <!-- Status -->
-                                                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                        Status
+                                                        <!-- Status Header -->
+                                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                            <xsl:with-param name="code" select="'176'"/>
+                                                        </xsl:call-template>
                                                     </th>
                                                     <th>
                                                         <!-- Pregnancy observation code -->
@@ -84,19 +87,22 @@
                                     <tbody>
                                         <tr>
                                             <th>
-                                                <!-- History of previous pregnancies -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                History of previous pregnancies
+                                                <!-- History of Previous Pregnancies Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'177'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Outcome -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Outcome
+                                                <!-- Outcome Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'178'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Number of children -->
-                                                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                Number of children
+                                                <!-- Number of Children Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'179'"/>
+                                                </xsl:call-template>
                                             </th>
                                         </tr>
                                         <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code!='93857-1'][@code!='82810-3']" mode="outcomeobservations"/>
@@ -109,9 +115,10 @@
                                                 <tbody>
                                                     <tr>
                                                         <th>
-                                                            <!-- Outcome dates -->
-                                                            <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                            Outcome dates
+                                                            <!-- Outcome Dates Header -->
+                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                <xsl:with-param name="code" select="'180'"/>
+                                                            </xsl:call-template>
                                                         </th>
                                                     </tr>
                                                     <xsl:apply-templates select="n1:entry/n1:observation/n1:code[@code='93857-1']" mode="outcomedates"/>
