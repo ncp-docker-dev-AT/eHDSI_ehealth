@@ -164,8 +164,10 @@
                                                     </xsl:call-template>
                                                 </td>
                                                 <th>
-                                                    <!--  TODO Add entry to the eHDSIDisplayLabel value set -->
-                                                    Organisation Contact Information
+                                                    <!--  Organization Contact Information -->
+                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                        <xsl:with-param name="code" select="'182'"/>
+                                                    </xsl:call-template>
                                                 </th>
                                                 <td>
                                                     <xsl:call-template name="telecom">

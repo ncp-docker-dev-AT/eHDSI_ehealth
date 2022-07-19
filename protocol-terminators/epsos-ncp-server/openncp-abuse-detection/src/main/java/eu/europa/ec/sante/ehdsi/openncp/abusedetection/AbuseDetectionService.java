@@ -16,7 +16,6 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 public class AbuseDetectionService implements Job {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbuseDetectionService.class);
@@ -51,10 +51,15 @@ public class AbuseDetectionService implements Job {
     public AbuseDetectionService() {
     }
 
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        LOGGER.info("AbuseDetectionService Job is running......");
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
 
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) {
+
+        LOGGER.info("AbuseDetectionService Job is running......");
         var scheduler = jobExecutionContext.getScheduler();
 
         try {
@@ -73,7 +78,7 @@ public class AbuseDetectionService implements Job {
                             .sorted(Comparator.comparingLong(p -> p.toFile().lastModified()))
                             .collect(Collectors.toList());
 
-                    if(files.size() > 0) {
+                    if (!files.isEmpty()) {
                         files.forEach(p -> {
                             try {
                                 if (readAuditFile(p)) {
@@ -104,7 +109,7 @@ public class AbuseDetectionService implements Job {
     }
 
     private boolean readAuditFile(Path p) throws JAXBException {
-        Document document = null;
+        Document document;
         try {
             String filename = p.toString();
 
@@ -113,22 +118,15 @@ public class AbuseDetectionService implements Job {
             LocalDateTime now = new LocalDateTime();
             Period diff = new Period(fdt, now);
             int val = Math.max(3600, Integer.parseInt(Constants.ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD));
-            if(diff.toStandardSeconds().getSeconds() > val) {
+            if (diff.toStandardSeconds().getSeconds() > val) {
                 return false; // do not process file
             }
 
             boolean newFileToProcess = abuseList.stream().noneMatch(f -> StringUtils.equals(f.getFilename(), filename));
 
-
-//            IntStream.range(0, abuseList.size())
-//                    .filter(i -> Objects.nonNull(abuseList.get(i)))
-//                    .filter(i -> filename.equals(abuseList.get(i).getFilename()))
-//                    .findFirst()
-//                    .orElse(-1);
-
-            if(newFileToProcess) {
+            if (newFileToProcess) {
                 document = EvidenceUtils.readMessage(p.toString());
-                if(StringUtils.equals(document.getDocumentElement().getLocalName(), "AuditMessage")) {
+                if (StringUtils.equals(document.getDocumentElement().getLocalName(), "AuditMessage")) {
                     AuditMessage au = AuditTrailUtils.convertXMLToAuditObject(p.toFile());
 
                     LocalDateTime dt = new LocalDateTime(au.getEventIdentification().getEventDateTime()
@@ -243,6 +241,12 @@ public class AbuseDetectionService implements Job {
                                 "event id codes [" + getTypeCodes(au.getEventIdentification().getEventTypeCode()) + "] " +
                                 "active participants [" + getActiveParticipants(au.getActiveParticipant()) + "] "
                         );
+                    if (evtPresent) {
+                        LOGGER.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
+                                        "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
+                                dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
+                                au.getEventIdentification().getEventID().getCodeSystemName(),
+                                getTypeCodes(au.getEventIdentification().getEventTypeCode()), getActiveParticipants(au.getActiveParticipant()));
 
                         String joined_poc = au.getActiveParticipant().stream()
                                 .filter(ActiveParticipantType::isUserIsRequestor)
@@ -312,7 +316,7 @@ public class AbuseDetectionService implements Job {
         int upat_threshold = Integer.parseInt(Constants.ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD);
         int upoc_threshold = Integer.parseInt(Constants.ABUSE_UNIQUE_POC_REQUEST_THRESHOLD);
 
-        if(areqr <= 0 && upatr <= 0 && upocr <= 0) { // no check
+        if (areqr <= 0 && upatr <= 0 && upocr <= 0) { // no check
             return list;
         }
 
@@ -321,8 +325,8 @@ public class AbuseDetectionService implements Job {
         List<AbuseEvent> sortedAllList = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
-        if(areqr > 0 && sortedAllList.size() > areq_threshold) { // Analyze ALL requests
-            for(int i = 0; i < sortedAllList.size(); i++) {
+        if (areqr > 0 && sortedAllList.size() > areq_threshold) { // Analyze ALL requests
+            for (int i = 0; i < sortedAllList.size(); i++) {
                 int begin;
                 int end;
 
@@ -386,7 +390,7 @@ public class AbuseDetectionService implements Job {
                 .collect( Collectors.toList() );
         if(upatr > 0 && sortedAllList.size() > upat_threshold) { // Analyze unique Patient requests
 
-            if(distinctPatientIds.size() > 0) {
+            if (!distinctPatientIds.isEmpty()) {
                 distinctPatientIds.forEach(pat -> {
 
                     List<AbuseEvent> sortedXcpdList = list.stream()
@@ -396,7 +400,7 @@ public class AbuseDetectionService implements Job {
                             .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                             .collect(Collectors.toList());
 
-                    for(int i = 0; i < sortedXcpdList.size(); i++) {
+                    for (int i = 0; i < sortedXcpdList.size(); i++) {
                         int begin;
                         int end;
 
@@ -424,8 +428,7 @@ public class AbuseDetectionService implements Job {
             }
         }
 
-        // TODO: strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD
-        //
+        // strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD
         int purge_limit = NumberUtils.max(new int[] {areqr, upocr, upatr});
         List<AbuseEvent> ret = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
@@ -440,25 +443,19 @@ public class AbuseDetectionService implements Job {
         return ret;
     }
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
     private String getActiveParticipants(List<AuditMessage.ActiveParticipant> activeParticipant) {
-        String val = "";
-        for(AuditMessage.ActiveParticipant p : activeParticipant) {
-            val += "ActiveParticipant " + p.getUserID() + " - " + p.isUserIsRequestor() + " ";
+        StringBuilder val = new StringBuilder();
+        for (AuditMessage.ActiveParticipant p : activeParticipant) {
+            val.append("ActiveParticipant ").append(p.getUserID()).append(" - ").append(p.isUserIsRequestor()).append(" ");
         }
-        return StringUtils.trim(val);
+        return StringUtils.trim(val.toString());
     }
 
     private String getTypeCodes(List<CodedValueType> eventTypeCode) {
-        String val = "";
-        for(CodedValueType t : eventTypeCode) {
-            val += "EventTypeCode " + t.getCode() + " - " + t.getDisplayName() + " ";
+        StringBuilder val = new StringBuilder();
+        for (CodedValueType t : eventTypeCode) {
+            val.append("EventTypeCode ").append(t.getCode()).append(" - ").append(t.getDisplayName()).append(" ");
         }
-        return StringUtils.trim(val);
+        return StringUtils.trim(val.toString());
     }
-
 }

@@ -98,8 +98,9 @@
                                                                 </th>
                                                                 <th>
                                                                     <!-- Duration header -->
-                                                                    <!-- TODO add title to eHDSIDisplayLabel value set -->
-                                                                    Duration
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'155'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Severity header -->
@@ -109,18 +110,21 @@
                                                                 </th>
                                                                 <th>
                                                                     <!-- Criticality header -->
-                                                                    <!-- TODO add title to eHDSIDisplayLabel value set -->
-                                                                    Criticality
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'156'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Allergy Status header -->
-                                                                    <!-- TODO add title to eHDSIDisplayLabel value set -->
-                                                                    Allergy status
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'157'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Certainty header -->
-                                                                    <!-- TODO add title to eHDSIDisplayLabel value set -->
-                                                                    Certainty
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'158'"/>
+                                                                    </xsl:call-template>
                                                                 </th>
                                                                 <xsl:apply-templates select="n1:entry/n1:act" mode="allergiesAndIntolerances"/>
                                                             </tr>
