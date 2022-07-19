@@ -225,6 +225,16 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- eHDSIAllergyStatus -->
+    <xsl:template name="show-eHDSIAllergyStatus">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.59.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.4.642.4.1373'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- eHDSIBloodGroup -->
     <xsl:template name="show-eHDSIBloodGroup">
         <xsl:param name="node"/>
@@ -242,6 +252,16 @@
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.21.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSICertainty -->
+    <xsl:template name="show-eHDSICertainty">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.58.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.4.642.4.1371'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -272,6 +292,26 @@
             <xsl:with-param name="node" select="$node"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.4.xml'"/>
             <xsl:with-param name="codeSystem" select="'1.0.3166.1'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSICriticality -->
+    <xsl:template name="show-eHDSICriticality">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.57.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.4.642.4.130'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSICurrentPregnancyStatus -->
+    <xsl:template name="show-eHDSICurrentPregnancyStatus">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.60.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -382,6 +422,16 @@
             <xsl:with-param name="code" select="$code"/>
             <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.37.xml'"/>
             <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.5.1008'"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <!-- eHDSIOutcomeOfPregnancy -->
+    <xsl:template name="show-eHDSIOutcomeOfPregnancy">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.62.xml'"/>
+            <xsl:with-param name="codeSystem" select="'2.16.840.1.113883.6.96'"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -582,9 +632,24 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-eHDSINullFlavor">
-                    <xsl:with-param name="code" select="$node/@nullFlavor"/>
-                </xsl:call-template>
+                <xsl:choose>
+                    <xsl:when test="$node/@nullFlavor='OTH'">
+                        <div class="tooltip-right">
+                            <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
+                            <span class="tooltiptext">
+                                <!-- TODO Concept needs to be added to eHDSIDisplayLabel value set -->
+                                Unmapped concept
+                            </span>
+                        </div>
+                        <xsl:text> </xsl:text>
+                        <i><xsl:value-of select="$node/n1:translation/@displayName"/></i>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

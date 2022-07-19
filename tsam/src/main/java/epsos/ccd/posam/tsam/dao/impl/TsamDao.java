@@ -1,16 +1,19 @@
 package epsos.ccd.posam.tsam.dao.impl;
 
 import epsos.ccd.posam.tsam.dao.ITsamDao;
-import epsos.ccd.posam.tsam.exception.TSAMError;
 import epsos.ccd.posam.tsam.exception.TSAMException;
 import epsos.ccd.posam.tsam.model.*;
 import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.util.TsamConfiguration;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
@@ -187,18 +190,17 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
 
         logger.debug("--> method CodeSystemConcept getConcept('{}', '{}')", code, codeSystemVersion.getFullName());
         List<CodeSystemConcept> concepts;
-        List ids = new ArrayList();
-        CodeSystemVersion tmp = codeSystemVersion;
-        while (tmp != null) {
-            ids.add(tmp.getId());
-            tmp = tmp.getPreviousVersion();
+        List<Long> codeSystemVersionIds = new ArrayList<>();
+        CodeSystemVersion codeSystemVersionList = codeSystemVersion;
+        while (codeSystemVersionList != null) {
+            codeSystemVersionIds.add(codeSystemVersionList.getId());
+            codeSystemVersionList = codeSystemVersionList.getPreviousVersion();
         }
-        Criteria crt = getSessionFactory().getCurrentSession().createCriteria(CodeSystemConcept.class).add(
+        Criteria criteria = getSessionFactory().getCurrentSession().createCriteria(CodeSystemConcept.class).add(
                 Restrictions.eq(CodeSystemConcept.AT_CODE, code));
-        crt.createCriteria(CodeSystemConcept.AT_CS_VERSION).add(
-                Restrictions.in(TsamDao.AT_ID, ids));
+        criteria.createCriteria(CodeSystemConcept.AT_CS_VERSION).add(Restrictions.in(TsamDao.AT_ID, codeSystemVersionIds));
 
-        concepts = crt.list();
+        concepts = criteria.list();
         if (concepts.isEmpty()) {
             throw new TSAMException(TSAMError.ERROR_CODE_SYSTEM_CONCEPT_NOTFOUND);
         }
@@ -206,6 +208,35 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         if (concepts.size() > 1) {
             for (CodeSystemConcept concept : concepts) {
                 if (CURRENT_STATUS.equalsIgnoreCase(concept.getStatus())) {
+                    return concept;
+                }
+            }
+        }
+        return concepts.get(0);
+    }
+
+    /**
+     * @param code
+     * @param codeSystemVersionIds
+     * @return
+     * @throws TSAMException
+     */
+    public CodeSystemConcept getConceptByCodeSystemVersionIds(String code, List<Long> codeSystemVersionIds) throws TSAMException {
+
+        logger.debug("--> method CodeSystemConcept getConceptByCodeSystemVersionIds('{}', '{}')", code, codeSystemVersionIds.size());
+        List<CodeSystemConcept> concepts;
+        Criteria criteria = getSessionFactory().getCurrentSession().createCriteria(CodeSystemConcept.class).add(
+                Restrictions.eq(CodeSystemConcept.AT_CODE, code));
+        criteria.createCriteria(CodeSystemConcept.AT_CS_VERSION).add(Restrictions.in(TsamDao.AT_ID, codeSystemVersionIds));
+
+        concepts = criteria.list();
+        if (concepts.isEmpty()) {
+            throw new TSAMException(TSAMError.ERROR_CODE_SYSTEM_CONCEPT_NOTFOUND);
+        }
+        // if more concepts are found, try to pick current one
+        if (concepts.size() > 1) {
+            for (CodeSystemConcept concept : concepts) {
+                if (StringUtils.equalsIgnoreCase(CURRENT_STATUS, concept.getStatus())) {
                     return concept;
                 }
             }
@@ -226,12 +257,12 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
         Criteria crt;
         if (version != null) {
             crt = getSessionFactory().getCurrentSession().createCriteria(CodeSystemVersion.class).add(
-                    Restrictions.eq(CodeSystemVersion.AT_LNAME, version));
+                    Restrictions.eq(CodeSystemVersion.AT_LOCAL_NAME, version));
         } else {
             crt = getSessionFactory().getCurrentSession().createCriteria(CodeSystemVersion.class).add(
                     Restrictions.ilike(TsamDao.AT_STATUS, CURRENT_STATUS));
         }
-        crt.createCriteria(CodeSystemVersion.AT_CODESYSTEM).add(Restrictions.eq(TsamDao.AT_ID, system.getId()));
+        crt.createCriteria(CodeSystemVersion.AT_CODE_SYSTEM).add(Restrictions.eq(TsamDao.AT_ID, system.getId()));
         versions = crt.list();
         if (versions.isEmpty()) {
             throw new TSAMException(TSAMError.ERROR_CODE_SYSTEM_VERSION_NOTFOUND);
@@ -247,6 +278,7 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
     public CodeSystem getCodeSystem(String oid) throws TSAMException {
 
         logger.debug("--> method CodeSystem getCodeSystem('{}')", oid);
+        //TODO: CTS should return Code System Version with Code System parent ID set.
         Criteria crt = getSessionFactory().getCurrentSession().createCriteria(CodeSystem.class).add(
                 Restrictions.eq(TsamDao.AT_OID, oid));
         List<CodeSystem> systems = crt.list();
@@ -254,6 +286,16 @@ public class TsamDao extends HibernateDaoSupport implements ITsamDao {
             throw new TSAMException(TSAMError.ERROR_CODE_SYSTEM_NOTFOUND, oid);
         }
         return systems.get(0);
+    }
+
+    public List<Long> getCodeSystemVersionIds(String oid) {
+
+        Query query = getSessionFactory().getCurrentSession().createNativeQuery(
+                        "select csv.id from code_system_version csv, code_system cs where cs.id = csv.code_system_id and cs.oid = :oid")
+                .addScalar("id", StandardBasicTypes.LONG);
+        query.setParameter("oid", oid);
+        List<Long> result = query.getResultList();
+        return result;
     }
 
     /**

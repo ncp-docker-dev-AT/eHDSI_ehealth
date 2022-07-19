@@ -1,7 +1,84 @@
 # Change Log
 
-All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
+All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
+
+## [6.0.0] - 19-07-2022
+The OpenNCP 6.0.0 is the Wave 6 Initial release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 6 
+from October 2022 for their National implementation of the Wave 6 Change Proposals.
+A new release (6.1.0) is expected in August 2022 providing the implementation of the Change Proposal 064: IHE Technical Framework upgrade.
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/QIUDSQ
+
+Main changes in this release are:<br/>
+<ul>
+<li>Change Proposal 054: Remove PDF representation of eDispensation</li>
+<li>Change Proposal 055: Improve Automatic Data Collector with technical error logging</li>
+<li>Change Proposal 058: Create a Business Error Code layer</li>
+<li>Change Proposal 059: Implement an Abuse Detection System</li>
+<li>Change Proposal 060: Split the Allergy Reaction Manifestation Template</li>
+<li>Change Proposal 062: Split eHDSI Manufactured Product template between PS and eP/eD</li>
+<li>Change Proposal 065: Align Patient Summary with PS Guidelines v3</li>
+<li>Change Proposal 066: Prepare eHDSI Requirements Catalogue for ISO IDMP</li>
+<li>Change Proposal 067: Facilitate the exchange of coded information (Part A)</li>
+<li>CDA DisplayTool alignment with Wave 6 requirements</li>
+<li>OpenNCP Gateway minor UI improvements (ATNA module)</li>
+<li>OpenNCP vulnerabilities fix and Apache Axis2 framework upgrade</li>
+</ul>
+
+### Story
+    [EHEALTH-6681] - CP-eHealthDSI-059: Implement an Abuse Detection System - OpenNCP implementation
+    [EHEALTH-6686] - CP-eHealthDSI-055: Improve Automatic Data Collector with technical error logging - OpenNCP implementation
+    [EHEALTH-6689] - CP-eHealthDSI-067: Facilitate the exchange of coded information - OpenNCP implementation
+    [EHEALTH-6693] - CP-eHealthDSI-058: Create a Business Error Code layer - OpenNCP implementation
+    [EHEALTH-6698] - CP-eHealthDSI-066: Prepare eHDSI Requirements Catalogue for ISO IDMP - CDA Display Tool implementation
+    [EHEALTH-6704] - CP-eHealthDSI-065: Align Patient Summary with PS Guidelines v3 - OpenNCP implementation preparation
+    [EHEALTH-6706] - CP-eHealthDSI-060: Split the Allergy Reaction Manifestation Template - OpenNCP implementation
+    [EHEALTH-7565] - CP-eHealthDSI-062: Split eHDSI Manufactured Product template between PS and ePeD - OpenNCP implementation
+    [EHEALTH-7962] - CP-eHealthDSI-054: Remove PDF representation of eDispensation - OpenNCP Implementation
+    [EHEALTH-8521] - Load new XML Schema definitions in OpenNCP
+    [EHEALTH-8578] - CP-eHealthDSI-063: CP-eHealthDSI-063: Improve Medication Information Representation - OpenNCP implementation
+    [EHEALTH-8658] - Update hardcoded labels with concepts from MVC 6.1.0 eHDSIDisplayLabel
+
+### Task
+    [EHEALTH-5606] - Modify CDA Display Tool to reflect the changes done in the CDA IGs
+
+### Technical Sub-task
+    [EHEALTH-8143] - Change Database Initializer to include eTransactionError table
+    [EHEALTH-8144] - eADC Schema modification for new eTransactionError table
+    [EHEALTH-8145] - Implementation of error logging in eADC eTransationError table
+    [EHEALTH-8397] - Ambiguity in the frequency of intakes for the PIVL_TS.
+    [EHEALTH-8398] - Review representation of Social History observation end date
+    [EHEALTH-8525] - CDA Display Tool implementation - Allergies and intolerances section
+    [EHEALTH-8526] - CDA Display Tool implementation - Medical alert information
+    [EHEALTH-8527] - CDA Display Tool implementation - Vaccinations section
+    [EHEALTH-8528] - CDA Display Tool implementation - List of Resolved, Closed or Inactive problems section
+    [EHEALTH-8529] - CDA Display Tool implementation - Medical History section
+    [EHEALTH-8530] - CDA Display Tool implementation - Social History section
+    [EHEALTH-8531] - CDA Display Tool implementation - List of current problems/diagnosis section
+    [EHEALTH-8532] - CDA Display Tool implementation - Medical devices section
+    [EHEALTH-8533] - CDA Display Tool implementation - Procedures section
+    [EHEALTH-8534] - CDA Display Tool implementation - Functional Status section
+    [EHEALTH-8535] - CDA Display Tool implementation - Medication Summary section
+    [EHEALTH-8536] - CDA Display Tool implementation - History of pregnancies section
+    [EHEALTH-8537] - CDA Display Tool implementation - Advance Directive section
+    [EHEALTH-8538] - CDA Display Tool implementation - Result observations section
+    [EHEALTH-8550] - Social History section - Units of observation value are never displayed
+    [EHEALTH-8593] - CDA Display Tool implementation for unmappable concepts
+    [EHEALTH-8660] - Upgrade to Axis2 1.8.1
+    [EHEALTH-8661] - Modify transformation manager configuration file with updated template IDs
+    [EHEALTH-8690] - CDA Display Tool implementation for CP-063
+    [EHEALTH-8697] - Provide CDA Mock messages for Wave 6
+    [EHEALTH-8711] - Releasing OpenNCP 6.0.0
+
+### Bug
+    [EHEALTH-8123] - Wrong validator used for failed Order list response
+    [EHEALTH-8402] - CDA Display Tool bugfixes for Wave 6
+    [EHEALTH-8710] - Transformation Manager cannot retrieve a Concept without version if multiple CS versions available
+    [EHEALTH-8715] - Wave 6 Patient Summary Level 3 error/warning during the retrieve
+
+### Improvement
+    [EHEALTH-8503] - Cosmetic issues - OpenNCP-Gateway ATNA-Viewer main page lacks functionality
 
 ## [5.2.6] - 13-06-2022
 The OpenNCP 5.2.6 is the Wave 5 Operation Ready release.

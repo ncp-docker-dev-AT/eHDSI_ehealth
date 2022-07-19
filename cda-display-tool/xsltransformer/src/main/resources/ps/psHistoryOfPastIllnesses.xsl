@@ -43,21 +43,27 @@
                                     <tbody>
                                         <tr>
                                             <th>
-                                                <!-- Closed Inactive Problem -->
+                                                <!-- Closed Inactive Problem Heade -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'11'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- OnSet Date -->
+                                                <!-- OnSet Date Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'45'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- End Date -->
+                                                <!-- End Date Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'26'"/>
+                                                </xsl:call-template>
+                                            </th>
+                                            <th>
+                                                <!-- Problem Status Code Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'167'"/>
                                                 </xsl:call-template>
                                             </th>
                                         </tr>
@@ -81,6 +87,8 @@
                       select="n1:effectiveTime/n1:low"/>
         <xsl:variable name="problemEndDate"
                       select="n1:effectiveTime/n1:high"/>
+        <xsl:variable name="problemStatusCode"
+                      select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']/../n1:entryRelationship[@typeCode='REFR']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.9']/../n1:value"/>
 
         <xsl:choose>
             <xsl:when test="not(@nullFlavor)">
@@ -98,7 +106,7 @@
                     <xsl:otherwise>
                         <tr>
                             <td>
-                                <!-- Active Problem -->
+                                <!-- Closed Inactive Problem -->
                                 <xsl:call-template name="show-eHDSIIllnessandDisorder">
                                     <xsl:with-param name="node" select="$problemCondition"/>
                                 </xsl:call-template>
@@ -118,6 +126,12 @@
                                 <!-- End Date -->
                                 <xsl:call-template name="show-TS">
                                     <xsl:with-param name="node" select="$problemEndDate"/>
+                                </xsl:call-template>
+                            </td>
+                            <td>
+                                <!-- Problem Status code -->
+                                <xsl:call-template name="show-eHDSIStatusCode">
+                                    <xsl:with-param name="node" select="$problemStatusCode"/>
                                 </xsl:call-template>
                             </td>
                         </tr>

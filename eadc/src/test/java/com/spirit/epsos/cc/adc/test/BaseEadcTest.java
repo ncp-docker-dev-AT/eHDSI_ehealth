@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import java.sql.Statement;
 
 public abstract class BaseEadcTest extends TestCase {
 
@@ -26,7 +27,7 @@ public abstract class BaseEadcTest extends TestCase {
         ic.createSubcontext("java:/comp/env/jdbc");
 
         JdbcConnectionPool ds = JdbcConnectionPool.create(
-                "jdbc:h2:file:target/temp-database/h2db;FILE_LOCK=NO;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE", "sa", "");
+                "jdbc:h2:./target/temp-database/h2db;INIT=RUNSCRIPT FROM 'classpath:CREATE_EADC_TEST_DB.sql';FILE_LOCK=NO;DB_CLOSE_ON_EXIT=TRUE", "sa", "");
 
         ic.bind("java:/comp/env/jdbc/TestDS", ds);
     }

@@ -49,16 +49,9 @@
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Date From  -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'85'"/>
-                                                </xsl:call-template>
-                                            </th>
-                                            <th>
-                                                <!-- Date To -->
-                                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                    <xsl:with-param name="code" select="'18'"/>
-                                                </xsl:call-template>
+                                                <!-- Duration  -->
+                                                <!-- TODO Label needs to be added to eHDSIDisplayLabel value set -->
+                                                Duration
                                             </th>
                                             <th>
                                                 <!--  Observation Value -->
@@ -87,16 +80,12 @@
                 <xsl:apply-templates select="n1:code"/>
             </td>
             <td>
-                <!-- Date From -->
-                <xsl:apply-templates select="n1:effectiveTime/n1:low"/>
-            </td>
-            <td>
-                <!-- Date To -->
-                <xsl:apply-templates select="n1:effectiveTime/n1:high"/>
+                <!-- Duration -->
+                <xsl:apply-templates select="n1:effectiveTime"/>
             </td>
             <td>
                 <!-- Observation Value -->
-                <xsl:apply-templates select="n1:value"/>
+                <xsl:apply-templates select="n1:value" mode="socialhistoryobservationvalue"/>
             </td>
         </tr>
     </xsl:template>
@@ -107,20 +96,14 @@
         </xsl:call-template>
     </xsl:template>
 
-    <xsl:template match="n1:effectiveTime/n1:low">
-        <xsl:call-template name="show-TS">
-            <xsl:with-param name="node" select="."/>
-        </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template match="n1:effectiveTime/n1:high">
-        <xsl:call-template name="show-TS">
-            <xsl:with-param name="node" select="."/>
-        </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template match="n1:value">
+    <xsl:template match="n1:value" mode="socialhistoryobservationvalue">
         <xsl:call-template name="show-PQ">
+            <xsl:with-param name="node" select="."/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="n1:effectiveTime">
+        <xsl:call-template name="show-IVL_TS">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
     </xsl:template>

@@ -97,15 +97,33 @@
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
-                                                                    <!-- OnSet Date header -->
+                                                                    <!-- Duration header -->
                                                                     <xsl:call-template name="show-eHDSIDisplayLabel">
-                                                                        <xsl:with-param name="code" select="'45'"/>
+                                                                        <xsl:with-param name="code" select="'155'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <th>
                                                                     <!-- Severity header -->
                                                                     <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                         <xsl:with-param name="code" select="'123'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Criticality header -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'156'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Allergy Status header -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'157'"/>
+                                                                    </xsl:call-template>
+                                                                </th>
+                                                                <th>
+                                                                    <!-- Certainty header -->
+                                                                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                        <xsl:with-param name="code" select="'158'"/>
                                                                     </xsl:call-template>
                                                                 </th>
                                                                 <xsl:apply-templates select="n1:entry/n1:act" mode="allergiesAndIntolerances"/>
@@ -163,13 +181,25 @@
             </td>
             <td>
                 <!-- OnSet Date -->
-                <xsl:call-template name="show-TS">
-                    <xsl:with-param name="node" select="n1:effectiveTime/n1:low"/>
+                <xsl:call-template name="show-IVL_TS">
+                    <xsl:with-param name="node" select="n1:effectiveTime"/>
                 </xsl:call-template>
             </td>
             <td>
                 <!-- Severity -->
-                <xsl:apply-templates select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation" mode="severity" />
+                <xsl:apply-templates select="n1:entryRelationship[@typeCode='MFST']/n1:observation/n1:entryRelationship[@typeCode='SUBJ']/n1:observation" mode="severity" />
+            </td>
+            <td>
+                <!-- Criticality -->
+                <xsl:apply-templates select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:code[@code='82606-5']" mode="criticality" />
+            </td>
+            <td>
+                <!-- Allergy Status -->
+                <xsl:apply-templates select="n1:entryRelationship[@typeCode='REFR']/n1:observation/n1:code[@code='33999-4']" mode="allergyStatus" />
+            </td>
+            <td>
+                <!-- Certainty -->
+                <xsl:apply-templates select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:code[@code='66455-7']" mode="certainty" />
             </td>
         </tr>
     </xsl:template>
@@ -222,6 +252,24 @@
     <xsl:template match="n1:entryRelationship[@typeCode='SUBJ']/n1:observation" mode="severity">
         <xsl:call-template name="show-eHDSISeverity">
             <xsl:with-param name="node" select="n1:value"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="n1:entryRelationship[@typeCode='REFR']/n1:observation/n1:code[@code='33999-4']" mode="allergyStatus">
+        <xsl:call-template name="show-eHDSIAllergyStatus">
+            <xsl:with-param name="node" select="../n1:value"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:code[@code='82606-5']" mode="criticality">
+        <xsl:call-template name="show-eHDSICriticality">
+            <xsl:with-param name="node" select="../n1:value"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template match="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:code[@code='66455-7']" mode="certainty">
+        <xsl:call-template name="show-eHDSICertainty">
+            <xsl:with-param name="node" select="../n1:value"/>
         </xsl:call-template>
     </xsl:template>
 </xsl:stylesheet>

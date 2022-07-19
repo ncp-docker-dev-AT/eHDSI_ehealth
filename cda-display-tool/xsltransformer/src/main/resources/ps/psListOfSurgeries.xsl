@@ -64,13 +64,19 @@
                                                 <xsl:if test="not ($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                                                     <tr>
                                                         <th>
-                                                            <!--  Procedure -->
+                                                            <!--  Procedure Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'62'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!--  Procedure Date -->
+                                                            <!--  Body site Header -->
+                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                <xsl:with-param name="code" select="'154'"/>
+                                                            </xsl:call-template>
+                                                        </th>
+                                                        <th>
+                                                            <!--  Procedure Date Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'63'"/>
                                                             </xsl:call-template>
@@ -118,6 +124,10 @@
                                 </xsl:call-template>
                             </td>
                             <td>
+                                <!-- Body site -->
+                                <xsl:apply-templates select="n1:targetSiteCode" mode="targetsitecode"/>
+                            </td>
+                            <td>
                                 <!--  Procedure Date -->
                                 <xsl:call-template name="show-IVL_TS">
                                     <xsl:with-param name="node" select="n1:effectiveTime"/>
@@ -137,5 +147,10 @@
                 </tr>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="n1:targetSiteCode" mode="targetsitecode">
+        <!-- TODO To be bound with a value set, but for now nothing is available. -->
+        <xsl:value-of select="@displayName"/>
     </xsl:template>
 </xsl:stylesheet>

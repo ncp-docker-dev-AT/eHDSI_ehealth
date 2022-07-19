@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators</groupId>
         <artifactId>openncp-ncp-server</artifactId>
-        <version>5.2.6</version>
+        <version>6.0.0</version>
     </parent>
 
     <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
@@ -171,6 +171,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-abuse-detection</artifactId>
+            <version>6.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -208,9 +214,9 @@
                 <configuration>
                     <dependentWarIncludes/>
                     <dependentWarExcludes>
-                        WEB-INF/lib/log4j-api-2.14.1.jar,
-                        WEB-INF/lib/log4j-core-2.14.1.jar,
-                        WEB-INF/lib/log4j-jcl-2.14.1.jar,
+                        WEB-INF/lib/log4j-api-2.17.2.jar,
+                        WEB-INF/lib/log4j-core-2.17.2.jar,
+                        WEB-INF/lib/log4j-jcl-2.17.2.jar,
                     </dependentWarExcludes>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <nonFilteredFileExtensions>
@@ -244,9 +250,9 @@
                         WEB-INF/lib/jaxb-runtime-2.3.1.jar,
                         WEB-INF/lib/jaxen-1.1.6.jar,
                         WEB-INF/lib/joda-time-2.10.5.jar,
-<!--                        WEB-INF/lib/log4j-api-2.14.1.jar,-->
-<!--                        WEB-INF/lib/log4j-core-2.14.1.jar,-->
-<!--                        WEB-INF/lib/log4j-jcl-2.14.1.jar,-->
+<!--                        WEB-INF/lib/log4j-api-2.17.2.jar,-->
+<!--                        WEB-INF/lib/log4j-core-2.17.2.jar,-->
+<!--                        WEB-INF/lib/log4j-jcl-2.17.2.jar,-->
                         WEB-INF/lib/neethi-3.1.1.jar,
                         WEB-INF/lib/spring-aop-5.3.9.jar,
                         WEB-INF/lib/spring-expression-5.3.9.jar,

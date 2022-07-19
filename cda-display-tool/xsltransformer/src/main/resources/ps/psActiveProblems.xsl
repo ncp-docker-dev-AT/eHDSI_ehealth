@@ -110,11 +110,24 @@
                         <xsl:call-template name="show-eHDSIIllnessandDisorder">
                             <xsl:with-param name="node" select="$problemCondition"/>
                         </xsl:call-template>
-                        <xsl:if test="not($problemCondition/@nullFlavor)">
-                            <xsl:text> (</xsl:text>
-                            <xsl:value-of select="$problemCondition/@code"/>
-                            <xsl:text>)</xsl:text>
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="not($problemCondition/@nullFlavor)">
+                                <xsl:text> (</xsl:text>
+                                <xsl:value-of select="$problemCondition/@code"/>
+                                <xsl:text>)</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$problemCondition/@nullFlavor='OTH'">
+                                <i>
+                                <xsl:text> (</xsl:text>
+                                <xsl:value-of select="$problemCondition/n1:translation/@code"/>
+                                <xsl:if test="$problemCondition/n1:translation/@codeSystemName">
+                                    <xsl:text> - </xsl:text>
+                                    <xsl:value-of select="$problemCondition/n1:translation/@codeSystemName"/>
+                                </xsl:if>
+                                <xsl:text>)</xsl:text>
+                                </i>
+                            </xsl:when>
+                        </xsl:choose>
                     </td>
                     <td>
                         <!-- OnSet Date -->

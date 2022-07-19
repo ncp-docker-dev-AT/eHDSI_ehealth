@@ -2,9 +2,10 @@ package epsos.openncp.protocolterminator;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceStub;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPHeaderBlock;
@@ -12,7 +13,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
 import org.apache.axis2.phaseresolver.PhaseException;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.kernel.http.HTTPConstants;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -98,11 +99,11 @@ public class ClientConnectorConsumer {
 
             return Arrays.asList(docArray);
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
     }
 
@@ -134,11 +135,11 @@ public class ClientConnectorConsumer {
             PatientDemographics[] pdArray = queryPatientResponseDocument.getQueryPatientResponse().getReturnArray();
             return Arrays.asList(pdArray);
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_PI_GENERIC, ex.getMessage(), null,  ex);
         }
     }
 
@@ -161,11 +162,11 @@ public class ClientConnectorConsumer {
             var sayHelloResponseDocument = clientConnectorServiceStub.sayHello(sayHelloDocument);
             return sayHelloResponseDocument.getSayHelloResponse().getReturn();
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
     }
 
@@ -205,11 +206,11 @@ public class ClientConnectorConsumer {
             return retrieveDocumentResponseDocument.getRetrieveDocumentResponse().getReturn();
 
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_GENERIC, ex.getMessage(), null, ex);
         }
     }
 
@@ -255,11 +256,11 @@ public class ClientConnectorConsumer {
 
             return clientConnectorServiceStub.submitDocument(submitDocumentDoc).getSubmitDocumentResponse();
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
+        } catch (ClientConnectorConsumerException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(ex.getMessage(), ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_ED_GENERIC, ex.getMessage(), null, ex);
         }
     }
 
@@ -272,8 +273,12 @@ public class ClientConnectorConsumer {
     private void addAssertions(ClientConnectorServiceStub clientConnectorServiceStub,
                                Map<AssertionEnum, Assertion> assertions) throws Exception {
 
-        if (!assertions.containsKey(AssertionEnum.CLINICIAN) || AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
-            throw new ClientConnectorConsumerException("HCP Assertion expired");
+        if (!assertions.containsKey(AssertionEnum.CLINICIAN)) {
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion expired", null);
+        }
+
+        if (AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_HPI_GENERIC, "HCP Assertion expired", null);
         }
 
         var omFactory = OMAbstractFactory.getSOAP12Factory();
@@ -283,14 +288,14 @@ public class ClientConnectorConsumer {
         if (assertions.containsKey(AssertionEnum.NEXT_OF_KIN)) {
             var assertion = assertions.get(AssertionEnum.NEXT_OF_KIN);
             if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException("Next of Kin Assertion is expired");
+                throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Next of Kin Assertion is expired", null);
             }
             omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         }
         if (assertions.containsKey(AssertionEnum.TREATMENT)) {
             var assertion = assertions.get(AssertionEnum.TREATMENT);
             if (AssertionHelper.isExpired(assertion)) {
-                throw new ClientConnectorConsumerException("Treatment Confirmation Assertion is expired");
+                throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "Treatment Confirmation Assertion is expired", null);
             }
             omSecurityElement.addChild(XMLUtils.toOM(assertion.getDOM()));
         }
@@ -321,7 +326,7 @@ public class ClientConnectorConsumer {
             return builder.build();
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | CertificateException |
                 IOException | KeyManagementException e) {
-            throw new ClientConnectorConsumerException("SSL Context cannot be initialized: " + e.getMessage(), e);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "SSL Context cannot be initialized: " + e.getMessage(), null, e);
         }
     }
 
@@ -369,9 +374,7 @@ public class ClientConnectorConsumer {
 
             return clientConnectorStub;
         } catch (AxisFault axisFault) {
-            throw new ClientConnectorConsumerException(axisFault.getMessage(),
-                    axisFault.getDetail() != null ? axisFault.getDetail().getText() : null,
-                    axisFault);
+            throw createClientConnectorConsumerException(axisFault);
         }
     }
 
@@ -443,5 +446,16 @@ public class ClientConnectorConsumer {
         if (StringUtils.isNotBlank(patientDemographics.getCountry())) {
             patientDemographics.setCountry(StringUtils.trim(patientDemographics.getCountry()));
         }
+    }
+
+    private ClientConnectorConsumerException createClientConnectorConsumerException(AxisFault axisFault){
+
+        String errorCode = axisFault.getFaultCode() != null ? axisFault.getFaultCode().getLocalPart() : null;
+        String message  = axisFault.getMessage();
+        String context = axisFault.getDetail() != null ? axisFault.getDetail().getText() : null;
+
+        OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);
+
+        return new ClientConnectorConsumerException(openncpErrorCode, message, context, axisFault);
     }
 }
