@@ -11,6 +11,7 @@ import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
 import net.RFC3881.ParticipantObjectIdentificationType;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.quartz.Job;
@@ -153,12 +154,12 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.PATIENT_SERVICE_LIST.getCode())).findAny().isPresent() &&
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.PATIENT_SERVICE_LIST.getCode())) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            Constants.PS_CLASSCODE)).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            Constants.PS_CLASSCODE))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
@@ -166,12 +167,12 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.PATIENT_SERVICE_RETRIEVE.getCode())).findAny().isPresent() &&
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.PATIENT_SERVICE_RETRIEVE.getCode())) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            Constants.PS_CLASSCODE)).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            Constants.PS_CLASSCODE))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
@@ -179,12 +180,12 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.ORDER_SERVICE_LIST.getCode())).findAny().isPresent() &&
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.ORDER_SERVICE_LIST.getCode())) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            Constants.EP_CLASSCODE)).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            Constants.EP_CLASSCODE))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
@@ -192,12 +193,12 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.ORDER_SERVICE_RETRIEVE.getCode())).findAny().isPresent() &&
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.ORDER_SERVICE_RETRIEVE.getCode())) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            Constants.EP_CLASSCODE)).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            Constants.EP_CLASSCODE))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
@@ -205,12 +206,12 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.DISPENSATION_SERVICE_DISCARD.getCode())).findAny().isPresent() &&
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.DISPENSATION_SERVICE_DISCARD.getCode())) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            Constants.EDD_CLASSCODE)).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            Constants.EDD_CLASSCODE))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XDR_SERVICE_REQUEST;
                     }
@@ -218,8 +219,8 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.ORCD_SERVICE_LIST.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.ORCD_SERVICE_LIST.getCode())).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.ORCD_SERVICE_LIST.getCode()))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
@@ -227,13 +228,13 @@ public class AbuseDetectionService implements Job {
                             IHEEventType.ORCD_SERVICE_RETRIEVE.getCode()) &&
                             au.getEventIdentification().getEventTypeCode()
                                     .stream()
-                                    .filter(c -> StringUtils.equals(c.getCode(),
-                                            EventType.ORCD_SERVICE_RETRIEVE.getCode())).findAny().isPresent()) {
+                                    .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                            EventType.ORCD_SERVICE_RETRIEVE.getCode()))) {
                         evtPresent = true;
                         transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                     }
 
-                    if (evtPresent == true) {
+                    if (evtPresent) {
                         LOGGER.info("audit found: " +
                                 "event time [" + dt.toString() + "] " +
                                 "event id code [" + au.getEventIdentification().getEventID().getCode() + "] " +
@@ -244,9 +245,15 @@ public class AbuseDetectionService implements Job {
                         );
 
                         String joined_poc = au.getActiveParticipant().stream()
-                                .filter(a -> a.isUserIsRequestor())
+                                .filter(ActiveParticipantType::isUserIsRequestor)
                                 .map(ActiveParticipantType::getUserID)
                                 .collect(Collectors.joining("-"));
+
+                        String simple_poc = au.getActiveParticipant().stream()
+                                .filter(auid -> auid.getAlternativeUserID() != null)
+                                .filter(ActiveParticipantType::isUserIsRequestor)
+                                .map(ActiveParticipantType::getUserID)
+                                .collect(Collectors.joining());
 
                         String participant = au.getParticipantObjectIdentification().stream()
                                 .filter(a -> a.getParticipantObjectTypeCode() == 1 && a.getParticipantObjectTypeCodeRole() == 1)
@@ -279,7 +286,7 @@ public class AbuseDetectionService implements Job {
                         */
                         abuseList.add(
                                 new AbuseEvent(au.getEventIdentification().getEventID(),
-                                    joined_poc,
+                                    simple_poc,
                                     participant,
                                     dt,
                                     filename,
@@ -288,13 +295,7 @@ public class AbuseDetectionService implements Job {
                     }
                 }
             }
-        } catch (ParserConfigurationException e) {
-            LOGGER.debug(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            LOGGER.debug(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.debug(e.getMessage());
             throw new RuntimeException(e);
         }
@@ -315,6 +316,8 @@ public class AbuseDetectionService implements Job {
             return list;
         }
 
+        LocalDateTime now = new LocalDateTime();
+
         List<AbuseEvent> sortedAllList = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
@@ -324,14 +327,14 @@ public class AbuseDetectionService implements Job {
                 int end;
 
                 begin = i;
-                end = begin + Math.min(begin + areq_threshold - 1, sortedAllList.size() - 1 - begin);
+                end = begin + Math.min(begin + areq_threshold, sortedAllList.size() - 1 - begin);
                 LocalDateTime t1 = sortedAllList.get(begin).getRequestDateTime();
                 LocalDateTime t2 = sortedAllList.get(end).getRequestDateTime();
                 Period diff = new Period(t1, t2); // time elapsed between first and last request
                 if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
                     int totreq = end - begin + 1;
                     if (totreq > areq_threshold) {
-                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + areq_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedAllList.get(begin) + "] end event : [" + sortedAllList.get(end) + "]");
+                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + " exceeding threshold of : " + areq_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedAllList.get(begin) + "] end event : [" + sortedAllList.get(end) + "]");
                     }
                 }
             }
@@ -345,9 +348,41 @@ public class AbuseDetectionService implements Job {
             //}
         }
 
+        List<AbuseEvent> distinctPointOfCareIds = list.stream()
+                .filter( distinctByKey(AbuseEvent::getPointOfCare) )
+                .collect( Collectors.toList() );
+        if(upocr > 0 && sortedAllList.size() > upoc_threshold) { // analyze unique POC requests
+            if(distinctPointOfCareIds.size() > 0) {
+                distinctPointOfCareIds.forEach(poc -> {
+
+                    List<AbuseEvent> sortedPocList = list.stream()
+                            .filter(p -> p.getPointOfCare().equals(poc.getPointOfCare()))
+                            .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
+                            .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
+                            .collect(Collectors.toList());
+
+                    for(int i = 0; i < sortedPocList.size(); i++) {
+                        int begin;
+                        int end;
+
+                        begin = i;
+                        end = begin + Math.min(begin + upoc_threshold, sortedPocList.size() - 1 - begin);
+                        LocalDateTime t1 = sortedPocList.get(begin).getRequestDateTime();
+                        LocalDateTime t2 = sortedPocList.get(end).getRequestDateTime();
+                        Period diff = new Period(t1, t2); // time elapsed between first and last request
+                        if (diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
+                            int totreq = end - begin + 1;
+                            if (totreq > upoc_threshold) {
+                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + totreq + " exceeding threshold of : " + upoc_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedPocList.get(begin) + "] end event : [" + sortedPocList.get(end) + "]");
+                            }
+                        }
+                    }
+                });
+            }
+        }
 
         List<AbuseEvent> distinctPatientIds = list.stream()
-                .filter( distinctByKey(p -> p.getPatientId()) )
+                .filter( distinctByKey(AbuseEvent::getPatientId) )
                 .collect( Collectors.toList() );
         if(upatr > 0 && sortedAllList.size() > upat_threshold) { // Analyze unique Patient requests
 
@@ -366,14 +401,14 @@ public class AbuseDetectionService implements Job {
                         int end;
 
                         begin = i;
-                        end = begin + Math.min(begin + upat_threshold - 1, sortedXcpdList.size() - 1 - begin);
+                        end = begin + Math.min(begin + upat_threshold, sortedXcpdList.size() - 1 - begin);
                         LocalDateTime t1 = sortedXcpdList.get(begin).getRequestDateTime();
                         LocalDateTime t2 = sortedXcpdList.get(end).getRequestDateTime();
                         Period diff = new Period(t1, t2); // time elapsed between first and last request
                         if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
                             int totreq = end - begin + 1;
                             if (totreq > upat_threshold) {
-                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + upat_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
+                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + totreq + " exceeding threshold of : " + upat_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
                             }
                         }
                     }
@@ -389,45 +424,20 @@ public class AbuseDetectionService implements Job {
             }
         }
 
-        List<AbuseEvent> sortedPocList = list.stream()
-                .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
-                .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-                .collect(Collectors.toList());
-        if(upocr > 0 && sortedPocList.size() > upoc_threshold) { // analyze unique POC requests
-            for(int i = 0; i < sortedPocList.size(); i++) {
-                int begin;
-                int end;
-
-                begin = i;
-                end = begin + Math.min(begin + upoc_threshold - 1, sortedPocList.size() - 1 - begin);
-                LocalDateTime t1 = sortedPocList.get(begin).getRequestDateTime();
-                LocalDateTime t2 = sortedPocList.get(end).getRequestDateTime();
-                Period diff = new Period(t1, t2); // time elapsed between first and last request
-                if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
-                    int totreq = end - begin + 1;
-                    if (totreq > upoc_threshold) {
-                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + "exceeding threshold of : " + upoc_threshold + "requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedPocList.get(begin) + "] end event : [" + sortedPocList.get(end) + "]");
-                    }
-                }
-            }
-//            LocalDateTime begin = sortedPocList.get(0).getRequestDateTime();
-//            LocalDateTime end = sortedPocList.get(sortedPocList.size() - 1).getRequestDateTime();
-//            Period diff = new Period(begin, end); // time elapsed between first and last request
-//            if(diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
-//                if(sortedPocList.size() > upoc_threshold) {
-//                    LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + sortedPocList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
-//                }
-//            }
-        }
-
         // TODO: strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD
         //
-
-        LocalDateTime now = new LocalDateTime();
-        return list.stream()
+        int purge_limit = NumberUtils.max(new int[] {areqr, upocr, upatr});
+        List<AbuseEvent> ret = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-                .filter(p -> Period.fieldDifference(p.getRequestDateTime(), now).toStandardSeconds().getSeconds() <= areqr)
+                .filter(p -> Period.fieldDifference(p.getRequestDateTime(), now).toStandardSeconds().getSeconds() <= purge_limit)
                 .collect(Collectors.toList());
+
+        if(ret.size() < list.size()) {
+            LOGGER.info(list.size() - ret.size() + " events purged from active list, new list size = " + ret.size());
+        } else {
+            LOGGER.info("events in active list = " + list.size());
+        }
+        return ret;
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
