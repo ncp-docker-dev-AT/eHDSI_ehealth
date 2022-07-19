@@ -233,15 +233,6 @@ public class AbuseDetectionService implements Job {
                     }
 
                     if (evtPresent) {
-                        LOGGER.info("audit found: " +
-                                "event time [" + dt.toString() + "] " +
-                                "event id code [" + au.getEventIdentification().getEventID().getCode() + "] " +
-                                "event id display name [" + au.getEventIdentification().getEventID().getDisplayName() + "] " +
-                                "event id code system name [" + au.getEventIdentification().getEventID().getCodeSystemName() + "] " +
-                                "event id codes [" + getTypeCodes(au.getEventIdentification().getEventTypeCode()) + "] " +
-                                "active participants [" + getActiveParticipants(au.getActiveParticipant()) + "] "
-                        );
-                    if (evtPresent) {
                         LOGGER.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
                                         "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
                                 dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
