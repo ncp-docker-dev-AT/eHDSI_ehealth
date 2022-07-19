@@ -7,24 +7,23 @@ This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Ver
 The OpenNCP 6.0.0 is the Wave 6 Initial release including the implementation of the Wave 6 Change Proposals.
 This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 6 
 from October 2022 for their National implementation of the Wave 6 Change Proposals.
-A new release is expected in August 2022 providing the implementation of the Change Proposal 064: IHE Technical Framework upgrade.
+A new release (6.1.0) is expected in August 2022 providing the implementation of the Change Proposal 064: IHE Technical Framework upgrade.
 Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/QIUDSQ
 
 Main changes in this release are:<br/>
 <ul>
 <li>Change Proposal 054: Remove PDF representation of eDispensation</li>
 <li>Change Proposal 055: Improve Automatic Data Collector with technical error logging</li>
-<li></li>
-<li></li>
-
-    [EHEALTH-6681] - CP-eHealthDSI-059: Implement an Abuse Detection System - OpenNCP implementation
-    [EHEALTH-6686] -  - OpenNCP implementation
-    [EHEALTH-6689] - CP-eHealthDSI-067: Facilitate the exchange of coded information - OpenNCP implementation
-    [EHEALTH-6693] - CP-eHealthDSI-058: Create a Business Error Code layer - OpenNCP implementation
-    [EHEALTH-6698] - CP-eHealthDSI-066: Prepare eHDSI Requirements Catalogue for ISO IDMP - CDA Display Tool implementation
-    [EHEALTH-6704] - CP-eHealthDSI-065: Align Patient Summary with PS Guidelines v3 - OpenNCP implementation preparation
-    [EHEALTH-6706] - CP-eHealthDSI-060: Split the Allergy Reaction Manifestation Template - OpenNCP implementation
-    [EHEALTH-7565] - CP-eHealthDSI-062: Split eHDSI Manufactured Product template between PS and ePeD - OpenNCP implementation
+<li>Change Proposal 058: Create a Business Error Code layer</li>
+<li>Change Proposal 059: Implement an Abuse Detection System</li>
+<li>Change Proposal 060: Split the Allergy Reaction Manifestation Template</li>
+<li>Change Proposal 062: Split eHDSI Manufactured Product template between PS and eP/eD</li>
+<li>Change Proposal 065: Align Patient Summary with PS Guidelines v3</li>
+<li>Change Proposal 066: Prepare eHDSI Requirements Catalogue for ISO IDMP</li>
+<li>Change Proposal 067: Facilitate the exchange of coded information (Part A)</li>
+<li>CDA DisplayTool alignment with Wave 6 requirements</li>
+<li>OpenNCP Gateway minor UI improvements (ATNA module)</li>
+<li>OpenNCP vulnerabilities fix and Apache Axis2 framework upgrade</li>
 </ul>
 
 ### Story
