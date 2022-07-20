@@ -1,9 +1,10 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
 import net.RFC3881.CodedValueType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.joda.time.LocalDateTime;
-
-import java.util.Objects;
 
 public class AbuseEvent {
 
@@ -14,7 +15,8 @@ public class AbuseEvent {
     String filename;
     AbuseTransactionType transactionType;
 
-    public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime, String filename, AbuseTransactionType transactionType) {
+    public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
+                      String filename, AbuseTransactionType transactionType) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
         this.patientId = patientId;
@@ -74,25 +76,40 @@ public class AbuseEvent {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         AbuseEvent that = (AbuseEvent) o;
-        return Objects.equals(requestEventType, that.requestEventType) && Objects.equals(pointOfCare, that.pointOfCare) && Objects.equals(patientId, that.patientId) && Objects.equals(requestDateTime, that.requestDateTime) && Objects.equals(filename, that.filename) && transactionType == that.transactionType;
+
+        return new EqualsBuilder()
+                .append(requestEventType, that.requestEventType)
+                .append(pointOfCare, that.pointOfCare)
+                .append(patientId, that.patientId)
+                .append(requestDateTime, that.requestDateTime)
+                .append(filename, that.filename)
+                .append(transactionType, that.transactionType).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestEventType, pointOfCare, patientId, requestDateTime, filename, transactionType);
+        return new HashCodeBuilder(17, 37)
+                .append(requestEventType)
+                .append(pointOfCare)
+                .append(patientId)
+                .append(requestDateTime)
+                .append(filename)
+                .append(transactionType).toHashCode();
     }
 
     @Override
     public String toString() {
-        return "AbuseEventNew{" +
-                "requestEventType=" + requestEventType +
-                ", pointOfCare='" + pointOfCare + '\'' +
-                ", patientId='" + patientId + '\'' +
-                ", requestDateTime=" + requestDateTime +
-                ", filename='" + filename + '\'' +
-                ", transactionType=" + transactionType +
-                '}';
+        return new ToStringBuilder(this)
+                .append("requestEventType", requestEventType)
+                .append("pointOfCare", pointOfCare)
+                .append("patientId", patientId)
+                .append("requestDateTime", requestDateTime)
+                .append("filename", filename)
+                .append("transactionType", transactionType)
+                .toString();
     }
 }

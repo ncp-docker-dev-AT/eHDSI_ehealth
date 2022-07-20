@@ -43,10 +43,9 @@ import java.util.stream.Stream;
 
 public class AbuseDetectionService implements Job {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbuseDetectionService.class);
     private static List<AbuseEvent> abuseList = new ArrayList<>();
-
     private static long lastFileAnalyzed = -1;
+    private final Logger logger = LoggerFactory.getLogger(AbuseDetectionService.class);
 
     public AbuseDetectionService() {
     }
@@ -59,14 +58,14 @@ public class AbuseDetectionService implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
 
-        LOGGER.info("AbuseDetectionService Job is running......");
+        logger.info("AbuseDetectionService Job is running......");
         var scheduler = jobExecutionContext.getScheduler();
 
         try {
-            LOGGER.info("AbuseDetectionService Job paused");
-            //scheduler.pauseJob(new JobKey(AbuseDetectionHelper.NAME_OF_JOB, AbuseDetectionHelper.NAME_OF_GROUP));
+            logger.info("AbuseDetectionService Job paused");
             scheduler.pauseJob(jobExecutionContext.getJobDetail().getKey());
 
+            //  TODO: The ATNA secured repository must be use for the anomalies detection and not the audit generated for testing
             if (StringUtils.equals(ConfigurationManagerFactory.getConfigurationManager().getProperty("WRITE_TEST_AUDITS"), "true")) {
                 String path = Utils.getProperty("TEST_AUDITS_PATH");
 
@@ -85,30 +84,30 @@ public class AbuseDetectionService implements Job {
                                     lastFileAnalyzed = p.toFile().lastModified();
                                 }
                             } catch (JAXBException e) {
-                                LOGGER.error(e.getMessage());
-                                throw new RuntimeException(e);
+                                throw new AbuseDetectionException(e);
                             }
                         });
                         abuseList = checkAnomalies(abuseList);
-                        LOGGER.info("AbuseDetectionService: end of checking data");
+                        logger.info("AbuseDetectionService: end of checking data");
                     }
                 } catch (Exception e) {
-                    LOGGER.debug(e.getMessage());
+                    logger.debug(e.getMessage());
                 }
             }
         } catch (SchedulerException e) {
-            throw new RuntimeException(e);
+            throw new AbuseDetectionException(e);
         } finally {
             try {
                 scheduler.resumeJob(jobExecutionContext.getJobDetail().getKey());
-                LOGGER.info("AbuseDetectionService Job resumed");
+                logger.info("AbuseDetectionService Job resumed");
             } catch (SchedulerException e) {
-                LOGGER.debug(e.getMessage());
+                logger.debug(e.getMessage());
             }
         }
     }
 
     private boolean readAuditFile(Path p) throws JAXBException {
+
         Document document;
         try {
             String filename = p.toString();
@@ -233,7 +232,7 @@ public class AbuseDetectionService implements Job {
                     }
 
                     if (evtPresent) {
-                        LOGGER.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
+                        logger.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
                                         "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
                                 dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
                                 au.getEventIdentification().getEventID().getCodeSystemName(),
@@ -255,50 +254,26 @@ public class AbuseDetectionService implements Job {
                                 .map(ParticipantObjectIdentificationType::getParticipantObjectID)
                                 .collect(Collectors.joining());
 
-                        /*
-                        int index = IntStream.range(0, abuseList.size())
-                                .filter(i -> Objects.nonNull(abuseList.get(i)))
-                                .filter(i -> au.getEventIdentification().getEventID().getCode().equals(abuseList.get(i).getRequestType().getCode()) &&
-                                        joined_poc.equals(abuseList.get(i).getPointOfCare()) &&
-                                        participant.equals(abuseList.get(i).getPatientId()))
-                                .findFirst()
-                                .orElse(-1);
-
-                        if (index != -1) {
-                            AbuseEvent ae = abuseList.get(index);
-                            ae.setRequestNum(ae.getRequestNum() + 1);
-                            ae.setLastRequestDateTime(dt);
-                            ae.addFile(filename);
-                        } else {
-                            abuseList.add(new AbuseEvent(au.getEventIdentification().getEventID(),
-                                    joined_poc,
-                                    participant,
-                                    1,
-                                    dt,
-                                    false,
-                                    filename));
-                        }
-                        */
                         abuseList.add(
                                 new AbuseEvent(au.getEventIdentification().getEventID(),
-                                    simple_poc,
-                                    participant,
-                                    dt,
-                                    filename,
-                                    transactionType)
-                                );
+                                        simple_poc,
+                                        participant,
+                                        dt,
+                                        filename,
+                                        transactionType)
+                        );
                     }
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOGGER.debug(e.getMessage());
-            throw new RuntimeException(e);
+            throw new AbuseDetectionException(e);
         }
 
         return true;
     }
 
     private List<AbuseEvent> checkAnomalies(List<AbuseEvent> list) {
+
         int areqr = Integer.parseInt(Constants.ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD);
         int upatr = Integer.parseInt(Constants.ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD);
         int upocr = Integer.parseInt(Constants.ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD);
@@ -329,25 +304,19 @@ public class AbuseDetectionService implements Job {
                 if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
                     int totreq = end - begin + 1;
                     if (totreq > areq_threshold) {
-                        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + totreq + " exceeding threshold of : " + areq_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedAllList.get(begin) + "] end event : [" + sortedAllList.get(end) + "]");
+                        logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
+                                        "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
+                                totreq, areq_threshold, diff.toStandardSeconds().getSeconds(), sortedAllList.get(begin), sortedAllList.get(end));
                     }
                 }
             }
-            //LocalDateTime begin = sortedAllList.get(0).getRequestDateTime();
-            //LocalDateTime end = sortedAllList.get(sortedAllList.size() - 1).getRequestDateTime();
-            //Period diff = new Period(begin, end); // time elapsed between first and last request
-            //if(diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
-            //    if(sortedAllList.size() > areq_threshold) {
-            //        LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: " + sortedAllList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds]");
-            //    }
-            //}
         }
 
         List<AbuseEvent> distinctPointOfCareIds = list.stream()
-                .filter( distinctByKey(AbuseEvent::getPointOfCare) )
-                .collect( Collectors.toList() );
-        if(upocr > 0 && sortedAllList.size() > upoc_threshold) { // analyze unique POC requests
-            if(distinctPointOfCareIds.size() > 0) {
+                .filter(distinctByKey(AbuseEvent::getPointOfCare))
+                .collect(Collectors.toList());
+        if (upocr > 0 && sortedAllList.size() > upoc_threshold) { // analyze unique POC requests
+            if (!distinctPointOfCareIds.isEmpty()) {
                 distinctPointOfCareIds.forEach(poc -> {
 
                     List<AbuseEvent> sortedPocList = list.stream()
@@ -356,7 +325,7 @@ public class AbuseDetectionService implements Job {
                             .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                             .collect(Collectors.toList());
 
-                    for(int i = 0; i < sortedPocList.size(); i++) {
+                    for (int i = 0; i < sortedPocList.size(); i++) {
                         int begin;
                         int end;
 
@@ -368,7 +337,11 @@ public class AbuseDetectionService implements Job {
                         if (diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
                             int totreq = end - begin + 1;
                             if (totreq > upoc_threshold) {
-                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : [Total requests: " + totreq + " exceeding threshold of : " + upoc_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedPocList.get(begin) + "] end event : [" + sortedPocList.get(end) + "]");
+                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
+                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
+                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
+                                        totreq, upoc_threshold, diff.toStandardSeconds().getSeconds(),
+                                        sortedPocList.get(begin), sortedPocList.get(end));
                             }
                         }
                     }
@@ -377,9 +350,9 @@ public class AbuseDetectionService implements Job {
         }
 
         List<AbuseEvent> distinctPatientIds = list.stream()
-                .filter( distinctByKey(AbuseEvent::getPatientId) )
-                .collect( Collectors.toList() );
-        if(upatr > 0 && sortedAllList.size() > upat_threshold) { // Analyze unique Patient requests
+                .filter(distinctByKey(AbuseEvent::getPatientId))
+                .collect(Collectors.toList());
+        if (upatr > 0 && sortedAllList.size() > upat_threshold) { // Analyze unique Patient requests
 
             if (!distinctPatientIds.isEmpty()) {
                 distinctPatientIds.forEach(pat -> {
@@ -403,33 +376,25 @@ public class AbuseDetectionService implements Job {
                         if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
                             int totreq = end - begin + 1;
                             if (totreq > upat_threshold) {
-                                LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + totreq + " exceeding threshold of : " + upat_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" +  sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
+                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + totreq + " exceeding threshold of : " + upat_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" + sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
                             }
                         }
                     }
-//                    LocalDateTime begin = sortedXcpdList.get(0).getRequestDateTime();
-//                    LocalDateTime end = sortedXcpdList.get(sortedXcpdList.size() - 1).getRequestDateTime();
-//                    Period diff = new Period(begin, end); // time elapsed between first and last request
-//                    if(diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
-//                        if(sortedXcpdList.size() > upat_threshold) {
-//                            LOGGER.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + sortedXcpdList.size() + " inside an interval of " + diff.toStandardSeconds().getSeconds() + "seconds ]");
-//                        }
-//                    }
                 });
             }
         }
 
         // strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD
-        int purge_limit = NumberUtils.max(new int[] {areqr, upocr, upatr});
+        int purge_limit = NumberUtils.max(new int[]{areqr, upocr, upatr});
         List<AbuseEvent> ret = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .filter(p -> Period.fieldDifference(p.getRequestDateTime(), now).toStandardSeconds().getSeconds() <= purge_limit)
                 .collect(Collectors.toList());
 
-        if(ret.size() < list.size()) {
-            LOGGER.info(list.size() - ret.size() + " events purged from active list, new list size = " + ret.size());
+        if (ret.size() < list.size()) {
+            logger.info("'{}' events purged from active list, new list size; '{}'", list.size() - ret.size(), ret.size());
         } else {
-            LOGGER.info("events in active list = " + list.size());
+            logger.info("Events in active list: '{}'", list.size());
         }
         return ret;
     }
