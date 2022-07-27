@@ -79,6 +79,15 @@ public class Constants {
     public static final String NCP_SIG_PRIVATEKEY_ALIAS;
     public static final String NCP_SIG_PRIVATEKEY_PASSWORD;
 
+    public static final String ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD;
+    public static final String ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_UNIQUE_POC_REQUEST_THRESHOLD;
+    public static final String ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_ALL_REQUEST_THRESHOLD;
+    public static final String ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_SCHEDULER_TIME_INTERVAL;
+    public static final String ABUSE_SCHEDULER_ENABLE;
+
     /**
      * Name of the System Variable containing the path to the folder containing the configuration files.
      */
@@ -117,6 +126,15 @@ public class Constants {
         NCP_SIG_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
         NCP_SIG_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
         NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+
+        ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD");
+        ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD");
+        ABUSE_UNIQUE_POC_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_POC_REQUEST_THRESHOLD");
+        ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD");
+        ABUSE_ALL_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_THRESHOLD");
+        ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD");
+        ABUSE_SCHEDULER_TIME_INTERVAL = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_TIME_INTERVAL");
+        ABUSE_SCHEDULER_ENABLE = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_ENABLE");
     }
 
     private Constants() {

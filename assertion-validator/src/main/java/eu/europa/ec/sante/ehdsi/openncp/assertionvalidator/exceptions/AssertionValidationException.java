@@ -1,15 +1,15 @@
 package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions;
 
-public class AssertionValidationException extends Exception {
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+
+public class AssertionValidationException extends OpenNCPErrorCodeException {
 
     private static final long serialVersionUID = -6478057187366024151L;
-    private String message;
-    private String code;
+    private OpenNCPErrorCode openncpErrorCode;
 
     public AssertionValidationException() {
         super();
-        this.message = "Assertion is not valid. ";
-        this.code = "1001";
+        this.openncpErrorCode = OpenNCPErrorCode.ERROR_NOT_VALID_ASSERTION;
     }
 
     public AssertionValidationException(String message) {
@@ -18,18 +18,19 @@ public class AssertionValidationException extends Exception {
 
     @Override
     public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        return openncpErrorCode.getDescription();
     }
 
     public String getCode() {
-        return code;
+        return openncpErrorCode.getCode();
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public OpenNCPErrorCode getErrorCode() {
+        return openncpErrorCode;
     }
+
+    protected void setOpenncpErrorCode(OpenNCPErrorCode openncpErrorCode) {
+        this.openncpErrorCode = openncpErrorCode;
+    }
+
 }

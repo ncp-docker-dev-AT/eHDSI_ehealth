@@ -46,25 +46,28 @@
                                     <tbody>
                                         <tr>
                                             <th>
-                                                <!-- Functional Assessment Date-->
-                                                <!-- TODO Needs to be added to eHDSIDisplayLabel value set -->
-                                                Functional Assessment Date
+                                                <!-- Functional Assessment Date Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'163'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Functional Assessment -->
-                                                <!-- TODO Needs to be added to eHDSIDisplayLabel value set -->
-                                                Functional Assessment
+                                                <!-- Functional Assessment Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'164'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Onset Date -->
+                                                <!-- Onset Date Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'45'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Functional assessment result -->
-                                                <!-- TODO Needs to be added to eHDSIDisplayLabel value set -->
-                                                Functional Assessment Result
+                                                <!-- Functional Assessment Result Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'166'"/>
+                                                </xsl:call-template>
                                             </th>
                                         </tr>
                                         <xsl:apply-templates select="n1:entry/n1:organizer/n1:component/n1:observation" mode="functionalStatus"/>

@@ -16,6 +16,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.File;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.UUID;
 
 /**
@@ -144,7 +147,7 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
     }
 
     /**
-     * Test, if the correct Exceptino is thronw, if the transaction-xml is null
+     * Test, if the correct Exception is thronw, if the transaction-xml is null
      *
      * @throws Exception
      */
@@ -153,6 +156,15 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
         runAutomaticDataCollector(DS_NAME, null);
     }
 
+    /**
+     * Test if transaction failure populate correctly
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testWithTransactionError() throws Exception {
+        runAutomaticDataCollectorFailure(DS_NAME, transactionDemo, "unexpected error");
+    }
     /**
      * Helper Method for setting the code and codeSystem Attributes at
      * cda:ClinicalDocument/cda:code
@@ -184,4 +196,16 @@ public class TestAutomaticDataCollector extends BaseEadcTest {
     public void runAutomaticDataCollector(String dsName, Document transactionXmlStructure) throws Exception {
         automaticDataCollectorInstance.processTransaction(dsName, transactionXmlStructure);
     }
+
+    /**
+     * run a Test with the specified error description
+     *
+     * @param transactionXmlStructure
+     * @param errorDescription
+     * @throws Exception
+     */
+    public void runAutomaticDataCollectorFailure(String dsName, Document transactionXmlStructure, String errorDescription) throws Exception {
+        automaticDataCollectorInstance.processTransactionFailure(dsName, transactionXmlStructure, errorDescription);
+    }
+
 }

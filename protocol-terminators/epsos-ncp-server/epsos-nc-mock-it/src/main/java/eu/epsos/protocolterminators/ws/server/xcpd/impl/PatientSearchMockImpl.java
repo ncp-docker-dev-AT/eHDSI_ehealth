@@ -3,6 +3,8 @@ package eu.epsos.protocolterminators.ws.server.xcpd.impl;
 import eu.epsos.protocolterminators.ws.server.common.NationalConnectorGateway;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
+import eu.epsos.protocolterminators.ws.server.xcpd.exception.AnswerNotAvailableException;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,7 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             File rootDir = new File(patientFile + patientId.getRoot());
             //  Patient ID 999999 will throw an Exception from National Connector
             if (StringUtils.equals(patientId.getExtension(), "999999")) {
-                throw new NIException("EU-0000", "Mocked Patient Repository not working");
+                throw new NIException(OpenNCPErrorCode.ERROR_PI_GENERIC, "Mocked Patient Repository not working");
             }
 
             if (rootDir.exists()) {
@@ -114,11 +116,17 @@ public class PatientSearchMockImpl extends NationalConnectorGateway implements P
             patient.setStreetAddress(properties.getProperty(STREET));
             patient.setTelephone(properties.getProperty(TELEPHONE));
             result.add(patient);
+
+            //Create an error scenario to send two patients with the same id
+            if (StringUtils.equals(idList.get(0).getExtension(), "PI_MULTIPLE_MATCHES")) {
+                result.add(patient);
+            }
+
             logger.info("[National Infrastructure Mock] Patient with ID: '{}' found.", id.getFullId());
 
         } catch (Exception e) {
             logger.error("[National Infrastructure Mock] Patient Not Found Exception: '{}'", e.getMessage(), e);
-            return new ArrayList<>(0);
+            throw new AnswerNotAvailableException("[National Infrastructure Mock] Could not load the Patient Demographics");
         }
 
         return result;

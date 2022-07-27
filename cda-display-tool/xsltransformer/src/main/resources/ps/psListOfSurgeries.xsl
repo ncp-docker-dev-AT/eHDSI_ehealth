@@ -64,18 +64,19 @@
                                                 <xsl:if test="not ($surgicalProcedureCode/@code='no-known-procedures' or $surgicalProcedureCode/@code='no-procedure-info')">
                                                     <tr>
                                                         <th>
-                                                            <!--  Procedure -->
+                                                            <!--  Procedure Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'62'"/>
                                                             </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!--  Body site -->
-                                                            <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                                                            Body site
+                                                            <!--  Body site Header -->
+                                                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                                <xsl:with-param name="code" select="'154'"/>
+                                                            </xsl:call-template>
                                                         </th>
                                                         <th>
-                                                            <!--  Procedure Date -->
+                                                            <!--  Procedure Date Header -->
                                                             <xsl:call-template name="show-eHDSIDisplayLabel">
                                                                 <xsl:with-param name="code" select="'63'"/>
                                                             </xsl:call-template>

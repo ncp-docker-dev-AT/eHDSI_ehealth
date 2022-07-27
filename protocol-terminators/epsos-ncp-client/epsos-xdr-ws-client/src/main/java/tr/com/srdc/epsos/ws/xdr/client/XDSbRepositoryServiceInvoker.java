@@ -2,6 +2,7 @@ package tr.com.srdc.epsos.ws.xdr.client;
 
 import ee.affecto.epsos.util.EventLogClientUtil;
 import eu.epsos.exceptions.DocumentTransformationException;
+import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.transformation.TMServices;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
@@ -10,7 +11,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
-import eu.europa.ec.sante.openncp.protocolterminator.commons.AssertionEnum;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
@@ -54,7 +55,7 @@ public class XDSbRepositoryServiceInvoker {
      */
     public RegistryResponseType provideAndRegisterDocumentSet(final XdrRequest request, final String countryCode,
                                                               Map<AssertionEnum, Assertion> assertionMap, String docClassCode)
-            throws RemoteException {
+            throws RemoteException, XDRException {
 
         logger.info("[XDSb Repository] XDR Request: '{}', '{}', '{}'", assertionMap.get(AssertionEnum.CLINICIAN).getID(), countryCode, docClassCode);
         RegistryResponseType response;
