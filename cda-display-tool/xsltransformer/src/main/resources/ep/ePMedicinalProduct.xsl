@@ -182,14 +182,31 @@
                                     <xsl:value-of select="position()"/>
                                 </th>
                                 <xsl:for-each select="pharm:partProduct/pharm:ingredient">
-                                    <xsl:call-template name="show-active-ingredient">
-                                        <xsl:with-param name="code"
-                                                        select="pharm:ingredientSubstance/pharm:code"/>
-                                        <xsl:with-param name="name"
-                                                        select="pharm:ingredientSubstance/pharm:name"/>
-                                        <xsl:with-param name="strength"
-                                                        select="pharm:quantity"/>
-                                    </xsl:call-template>
+                                    <xsl:choose>
+                                        <xsl:when test="(position()!=1)">
+                                            <tr>
+                                                <th/>
+                                                <xsl:call-template name="show-active-ingredient">
+                                                    <xsl:with-param name="code"
+                                                                    select="pharm:ingredientSubstance/pharm:code"/>
+                                                    <xsl:with-param name="name"
+                                                                    select="pharm:ingredientSubstance/pharm:name"/>
+                                                    <xsl:with-param name="strength"
+                                                                    select="pharm:quantity"/>
+                                                </xsl:call-template>
+                                            </tr>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:call-template name="show-active-ingredient">
+                                                <xsl:with-param name="code"
+                                                                select="pharm:ingredientSubstance/pharm:code"/>
+                                                <xsl:with-param name="name"
+                                                                select="pharm:ingredientSubstance/pharm:name"/>
+                                                <xsl:with-param name="strength"
+                                                                select="pharm:quantity"/>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:for-each>
                             </tr>
                         </xsl:for-each>
