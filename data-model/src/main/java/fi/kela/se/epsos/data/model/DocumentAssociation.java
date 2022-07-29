@@ -1,5 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+
 /**
  * DocumentAssociation which includes XML and PDF versions of DocumentMetaData.
  * @author mimyllyv
@@ -12,7 +14,7 @@ public interface DocumentAssociation<T extends EPSOSDocumentMetaData> {
 
 	T getPDFDocumentMetaData();
 
-	String getDocumentClassCode(String documentId);
+	ClassCode getDocumentClassCode(String documentId);
 	
 	String getPatientId(String documentId);
 }

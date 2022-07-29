@@ -1,5 +1,6 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 
@@ -11,16 +12,18 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     private final String patientId;
     private final int documentFormat;
     private final Date effectiveDate;
-    private final String classCode;
+    private final ClassCode classCode;
     private final String repositoryId;
     private final String title;
     private final String author;
     private final ConfidentialityMetadata confidentiality;
     private final String language;
+    private final long size;
+    private final String hash;
 
     @Deprecated
     public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-                                     String classCode, String repositoryId, String title, String author) {
+                                     ClassCode classCode, String repositoryId, String title, String author, long size, String hash) {
 
         this.id = id;
         this.patientId = patientId;
@@ -32,11 +35,13 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
         this.author = author;
         this.confidentiality = new SimpleConfidentialityMetadata(SimpleConfidentialityEnum.N);
         this.language = null;
+        this.size = size;
+        this.hash = hash;
     }
 
     public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-                                     String classCode, String repositoryId, String title, String author,
-                                     ConfidentialityMetadata confidentiality, String language) {
+                                     ClassCode classCode, String repositoryId, String title, String author,
+                                     ConfidentialityMetadata confidentiality, String language, long size, String hash) {
 
         this.id = id;
         this.patientId = patientId;
@@ -48,6 +53,8 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
         this.author = author;
         this.confidentiality = confidentiality;
         this.language = language;
+        this.size = size;
+        this.hash = hash;
     }
 
     public EPSOSDocumentMetaDataImpl(EPSOSDocumentMetaData metaData) {
@@ -62,6 +69,8 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
         this.author = metaData.getAuthor();
         this.confidentiality = metaData.getConfidentiality();
         this.language = metaData.getLanguage();
+        this.size = metaData.getSize();
+        this.hash = metaData.getHash();
     }
 
     public String getId() {
@@ -80,7 +89,7 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
         return effectiveDate;
     }
 
-    public String getClassCode() {
+    public ClassCode getClassCode() {
         return classCode;
     }
 
@@ -107,18 +116,30 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     }
 
     @Override
+    public long getSize() {
+        return size;
+    }
+
+    @Override
+    public String getHash() {
+        return hash;
+    }
+
+    @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("patientId", patientId)
                 .append("documentFormat", documentFormat)
                 .append("effectiveDate", effectiveDate)
-                .append("classCode", classCode)
+                .append("classCode", classCode.getCode())
                 .append("repositoryId", repositoryId)
                 .append("title", title)
                 .append("author", author)
                 .append("confidentialityCode", confidentiality.getConfidentialityCode())
                 .append("confidentialityDisplay", confidentiality.getConfidentialityDisplay())
+                .append("size", size)
+                .append("hash", hash)
                 .toString();
     }
 

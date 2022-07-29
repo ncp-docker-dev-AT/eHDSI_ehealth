@@ -5,6 +5,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 import tr.com.srdc.epsos.data.model.XdrRequest;
@@ -55,7 +56,7 @@ public class ConsentService {
         XdrRequest request;
         request = XdrRequestDts.newInstance(document, patient);
         request.setDocumentCode(eu.epsos.pt.cc.dts.GenericDocumentCodeDts.newInstance(document.getClassCode()));
-        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.CONSENT_CLASSCODE);
+        return XdrDocumentSource.provideAndRegisterDocSet(request, countryCode, assertionMap, ClassCode.CONSENT_CLASSCODE);
     }
 
     /**

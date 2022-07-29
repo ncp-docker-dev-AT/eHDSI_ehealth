@@ -21,18 +21,13 @@
 package org.openhealthtools.openatna.audit.service;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
 import org.openhealthtools.openatna.audit.process.ProcessorChain;
 import org.openhealthtools.openatna.syslog.LogMessage;
+
+import java.util.*;
 
 /**
  * @author Andrew Harrison

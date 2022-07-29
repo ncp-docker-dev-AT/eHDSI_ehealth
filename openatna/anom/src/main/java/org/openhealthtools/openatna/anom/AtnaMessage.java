@@ -1,7 +1,6 @@
 package org.openhealthtools.openatna.anom;
 
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**

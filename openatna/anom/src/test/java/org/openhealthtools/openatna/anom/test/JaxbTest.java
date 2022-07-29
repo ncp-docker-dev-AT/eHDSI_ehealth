@@ -2,7 +2,6 @@ package org.openhealthtools.openatna.anom.test;
 
 import org.junit.Test;
 import org.openhealthtools.openatna.anom.*;
-import org.openhealthtools.openatna.anom.JaxbIOFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

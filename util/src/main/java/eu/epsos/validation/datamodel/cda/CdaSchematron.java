@@ -20,7 +20,7 @@
 package eu.epsos.validation.datamodel.cda;
 
 import eu.epsos.validation.datamodel.common.ObjectType;
-import tr.com.srdc.epsos.util.Constants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 
 /**
  * This enumerator gathers all the schematrons used in the CDA Schematron
@@ -61,7 +61,7 @@ public enum CdaSchematron {
      * document class code (also choosing between friendly or pivot documents).
      *
      * @param classCode  The document class code.
-     * @param isFriendly The boolean flag stating if the document is pivot or
+     * @param isPivot The boolean flag stating if the document is pivot or
      *                   not.
      * @return the correspondent CDA model.
      */
@@ -71,41 +71,41 @@ public enum CdaSchematron {
             return null;
         }
         if (isPivot) {
-            if (classCode.equals(Constants.EP_CLASSCODE)) {
+            if (classCode.equals(ClassCode.EP_CLASSCODE.getCode())) {
                 return CdaSchematron.EP_PIVOT.toString();
             }
-            if (classCode.equals(Constants.MRO_CLASSCODE)) {
+            if (classCode.equals(ClassCode.MRO_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
-            if (classCode.equals(Constants.PS_CLASSCODE)) {
+            if (classCode.equals(ClassCode.PS_CLASSCODE.getCode())) {
                 return CdaSchematron.PS_PIVOT.toString();
             }
-            if (classCode.equals(Constants.ED_CLASSCODE)) {
+            if (classCode.equals(ClassCode.ED_CLASSCODE.getCode())) {
                 return CdaSchematron.ED_PIVOT.toString();
             }
-            if (classCode.equals(Constants.HCER_CLASSCODE)) {
+            if (classCode.equals(ClassCode.HCER_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
-            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
+            if (classCode.equals(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
         } else {
-            if (classCode.equals(Constants.EP_CLASSCODE)) {
+            if (classCode.equals(ClassCode.EP_CLASSCODE.getCode())) {
                 return CdaSchematron.EP_FRIENDLY.toString();
             }
-            if (classCode.equals(Constants.MRO_CLASSCODE)) {
+            if (classCode.equals(ClassCode.MRO_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
-            if (classCode.equals(Constants.PS_CLASSCODE)) {
+            if (classCode.equals(ClassCode.PS_CLASSCODE.getCode())) {
                 return CdaSchematron.PS_FRIENDLY.toString();
             }
-            if (classCode.equals(Constants.ED_CLASSCODE)) {
+            if (classCode.equals(ClassCode.ED_CLASSCODE.getCode())) {
                 return CdaSchematron.ED_FRIENDLY.toString();
             }
-            if (classCode.equals(Constants.HCER_CLASSCODE)) {
+            if (classCode.equals(ClassCode.HCER_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
-            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
+            if (classCode.equals(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 throw new UnsupportedOperationException("There is no avaliable schematron for the supplied CLASSCODE: " + classCode);
             }
         }

@@ -6,6 +6,7 @@ import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
 import eu.epsos.pt.transformation.TMServices;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
@@ -101,11 +102,11 @@ public class XcaInitGateway {
             respondingGatewayStub.setCountryCode(countryCode);
 
             /* queryResponse */
-            List<String> documentCodeValues = new ArrayList<>();
+            List<ClassCode> documentClassCodes = new ArrayList<>();
             for (GenericDocumentCode genericDocumentCode : documentCodes) {
-                documentCodeValues.add(genericDocumentCode.getValue());
+                documentClassCodes.add(ClassCode.valueOf(genericDocumentCode.getValue()));
             }
-            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentCodeValues);
+            AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentClassCodes);
             processRegistryErrors(queryResponse.getRegistryErrorList());
 
             if (queryResponse.getRegistryObjectList() != null) {
@@ -128,7 +129,7 @@ public class XcaInitGateway {
                 assertionMap.get(AssertionEnum.TREATMENT).getID(), service);
         DocumentResponse result = null;
         RetrieveDocumentSetResponseType queryResponse;
-        String classCode = null;
+        ClassCode classCode = null;
 
         try {
 
@@ -155,7 +156,7 @@ public class XcaInitGateway {
                 case Constants.PatientService:
                 case Constants.MroService:
                 case Constants.OrCDService:
-                    classCode = document.getClassCode().getValue();
+                    classCode = ClassCode.valueOf(document.getClassCode().getValue());
                     break;
                 default:
                     LOGGER.error("Service Not Supported");
@@ -186,7 +187,7 @@ public class XcaInitGateway {
                 //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(pivotDocument, StandardCharsets.UTF_8),
-                            NcpSide.NCP_B, document.getClassCode().getValue(), true);
+                            NcpSide.NCP_B, ClassCode.valueOf(document.getClassCode().getValue()), true);
                 }
                 if (service.equals(Constants.OrCDService)) {
                     queryResponse.getDocumentResponse().get(0).setDocument(pivotDocument);
@@ -204,7 +205,7 @@ public class XcaInitGateway {
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(
                             new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8),
-                            NcpSide.NCP_B, document.getClassCode().getValue(), false);
+                            NcpSide.NCP_B, ClassCode.valueOf(document.getClassCode().getValue()), false);
                 }
                 //  Returns the original document, even if the translation process fails.
                 result = queryResponse.getDocumentResponse().get(0);

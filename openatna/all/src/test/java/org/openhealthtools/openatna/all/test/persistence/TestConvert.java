@@ -20,39 +20,17 @@
 
 package org.openhealthtools.openatna.all.test.persistence;
 
+import org.junit.Test;
+import org.openhealthtools.openatna.anom.*;
+import org.openhealthtools.openatna.audit.persistence.model.*;
+import org.openhealthtools.openatna.audit.persistence.model.codes.*;
+import org.openhealthtools.openatna.audit.persistence.util.Base64;
+import org.openhealthtools.openatna.audit.persistence.util.EntityConverter;
+
 import java.util.Date;
 import java.util.List;
 
-import org.openhealthtools.openatna.anom.AtnaCode;
-import org.openhealthtools.openatna.anom.AtnaMessage;
-import org.openhealthtools.openatna.anom.AtnaMessageObject;
-import org.openhealthtools.openatna.anom.AtnaMessageParticipant;
-import org.openhealthtools.openatna.anom.AtnaObject;
-import org.openhealthtools.openatna.anom.AtnaObjectDetail;
-import org.openhealthtools.openatna.anom.AtnaParticipant;
-import org.openhealthtools.openatna.anom.AtnaSource;
-import org.openhealthtools.openatna.anom.NetworkAccessPoint;
-import org.openhealthtools.openatna.anom.ObjectDataLifecycle;
-import org.openhealthtools.openatna.anom.ObjectType;
-import org.openhealthtools.openatna.anom.ObjectTypeCodeRole;
-import org.openhealthtools.openatna.audit.persistence.model.MessageEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.MessageSourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.NetworkAccessPointEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectDetailEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ObjectEntity;
-import org.openhealthtools.openatna.audit.persistence.model.ParticipantEntity;
-import org.openhealthtools.openatna.audit.persistence.model.SourceEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ObjectIdTypeCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.ParticipantCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.model.codes.SourceCodeEntity;
-import org.openhealthtools.openatna.audit.persistence.util.Base64;
-import org.openhealthtools.openatna.audit.persistence.util.EntityConverter;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 
 /**

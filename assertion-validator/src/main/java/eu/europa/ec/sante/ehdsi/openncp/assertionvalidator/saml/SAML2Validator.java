@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml;
 
 import epsos.ccd.netsmart.securitymanager.SignatureManager;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PolicyAssertionManager;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import tr.com.srdc.epsos.util.Constants;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    public static String validateXCAHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
+    public static String validateXCAHeader(Element soapHeader, ClassCode classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
         LOGGER.debug("[SAML] Validating XCA Header.");
@@ -159,7 +159,7 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    public static String validateXDRHeader(Element soapHeader, String classCode) throws InsufficientRightsException,
+    public static String validateXDRHeader(Element soapHeader, ClassCode classCode) throws InsufficientRightsException,
             MissingFieldException, InvalidFieldException, SMgrException {
 
         LOGGER.debug("[SAML] Validating XDR Header.");
@@ -281,7 +281,7 @@ public class SAML2Validator {
         return result;
     }
 
-    private static String checkHCPAssertion(Assertion assertion, String classCode) throws
+    private static String checkHCPAssertion(Assertion assertion, ClassCode classCode) throws
             InsufficientRightsException, SMgrException, MissingFieldException, InvalidFieldException {
 
         String sigCountryCode;
@@ -319,7 +319,7 @@ public class SAML2Validator {
             policyManager.XSPARoleValidator(assertion, classCode);
             policyManager.HealthcareFacilityValidator(assertion, classCode);
             policyManager.PurposeOfUseValidator(assertion, classCode);
-            if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
+            if (classCode.equals(ClassCode.EDD_CLASSCODE)) {
                 policyManager.XSPAOrganizationIdValidator(assertion, classCode);
             }
             policyManager.XSPALocalityValidator(assertion, classCode);
@@ -340,7 +340,7 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    private static void checkTRCAssertion(Assertion assertion, String classCode) throws MissingFieldException,
+    private static void checkTRCAssertion(Assertion assertion, ClassCode classCode) throws MissingFieldException,
             InvalidFieldException, InsufficientRightsException {
 
         RequiredFieldValidators.validateVersion(assertion);

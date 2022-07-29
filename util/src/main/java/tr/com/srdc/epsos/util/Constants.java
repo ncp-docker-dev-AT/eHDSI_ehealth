@@ -4,9 +4,6 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Constants {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Constants.class);
@@ -14,20 +11,6 @@ public class Constants {
     public static final String UUID_PREFIX = "urn:uuid:";
     public static final String OID_PREFIX = "urn:oid:";
     public static final String HL7II_PREFIX = "urn:hl7ii";
-
-    public static final String EP_CLASSCODE = "57833-6";
-    public static final String PS_CLASSCODE = "60591-5";
-    public static final String EDD_CLASSCODE = "DISCARD-60593-1";
-    public static final String ED_CLASSCODE = "60593-1";
-    public static final String MRO_CLASSCODE = "56445-0";
-    public static final String ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE= "34105-7";
-    public static final String ORCD_LABORATORY_RESULTS_CLASSCODE = "11502-2";
-    public static final String ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE= "18748-4";
-    public static final String ORCD_MEDICAL_IMAGES_CLASSCODE= "x-clinical-image";
-    public static final String CONSENT_CLASSCODE = "57016-8";
-    public static final String HCER_CLASSCODE = "34133-9";
-    public static final int FORMAT_XML = 1;
-    public static final int FORMAT_PDF = 2;
 
     public static final String PatientIdentificationService = "PatientIdentificationService";
     public static final String PatientService = "PatientService";
@@ -156,14 +139,5 @@ public class Constants {
         }
 
         return path;
-    }
-
-    public static List<String> getClassCodesOrCD() {
-        List<String> list = new ArrayList<>();
-        list.add(ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE);
-        list.add(ORCD_LABORATORY_RESULTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGES_CLASSCODE);
-        return list;
     }
 }

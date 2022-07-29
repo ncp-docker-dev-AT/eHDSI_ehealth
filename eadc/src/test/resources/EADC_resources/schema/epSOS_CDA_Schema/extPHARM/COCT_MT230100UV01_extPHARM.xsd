@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- edited with XMLSpy v2013 sp1 (http://www.altova.com) by ﻿Giorgio Cangioli (Giorgio Cangioli) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ex="urn:hl7-org/v3-example" xmlns:hl7v3="urn:hl7-org:v3" xmlns:pharm="urn:hl7-org:pharm" xmlns:ips="urn:hl7-org:ips" targetNamespace="urn:hl7-org:pharm" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:hl7v3="urn:hl7-org:v3" xmlns:pharm="urn:hl7-org:pharm"
+           targetNamespace="urn:hl7-org:pharm" elementFormDefault="qualified">
 	<!--
 *****************************************************************************************************************
 * XML schema for message type COCT_MT230100UV01.

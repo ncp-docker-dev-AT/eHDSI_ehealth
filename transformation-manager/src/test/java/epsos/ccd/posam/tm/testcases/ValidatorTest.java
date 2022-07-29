@@ -37,7 +37,7 @@ public class ValidatorTest {
     @Test
     public void testSchemaValidationePL3_3() {
         final boolean result = validateXml("src/test/resources/schema/CDA_Pharma.xsd",
-                "src/test/resources/samples/eP_L3_W6_3.xml");
+                "src/test/resources/samples/");
         Assert.assertTrue(result);
     }
 

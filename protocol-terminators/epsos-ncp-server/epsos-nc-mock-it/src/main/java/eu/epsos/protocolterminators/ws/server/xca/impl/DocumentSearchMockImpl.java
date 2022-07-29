@@ -14,6 +14,7 @@ import eu.europa.ec.sante.ehdsi.openncp.mock.util.CdaUtils;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -92,6 +93,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
@@ -117,7 +120,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                        getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
@@ -126,12 +129,13 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                     EPDocumentMetaData epdPdf = null;
                     try {
                         Document pdfDoc = XMLUtil.parseContent(xmlDocString);
+                        size = getFileSize(pdfFilename);
                         byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
                         wrapPDFinCDA(pdfcontents, pdfDoc);
                         addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
                         epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                                 new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                                getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                                getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
                         logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                         documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
                     } catch (Exception e) {
@@ -155,12 +159,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing PS patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
                 PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdXml.getClassCode(), xmlDoc));
 
                 if (!StringUtils.endsWith(pdfFilename, "-NO-PDF.pdf")) {
@@ -168,13 +174,14 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                     try {
                         Document pdfDoc = XMLUtil.parseContent(xmlDocString);
+                        size = getFileSize(pdfFilename);
                         byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
                         wrapPDFinCDA(pdfcontents, pdfDoc);
                         logger.debug("Adding format to the document's OID");
                         addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
                         psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                                 new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                                this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                                this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc), size, hash);
                         documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                     } catch (Exception e) {
                         logger.warn("Could not read file at '{}'", pdfFilename, e);
@@ -203,14 +210,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
-                long size = getFileSize(xmlFilename);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDHospitalDischargeReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
                 orCDDocumentHospitalDischargeReportsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
@@ -227,14 +235,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
-                long size = getFileSize(xmlFilename);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDLaboratoryResultsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
                 orCDDocumentLaboratoryResultsMetaDatas.add(orcddXml);
                 logger.debug("Placed XML doc id= '{}' into OrCD repository", orcddXml.getId());
@@ -250,14 +259,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
-                long size = getFileSize(xmlFilename);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagingReportsDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, authors, reasonOfHospitalisation, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
 
                 orCDDocumentMedicalImagingReportsMetaDatas.add(orcddXml);
@@ -274,14 +284,15 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = XMLUtil.parseContent(xmlDocString);
-                long size = getFileSize(xmlFilename);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing OrCD patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
 
                 OrCDDocumentMetaData orcddXml = DocumentFactory.createOrCDMedicalImagesDocument(getOIDFromDocument(xmlDoc), pd.getId(),
                         getCreationDateFromDocument(xmlDoc), getServiceStartTimeFromDocument(xmlDoc), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size, authors, reasonOfHospitalisation);
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), OrCDDocumentMetaData.DocumentFileType.PNG, size, authors, reasonOfHospitalisation, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(orcddXml.getPatientId(), orcddXml.getClassCode(), xmlDoc));
 
                 orCDDocumentMedicalImagesMetaDatas.add(orcddXml);
@@ -305,6 +316,8 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             try {
                 var xmlDocString = resourceLoader.getResource(xmlFilename);
                 Document xmlDoc = loadCDADocument(xmlDocString);
+                var size = getFileSize(xmlFilename);
+                var hash = getHash(xmlFilename);
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 Document pdfDoc = loadCDADocument(xmlDocString);
                 byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
@@ -316,11 +329,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
                 MroDocumentMetaData psdPdf = DocumentFactory.createMroDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc));
+                        this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc), size, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                 MroDocumentMetaData psdXml = DocumentFactory.createMroDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
                         new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdPdf.getClassCode(), xmlDoc));
                 logger.debug("Placed PDF doc id='{}' into MRO repository", psdPdf.getId());
                 logger.debug("Placed XML doc id='{}' into MRO repository", psdXml.getId());
@@ -340,6 +353,12 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         long bytes = tempFile.length();
         tempFile.delete();
         return bytes;
+    }
+
+    private String getHash(String xmlFilename) throws IOException {
+        var classLoader = getClass().getClassLoader();
+        InputStream is = classLoader.getResourceAsStream(xmlFilename);
+        return DigestUtils.sha1Hex(is);
     }
 
     private Document loadCDADocument(String content) throws ParserConfigurationException, SAXException, IOException {

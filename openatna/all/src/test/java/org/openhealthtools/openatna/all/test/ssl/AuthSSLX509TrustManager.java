@@ -23,12 +23,11 @@ package org.openhealthtools.openatna.all.test.ssl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.X509TrustManager;
 
 /**
  * <p>

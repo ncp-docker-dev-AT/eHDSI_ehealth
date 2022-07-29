@@ -1,7 +1,7 @@
 package eu.epsos.validation.datamodel.cda;
 
 import eu.epsos.validation.datamodel.common.ObjectType;
-import tr.com.srdc.epsos.util.Constants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 
 /**
  * This enumerator gathers all the models used in the CDA Model Based Validator at EVS Client.
@@ -60,29 +60,29 @@ public enum CdaModel {
             return null;
         }
         if (isPivot) {
-            if (classCode.equals(Constants.MRO_CLASSCODE)) {
+            if (classCode.equals(ClassCode.MRO_CLASSCODE.getCode())) {
                 return CdaModel.MRO.toString();
             }
-            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE) || classCode.equals(Constants.ED_CLASSCODE)) {
+            if (classCode.equals(ClassCode.PS_CLASSCODE.getCode()) || classCode.equals(ClassCode.EP_CLASSCODE.getCode()) || classCode.equals(ClassCode.ED_CLASSCODE.getCode())) {
                 return CdaModel.ART_DECOR_CDA_PIVOT.toString();
             }
-            if (classCode.equals(Constants.HCER_CLASSCODE)) {
+            if (classCode.equals(ClassCode.HCER_CLASSCODE.getCode())) {
                 return CdaModel.HCER.toString();
             }
-            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
+            if (classCode.equals(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 return CdaModel.CONSENT.toString();
             }
         } else {
-            if (classCode.equals(Constants.MRO_CLASSCODE)) {
+            if (classCode.equals(ClassCode.MRO_CLASSCODE.getCode())) {
                 return CdaModel.MRO.toString();
             }
-            if (classCode.equals(Constants.PS_CLASSCODE) || classCode.equals(Constants.EP_CLASSCODE) || classCode.equals(Constants.ED_CLASSCODE)) {
+            if (classCode.equals(ClassCode.PS_CLASSCODE.getCode()) || classCode.equals(ClassCode.EP_CLASSCODE.getCode()) || classCode.equals(ClassCode.ED_CLASSCODE.getCode())) {
                 return CdaModel.ART_DECOR_CDA_FRIENDLY.toString();
             }
-            if (classCode.equals(Constants.HCER_CLASSCODE)) {
+            if (classCode.equals(ClassCode.HCER_CLASSCODE.getCode())) {
                 return CdaModel.HCER.toString();
             }
-            if (classCode.equals(Constants.CONSENT_CLASSCODE)) {
+            if (classCode.equals(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 return CdaModel.CONSENT.toString();
             }
         }
