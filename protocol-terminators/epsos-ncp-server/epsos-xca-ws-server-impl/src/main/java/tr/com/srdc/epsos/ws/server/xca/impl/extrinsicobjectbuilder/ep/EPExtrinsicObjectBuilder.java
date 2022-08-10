@@ -37,12 +37,10 @@ public class EPExtrinsicObjectBuilder extends AbstractExtrinsicObjectBuilder {
         if (documentMetaData.isDispensable()) {
             ClassificationType dispensableClassification = ClassificationBuilder.build("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:open", "1.3.6.1.4.1.19376.1.2.3", "Open");
-            dispensableClassification.getSlot().add(SlotBuilder.build("dispensable", "Open"));
             eot.getClassification().add(dispensableClassification);
         } else {
             ClassificationType dispensableClassification = ClassificationBuilder.build("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4",
                     uuid, "urn:ihe:iti:xdw:2011:eventCode:closed", "1.3.6.1.4.1.19376.1.2.3", "Closed");
-            dispensableClassification.getSlot().add(SlotBuilder.build("dispensable", "Closed"));
             eot.getClassification().add(dispensableClassification);
         }
 

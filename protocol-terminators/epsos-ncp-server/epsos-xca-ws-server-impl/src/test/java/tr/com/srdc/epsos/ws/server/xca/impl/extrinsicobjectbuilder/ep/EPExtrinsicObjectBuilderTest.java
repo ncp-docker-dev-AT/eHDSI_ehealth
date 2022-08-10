@@ -7,6 +7,7 @@ import fi.kela.se.epsos.data.model.EPDocumentMetaDataImpl;
 import fi.kela.se.epsos.data.model.EPSOSDocumentMetaDataImpl;
 import fi.kela.se.epsos.data.model.EpListParam;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
@@ -44,9 +45,9 @@ public class EPExtrinsicObjectBuilderTest extends AbstractExtrinsicObjectBuilder
         boolean found = false;
         for (ClassificationType classificationType: extrinsicObject.getValue().getClassification()) {
             if (classificationType.getClassificationScheme().equals("urn:uuid:2c6b8cb7-8b2a-4051-b291-b1ae6a575ef4") &&
-            classificationType.getNodeRepresentation().equals(atcCode) &&
-            classificationType.getSlot().iterator().next().getValueList().getValue().iterator().next().equals(CodeSystem.ATC.getOID()) &&
-            classificationType.getName().getLocalizedString().iterator().next().getValue().equals(atcName)) {
+                    classificationType.getNodeRepresentation().equals(atcCode) &&
+                    classificationType.getSlot().iterator().next().getValueList().getValue().iterator().next().equals(CodeSystem.ATC.getOID()) &&
+                    classificationType.getName().getLocalizedString().iterator().next().getValue().equals(atcName)) {
                 found = true;
                 var je =  OBJECT_FACTORY_RIM.createClassification(classificationType);
                 System.out.println(toXml(je));
@@ -246,6 +247,27 @@ public class EPExtrinsicObjectBuilderTest extends AbstractExtrinsicObjectBuilder
             }
         }
         Assert.assertFalse(found);
+    }
+
+    @Test
+    public void testClassifications() {
+        var adHocQueryRequest = buildAdhocQueryRequest();
+        var eotXML = OBJECT_FACTORY_RIM.createExtrinsicObjectType();
+        var ePListParam = EPListParamBuilder.newInstance()
+                .build();
+        var epDocumentMetaData = buildEPDocumentMetaData(ePListParam);
+
+        EPExtrinsicObjectBuilder.build(adHocQueryRequest, eotXML, epDocumentMetaData);
+        var extrinsicObject = OBJECT_FACTORY_RIM.createExtrinsicObject(eotXML);
+        for (ClassificationType classificationType: extrinsicObject.getValue().getClassification()) {
+            // Ensure we are talking about coded attributes, not author attributes
+            if (StringUtils.isNotEmpty(classificationType.getNodeRepresentation())) {
+                // classification shall not contain other Slot than the one defined by name='codingScheme' (IHE_ITI_TF V3, 4.2.3.1.2)
+                Assert.assertEquals(1, classificationType.getSlot().size());
+                // Classification/slot/@name is required and fixed to 'codingScheme' (IHE_ITI_TF V3, 4.2.3.1.2)
+                Assert.assertEquals("codingScheme", classificationType.getSlot().iterator().next().getName());
+            }
+        }
     }
 
     private EPDocumentMetaData buildEPDocumentMetaData(EpListParam ePListParam) {
