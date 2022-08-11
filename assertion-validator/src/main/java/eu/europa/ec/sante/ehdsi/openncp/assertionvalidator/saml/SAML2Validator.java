@@ -319,7 +319,7 @@ public class SAML2Validator {
             policyManager.XSPARoleValidator(assertion, classCode);
             policyManager.HealthcareFacilityValidator(assertion, classCode);
             policyManager.PurposeOfUseValidator(assertion, classCode);
-            if (classCode.equals(ClassCode.EDD_CLASSCODE)) {
+            if (classCode != null && classCode.equals(ClassCode.EDD_CLASSCODE)) {
                 policyManager.XSPAOrganizationIdValidator(assertion, classCode);
             }
             policyManager.XSPALocalityValidator(assertion, classCode);

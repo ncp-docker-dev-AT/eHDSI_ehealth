@@ -23,4 +23,13 @@ public enum ClassCode {
     public String getCode() {
         return code;
     }
+
+    public static ClassCode getByCode(String code) {
+        for (ClassCode classCode : values()) {
+            if (classCode.code.equals(code)) {
+                return classCode;
+            }
+        }
+        throw new IllegalArgumentException("Unknown class code : " + code);
+    }
 }

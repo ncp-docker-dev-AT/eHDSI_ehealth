@@ -122,7 +122,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             QueryResponse response;
             if (documentCodes.size() == 1) {
                 String classCode = documentCodes.get(0).getValue();
-                switch (ClassCode.valueOf(classCode)) {
+                switch (ClassCode.getByCode(classCode)) {
                     case PS_CLASSCODE:
                         response = PatientService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
@@ -210,7 +210,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             xdsDocument.setClassCode(documentCode);
 
             logger.info("[ClientConnector retrieveDocument()] homeCommunityId: '{}' targetLanguage: '{}'", homeCommunityId, targetLanguage);
-            ClassCode classCode = ClassCode.valueOf(documentCode.getValue());
+            ClassCode classCode = ClassCode.getByCode(documentCode.getValue());
             switch (classCode) {
                 case PS_CLASSCODE:
                     response = PatientService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
@@ -284,7 +284,7 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             logger.info("[Document] ClassCode: '{}' NodeRepresentation: '{}'", classCodeNode, nodeRepresentation);
             //TODO: CDA as input needs to be validated according XSD, Schematron or Validators.
             XdrResponse response;
-            var classCodeValue = ClassCode.valueOf(classCodeNode);
+            var classCodeValue = ClassCode.getByCode(classCodeNode);
             switch (classCodeValue) {
 
                 // call XDR Client for Consent

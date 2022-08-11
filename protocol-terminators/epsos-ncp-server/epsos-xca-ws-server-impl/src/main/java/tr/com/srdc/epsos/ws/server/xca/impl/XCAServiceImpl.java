@@ -296,7 +296,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 String[] classCodeString = fullClassCodeString.split(",");
                 for (String classCode : classCodeString) {
                     classCode = classCode.substring(0, classCode.indexOf("^^"));
-                    classCodes.add(ClassCode.valueOf(classCode));
+                    classCodes.add(ClassCode.getByCode(classCode));
                 }
             }
         }
@@ -396,66 +396,53 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return association;
     }
 
-    private String getLocation(String location) {
-
-        //TODO: to be reviewed in the future linked with JIRA EHNCP-1131.
-        //  String location = ConfigurationManagerFactory.getConfigurationManager()
-        //      .getEndpointUrl(Constants.COUNTRY_CODE.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE);
-        return StringUtils.isBlank(location)?  Constants.OID_PREFIX + Constants.HOME_COMM_ID : location;
+    private void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, null, severity));
     }
 
-    private void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, value, null, severity));
-    }
-
-    private void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String value, String location , RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, value, location, severity));
+    private void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String location, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, location, severity));
     }
 
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, "", null, severity));
+        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(),codeContext, null, severity));
     }
 
-    private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, IheErrorCode iheErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, iheErrorCode.getCode(), codeContext, value, null, severity));
+    private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, IheErrorCode iheErrorCode, String codeContext, RegistryErrorSeverity severity) {
+        registryErrorList.addChild(createErrorOMMessage(ons, iheErrorCode.getCode(), codeContext, null, severity));
     }
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String location, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, "", location, severity));
+        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, location, severity));
     }
 
     private void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ITMTSAMEror error, String operationType, RegistryErrorSeverity severity) {
         registryErrorList.addChild(createErrorOMMessage(ons,
                 error.getCode(),
-                error.getDescription(),
                 "ECDATransformationHandler.Error." + operationType + "(" + error.getCode() + " / " + error.getDescription() + ")",
                 null,
                 severity));
     }
 
-    private RegistryError createErrorMessage(String errorCode, String codeContext, String value, String location, RegistryErrorSeverity severity) {
+    private RegistryError createErrorMessage(String errorCode, String codeContext, String location, RegistryErrorSeverity severity) {
 
         var registryError = ofRs.createRegistryError();
         registryError.setErrorCode(errorCode);
-        registryError.setLocation(getLocation(location));
+        registryError.setLocation(location);
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
-        registryError.setValue(value);
         return registryError;
     }
 
-    private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String value, String location,  RegistryErrorSeverity severity) {
+    private OMElement createErrorOMMessage(OMNamespace ons, String errorCode, String codeContext, String location, RegistryErrorSeverity severity) {
 
         var registryError = omFactory.createOMElement("RegistryError", ons);
         registryError.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
         registryError.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
-        String aux = severity != null? severity.getText() : null ;
+        String aux = severity != null? severity.getText() : null;
         registryError.addAttribute(omFactory.createOMAttribute("severity", null, aux));
-        // EHNCP-1131
-        registryError.addAttribute(omFactory.createOMAttribute("location", null, getLocation(location)));
-        registryError.setText(value);
-
+        registryError.addAttribute(omFactory.createOMAttribute("location", null, location));
         return registryError;
     }
 
@@ -715,7 +702,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     // Is this fatal?
                 }
             } catch (NIException e){
-                addErrorMessage(registryErrorList, e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                var stackTraceLines = e.getStackTrace();
+                addErrorMessage(registryErrorList, e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), String.valueOf(stackTraceLines[0]), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 responseStatus = AdhocQueryResponseStatus.FAILURE;
             }
         }
@@ -950,7 +938,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 addErrorOMMessage(omNamespace, registryErrorList,
                         IheErrorCode.XDSMissingDocument,
                         OpenNCPErrorCode.ERROR_GENERIC_DOCUMENT_MISSING.getCode() + " : " + OpenNCPErrorCode.ERROR_GENERIC_DOCUMENT_MISSING.getDescription(),
-                        "Requested document not found.",
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }

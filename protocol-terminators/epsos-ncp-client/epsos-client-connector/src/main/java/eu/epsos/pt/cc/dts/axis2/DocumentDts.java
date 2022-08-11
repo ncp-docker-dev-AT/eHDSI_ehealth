@@ -75,7 +75,7 @@ public class DocumentDts {
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
             var classCode = result.getClassCode().getNodeRepresentation();
-            switch (ClassCode.valueOf(classCode)) {
+            switch (ClassCode.getByCode(classCode)) {
                 case PS_CLASSCODE:
                     result.setTitle(Constants.PS_TITLE);
                     break;

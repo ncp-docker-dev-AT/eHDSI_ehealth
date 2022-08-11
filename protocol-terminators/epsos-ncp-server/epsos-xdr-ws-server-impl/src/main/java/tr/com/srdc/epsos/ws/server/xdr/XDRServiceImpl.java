@@ -905,7 +905,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (result.isEmpty()) {
             logger.warn("No class code was found in request object.");
         }
-        return ClassCode.valueOf(result);
+        return ClassCode.getByCode(result);
     }
 
     private String getDocumentId(org.w3c.dom.Document document) {

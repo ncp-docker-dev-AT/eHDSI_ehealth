@@ -274,7 +274,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         for (int i = 0; i < slot.getValueList().getValue().size(); i++) {
                             String item = StringUtils.substringBetween(slot.getValueList().getValue().get(i), "('", "^^");
                             if (StringUtils.isNotBlank(item)) {
-                                list.add(ClassCode.valueOf(item));
+                                list.add(ClassCode.getByCode(item));
                             }
                         }
                     }

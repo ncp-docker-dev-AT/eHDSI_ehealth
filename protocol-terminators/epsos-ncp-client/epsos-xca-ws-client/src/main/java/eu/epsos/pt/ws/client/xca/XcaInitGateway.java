@@ -104,7 +104,7 @@ public class XcaInitGateway {
             /* queryResponse */
             List<ClassCode> documentClassCodes = new ArrayList<>();
             for (GenericDocumentCode genericDocumentCode : documentCodes) {
-                documentClassCodes.add(ClassCode.valueOf(genericDocumentCode.getValue()));
+                documentClassCodes.add(ClassCode.getByCode(genericDocumentCode.getValue()));
             }
             AdhocQueryResponse queryResponse = respondingGatewayStub.respondingGateway_CrossGatewayQuery(queryRequest, assertionMap, documentClassCodes);
             processRegistryErrors(queryResponse.getRegistryErrorList());
@@ -156,7 +156,7 @@ public class XcaInitGateway {
                 case Constants.PatientService:
                 case Constants.MroService:
                 case Constants.OrCDService:
-                    classCode = ClassCode.valueOf(document.getClassCode().getValue());
+                    classCode = ClassCode.getByCode(document.getClassCode().getValue());
                     break;
                 default:
                     LOGGER.error("Service Not Supported");
@@ -187,7 +187,7 @@ public class XcaInitGateway {
                 //  Validate CDA Pivot
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(new String(pivotDocument, StandardCharsets.UTF_8),
-                            NcpSide.NCP_B, ClassCode.valueOf(document.getClassCode().getValue()), true);
+                            NcpSide.NCP_B, ClassCode.getByCode(document.getClassCode().getValue()), true);
                 }
                 if (service.equals(Constants.OrCDService)) {
                     queryResponse.getDocumentResponse().get(0).setDocument(pivotDocument);
@@ -205,7 +205,7 @@ public class XcaInitGateway {
                 if (OpenNCPValidation.isValidationEnable()) {
                     OpenNCPValidation.validateCdaDocument(
                             new String(queryResponse.getDocumentResponse().get(0).getDocument(), StandardCharsets.UTF_8),
-                            NcpSide.NCP_B, ClassCode.valueOf(document.getClassCode().getValue()), false);
+                            NcpSide.NCP_B, ClassCode.getByCode(document.getClassCode().getValue()), false);
                 }
                 //  Returns the original document, even if the translation process fails.
                 result = queryResponse.getDocumentResponse().get(0);
