@@ -12,6 +12,7 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tr.com.srdc.epsos.util.Constants;
+import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.ws.server.xca.impl.ClassificationBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.SlotBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.AbstractExtrinsicObjectBuilder;
@@ -84,6 +85,9 @@ public class OrCDExtrinsicObjectBuilder extends AbstractExtrinsicObjectBuilder {
         // FormatCode
         eot.getClassification().add(ClassificationBuilder.build(ClassificationScheme.FORMAT_CODE.getUuid(),
                 uuid, nodeRepresentation, "eHDSI formatCodes", displayName));
+
+        // Service Start time (optional)
+        eot.getSlot().add(SlotBuilder.build("serviceStartTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", orCDDocumentMetaData.getServiceStartTime())));
 
         // Reason of hospitalisation
         var reasonOfHospitalisation = orCDDocumentMetaData.getReasonOfHospitalisation();
