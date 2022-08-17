@@ -273,6 +273,10 @@
                                         <xsl:text>dispensedPackageSizeL3_</xsl:text>
                                         <xsl:value-of select="position()-1"/>
                                     </xsl:attribute>
+                                    <xsl:attribute name="data-dispense-field">
+                                        <xsl:text>dispensedPackageSizeL3_</xsl:text>
+                                        <xsl:value-of select="position()-1"/>
+                                    </xsl:attribute>
                                     <xsl:attribute name="name">
                                         <xsl:text>dispensedPackageSizeL3_</xsl:text>
                                         <xsl:value-of select="position()-1"/>
@@ -343,6 +347,10 @@
                         <xsl:text>dispensedPackageSizeL2_</xsl:text>
                         <xsl:value-of select="position()-1"/>
                     </xsl:attribute>
+                    <xsl:attribute name="data-dispense-field">
+                        <xsl:text>dispensedPackageSizeL2_</xsl:text>
+                        <xsl:value-of select="position()-1"/>
+                    </xsl:attribute>
                     <xsl:attribute name="name">
                         <xsl:text>dispensedPackageSizeL2_</xsl:text>
                         <xsl:value-of select="position()-1"/>
@@ -377,6 +385,10 @@
                 <li>
                     <input type="text" size="5">
                         <xsl:attribute name="id">
+                            <xsl:text>dispensedPackageSizeL1_</xsl:text>
+                            <xsl:value-of select="position()-1"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="data-dispense-field">
                             <xsl:text>dispensedPackageSizeL1_</xsl:text>
                             <xsl:value-of select="position()-1"/>
                         </xsl:attribute>
