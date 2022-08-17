@@ -77,23 +77,19 @@
                             </span>
                         </th>
                         <td>
-                            <xsl:choose>
-                                <xsl:when test="not(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part)">
-                                    <xsl:call-template name="show-package-size-for-dispense">
-                                        <xsl:with-param name="quantity" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:quantity"/>
-                                        <xsl:with-param name="asContent_level1" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent"/>
-                                        <xsl:with-param name="asContent_level2" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
-                                        <xsl:with-param name="asContent_level3" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
-                                    </xsl:call-template>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <table>
-                                        <tbody>
-                                            <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packagingDispense"/>
-                                        </tbody>
-                                    </table>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:call-template name="show-package-size-for-dispense">
+                                <xsl:with-param name="quantity" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:quantity"/>
+                                <xsl:with-param name="asContent_level1" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent"/>
+                                <xsl:with-param name="asContent_level2" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
+                                <xsl:with-param name="asContent_level3" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
+                            </xsl:call-template>
+                            <xsl:if test="not(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part)">
+                                <table>
+                                    <tbody>
+                                        <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packagingDispense"/>
+                                    </tbody>
+                                </table>
+                            </xsl:if>
                         </td>
                     </tr>
                     <tr>
@@ -270,15 +266,15 @@
                             <li>
                                 <input type="text" size="5">
                                     <xsl:attribute name="id">
-                                        <xsl:text>dispensedPackageSizeL3_</xsl:text>
+                                        <xsl:text>packageSizeL3_</xsl:text>
                                         <xsl:value-of select="position()-1"/>
                                     </xsl:attribute>
                                     <xsl:attribute name="data-dispense-field">
-                                        <xsl:text>dispensedPackageSizeL3_</xsl:text>
+                                        <xsl:text>packageSizeL3_</xsl:text>
                                         <xsl:value-of select="position()-1"/>
                                     </xsl:attribute>
                                     <xsl:attribute name="name">
-                                        <xsl:text>dispensedPackageSizeL3_</xsl:text>
+                                        <xsl:text>packageSizeL3_</xsl:text>
                                         <xsl:value-of select="position()-1"/>
                                     </xsl:attribute>
                                     <xsl:attribute name="value">
@@ -344,15 +340,15 @@
             <li>
                 <input type="text" size="5">
                     <xsl:attribute name="id">
-                        <xsl:text>dispensedPackageSizeL2_</xsl:text>
+                        <xsl:text>packageSizeL2_</xsl:text>
                         <xsl:value-of select="position()-1"/>
                     </xsl:attribute>
                     <xsl:attribute name="data-dispense-field">
-                        <xsl:text>dispensedPackageSizeL2_</xsl:text>
+                        <xsl:text>packageSizeL2_</xsl:text>
                         <xsl:value-of select="position()-1"/>
                     </xsl:attribute>
                     <xsl:attribute name="name">
-                        <xsl:text>dispensedPackageSizeL2_</xsl:text>
+                        <xsl:text>packageSizeL2_</xsl:text>
                         <xsl:value-of select="position()-1"/>
                     </xsl:attribute>
                     <xsl:attribute name="value">
@@ -385,15 +381,15 @@
                 <li>
                     <input type="text" size="5">
                         <xsl:attribute name="id">
-                            <xsl:text>dispensedPackageSizeL1_</xsl:text>
+                            <xsl:text>packageSizeL1_</xsl:text>
                             <xsl:value-of select="position()-1"/>
                         </xsl:attribute>
                         <xsl:attribute name="data-dispense-field">
-                            <xsl:text>dispensedPackageSizeL1_</xsl:text>
+                            <xsl:text>packageSizeL1_</xsl:text>
                             <xsl:value-of select="position()-1"/>
                         </xsl:attribute>
                         <xsl:attribute name="name">
-                            <xsl:text>dispensedPackageSizeL1_</xsl:text>
+                            <xsl:text>packageSizeL1_</xsl:text>
                             <xsl:value-of select="position()-1"/>
                         </xsl:attribute>
                         <xsl:attribute name="value">
@@ -439,6 +435,10 @@
         <xsl:if test="$quantity">
             <input type="text" size="5">
                 <xsl:attribute name="id">
+                    <xsl:text>quantity_</xsl:text>
+                    <xsl:value-of select="position()-1"/>
+                </xsl:attribute>
+                <xsl:attribute name="data-dispense-field">
                     <xsl:text>quantity_</xsl:text>
                     <xsl:value-of select="position()-1"/>
                 </xsl:attribute>
