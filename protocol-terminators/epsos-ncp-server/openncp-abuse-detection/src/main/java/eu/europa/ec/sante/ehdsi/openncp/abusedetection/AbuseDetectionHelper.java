@@ -4,9 +4,12 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import tr.com.srdc.epsos.util.Constants;
 
-public class AbuseDetectionHelper {
+public class AbuseDetectionHelper implements ApplicationContextAware {
 
     public static final String NAME_OF_JOB = "AbuseDetectionJob";
     public static final String NAME_OF_GROUP = "OpenNCP";
@@ -15,6 +18,7 @@ public class AbuseDetectionHelper {
 
     //create variable scheduler of type Scheduler
     private static Scheduler scheduler;
+    private static ApplicationContext applicationContext;
 
     private AbuseDetectionHelper() {
     }
@@ -80,4 +84,13 @@ public class AbuseDetectionHelper {
                         SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(triggerInterval).repeatForever())
                 .build();
     }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        applicationContext = applicationContext;
+    }
+
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }    
 }
