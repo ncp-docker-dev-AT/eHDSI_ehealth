@@ -1,13 +1,13 @@
 package epsos.ccd.posam.tm.response;
 
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 
 public class ErrorWrapper {
 
-    private ITMTSAMEror error;
+    private ITMTSAMError error;
     private String context;
 
-    public ErrorWrapper(ITMTSAMEror error, String context) {
+    public ErrorWrapper(ITMTSAMError error, String context) {
         this.error = error;
         this.context = context;
     }
@@ -16,7 +16,7 @@ public class ErrorWrapper {
         return context;
     }
 
-    public ITMTSAMEror getError() {
+    public ITMTSAMError getError() {
         return error;
     }
 }
