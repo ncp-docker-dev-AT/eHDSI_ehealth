@@ -90,6 +90,7 @@ export default {
         { text: 'Receiving ISO', value: 'receivingISO' },
         { text: 'startTime', value: 'startTime' },
         { text: 'endTime', value: 'endTime' },
+        { text: 'Error Description', value: 'errorDescription' },
         { value: 'actions', sortable: false }
       ],
       transactions: [],
@@ -165,6 +166,10 @@ export default {
             }
           }).then((response) => {
             this.transactions = response.data.content
+            this.transactions = this.transactions.map(t => ({
+              ...t,
+              errorDescription: t.transactionError != null ? t.transactionError.errorDescription : ''
+            }))
             this.totalTransactions = response.data.totalElements
             this.options.page = response.data.number + 1
             this.loading = false
