@@ -1,10 +1,17 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
 import com.ibatis.common.jdbc.ScriptRunner;
-import epsos.ccd.gnomon.auditmanager.AuditTrailUtils;
-import epsos.ccd.gnomon.auditmanager.EventType;
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import epsos.ccd.gnomon.auditmanager.*;
+import epsos.ccd.gnomon.auditmanager.ssl.AuthSSLSocketFactory;
+import epsos.ccd.gnomon.auditmanager.ssl.KeystoreDetails;
 import eu.epsos.util.EvidenceUtils;
+import eu.epsos.util.audit.MessageHandlerListener;
+import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditService;
+import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
+import eu.europa.ec.sante.ehdsi.openncp.audit.Configuration;
+import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.RFC3881.ActiveParticipantType;
 import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
@@ -28,10 +35,12 @@ import tr.com.srdc.epsos.util.Constants;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.net.ssl.SSLSocket;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -48,13 +57,20 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AbuseDetectionService implements Job {
+    private static final String AUDIT_REPOSITORY_URL = "audit.repository.url";
+    private static final String AUDIT_REPOSITORY_PORT = "audit.repository.port";
+    private static final String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
+    private static final String TRUSTSTORE = "TRUSTSTORE_PATH";
+    private static final String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
+    private static String[] enabledProtocols = {"TLSv1.2"};
 
-    public static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
-    public static final String JDBC_OPEN_ATNA = "jdbc/OPEN_ATNA";
-    public static final String JDBC_EHNCP_PROPERTY = "jdbc/ConfMgr";
+    private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String JDBC_OPEN_ATNA = "jdbc/OPEN_ATNA";
+    private static final String JDBC_EHNCP_PROPERTY = "jdbc/ConfMgr";
     private static List<AbuseEvent> abuseList = new ArrayList<>();
     private static long lastIdAnalyzed = -1;
     private final Logger logger = LoggerFactory.getLogger(AbuseDetectionService.class);
+    private MessageHandlerListener listener;
 
     public AbuseDetectionService() {
     }
@@ -208,7 +224,7 @@ public class AbuseDetectionService implements Job {
         }
     }
 
-    private void setAbuseFlag()  {
+    private void setAbuseFlag(AbuseEvent abuseEvent)  {
         String query = "UPDATE EHNCP_PROPERTY SET VALUE = 'true' " +
                 "WHERE NAME = 'ABUSE_DETECTED';";
         try {
@@ -216,6 +232,163 @@ public class AbuseDetectionService implements Job {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        setAbuseErrorEvent(abuseEvent);
+    }
+
+    private SSLSocket createAuditSecuredSocket() throws IOException {
+
+        String host = ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_URL);
+        int port = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_PORT));
+
+        File u = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(TRUSTSTORE));
+        KeystoreDetails trust = new KeystoreDetails(u.toString(),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
+        File uu = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
+        KeystoreDetails key = new KeystoreDetails(uu.toString(),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.PRIVATE_KEY_PWD.getValue()));
+        AuthSSLSocketFactory authSSLSocketFactory = new AuthSSLSocketFactory(key, trust);
+        SSLSocket sslsocket = (SSLSocket) authSSLSocketFactory.createSecureSocket(host, port);
+        sslsocket.setEnabledProtocols(enabledProtocols);
+
+        String[] suites = sslsocket.getSupportedCipherSuites();
+        sslsocket.setEnabledCipherSuites(suites);
+
+        return sslsocket;
+    }
+
+    /*
+    private void setAbuseErrorEventOld(AbuseEvent abuseEvent) {
+
+        DateTimeFormatter dtf = DateTimeFormat.forPattern(AbuseDetectionService.PATTERN);
+        String evtDateTime = LocalDateTime.now().toString(dtf);
+
+        //"2022-08-29T19:04:39.187+02:00"
+        String payload  = String.format(
+            "<AuditMessage>" +
+                "<EventIdentification EventActionCode=\"E\" EventDateTime=\"%s\" EventOutcomeIndicator=\"%s\">" +
+                "<EventID code=\"EHDSI-AB\" displayName=\"ncp::AnomalyDetected\" codeSystemName=\"IHE Transactions\"/>" +
+                "<EventTypeCode code=\"EHDSI-AB\" displayName=\"ncp:AnomalyDetected\" codeSystemName=\"eHDSI Transactions\"/>" +
+                "</EventIdentification>" +
+            "</AuditMessage>",
+                Instant.now().toString(),
+                EventOutcomeIndicator.TEMPORAL_FAILURE.getCode().toString()
+        );
+
+        String host = ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_URL);
+
+        BsdMessage m2 = new BsdMessage(10, 5, "Oct  1 22:14:15", host, new StringLogMessage(payload), "ATNALOG");
+
+
+        try {
+            AuditMessage auditMessage = AuditTrailUtils.convertXMLToAuditObject(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)));
+            AuditLogSerializer auditLogSerializer = new AuditLogSerializerImpl(AuditLogSerializer.Type.AUDIT_MANAGER);
+            MessageSender messageSender = new MessageSender();
+            new Thread(() -> messageSender.send(auditLogSerializer, auditMessage, "10", "5")).start();
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+
+//        byte[] bytes = new byte[0];
+//        try {
+//            bytes = m2.toByteArray();
+//                    //SSLSocket socket = createAuditSecuredSocket();
+//            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, new InetSocketAddress(host, port));
+//            DatagramSocket socket = new DatagramSocket();
+//            socket.send(packet);
+//        } catch (SocketException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        } catch (SyslogException e) {
+//            throw new RuntimeException(e);
+//        }
+
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        try {
+//            m.write(outputStream);
+//        } catch (SyslogException e) {
+//            throw new RuntimeException(e);
+//        }
+//        logger.info("Output:\n{}", outputStream.toString());
+//
+//        SyslogMessageFactory.registerLogMessage("ATNALOG", StringLogMessage.class);
+//        //SyslogMessageFactory.setFactory(new BsdMessageFactory());
+//        SyslogMessageFactory.setFactory(new ProtocolMessageFactory());
+//        byte[] bytes = new byte[0];
+//        try {
+//            bytes = m.toByteArray();
+//        } catch (SyslogException e) {
+//            throw new RuntimeException(e);
+//        }
+//        DatagramPacket packet = new DatagramPacket(bytes, bytes.length, new InetSocketAddress("localhost", 2861));
+//        DatagramSocket socket = null;
+//        try {
+//            socket = new DatagramSocket();
+//            socket.send(packet);
+//        } catch (SocketException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+    }
+*/
+
+    private void setAbuseErrorEvent(AbuseEvent abuseEvent) {
+        EventLog eventLog = new EventLog();
+
+        eventLog.setEI_EventActionCode(EventActionCode.CREATE);
+        eventLog.setEI_EventDateTime(abuseEvent.audit.getEventIdentification().getEventDateTime());
+        eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
+
+        eventLog.setAS_AuditSourceId(abuseEvent.audit.getAuditSourceIdentification().get(0).getAuditSourceID());
+
+        Optional<ParticipantObjectIdentificationType> req = abuseEvent.audit.getParticipantObjectIdentification()
+                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "req")).findFirst();
+        Optional<ParticipantObjectIdentificationType> rsp = abuseEvent.audit.getParticipantObjectIdentification()
+                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "rsp")).findFirst();
+
+        eventLog.setReqM_ParticipantObjectID(req.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
+        eventLog.setReqM_ParticipantObjectDetail(req.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
+
+        Optional<AuditMessage.ActiveParticipant> cons = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceConsumer")).findFirst();
+        Optional<AuditMessage.ActiveParticipant> prov = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
+
+        Optional<AuditMessage.ActiveParticipant> prov2 = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
+
+        eventLog.setEI_TransactionName(TransactionName.ANOMALY_DETECTED);
+
+        eventLog.setSC_UserID(cons.get().getUserID()); //clientCommonName
+        eventLog.setSP_UserID(prov.get().getUserID()); //clientCommonName
+        eventLog.setHR_UserID(cons.get().getUserID());
+        for(ActiveParticipantType a : abuseEvent.audit.getActiveParticipant()) {
+            if(XSPAFunctionalRole.containsLabel(a.getRoleIDCode().get(0).getCode())) {
+                eventLog.setHR_UserID(a.getUserID());
+                eventLog.setHR_RoleID(a.getRoleIDCode().get(0).getCode());
+                eventLog.setHR_UserName(a.getUserName());
+                eventLog.setHR_AlternativeUserID(a.getAlternativeUserID());
+                break;
+            }
+        }
+
+        eventLog.setSourceip(cons.get().getNetworkAccessPointID());
+        eventLog.setTargetip(prov.get().getNetworkAccessPointID());
+
+        eventLog.setResM_ParticipantObjectID(rsp.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
+        eventLog.setResM_ParticipantObjectDetail(rsp.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
+
+        eventLog.setNcpSide(NcpSide.NCP_A);
+        eventLog.setEventType(EventType.ANOMALY_DETECTED);
+
+        AuditService auditService = AuditServiceFactory.getInstance();
+        auditService.write(eventLog, "", "1");
+        logger.info("EventLog: '{}' generated.", eventLog.getEventType());
     }
 
     private AuditMessage readAuditString(MessagesRecord rec) throws JAXBException {
@@ -366,7 +539,8 @@ public class AbuseDetectionService implements Job {
                                     participant,
                                     dt,
                                     rec.getId().toString(),
-                                    transactionType)
+                                    transactionType,
+                                    au)
                     );
                 }
                 return au;
@@ -532,7 +706,8 @@ public class AbuseDetectionService implements Job {
                                         participant,
                                         dt,
                                         filename,
-                                        transactionType)
+                                        transactionType,
+                                        au)
                         );
                     }
                 }
@@ -576,7 +751,7 @@ public class AbuseDetectionService implements Job {
                 if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
                     int totreq = end - begin + 1;
                     if (totreq > areq_threshold) {
-                        setAbuseFlag();
+                        setAbuseFlag(sortedAllList.get(end));
                         logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
                                         "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
                                 totreq, areq_threshold, diff.toStandardSeconds().getSeconds(), sortedAllList.get(begin), sortedAllList.get(end));
@@ -610,7 +785,7 @@ public class AbuseDetectionService implements Job {
                         if (diff.toStandardSeconds().getSeconds() < upocr) { // we are inside the interval for detecting
                             int totreq = end - begin + 1;
                             if (totreq > upoc_threshold) {
-                                setAbuseFlag();
+                                setAbuseFlag(sortedPocList.get(end));
                                 logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
                                                 "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
                                                 "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
@@ -650,7 +825,7 @@ public class AbuseDetectionService implements Job {
                         if (diff.toStandardSeconds().getSeconds() < upatr) { // we are inside the interval for detecting
                             int totreq = end - begin + 1;
                             if (totreq > upat_threshold) {
-                                setAbuseFlag();
+                                setAbuseFlag(sortedXcpdList.get(end));
                                 logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : [Total requests: " + totreq + " exceeding threshold of : " + upat_threshold + " requests inside an interval of " + diff.toStandardSeconds().getSeconds() + " seconds] - begin event : [" + sortedXcpdList.get(begin) + "] end event : [" + sortedXcpdList.get(end) + "]");
                             }
                         }

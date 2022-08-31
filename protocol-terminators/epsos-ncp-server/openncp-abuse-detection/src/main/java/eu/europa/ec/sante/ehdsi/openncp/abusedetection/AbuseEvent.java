@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
+import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,14 +16,17 @@ public class AbuseEvent {
     String filename;
     AbuseTransactionType transactionType;
 
+    AuditMessage audit;
+
     public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
-                      String filename, AbuseTransactionType transactionType) {
+                      String filename, AbuseTransactionType transactionType, AuditMessage audit) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
         this.patientId = patientId;
         this.requestDateTime = requestDateTime;
         this.filename = filename;
         this.transactionType = transactionType;
+        this.audit = audit;
     }
 
     public CodedValueType getRequestEventType() {
@@ -71,6 +75,14 @@ public class AbuseEvent {
 
     public void setTransactionType(AbuseTransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public AuditMessage getAudit() {
+        return audit;
+    }
+
+    public void setAudit(AuditMessage audit) {
+        this.audit = audit;
     }
 
     @Override

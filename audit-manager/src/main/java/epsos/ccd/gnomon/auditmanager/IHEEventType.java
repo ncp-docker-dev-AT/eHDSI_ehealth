@@ -48,7 +48,8 @@ public enum IHEEventType {
     MRO_LIST("ITI-38"),
     MRO_RETRIEVE("ITI-39"),
     SMP_QUERY("EHDSI-193"),
-    SMP_PUSH("EHDSI-194");
+    SMP_PUSH("EHDSI-194"),
+    ANOMALY_DETECTED("EHDSI-AB");
 
     private final String code;
 

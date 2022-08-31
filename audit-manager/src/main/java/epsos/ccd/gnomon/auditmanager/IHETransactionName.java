@@ -45,7 +45,8 @@ public enum IHETransactionName {
     MRO_SERVICE_LIST("XCA::CrossGatewayQuery"),
     MRO_SERVICE_RETRIEVE("XCA::CrossGatewayRetrieve"),
     SMP_QUERY("SMP::Query"),
-    SMP_PUSH("SMP::Push");
+    SMP_PUSH("SMP::Push"),
+    ANOMALY_DETECTED("ncp::AnomalyDetected");
 
     private final String code;
 

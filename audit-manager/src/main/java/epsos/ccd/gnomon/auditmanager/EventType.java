@@ -55,7 +55,8 @@ public enum EventType {
     SMP_PUSH("EHDSI-194"),
     MRO_LIST("ITI-38"),
     MRO_RETRIEVE("ITI-39"),
-    COMMUNICATION_FAILURE("EHDSI-CF");
+    COMMUNICATION_FAILURE("EHDSI-CF"),
+    ANOMALY_DETECTED("EHDSI-AB");
 
     private final String code;
 
