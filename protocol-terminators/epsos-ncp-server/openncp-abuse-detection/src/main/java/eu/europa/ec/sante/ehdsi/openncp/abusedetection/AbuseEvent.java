@@ -13,18 +13,18 @@ public class AbuseEvent {
     String pointOfCare;
     String patientId;
     LocalDateTime requestDateTime;
-    String filename;
+    String recordId;
     AbuseTransactionType transactionType;
 
     AuditMessage audit;
 
     public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
-                      String filename, AbuseTransactionType transactionType, AuditMessage audit) {
+                      String recordId, AbuseTransactionType transactionType, AuditMessage audit) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
         this.patientId = patientId;
         this.requestDateTime = requestDateTime;
-        this.filename = filename;
+        this.recordId = recordId;
         this.transactionType = transactionType;
         this.audit = audit;
     }
@@ -61,12 +61,12 @@ public class AbuseEvent {
         this.requestDateTime = requestDateTime;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getRecordId() {
+        return recordId;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public AbuseTransactionType getTransactionType() {
@@ -98,7 +98,7 @@ public class AbuseEvent {
                 .append(pointOfCare, that.pointOfCare)
                 .append(patientId, that.patientId)
                 .append(requestDateTime, that.requestDateTime)
-                .append(filename, that.filename)
+                .append(recordId, that.recordId)
                 .append(transactionType, that.transactionType).isEquals();
     }
 
@@ -109,7 +109,7 @@ public class AbuseEvent {
                 .append(pointOfCare)
                 .append(patientId)
                 .append(requestDateTime)
-                .append(filename)
+                .append(recordId)
                 .append(transactionType).toHashCode();
     }
 
@@ -120,7 +120,7 @@ public class AbuseEvent {
                 .append("pointOfCare", pointOfCare)
                 .append("patientId", patientId)
                 .append("requestDateTime", requestDateTime)
-                .append("filename", filename)
+                .append("filename", recordId)
                 .append("transactionType", transactionType)
                 .toString();
     }
