@@ -225,6 +225,7 @@ public final class PRPAIN201305UV022DTS {
                 id.getValue().add(ii);
                 // Set controlActProcess/queryByParameter/parameterList/livingSubjectId/semanticsText
                 id.setSemanticsText(of.createST());
+                id.getSemanticsText().setContent(XCPDConstants.CONTROL_ACT_PROCESS.QUERY_BY_PARAMETER_LIVING_SUBJECT_ID_SEMANTICS);
 
                 request.getControlActProcess().getQueryByParameter().getValue().getParameterList().getLivingSubjectId().add(id);
             }

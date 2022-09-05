@@ -46,6 +46,7 @@ public class XCPDConstants {
         public static final String QUERY_BY_PARAMETER_RESPONSE_MODALITY_CODE = "R";
         public static final String QUERY_BY_PARAMETER_RESPONSE_PRIORITY_CODE = "I";
         public static final String QUERY_BY_PARAMETER_LIVING_SUBJECT_NAME_SEMANTICS = "LivingSubject.name";
+        public static final String QUERY_BY_PARAMETER_LIVING_SUBJECT_ID_SEMANTICS = "LivingSubject.id";
     }
 
     public class SOAP_HEADERS {

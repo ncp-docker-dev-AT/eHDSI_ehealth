@@ -352,7 +352,9 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
 
     private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code) {
 
-        // Set queryAck/queryResponseCode
+        // Set queryAck/statusCode and queryAck/queryResponseCode
+        outputMessage.getControlActProcess().getQueryAck().setStatusCode(objectFactory.createCS());
+        outputMessage.getControlActProcess().getQueryAck().getStatusCode().setCode(code);
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
 
