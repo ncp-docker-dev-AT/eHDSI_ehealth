@@ -120,7 +120,7 @@ public class AbuseEvent {
                 .append("pointOfCare", pointOfCare)
                 .append("patientId", patientId)
                 .append("requestDateTime", requestDateTime)
-                .append("filename", recordId)
+                .append("recordId", recordId)
                 .append("transactionType", transactionType)
                 .toString();
     }
