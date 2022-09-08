@@ -309,6 +309,7 @@ public final class PRPAIN201305UV022DTS {
             // Set controlActProcess/queryByParameter/parameterList/patientAddress/semanticsText
             request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
                     .getPatientAddress().get(0).setSemanticsText(of.createST());
+
             request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
                     .getPatientAddress().get(0).getSemanticsText().setContent(XCPDConstants.CONTROL_ACT_PROCESS.QUERY_BY_PARAMETER_PATIENT_ADDRESS_SEMANTICS);
         }
