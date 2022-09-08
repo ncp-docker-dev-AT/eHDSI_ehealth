@@ -191,6 +191,8 @@ public final class PRPAIN201305UV022DTS {
             // Set controlActProcess/queryByParameter/parameterList/livingSubjectAdministrativeGender/semanticsText
             request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
                     .getLivingSubjectAdministrativeGender().get(0).setSemanticsText(of.createST());
+            request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
+                    .getLivingSubjectAdministrativeGender().get(0).getSemanticsText().setContent(XCPDConstants.CONTROL_ACT_PROCESS.QUERY_BY_PARAMETER_ADMINISTRATIVE_GENDER_SEMANTICS);
         }
 
         if (patientDemographics.getBirthDate() != null) {
@@ -210,6 +212,8 @@ public final class PRPAIN201305UV022DTS {
             // Set controlActProcess/queryByParameter/parameterList/livingSubjectBirthTime/semanticsText
             request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
                     .getLivingSubjectBirthTime().get(0).setSemanticsText(of.createST());
+            request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
+                    .getLivingSubjectBirthTime().get(0).getSemanticsText().setContent(XCPDConstants.CONTROL_ACT_PROCESS.QUERY_BY_PARAMETER_BIRTHDATE_SEMANTICS);
         }
 
         if (patientDemographics.getIdList() != null) {
@@ -305,6 +309,8 @@ public final class PRPAIN201305UV022DTS {
             // Set controlActProcess/queryByParameter/parameterList/patientAddress/semanticsText
             request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
                     .getPatientAddress().get(0).setSemanticsText(of.createST());
+            request.getControlActProcess().getQueryByParameter().getValue().getParameterList()
+                    .getPatientAddress().get(0).getSemanticsText().setContent(XCPDConstants.CONTROL_ACT_PROCESS.QUERY_BY_PARAMETER_PATIENT_ADDRESS_SEMANTICS);
         }
 
         return request;
