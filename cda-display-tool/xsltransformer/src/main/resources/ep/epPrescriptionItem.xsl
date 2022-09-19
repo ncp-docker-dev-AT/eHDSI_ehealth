@@ -152,9 +152,10 @@
         <xsl:param name="strength"/>
         <td>
             <xsl:if test="$code/@codeSystem and $code/@codeSystem='2.16.840.1.113883.6.73'">ATC</xsl:if>
+            <xsl:if test="$code/@codeSystem and $code/@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.100000075825'">EMA SMS</xsl:if>
         </td>
         <td>
-            <xsl:if test="$code/@code and $code/@codeSystem='2.16.840.1.113883.6.73'">
+            <xsl:if test="$code/@code and ($code/@codeSystem='2.16.840.1.113883.6.73' or $code/@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.100000075825')">
                 <xsl:choose>
                     <xsl:when test="not($code/@nullFlavor)">
                         <xsl:value-of select="$code/@code"/>
@@ -171,6 +172,9 @@
             <xsl:choose>
                 <xsl:when test="not($code/@nullFlavor)">
                     <xsl:call-template name="show-eHDSIActiveIngredient">
+                        <xsl:with-param name="node" select="$code"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="show-eHDSISubstance">
                         <xsl:with-param name="node" select="$code"/>
                     </xsl:call-template>
                 </xsl:when>
