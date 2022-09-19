@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container class="fill-height">
       <v-row class="justify-center">
         <v-card>
@@ -32,7 +32,7 @@
         <v-btn dark text @click="authenticationFailed = false"> Close </v-btn>
       </v-snackbar>
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
