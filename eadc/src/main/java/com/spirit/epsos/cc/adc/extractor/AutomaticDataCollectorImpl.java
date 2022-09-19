@@ -36,6 +36,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
     private static final String PATH_XML_CONFIG = new File(EadcUtil.getDefaultDsPath()).getAbsolutePath() + File.separator
             + "EADC_resources" + File.separator + "config" + File.separator + "config.xml";
     private static final String SERVER_EHEALTH_MODE = "server.ehealth.mode";
+    public static final int ERROR_DESC_MAX_SIZE = 2000;
     private static AutomaticDataCollectorImpl INSTANCE = null;
     private final Logger logger = LoggerFactory.getLogger(AutomaticDataCollectorImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
@@ -124,6 +125,7 @@ public class AutomaticDataCollectorImpl implements AutomaticDataCollector {
      */
     private String createErrorSqlInserts(String sql, String errorDescription) throws Exception {
         String foreignKey = extractForeignKey(sql);
+        errorDescription = errorDescription.substring(0, Math.min(errorDescription.length(), ERROR_DESC_MAX_SIZE));
         String retval = "INSERT INTO eTransactionError(Transaction_FK, ErrorDescription) VALUES " +
                 "('" + foreignKey + "', " +
                 "'" +

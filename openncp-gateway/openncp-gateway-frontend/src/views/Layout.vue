@@ -99,9 +99,9 @@
         <v-icon>mdi-power</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <router-view />
-    </v-content>
+    </v-main>
     <v-dialog v-model="changePasswordDialog" width="500">
       <!-- <template v-slot:activator="{ on, attrs }">
         <v-btn color="red lighten-2" dark v-bind="attrs" v-on="on">
@@ -170,6 +170,7 @@ import axios from 'axios'
 export default {
   data () {
     return {
+      attrs: '',
       pwd: '',
       confirmPwd: '',
       oldPwd: '',
