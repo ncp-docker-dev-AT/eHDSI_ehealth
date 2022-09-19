@@ -142,11 +142,11 @@
         <xsl:value-of select="."/>&#160;
     </xsl:template>
 
-    <xsl:template match="n1:patient/n1:name/n1:prefix">
+    <xsl:template match="n1:patient/n1:name/n1:family">
         <xsl:value-of select="."/>&#160;
     </xsl:template>
 
-    <xsl:template match="n1:patient/n1:name/n1:prefix">
+    <xsl:template match="n1:patient/n1:name/n1:given">
         <xsl:value-of select="."/>&#160;
     </xsl:template>
 </xsl:stylesheet>
