@@ -34,8 +34,7 @@ public enum TransactionName {
     MRO_SERVICE_LIST("MroService::List"),
     MRO_SERVICE_RETRIEVE("MroService::Retrieve"),
     SMP_QUERY("SMP::Query"),
-    SMP_PUSH("SMP::Push"),
-    ANOMALY_DETECTED("ncp:AnomalyDetected");
+    SMP_PUSH("SMP::Push");
 
     private String code;
 
