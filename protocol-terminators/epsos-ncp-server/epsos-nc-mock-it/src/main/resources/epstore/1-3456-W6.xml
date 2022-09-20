@@ -199,11 +199,11 @@
                                     <pharm:ingredient classCode="ACTI">
                                        <pharm:quantity>
                                           <numerator xsi:type="PQ"
-                                                     value="100"
-                                                     unit="1"/>
+                                                     value="10"
+                                                     unit="mg"/>
                                           <denominator xsi:type="PQ"
                                                        value="1"
-                                                       unit="mL"/>
+                                                       unit="g"/>
                                        </pharm:quantity>
                                        <pharm:ingredientSubstance classCode="MMAT"
                                                                   determinerCode="KIND">
@@ -234,10 +234,10 @@
                                        <pharm:quantity>
                                           <numerator xsi:type="PQ"
                                                      value="100"
-                                                     unit="1"/>
+                                                     unit="mg"/>
                                           <denominator xsi:type="PQ"
                                                        value="1"
-                                                       unit="mL"/>
+                                                       unit="1"/>
                                        </pharm:quantity>
                                        <pharm:ingredientSubstance classCode="MMAT"
                                                                   determinerCode="KIND">

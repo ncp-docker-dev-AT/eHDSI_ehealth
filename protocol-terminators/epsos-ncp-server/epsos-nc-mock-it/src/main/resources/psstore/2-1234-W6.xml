@@ -271,6 +271,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <th>Dosage</th>
                                     <th>Time</th>
                                     <th>Route</th>
+                                    <th>Medical reason</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -289,6 +290,10 @@ Although being real choices for the different diseases and conditions, the selec
                                     <td>since 1997-10-06</td>
                                     <td>
                                         <content ID="route-1" language="xx-XX">Oral use</content>
+                                        <br/>
+                                    </td>
+                                    <td>
+                                        <content ID="medreason-1" language="xx-XX">Medical reason</content>
                                         <br/>
                                     </td>
                                 </tr>
@@ -735,10 +740,10 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr><th>Reaction Type</th><th>Clinical Manifestation</th><th>Agent</th><th>Time</th><th>Severity</th><th>Criticality</th><th>Status</th><th>Certainty</th><th>Process of establishing a problem</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td>since 1990-01-10</td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td><td>low risk</td><td><content ID="status-1">active</content></td><td>confirmed</td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
-                                <tr><td><content ID="obs-3a"><content ID="code-10" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-4"><content ID="val-4" language="xx-XX">Diarrhea</content><br/></td><td><content ID="code-11" language="xx-XX">Lactose</content><br/></td><td>since 1983-05-05</td><td><content ID="code-13" language="xx-XX">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-2">active</content></td><td>confirmed</td><td><content ID="code-12" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
-                                <tr><td><content ID="obs-5a"><content ID="code-14" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-6"><content ID="val-6" language="xx-XX">Asthma</content><br/></td><td><content ID="code-15" language="xx-XX">acetylsalicylic acid</content><br/></td><td>from 1994 until 2010</td><td><content ID="code-17">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-3">resolved</content></td><td>confirmed</td><td><content ID="code-16" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
-                                <tr><td><content ID="obs-7a"><content ID="code-18" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-8"><content ID="val-8" language="xx-XX">Urticaria</content><br/></td><td><content ID="code-19" language="xx-XX">Latex</content><br/></td><td>since 1990-01-10</td><td><content ID="code-21">Moderate to severe</content><br/></td><td>high risk</td><td><content ID="status-4">suspended</content></td><td>confirmed</td><td><content ID="code-20" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
+                                <tr><td><content ID="obs-1a"><content ID="code-6" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-2"><content ID="val-2" language="xx-XX">Eczema</content><br/></td><td><content ID="code-7" language="xx-XX">Kiwi fruit</content><br/></td><td>since 1990-01-10</td><td><content ID="code-9" language="xx-XX">Moderate to severe</content><br/></td><td><content ID="criticality-1">low risk</content></td><td><content ID="status-1">active</content></td><td><content ID="certainty-1">confirmed</content></td><td><content ID="code-8" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
+                                <tr><td><content ID="obs-3a"><content ID="code-10" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-4"><content ID="val-4" language="xx-XX">Diarrhea</content><br/></td><td><content ID="code-11" language="xx-XX">Lactose</content><br/></td><td>since 1983-05-05</td><td><content ID="code-13" language="xx-XX">Moderate to severe</content><br/></td><td><content ID="criticality-2">high risk</content></td><td><content ID="status-2">active</content></td><td><content ID="certainty-2">confirmed</content></td><td><content ID="code-12" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
+                                <tr><td><content ID="obs-5a"><content ID="code-14" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-6"><content ID="val-6" language="xx-XX">Asthma</content><br/></td><td><content ID="code-15" language="xx-XX">acetylsalicylic acid</content><br/></td><td>from 1994 until 2010</td><td><content ID="code-17">Moderate to severe</content><br/></td><td><content ID="criticality-3">high risk</content></td><td><content ID="status-3">resolved</content></td><td><content ID="certainty-3">confirmed</content></td><td><content ID="code-16" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
+                                <tr><td><content ID="obs-7a"><content ID="code-18" language="xx-XX">Propensity to adverse reaction</content><br/></content></td><td ID="obs-8"><content ID="val-8" language="xx-XX">Urticaria</content><br/></td><td><content ID="code-19" language="xx-XX">Latex</content><br/></td><td>since 1990-01-10</td><td><content ID="code-21">Moderate to severe</content><br/></td><td><content ID="criticality-4">high risk</content></td><td><content ID="status-4">suspended</content></td><td><content ID="certainty-4">confirmed</content></td><td><content ID="code-20" language="xx-XX">Finding reported by subject or history provider</content></td></tr>
                             </tbody>
                         </table>
                     </text>
@@ -812,6 +817,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
+                                            <text>
+                                                <reference value="#criticality-1"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="low" displayName="Low Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
@@ -821,6 +829,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
+                                            <text>
+                                                <reference value="#certainty-1"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
@@ -910,6 +921,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
+                                            <text>
+                                                <reference value="#criticality-2"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
@@ -919,6 +933,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
+                                            <text>
+                                                <reference value="#certainty-2"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
@@ -947,8 +964,6 @@ Although being real choices for the different diseases and conditions, the selec
                             <code code="CONC" codeSystem="2.16.840.1.113883.5.6" codeSystemName="ActClass"/>
                             <!-- status of Concern -->
                             <statusCode code="active"/>
-
-
                             <entryRelationship typeCode="SUBJ" inversionInd="false">
                                 <!-- Allergies And Intolerances -->
                                 <observation classCode="OBS" moodCode="EVN">
@@ -1011,6 +1026,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
+                                            <text>
+                                                <reference value="#criticality-3"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
@@ -1020,6 +1038,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
+                                            <text>
+                                                <reference value="#certainty-3"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
@@ -1117,6 +1138,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.33"/>
                                             <code code="82606-5" codeSystem="2.16.840.1.113883.6.1"/>
+                                            <text>
+                                                <reference value="#criticality-4"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="high" displayName="High Risk" codeSystem="2.16.840.1.113883.4.642.4.130"/>
                                         </observation>
@@ -1126,6 +1150,9 @@ Although being real choices for the different diseases and conditions, the selec
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.35"/>
                                             <code code="66455-7" codeSystem="2.16.840.1.113883.6.1" displayName="Condition status"/>
+                                            <text>
+                                                <reference value="#criticality-4"/>
+                                            </text>
                                             <statusCode code="completed"/>
                                             <value xsi:type="CD" code="confirmed" displayName="Confirmed" codeSystem="2.16.840.1.113883.4.642.4.1371"/>
                                         </observation>
@@ -1220,7 +1247,7 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr ID="pca-1a"><td><content ID="obs-9"><content ID="val-9" language="xx-XX">Predominantly allergic asthma</content><br/></content></td><td><content ID="code-27" language="xx-XX">Clinical finding</content><br/></td><td>since 1994-10-03</td><td>active</td><td/></tr>
                                 <tr ID="pca-2a"><td><content ID="obs-10"><content ID="val-10" language="xx-XX">Postprocedural hypothyroidism</content><br/></content></td><td><content ID="code-29" language="xx-XX">Clinical finding</content><br/></td><td>since 1997-10-06</td><td>active</td><td/></tr>
                                 <tr ID="pca-3a"><td><content ID="obs-11"><content ID="val-11" language="xx-XX">Other specified cardiac arrhythmias</content><br/></content></td><td><content ID="code-31" language="xx-XX">Clinical finding</content><br/></td><td>since 2013-01-09</td><td>active</td><td/></tr>
-                                <tr ID="pca-4a"><td><content ID="obs-12"><content ID="val-12" language="xx-XX">Type 2 diabetes mellitus</content><br/></content></td><td><content ID="code-33" language="xx-XX">Clinical finding</content><br/></td><td>since 2013-01-09</td><td>active</td><td/></tr>
+                                <tr ID="pca-4a"><td><content ID="obs-12"><content ID="val-12" language="xx-XX">Meningoencefalitis herpetica</content><br/></content></td><td><content ID="code-33" language="xx-XX">Clinical finding</content><br/></td><td>since 2013-01-09</td><td>active</td><td/></tr>
                                 <tr ID="pca-5a"><td><content ID="obs-13"><content ID="val-13" language="xx-XX">Severe pre-eclampsia</content><br/></content></td><td><content ID="code-35" language="xx-XX">Problem</content><br/></td><td>since 2017-05-06</td><td>active</td><td><content ID="obs-14" language="xx-XX"><content ID="val-14" language="xx-XX">Severe</content></content></td></tr>
                                 <tr ID="pca-6a"><td><content ID="obs-15"><content ID="val-15" language="xx-XX">Acute tubulo-interstitial nephritis</content><br/></content></td><td><content ID="code-38" language="xx-XX">Problem</content><br/></td><td>since 2017-05-07</td><td>active</td><td><content ID="obs-16" language="xx-XX"><content ID="val-16" language="xx-XX">Moderate to severe</content></content></td></tr>
                             </tbody>
@@ -1366,9 +1393,9 @@ Although being real choices for the different diseases and conditions, the selec
                                     <effectiveTime>
                                         <low value="20130109"/>
                                     </effectiveTime>
-                                    <value xsi:type="CD" nullFlavor="OTH">
+                                    <value xsi:type="CD" codeSystem="2.16.840.1.113883.5.1008" nullFlavor="OTH">
                                         <originalText>
-                                            <reference value="#ref1"/>
+                                            <reference value="#val-12"/>
                                         </originalText>
                                         <translation code="054.3" codeSystem="2.16.840.1.113883.6.103" displayName="Meningoencefalitis herpetica" />
                                     </value>
@@ -1510,7 +1537,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <id root="2.999" extension="ABC-Device-ID-2"/>
                                     <playingDevice classCode="DEV" determinerCode="INSTANCE">
                                         <code code="68183006" codeSystem="2.16.840.1.113883.6.96">
-                                            <originalText><reference value="#code-70"/></originalText>
+                                            <originalText><reference value="#code-71"/></originalText>
                                         </code>
                                     </playingDevice>
                                 </participantRole>
@@ -1572,6 +1599,9 @@ Although being real choices for the different diseases and conditions, the selec
                                     <entryRelationship typeCode="REFR">
                                         <observation classCode="OBS" moodCode="EVN">
                                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.9"/>
+                                            <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.1.1"/>
+                                            <templateId root="2.16.840.1.113883.10.20.1.57"/>
+                                            <templateId root="2.16.840.1.113883.10.20.1.50"/>
                                             <code code="33999-4" codeSystem="2.16.840.1.113883.6.1" displayName="Problem Status" codeSystemName="LOINC">
                                                 <originalText><reference value="#code-45"/></originalText>
                                             </code>
@@ -1843,12 +1873,22 @@ Although being real choices for the different diseases and conditions, the selec
                                 <tr><th>Outcome</th><th>Number</th><th>Outcome date(s)</th></tr>
                             </thead>
                             <tbody>
-                                <tr ID="obs-22a"><td><content ID="code-60" language="en-GB">Livebirth</content><br/></td><td>2</td><td>2020-02-05, 2021-09-08</td></tr>
-                                <tr ID="obs-22b"><td><content ID="code-61" language="en-GB">Termination of pregnancy</content><br/></td><td>1</td><td>2010-07-03</td></tr>
+                                <tr ID="obs-22a"><td><content ID="pregnancy-1" language="en-GB">20200205</content></td></tr>
+                                <tr ID="obs-22b"><td><content ID="pregnancy-2" language="en-GB">20210908</content></td></tr>
+                            </tbody>
+                        </table>
+                        <paragraph ID="obs-23">Previous pregnancies overview</paragraph>
+                        <table><colgroup><col width="60%"/></colgroup>
+                            <thead>
+                                <tr><th>Outcome date(s)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr ID="obs-23a"><td><content ID="code-60" language="en-GB">Livebirth</content><br/></td><td>2</td><td>2020-02-05, 2021-09-08</td></tr>
+                                <tr ID="obs-23b"><td><content ID="code-61" language="en-GB">Termination of pregnancy</content><br/></td><td>1</td><td>2010-07-03</td></tr>
                             </tbody>
                         </table>
                     </text>
-                    <entry>
+                    <entry typeCode="COMP">
                         <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.45"/>
                             <code code="82810-3" codeSystem="2.16.840.1.113883.6.1"/>
@@ -1867,7 +1907,7 @@ Although being real choices for the different diseases and conditions, the selec
                                     <id root="2.999.8.1"/>
                                     <code code="11778-8" codeSystem="2.16.840.1.113883.6.1" displayName="Delivery date estimated (clinical)" codeSystemName="LOINC"/>
                                     <text>
-                                        <reference value="#xxx"/>
+                                        <reference value="#obs-21a"/>
                                     </text>
                                     <statusCode code="completed"/>
                                     <effectiveTime value="20150819"/>
@@ -1876,23 +1916,29 @@ Although being real choices for the different diseases and conditions, the selec
                             </entryRelationship>
                         </observation>
                     </entry>
-                    <entry>
+                    <entry typeCode="COMP">
                         <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.46"/>
                             <code code="281050002" displayName="Livebirth" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96"/>
+                            <text>
+                                <reference value="#obs-23a"/>
+                            </text>
                             <statusCode code="completed"/>
                             <value xsi:type="INT" value="2"/>
                         </observation>
                     </entry>
-                    <entry>
+                    <entry typeCode="COMP">
                         <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.46"/>
                             <code code="57797005" displayName="Termination of pregnancy" codeSystemVersion="2021-09-30" codeSystem="2.16.840.1.113883.6.96"/>
+                            <text>
+                                <reference value="#obs-23b"/>
+                            </text>
                             <statusCode code="completed"/>
                             <value xsi:type="INT" value="1"/>
                         </observation>
                     </entry>
-                    <entry>
+                    <entry typeCode="COMP">
                         <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.47"/>
                             <code code="93857-1" codeSystem="2.16.840.1.113883.6.1"/>
@@ -1904,7 +1950,7 @@ Although being real choices for the different diseases and conditions, the selec
                             <value xsi:type="TS" value="20200205"/>
                         </observation>
                     </entry>
-                    <entry>
+                    <entry typeCode="COMP">
                         <observation classCode="OBS" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.47"/>
                             <code code="93857-1" codeSystem="2.16.840.1.113883.6.1"/>
@@ -2128,14 +2174,15 @@ Although being real choices for the different diseases and conditions, the selec
                             <component>
                                 <observation classCode="OBS" moodCode="EVN">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.43"/>
+                                    <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
                                     <id root="2.999.11.2" extension="__example only__"/>
                                     <code code="LP6406-5" displayName="Magnetic resonance imaging (MRI)" codeSystem="1.2.3.999"/>
                                     <text><reference value="#obs-29"/></text>
-                                    <statusCode/>
+                                    <statusCode code="completed"/>
                                     <effectiveTime value="20220614" />
                                     <value xsi:type="CD" code="121112" codeSystem="1.2.840.10008.2.16.4"
                                            codeSystemName="DCM" displayName="Source of Measurement"/>
-                                    <interpretationCode code="..." codeSystem="2.16.840.1.113883.5.83"/>
+                                    <interpretationCode code="N" codeSystem="2.16.840.1.113883.5.83"/>
                                     <methodCode code="..." codeSystem="1.2.3.999"/>
                                     <targetSiteCode code="..." codeSystem="1.2.3.999"/>
                                     <entryRelationship typeCode="COMP">
@@ -2152,7 +2199,7 @@ Although being real choices for the different diseases and conditions, the selec
                                                 <assignedAuthor>
                                                     <id root="2.999.11.2.1" extension="__example only__"/>
                                                     <addr/>
-                                                    <telecom value="" use=""/>
+                                                    <telecom value="tel:351211234567" use="H"/>
                                                     <assignedPerson>
                                                         <name/>
                                                     </assignedPerson>
@@ -2213,6 +2260,7 @@ Although being real choices for the different diseases and conditions, the selec
                     <entry>
                         <organizer classCode="CLUSTER" moodCode="EVN">
                             <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.39"/>
+                            <id root="2.999.13.1"/>
                             <code code="47420-5" displayName="Functional status assessment note" codeSystemName="LOINC" codeSystem="2.16.840.1.113883.6.1"/>
                             <statusCode code="completed"/>
                             <effectiveTime value="20220613"/>
@@ -2220,7 +2268,7 @@ Although being real choices for the different diseases and conditions, the selec
                                 <observation classCode="OBS" moodCode="EVN">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.40"/>
                                     <templateId root="1.3.6.1.4.1.19376.1.5.3.1.4.13"/>
-                                    <id root="2.999.13.1"/>
+                                    <id root="2.999.13.1.1"/>
                                     <code code="45588-1" displayName="Bed mobility - self-performance during assessment period" codeSystem="2.16.840.1.113883.6.1"/>
                                     <text>
                                         <reference value="#obs-30a"/>
