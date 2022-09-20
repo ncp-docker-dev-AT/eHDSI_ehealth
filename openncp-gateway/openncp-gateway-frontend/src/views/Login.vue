@@ -13,10 +13,12 @@
                 :rules="[(v) => !!v || 'Username is required']"
               />
               <v-text-field
+                name="current-password"
                 v-model="password"
                 label="Password"
                 prepend-icon="mdi-lock"
                 type="password"
+                autocomplete="on"
                 :rules="[(v) => !!v || 'Password is required']"
                 @keypress.enter="login"
               />

@@ -193,7 +193,6 @@ export default {
     }
   },
   mounted () {
-    console.log('okok')
     // this.getDataFromApi()
     const d = new Date()
     const a = d.getUTCHours()

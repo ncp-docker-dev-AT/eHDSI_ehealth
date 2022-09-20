@@ -32,7 +32,7 @@
                         Pharmaceutical Product Identifier
                     </th>
                     <td>
-                        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code[@codeSystem!='2.16.840.1.113883.6.73']/@code"/>
+                        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code[@codeSystem!='2.16.840.1.113883.6.73']/@code"/>
                     </td>
                 </tr>
                 <tr>

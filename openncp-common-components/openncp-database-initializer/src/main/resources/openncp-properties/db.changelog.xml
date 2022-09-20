@@ -54,4 +54,17 @@
 
         <addPrimaryKey tableName="EHNCP_USER_ROLE" columnNames="USER_ID,ROLE_ID"/>
     </changeSet>
+
+    <changeSet id="2" author="miorial">
+        <createTable tableName="EHNCP_ANOMALIES">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="AnomalyDescription" type="varchar(2000)" />
+            <column name="AnomalyType" type="varchar(20)"/>
+            <column name="AnomalyDateTime" type="datetime"/>
+            <column name="BeginEventDateTime" type="datetime"/>
+            <column name="EndEventDateTime" type="datetime"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>

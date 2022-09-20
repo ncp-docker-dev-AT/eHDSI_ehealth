@@ -15,6 +15,19 @@
             <v-list-item-action>
               <v-icon>mdi-file-code</v-icon>
             </v-list-item-action>
+            <v-list-item-title>Anomaly Viewer</v-list-item-title>
+          </template>
+          <v-list-item link to="/anomalies-viewer/anomalies-events">
+            <v-list-item-content>
+              <v-list-item-title>Anomalies</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-group>
+        <v-list-group v-if="checkRoles('GTW_ATNA_ADMIN')">
+          <template v-slot:activator>
+            <v-list-item-action>
+              <v-icon>mdi-file-code</v-icon>
+            </v-list-item-action>
             <v-list-item-title>ATNA Viewer</v-list-item-title>
           </template>
           <v-list-item link to="/atna-viewer/audit-messages">
@@ -170,7 +183,7 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      attrs: '',
+      attrs: [],
       pwd: '',
       confirmPwd: '',
       oldPwd: '',
