@@ -102,6 +102,19 @@
                 />
               </v-col>
             </v-row>
+            <v-row v-if="message.transactionError != null && message.transactionError.errorDescription != ''">
+              <v-col>
+                <v-text-field
+                  label="Error Description"
+                  outlined
+                  :value= "message.transactionError.errorDescription"
+                  disabled
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+              </v-col>
+            </v-row>
           </v-container>
         </v-tab-item>
         <v-tab-item value="tab-home-snd-receiving">
