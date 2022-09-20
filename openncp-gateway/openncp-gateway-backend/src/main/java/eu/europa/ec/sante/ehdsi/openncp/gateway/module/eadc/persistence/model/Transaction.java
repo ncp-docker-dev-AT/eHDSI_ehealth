@@ -88,6 +88,9 @@ public class Transaction {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "transaction", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TransactionData> transactionData = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "transaction", orphanRemoval = true, fetch = FetchType.EAGER)
+    private TransactionError transactionError;
+
     public String getId() {
         return id;
     }
@@ -219,4 +222,13 @@ public class Transaction {
     public void setTransactionData(List<TransactionData> transactionData) {
         this.transactionData = transactionData;
     }
+
+    public TransactionError getTransactionError() {
+        return transactionError;
+    }
+
+    public void setTransactionError(TransactionError transactionError) {
+        this.transactionError = transactionError;
+    }
+
 }

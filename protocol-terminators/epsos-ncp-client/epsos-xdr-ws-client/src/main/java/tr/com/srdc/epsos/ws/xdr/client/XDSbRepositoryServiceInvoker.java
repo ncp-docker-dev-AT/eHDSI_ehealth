@@ -388,6 +388,9 @@ public class XDSbRepositoryServiceInvoker {
         SlotType1 slId = makeSlot(XDRConstants.EXTRINSIC_OBJECT.SRC_PATIENT_INFO_STR, "PID-3|" + patientId);
         slId.getValueList().getValue().add("PID-5|" + patient.getFamilyName() + "^" + patient.getGivenName());
         slId.getValueList().getValue().add("PID-7|" + new SimpleDateFormat("yyyyMMddkkmmss.SSSZZZZ", Locale.ENGLISH).format(patient.getBirthDate()));
+        if (patient.getAdministrativeGender() != null) {
+            slId.getValueList().getValue().add("PID-8|" + patient.getAdministrativeGender().getValue());
+        }
         result.getSlot().add(slId);
 
         // eHDSI Type Code
