@@ -77,23 +77,19 @@
                             </span>
                         </th>
                         <td>
-                            <xsl:choose>
-                                <xsl:when test="not(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part)">
-                                    <xsl:call-template name="show-package-size-for-dispense">
-                                        <xsl:with-param name="quantity" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:quantity"/>
-                                        <xsl:with-param name="asContent_level1" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent"/>
-                                        <xsl:with-param name="asContent_level2" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
-                                        <xsl:with-param name="asContent_level3" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
-                                    </xsl:call-template>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <table>
-                                        <tbody>
-                                            <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packagingDispense"/>
-                                        </tbody>
-                                    </table>
-                                </xsl:otherwise>
-                            </xsl:choose>
+                            <xsl:call-template name="show-package-size-for-dispense">
+                                <xsl:with-param name="quantity" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:quantity"/>
+                                <xsl:with-param name="asContent_level1" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent"/>
+                                <xsl:with-param name="asContent_level2" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
+                                <xsl:with-param name="asContent_level3" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
+                            </xsl:call-template>
+                            <xsl:if test="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part">
+                                <table>
+                                    <tbody>
+                                        <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packagingDispense"/>
+                                    </tbody>
+                                </table>
+                            </xsl:if>
                         </td>
                     </tr>
                     <tr>

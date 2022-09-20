@@ -49,37 +49,24 @@
                             </xsl:call-template>
                         </td>
                     </tr>
-                    <xsl:choose>
-                        <xsl:when test="not(n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part)">
-                            <tr>
-                                <th>
-                                    <!-- Package Size Header -->
-                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                        <xsl:with-param name="code" select="'50'"/>
-                                    </xsl:call-template>
-                                </th>
-                                <td>
-                                    <xsl:call-template name="show-package-size">
-                                        <xsl:with-param name="asContent_level1" select="$asContent_level1"/>
-                                        <xsl:with-param name="asContent_level2" select="$asContent_level2"/>
-                                        <xsl:with-param name="asContent_level3" select="$asContent_level3"/>
-                                    </xsl:call-template>
-                                </td>
-                            </tr>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <tr>
-                                <th>
-                                    <!-- Package Size Header -->
-                                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                                        <xsl:with-param name="code" select="'50'"/>
-                                    </xsl:call-template>
-                                </th>
-                                <td/>
-                            </tr>
-                            <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <tr>
+                        <th>
+                            <!-- Package Size Header -->
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                <xsl:with-param name="code" select="'50'"/>
+                            </xsl:call-template>
+                        </th>
+                        <td>
+                            <xsl:call-template name="show-package-size">
+                                <xsl:with-param name="asContent_level1" select="$asContent_level1"/>
+                                <xsl:with-param name="asContent_level2" select="$asContent_level2"/>
+                                <xsl:with-param name="asContent_level3" select="$asContent_level3"/>
+                            </xsl:call-template>
+                        </td>
+                    </tr>
+                    <xsl:if test="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part">
+                        <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging"/>
+                    </xsl:if>
                 </tbody>
             </table>
         </fieldset>
