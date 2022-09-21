@@ -20,14 +20,14 @@
 
 package org.openhealthtools.openatna.net;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.HashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.common.utils.DateUtil;
 import org.openhealthtools.common.utils.StringUtil;
-
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  * This classes defines an Object as in the ObjectList.

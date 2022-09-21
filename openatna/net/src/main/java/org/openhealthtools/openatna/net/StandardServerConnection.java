@@ -20,11 +20,11 @@
 
 package org.openhealthtools.openatna.net;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.net.ServerSocket;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A standard non encrypted tcp server connection.

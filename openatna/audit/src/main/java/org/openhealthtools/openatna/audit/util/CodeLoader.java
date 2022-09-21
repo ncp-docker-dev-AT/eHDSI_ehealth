@@ -20,6 +20,9 @@
 
 package org.openhealthtools.openatna.audit.util;
 
+import java.net.URL;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.anom.AtnaCode;
@@ -31,9 +34,6 @@ import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
 import org.openhealthtools.openatna.audit.persistence.dao.CodeDao;
 import org.openhealthtools.openatna.audit.persistence.model.codes.CodeEntity;
 import org.openhealthtools.openatna.audit.persistence.util.EntityConverter;
-
-import java.net.URL;
-import java.util.List;
 
 /**
  * @author Andrew Harrison

@@ -1,5 +1,7 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 /**

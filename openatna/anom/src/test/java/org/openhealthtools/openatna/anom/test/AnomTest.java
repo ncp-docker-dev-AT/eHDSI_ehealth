@@ -20,12 +20,20 @@
 
 package org.openhealthtools.openatna.anom.test;
 
-import org.junit.Test;
-import org.openhealthtools.openatna.anom.*;
-
 import java.io.IOException;
 
+import org.openhealthtools.openatna.anom.AtnaCode;
+import org.openhealthtools.openatna.anom.AtnaException;
+import org.openhealthtools.openatna.anom.AtnaMessage;
+import org.openhealthtools.openatna.anom.AtnaMessageObject;
+import org.openhealthtools.openatna.anom.AtnaMessageParticipant;
+import org.openhealthtools.openatna.anom.AtnaObject;
+import org.openhealthtools.openatna.anom.AtnaObjectDetail;
+import org.openhealthtools.openatna.anom.AtnaParticipant;
+import org.openhealthtools.openatna.anom.AtnaSource;
+import org.openhealthtools.openatna.anom.EventOutcome;
 import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 
 /**
