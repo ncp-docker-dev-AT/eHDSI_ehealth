@@ -17,34 +17,26 @@
  * University of Cardiff - initial API and implementation
  * -
  */
-
 package org.openhealthtools.openatna.all.test.ssl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.X509TrustManager;
-
-/**
- * <p>
- * <p/>
- * </p>
- */
-
 public class AuthSSLX509TrustManager implements X509TrustManager {
 
-    private X509TrustManager trustManager = null;
-    private X509TrustManager defaultTrustManager = null;
-    List<String> authorizedDns = null;
     /**
      * Log object for this class.
      */
     static Logger log = LoggerFactory.getLogger(AuthSSLX509TrustManager.class);
+    List<String> authorizedDns = null;
+    private X509TrustManager trustManager = null;
+    private X509TrustManager defaultTrustManager = null;
 
     /**
      * Constructor for AuthSSLX509TrustManager.
@@ -67,13 +59,10 @@ public class AuthSSLX509TrustManager implements X509TrustManager {
      */
     public void checkClientTrusted(X509Certificate[] certificates, String authType) throws CertificateException {
         if (certificates != null) {
-            boolean isAuthDN = false;
-            if (authorizedDns.size() == 0) {
-                isAuthDN = true;
-            }
+            boolean isAuthDN = authorizedDns.size() == 0;
             for (int c = 0; c < certificates.length; c++) {
                 X509Certificate cert = certificates[c];
-                if (isAuthDN == false) {
+                if (!isAuthDN) {
                     for (String authorizedDn : authorizedDns) {
                         if (authorizedDn.equals(cert.getSubjectDN())) {
                             isAuthDN = true;
