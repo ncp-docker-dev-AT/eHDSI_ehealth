@@ -28,7 +28,7 @@
                   label="Anomaly Type"
                   outlined
                   :value="
-                    anomaly.anomalyType
+                    anomaly.type
                   "
                   disabled
                   hide-details="auto"
@@ -39,7 +39,7 @@
                   label="Anomaly Detection Date Time"
                   outlined
                   :value="
-                    anomaly.anomalyDateTime | date('long')
+                    anomaly.eventDate | date('long')
                   "
                   disabled
                   hide-details="auto"
@@ -52,7 +52,7 @@
                   label="Anomaly Begin Event Date Time"
                   outlined
                   :value="
-                    anomaly.beginEventDateTime | date('long')
+                    anomaly.eventStartDate | date('long')
                   "
                   disabled
                   hide-details="auto"
@@ -63,7 +63,7 @@
                   label="Anomaly End Event Date Time"
                   outlined
                   :value="
-                    anomaly.endEventDateTime | date('long')
+                    anomaly.eventEndDate | date('long')
                   "
                   disabled
                   hide-details="auto"
@@ -75,7 +75,7 @@
                 <v-textarea height="200" width="350"
                   label="Anomaly Description"
                   :value="
-                    anomaly.anomalyDescription
+                    anomaly.description
                   "
                   outlined
                   disabled

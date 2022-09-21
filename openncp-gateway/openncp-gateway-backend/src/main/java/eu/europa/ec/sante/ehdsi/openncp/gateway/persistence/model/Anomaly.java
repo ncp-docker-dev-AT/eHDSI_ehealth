@@ -4,22 +4,25 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "EHNCP_ANOMALIES")
+@Table(name = "EHNCP_ANOMALY")
 public class Anomaly {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "ID", nullable = false)
     private Long id;
 
-    private String AnomalyDescription;
+    private String description;
 
-    private String anomalyType;
+    private String type;
 
-    private Date anomalyDateTime;
+    @Column(name = "EVENT_DATE")
+    private Date eventDate;
 
-    private Date beginEventDateTime;
+    @Column(name = "EVENT_START_DATE")
+    private Date eventStartDate;
 
-    private Date endEventDateTime;
+    @Column(name = "EVENT_END_DATE")
+    private Date eventEndDate;
 
     public Long getId() {
         return id;
@@ -29,43 +32,43 @@ public class Anomaly {
         this.id = id;
     }
 
-    public String getAnomalyDescription() {
-        return AnomalyDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setAnomalyDescription(String anomalyDescription) {
-        AnomalyDescription = anomalyDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getAnomalyType() {
-        return anomalyType;
+    public String getType() {
+        return type;
     }
 
-    public void setAnomalyType(String anomalyType) {
-        this.anomalyType = anomalyType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Date getAnomalyDateTime() {
-        return anomalyDateTime;
+    public Date getEventDate() {
+        return eventDate;
     }
 
-    public void setAnomalyDateTime(Date anomalyDateTime) {
-        this.anomalyDateTime = anomalyDateTime;
+    public void setEventDate(Date eventDate) {
+        this.eventDate = eventDate;
     }
 
-    public Date getBeginEventDateTime() {
-        return beginEventDateTime;
+    public Date getEventStartDate() {
+        return eventStartDate;
     }
 
-    public void setBeginEventDateTime(Date beginEventDateTime) {
-        this.beginEventDateTime = beginEventDateTime;
+    public void setEventStartDate(Date eventStartDate) {
+        this.eventStartDate = eventStartDate;
     }
 
-    public Date getEndEventDateTime() {
-        return endEventDateTime;
+    public Date getEventEndDate() {
+        return eventEndDate;
     }
 
-    public void setEndEventDateTime(Date endEventDateTime) {
-        this.endEventDateTime = endEventDateTime;
+    public void setEventEndDate(Date eventEndDate) {
+        this.eventEndDate = eventEndDate;
     }
 }
