@@ -20,9 +20,9 @@
 
 package org.openhealthtools.openatna.syslog.mina.udp;
 
-import org.openhealthtools.openatna.syslog.transport.TransportConfig;
-
 import java.util.Map;
+
+import org.openhealthtools.openatna.syslog.transport.TransportConfig;
 
 /**
  * Class Description Here...

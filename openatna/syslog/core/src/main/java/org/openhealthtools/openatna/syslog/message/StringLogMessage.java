@@ -20,14 +20,14 @@
 
 package org.openhealthtools.openatna.syslog.message;
 
-import org.openhealthtools.openatna.syslog.Constants;
-import org.openhealthtools.openatna.syslog.LogMessage;
-import org.openhealthtools.openatna.syslog.SyslogException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+
+import org.openhealthtools.openatna.syslog.Constants;
+import org.openhealthtools.openatna.syslog.LogMessage;
+import org.openhealthtools.openatna.syslog.SyslogException;
 
 /**
  * Simple string implementation of LogMessage.

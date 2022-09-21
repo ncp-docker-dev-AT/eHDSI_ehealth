@@ -20,10 +20,10 @@
 
 package org.openhealthtools.openatna.syslog.core.test.tls;
 
+import java.util.Map;
+
 import org.openhealthtools.openatna.syslog.core.test.tls.ssl.AuthSSLSocketFactory;
 import org.openhealthtools.openatna.syslog.transport.TransportConfig;
-
-import java.util.Map;
 
 /**
  * Class Description Here...
