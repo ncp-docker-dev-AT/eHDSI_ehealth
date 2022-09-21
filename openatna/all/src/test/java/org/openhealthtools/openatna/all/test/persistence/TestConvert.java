@@ -1,22 +1,3 @@
-/**
- * Copyright (c) 2009-2011 University of Cardiff and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * University of Cardiff - initial API and implementation
- * -
- */
 package org.openhealthtools.openatna.all.test.persistence;
 
 import org.junit.Test;
@@ -32,10 +13,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-/**
- * @author Andrew Harrison
- * @version $Revision:$
- */
 public class TestConvert {
 
     @Test
@@ -61,7 +38,7 @@ public class TestConvert {
         part.setAlternativeUserId("werdna");
 
         MessageParticipantEntity pentity = new MessageParticipantEntity(part);
-        NetworkAccessPointEntity net = new NetworkAccessPointEntity(new Short("2"), "192.168.0.1");
+        NetworkAccessPointEntity net = new NetworkAccessPointEntity(Short.valueOf("2"), "192.168.0.1");
         pentity.setNetworkAccessPoint(net);
         msgEnt.addMessageParticipant(pentity);
 
@@ -71,11 +48,11 @@ public class TestConvert {
         ObjectEntity obj = new ObjectEntity("obj1", ocode);
         obj.setObjectName("machine");
         obj.setObjectSensitivity("N");
-        obj.setObjectTypeCodeRole(new Short("1"));
-        obj.setObjectTypeCode(new Short("1"));
+        obj.setObjectTypeCodeRole(Short.valueOf("1"));
+        obj.setObjectTypeCode(Short.valueOf("1"));
 
         MessageObjectEntity objEnt = new MessageObjectEntity(obj);
-        objEnt.setObjectDataLifeCycle(new Short("1"));
+        objEnt.setObjectDataLifeCycle(Short.valueOf("1"));
         objEnt.addObjectDetail(new ObjectDetailEntity("version", Base64.encodeString("1.2").getBytes()));
         objEnt.setObjectQuery(Base64.encodeString("a query string").getBytes());
         msgEnt.addMessageObject(objEnt);
@@ -141,7 +118,6 @@ public class TestConvert {
         AtnaMessage am = EntityConverter.createMessage(msgEntity);
         assertEquals(msg, am);
     }
-
 
     protected MessageEntity createMessage() {
         MessageEntity msg = new MessageEntity();

@@ -14,14 +14,10 @@ public enum ClassCode {
     CONSENT_CLASSCODE("57016-8"),
     HCER_CLASSCODE("34133-9");
 
-    private String code;
+    private final String code;
 
     ClassCode(String code) {
         this.code = code;
-    }
-
-    public String getCode() {
-        return code;
     }
 
     public static ClassCode getByCode(String code) {
@@ -31,5 +27,9 @@ public enum ClassCode {
             }
         }
         throw new IllegalArgumentException("Unknown class code : " + code);
+    }
+
+    public String getCode() {
+        return code;
     }
 }

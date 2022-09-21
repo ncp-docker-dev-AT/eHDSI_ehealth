@@ -33,11 +33,11 @@ public enum Country {
     Turkey("TR", "nn", "Turkey");
 
     // Country code
-    private String code;
+    private final String code;
     // Country language code
-    private String language;
+    private final String language;
     // Country display name
-    private String display;
+    private final String display;
 
     /**
      * A basic constructor initializing the country.

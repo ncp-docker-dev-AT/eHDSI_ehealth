@@ -2,12 +2,8 @@ package tr.com.srdc.epsos.ws.server.xca.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
-import eu.europa.ec.sante.ehdsi.constant.ClassCode;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
-import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
@@ -15,6 +11,11 @@ import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
+import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
@@ -25,13 +26,15 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.openncp.util.UUIDHelper;
-import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import fi.kela.se.epsos.data.model.*;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.*;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.AssociationType1;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -55,9 +58,9 @@ import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
 import tr.com.srdc.epsos.ws.server.xca.impl.errorlist.RegistryErrorUtils;
+import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.ep.EPExtrinsicObjectBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.orcd.OrCDExtrinsicObjectBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.ps.PSExtrinsicObjectBuilder;
-import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.ep.EPExtrinsicObjectBuilder;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
@@ -116,6 +119,23 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         var applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
         transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
+    }
+
+    private static String trimDocumentEntryPatientId(String patientId) {
+
+        if (patientId.contains("^^^")) {
+            return patientId.substring(0, patientId.indexOf("^^^"));
+        }
+        return patientId;
+    }
+
+    public static List<ClassCode> getClassCodesOrCD() {
+        List<ClassCode> list = new ArrayList<>();
+        list.add(ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE);
+        list.add(ORCD_LABORATORY_RESULTS_CLASSCODE);
+        list.add(ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE);
+        list.add(ORCD_MEDICAL_IMAGES_CLASSCODE);
+        return list;
     }
 
     private void prepareEventLogForQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response,
@@ -303,7 +323,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
         return classCodes;
     }
 
-    private ClassCode getClassCode(List<ClassCode> classCodeList){
+    private ClassCode getClassCode(List<ClassCode> classCodeList) {
 
         for (ClassCode classCode : classCodeList) {
             for (ClassCode classCodeValue : ClassCode.values()) {
@@ -316,13 +336,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * Extracts the XDS patient ID from the XCA query
+     * Util method extracting the XDS Patient Identifier from the XCA query.
+     *
+     * @return HL7v2 Patient Identifier formatted String.
      */
     private String getDocumentEntryPatientId(AdhocQueryRequest request) {
 
-        for (SlotType1 sl : request.getAdhocQuery().getSlot()) {
-            if (sl.getName().equals("$XDSDocumentEntryPatientId")) {
-                String patientId = sl.getValueList().getValue().get(0);
+        for (SlotType1 slot : request.getAdhocQuery().getSlot()) {
+            if (slot.getName().equals("$XDSDocumentEntryPatientId")) {
+                String patientId = slot.getValueList().getValue().get(0);
                 patientId = patientId.substring(1, patientId.length() - 1);
                 return patientId;
             }
@@ -420,7 +442,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             RegistryErrorUtils.addErrorMessage(registryErrorList, e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
             OpenNCPErrorCode code = OpenNCPErrorCode.ERROR_GENERIC;
-            switch (getClassCode(classCodeValues)){
+            switch (getClassCode(classCodeValues)) {
                 case EP_CLASSCODE:
                     code = OpenNCPErrorCode.ERROR_EP_GENERIC;
                     break;
@@ -438,7 +460,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
             throw e;
         }
 
-        String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
+        String fullPatientId = Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement);
+        //String fullPatientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement));
         if (!getDocumentEntryPatientId(request).contains(fullPatientId)) {
             // Patient ID in TRC assertion does not match the one given in the request. Return "No documents found".
             OpenNCPErrorCode code = OpenNCPErrorCode.ERROR_DOCUMENT_NOT_FOUND;
@@ -459,7 +482,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             RegistryErrorUtils.addErrorMessage(registryErrorList, code, code.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
 
         }
-        String patientId = trimDocumentEntryPatientId(fullPatientId);
+        //String patientId = trimDocumentEntryPatientId(fullPatientId);
         var countryCode = "";
         String distinguishedName = eventLog.getSC_UserID();
         int cIndex = distinguishedName.indexOf("C=");
@@ -482,12 +505,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
 
         // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
-        if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
-            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_NO_CONSENT, OpenNCPErrorCode.ERROR_NO_CONSENT.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+        if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
+            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_NO_CONSENT,
+                    OpenNCPErrorCode.ERROR_NO_CONSENT.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         if (classCodeValues.isEmpty()) {
-            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN, OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN,
+                    OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         // Evidence for call to NI for XCA List
@@ -498,7 +523,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             Assertion assertionTRC = Helper.getTRCAssertion(shElement);
             String messageUUID = UUIDHelper.encodeAsURN(assertionTRC.getID()) + "_" + assertionTRC.getIssueInstant();
 
-            EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+            EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().addPatientId(fullPatientId).asXml(),
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                     Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
@@ -506,7 +531,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     "NI_XCA_LIST_REQ", messageUUID);
         } catch (Exception e) {
             logger.error(ExceptionUtils.getStackTrace(e));
-            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_SEC_GENERIC, OpenNCPErrorCode.ERROR_SEC_GENERIC.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         for (ClassCode classCodeValue : classCodeValues) {
@@ -514,13 +540,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 switch (classCodeValue) {
                     case EP_CLASSCODE:
                         List<DocumentAssociation<EPDocumentMetaData>> prescriptions = documentSearchService.getEPDocumentList(
-                                DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                                DocumentFactory.createSearchCriteria().addPatientId(fullPatientId));
 
                         if (prescriptions == null) {
-                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_EP_REGISTRY_NOT_ACCESSIBLE, OpenNCPErrorCode.ERROR_EP_REGISTRY_NOT_ACCESSIBLE.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_EP_REGISTRY_NOT_ACCESSIBLE,
+                                    OpenNCPErrorCode.ERROR_EP_REGISTRY_NOT_ACCESSIBLE.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else if (prescriptions.isEmpty()) {
-                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_EP_NOT_FOUND, OpenNCPErrorCode.ERROR_EP_NOT_FOUND.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_EP_NOT_FOUND,
+                                    OpenNCPErrorCode.ERROR_EP_NOT_FOUND.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else {
                             // Multiple prescriptions mean multiple PDF and XML files, multiple ExtrinsicObjects and associations
@@ -545,7 +573,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                         break;
                     case PS_CLASSCODE:
-                        DocumentAssociation<PSDocumentMetaData> psDoc = documentSearchService.getPSDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                        DocumentAssociation<PSDocumentMetaData> psDoc = documentSearchService.getPSDocumentList(
+                                DocumentFactory.createSearchCriteria().addPatientId(fullPatientId));
 
                         if (psDoc == null || (psDoc.getPDFDocumentMetaData() == null && psDoc.getXMLDocumentMetaData() == null)) {
 
@@ -575,11 +604,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         }
                         break;
                     case MRO_CLASSCODE:
-                        DocumentAssociation<MroDocumentMetaData> mro = documentSearchService.getMroDocumentList(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId));
+                        DocumentAssociation<MroDocumentMetaData> mro = documentSearchService.getMroDocumentList(
+                                DocumentFactory.createSearchCriteria().addPatientId(fullPatientId));
 
                         if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
 
-                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_MRO_NO_DATA, OpenNCPErrorCode.ERROR_MRO_NO_DATA.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_MRO_NO_DATA,
+                                    OpenNCPErrorCode.ERROR_MRO_NO_DATA.getDescription(), "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
 
@@ -609,25 +640,27 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     case ORCD_LABORATORY_RESULTS_CLASSCODE:
                     case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     case ORCD_MEDICAL_IMAGES_CLASSCODE:
-                        var searchCriteria = DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId);
+                        var searchCriteria = DocumentFactory.createSearchCriteria().addPatientId(fullPatientId);
                         var filterParams = getFilterParams(request);
                         if (filterParams.getMaximumSize() != null) {
-                            searchCriteria.add(Criteria.MaximumSize, filterParams.getMaximumSize().toString());
+                            searchCriteria.add(Criteria.MAXIMUM_SIZE, filterParams.getMaximumSize().toString());
                         }
                         if (filterParams.getCreatedBefore() != null) {
-                            searchCriteria.add(Criteria.CreatedBefore, filterParams.getCreatedBefore().toString());
+                            searchCriteria.add(Criteria.CREATED_BEFORE, filterParams.getCreatedBefore().toString());
                         }
                         if (filterParams.getCreatedAfter() != null) {
-                            searchCriteria.add(Criteria.CreatedAfter, filterParams.getCreatedAfter().toString());
+                            searchCriteria.add(Criteria.CREATED_AFTER, filterParams.getCreatedAfter().toString());
                         }
 
                         List<OrCDDocumentMetaData> orCDDocumentMetaDataList = getOrCDDocumentMetaDataList(classCodeValue, searchCriteria);
 
                         if (orCDDocumentMetaDataList == null) {
-                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_GENERIC, "orCD registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_GENERIC,
+                                    "orCD registry could not be accessed.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else if (orCDDocumentMetaDataList.isEmpty()) {
-                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND, "There is no original clinical data of the requested type registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                            RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND,
+                                    "There is no original clinical data of the requested type registered for the given patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
 
@@ -640,7 +673,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         break;
 
                     default:
-                        RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN, "Class code not supported for XCA query(" + classCodeValue + ").", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                        RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN,
+                                "Class code not supported for XCA query(" + classCodeValue + ").", "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         break;
                 }
@@ -651,14 +685,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     logger.error("Prepare Audit log failed: '{}'", e.getMessage(), e);
                     // Is this fatal?
                 }
-            } catch (NIException e){
+            } catch (NIException e) {
                 var stackTraceLines = e.getStackTrace();
-                RegistryErrorUtils.addErrorMessage(registryErrorList, e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), String.valueOf(stackTraceLines[0]), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                RegistryErrorUtils.addErrorMessage(registryErrorList, e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(),
+                        String.valueOf(stackTraceLines[0]), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 responseStatus = AdhocQueryResponseStatus.FAILURE;
             }
         }
 
-        if(!registryErrorList.getRegistryError().isEmpty()) {
+        if (!registryErrorList.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(registryErrorList);
         }
         response.setStatus(responseStatus);
@@ -786,11 +821,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
             documentSearchService.setSOAPHeader(soapHeaderElement);
 
             String documentId = request.getDocumentRequest().get(0).getDocumentUniqueId();
-            String patientId = trimDocumentEntryPatientId(Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement));
+            String fullPatientId = Helper.getDocumentEntryPatientIdFromTRCAssertion(soapHeaderElement);
+            //  TODO: EHNCP-2055 Inconsistency in handling patient id
+            //String patientId = trimDocumentEntryPatientId(fullPatientId);
             String repositoryId = getRepositoryUniqueId(request);
             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                 loggerClinical.debug("Retrieving clinical document by criteria:\nPatient ID: '{}'\nDocument ID: '{}'\nRepository ID: '{}'",
-                        patientId, documentId, repositoryId);
+                        fullPatientId, documentId, repositoryId);
             }
             //try getting country code from the certificate
             String countryCode = null;
@@ -822,7 +859,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.info("The client country code to be used by the PDP '{}' ", countryCode);
 
             // Then, it is the Policy Decision Point (PDP) that decides according to the consent of the patient
-            if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
+            if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
                 RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList,
                         OpenNCPErrorCode.ERROR_NO_CONSENT,
                         OpenNCPErrorCode.ERROR_NO_CONSENT.getDescription(),
@@ -836,7 +873,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 "SearchCriteria: {patientId = 12445ASD}"
                 So we provided a XML representation of such data */
             try {
-                EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().add(Criteria.PatientId, patientId).asXml(),
+                EvidenceUtils.createEvidenceREMNRO(DocumentFactory.createSearchCriteria().addPatientId(fullPatientId).asXml(),
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
                         Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS,
                         Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
@@ -851,16 +888,16 @@ public class XCAServiceImpl implements XCAServiceInterface {
             EPSOSDocument epsosDoc;
             try {
                 epsosDoc = documentSearchService.getDocument(DocumentFactory.createSearchCriteria()
-                        .add(Criteria.DocumentId, documentId)
-                        .add(Criteria.PatientId, patientId)
-                        .add(Criteria.RepositoryId, repositoryId));
+                        .add(Criteria.DOCUMENT_ID, documentId)
+                        .addPatientId(fullPatientId)
+                        .add(Criteria.REPOSITORY_ID, repositoryId));
                 //  TODO: EHNCP-2055 Inconsistency in handling patient id
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
                 RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList,
                         e.getOpenncpErrorCode(),
                         e.getOpenncpErrorCode().getDescription(),
-                         e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                        e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 break processLabel;
             }
 
@@ -984,7 +1021,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
                                 OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.ERROR_TRANSCODING_ERROR;
 
-                                switch (classCodeValue){
+                                switch (classCodeValue) {
                                     case EP_CLASSCODE:
                                         openncpErrorCode = OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
                                         break;
@@ -1105,7 +1142,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING.getCode(),
                         OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING.getCode(),
                         OpenNCPErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getCode());
-                if(!list.contains(errorCode.getAttributeValue(QName.valueOf("errorCode")))){
+                if (!list.contains(errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
                     errors.remove();
                 }
             }
@@ -1228,22 +1265,5 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                  OMElement response) throws Exception {
 
         retrieveDocumentSetBuilder(request, sh, eventLog, response);
-    }
-
-    private static String trimDocumentEntryPatientId(String patientId) {
-
-        if (patientId.contains("^^^")) {
-            return patientId.substring(0, patientId.indexOf("^^^"));
-        }
-        return patientId;
-    }
-
-    public static List<ClassCode> getClassCodesOrCD() {
-        List<ClassCode> list = new ArrayList<>();
-        list.add(ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE);
-        list.add(ORCD_LABORATORY_RESULTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGES_CLASSCODE);
-        return list;
     }
 }

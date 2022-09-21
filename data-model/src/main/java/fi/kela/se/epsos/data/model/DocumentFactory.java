@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Factory class for Clinical Document container (metadatas and associations).
+ * Factory class for Clinical Document container (metadata and associations).
  *
  * @author mimyllyv
  */
@@ -66,11 +66,10 @@ public class DocumentFactory {
                                                        EpListParam epListParam,
                                                        SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
 
-        EPDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialitymetadata = null;
-        confidentialitymetadata = new EPDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
+        EPDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialityMetadata = new EPDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
         EPSOSDocumentMetaData metaData =
                 new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate, ClassCode.EP_CLASSCODE, repositoryId, title, author,
-                        confidentialitymetadata, languageCode, size, hash);
+                        confidentialityMetadata, languageCode, size, hash);
         if (StringUtils.isNoneBlank(productCode, productName)) {
             return new EPDocumentMetaDataImpl(metaData, description, new EPDocumentMetaDataImpl.SimpleProductMetadata(productCode, productName), epListParam);
         } else {
@@ -121,7 +120,7 @@ public class DocumentFactory {
                                                          String title, String author, String description, String productCode, String productName, long size, String hash) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, productCode, productName,
-                new EpListParam(true, null, null, null,null,null, null),
+                new EpListParam(true, null, null, null, null, null, null),
                 SimpleConfidentialityEnum.N, null, size, hash);
     }
 
@@ -129,7 +128,7 @@ public class DocumentFactory {
                                                          String title, String author, String description, boolean dispensable, long size, String hash) {
 
         return createEPDocumentXML(id, patientId, effectiveDate, repositoryId, title, author, description, null, null,
-                new EpListParam(dispensable, null, null, null, null,null, null),
+                new EpListParam(dispensable, null, null, null, null, null, null),
                 SimpleConfidentialityEnum.N, null, size, hash);
     }
 
@@ -148,10 +147,10 @@ public class DocumentFactory {
      * PSDocument
      */
     private static PSDocumentMetaData createPSDocument(int documentFormat, String id, String patientId, Date effectiveDate,
-                                                       String repositoryId, String title, String author,  SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
-        PSDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialitymetadata = new PSDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
+                                                       String repositoryId, String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
+        PSDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialityMetadata = new PSDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
-                ClassCode.PS_CLASSCODE, repositoryId, title, author, confidentialitymetadata, languageCode, size, hash);
+                ClassCode.PS_CLASSCODE, repositoryId, title, author, confidentialityMetadata, languageCode, size, hash);
         return new PSDocumentMetaDataImpl(metaData);
     }
 
@@ -179,9 +178,9 @@ public class DocumentFactory {
                                                            long size,
                                                            List<OrCDDocumentMetaData.Author> authors,
                                                            OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation, String hash) {
-        OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialitymetadata = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
+        OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialityMetadata = new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
-                orCDClassCode, repositoryId, title, author, confidentialitymetadata, languageCode, size, hash);
+                orCDClassCode, repositoryId, title, author, confidentialityMetadata, languageCode, size, hash);
         return new OrCDDocumentMetaDataImpl(metaData, documentFileType, serviceStartTime, authors, reasonOfHospitalisation);
     }
 
@@ -190,7 +189,7 @@ public class DocumentFactory {
      */
     public static OrCDDocumentMetaData createOrCDLaboratoryResultsDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
                                                                            String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode,
-                                                                           long size, List<OrCDDocumentMetaData.Author> authors, String hash){
+                                                                           long size, List<OrCDDocumentMetaData.Author> authors, String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
                 repositoryId, title, author, confidentiality, languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, null, hash);
@@ -222,7 +221,7 @@ public class DocumentFactory {
      * Medical Images
      */
     public static OrCDDocumentMetaData createOrCDMedicalImagesDocument(String id, String patientId, Date effectiveDate, Date serviceStartTime, String repositoryId,
-                                                                               String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size,
+                                                                       String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, OrCDDocumentMetaData.DocumentFileType documentFileType, long size,
                                                                        List<OrCDDocumentMetaData.Author> authors, OrCDDocumentMetaData.ReasonOfHospitalisation reasonOfHospitalisation, String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, serviceStartTime,
@@ -263,13 +262,13 @@ public class DocumentFactory {
         return new ConsentDocumentMetaDataImpl(metaData);
     }
 
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     public static ConsentDocumentMetaData createConsentDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author, Long size, String hash) {
 
         return createConsentDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF, id, patientId, effectiveDate, repositoryId, title, author, size, hash);
     }
 
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     public static ConsentDocumentMetaData createConsentDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId, String title, String author, Long size, String hash) {
 
         return createConsentDocument(EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML, id, patientId, effectiveDate, repositoryId, title, author, size, hash);
@@ -278,18 +277,17 @@ public class DocumentFactory {
     /**
      * MRODocument
      */
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     private static MroDocumentMetaData createMroDocument(int documentFormat, String id, String patientId, Date effectiveDate,
                                                          String repositoryId, String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
 
-        MroDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialitymetadata = null;
-        confidentialitymetadata = new MroDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
+        MroDocumentMetaDataImpl.SimpleConfidentialityMetadata confidentialityMetadata = new MroDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
-                ClassCode.MRO_CLASSCODE, repositoryId, title, author, confidentialitymetadata, languageCode, size, hash);
+                ClassCode.MRO_CLASSCODE, repositoryId, title, author, confidentialityMetadata, languageCode, size, hash);
         return new MroDocumentMetaDataImpl(metaData);
     }
 
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     public static MroDocumentMetaData createMroDocumentPDF(String id, String patientId, Date effectiveDate, String repositoryId,
                                                            String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
 
@@ -297,7 +295,7 @@ public class DocumentFactory {
                 title, author, confidentiality, languageCode, size, hash);
     }
 
-    @Deprecated
+    @Deprecated(since = "2.5.0", forRemoval = true)
     public static MroDocumentMetaData createMroDocumentXML(String id, String patientId, Date effectiveDate, String repositoryId,
                                                            String title, String author, SimpleConfidentialityEnum confidentiality, String languageCode, long size, String hash) {
 

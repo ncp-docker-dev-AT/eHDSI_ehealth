@@ -15,5 +15,5 @@ public interface EPSOSDocument {
 
     org.w3c.dom.Document getDocument();
 
-    boolean matchesCriteria(SearchCriteria sc);
+    boolean matchesCriteria(SearchCriteria searchCriteria);
 }
