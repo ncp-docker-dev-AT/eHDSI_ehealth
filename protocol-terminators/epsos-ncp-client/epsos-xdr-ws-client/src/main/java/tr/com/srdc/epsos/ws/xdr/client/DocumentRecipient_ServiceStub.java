@@ -10,6 +10,7 @@ import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -105,7 +106,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
     private final QName[] opNameArray = null;
     private AxisOperation[] axisOperations;
     private String countryCode;
-    private String classCode;
+    private ClassCode classCode;
 
     /**
      * Constructor that takes in a configContext
@@ -183,7 +184,7 @@ public class DocumentRecipient_ServiceStub extends Stub {
      * Methods
      */
 
-    public void setClassCode(String classCode) {
+    public void setClassCode(ClassCode classCode) {
         this.classCode = classCode;
     }
 
@@ -315,11 +316,11 @@ public class DocumentRecipient_ServiceStub extends Stub {
                 LOGGER.debug("ClassCode: '{}'", this.classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
-                    case tr.com.srdc.epsos.util.Constants.ED_CLASSCODE:
+                    case ED_CLASSCODE:
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.DISPENSATION_SERVICE, true);
                         break;
-                    case tr.com.srdc.epsos.util.Constants.CONSENT_CLASSCODE:
+                    case CONSENT_CLASSCODE:
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.CONSENT_SERVICE, true);
                         break;

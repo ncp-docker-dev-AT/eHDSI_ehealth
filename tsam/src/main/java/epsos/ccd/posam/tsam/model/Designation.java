@@ -1,7 +1,6 @@
 package epsos.ccd.posam.tsam.model;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Each Designation is a representation of the Concept and is assigned a unique

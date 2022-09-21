@@ -1,7 +1,8 @@
 package fi.kela.se.epsos.data.model;
 
-import java.util.Iterator;
 import org.w3c.dom.Document;
+
+import java.util.Iterator;
 
 /**
  * SearchCriteria class will be used for XCAService interface to allow search of documents with

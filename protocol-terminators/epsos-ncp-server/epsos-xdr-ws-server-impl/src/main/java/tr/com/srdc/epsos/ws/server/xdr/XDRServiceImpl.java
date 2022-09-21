@@ -10,6 +10,7 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
@@ -326,7 +327,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         String sealCountryCode = null;
 
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, Constants.EDD_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, ClassCode.EDD_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -365,7 +366,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         try {
             org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
-            EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
+            EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, ClassCode.ED_CLASSCODE, domDocument);
             documentId = getDocumentId(epsosDocument.getDocument());
             // Evidence for call to NI for XDR submit (dispensation)
             // Joao: here we have a Document so we can generate the mandatory NRO
@@ -465,7 +466,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, ClassCode.ED_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -539,7 +540,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
                 try {
                     org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
-                    EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
+                    EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, ClassCode.ED_CLASSCODE, domDocument);
                     // Evidence for call to NI for XDR submit (dispensation)
                     // Joao: here we have a Document so we can generate the mandatory NRO
                     try {
@@ -662,7 +663,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, ClassCode.CONSENT_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -711,7 +712,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
             try {
                 org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
-                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.CONSENT_CLASSCODE, domDocument);
+                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, ClassCode.CONSENT_CLASSCODE, domDocument);
 
                 // Evidence for call to NI for XDR submit (patient consent)
                 // Joao: here we have a Document so we can generate the mandatory NRO
@@ -768,7 +769,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return response;
     }
 
-    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException,
+    protected String validateXDRHeader(Element sh, ClassCode classCode) throws MissingFieldException, InvalidFieldException,
             SMgrException, InsufficientRightsException {
 
         return SAML2Validator.validateXDRHeader(sh, classCode);
@@ -796,7 +797,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
-            sigCountryCode = validateXDRHeader(shElement, Constants.HCER_CLASSCODE);
+            sigCountryCode = validateXDRHeader(shElement, ClassCode.HCER_CLASSCODE);
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -829,7 +830,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
                 org.w3c.dom.Document domDocument = XMLUtil.parseContent(documentString);
-                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.HCER_CLASSCODE, domDocument);
+                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, ClassCode.HCER_CLASSCODE, domDocument);
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
@@ -873,7 +874,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @param request the request containing the class code.
      * @return the class code.
      */
-    private String obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
+    private ClassCode obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
 
         if (request == null) {
             logger.error("The provided request message in order to extract the classcode is null.");
@@ -904,7 +905,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (result.isEmpty()) {
             logger.warn("No class code was found in request object.");
         }
-        return result;
+        return ClassCode.getByCode(result);
     }
 
     private String getDocumentId(org.w3c.dom.Document document) {

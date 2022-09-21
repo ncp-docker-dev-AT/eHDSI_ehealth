@@ -7,6 +7,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
@@ -149,7 +150,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             msgContext.getEnvelope().getBody().getFirstElement(), AdhocQueryRequest.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    List<String> classCodes = extractClassCodesFromQueryRequest(wrappedParam);
+                    List<ClassCode> classCodes = extractClassCodesFromQueryRequest(wrappedParam);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A, classCodes);
                     }
@@ -264,8 +265,8 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
         }
     }
 
-    private List<String> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
-        ArrayList<String> list = new ArrayList<>();
+    private List<ClassCode> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
+        ArrayList<ClassCode> list = new ArrayList<>();
         if (wrappedParam != null) {
             wrappedParam.getAdhocQuery().getSlot().forEach(slot -> {
                 if (StringUtils.equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME, slot.getName())) {
@@ -273,7 +274,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         for (int i = 0; i < slot.getValueList().getValue().size(); i++) {
                             String item = StringUtils.substringBetween(slot.getValueList().getValue().get(i), "('", "^^");
                             if (StringUtils.isNotBlank(item)) {
-                                list.add(item);
+                                list.add(ClassCode.getByCode(item));
                             }
                         }
                     }

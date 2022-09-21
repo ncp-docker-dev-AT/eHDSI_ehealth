@@ -1,5 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+
 /**
  * EPSOSDocument interface. Includes EPSOSDocumentMetaData and includes DOM Document.
  *
@@ -9,7 +11,7 @@ public interface EPSOSDocument {
 
     String getPatientId();
 
-    String getClassCode();
+    ClassCode getClassCode();
 
     org.w3c.dom.Document getDocument();
 

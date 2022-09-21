@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.reporting.ReportBuilder;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.DetailedResultUnMarshaller;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
@@ -170,7 +171,7 @@ public class OpenNCPValidation {
      * @param message
      * @param ncpSide
      */
-    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide, List<String> classCodes) {
+    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide, List<ClassCode> classCodes) {
 
         LOGGER.info("[Validation Service: XCA Validator]");
         XdsModel xdsModel = ValidatorUtil.obtainModelXca(message, classCodes);
@@ -213,7 +214,7 @@ public class OpenNCPValidation {
      * @param classCode
      * @param isPivot
      */
-    public static void validateCdaDocument(String cda, NcpSide ncpSide, String classCode, boolean isPivot) {
+    public static void validateCdaDocument(String cda, NcpSide ncpSide, ClassCode classCode, boolean isPivot) {
 
         LOGGER.info("[Validation Service: CDA Validator]");
         boolean isScannedDocument = cda.contains("nonXMLBody");

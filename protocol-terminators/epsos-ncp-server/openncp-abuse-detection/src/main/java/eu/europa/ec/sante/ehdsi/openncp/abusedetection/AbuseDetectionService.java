@@ -4,6 +4,7 @@ import com.ibatis.common.jdbc.ScriptRunner;
 import epsos.ccd.gnomon.auditmanager.AuditTrailUtils;
 import epsos.ccd.gnomon.auditmanager.EventType;
 import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import net.RFC3881.ActiveParticipantType;
 import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
@@ -337,7 +338,7 @@ public class AbuseDetectionService implements Job {
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCode(),
-                                        Constants.PS_CLASSCODE))) {
+                                        ClassCode.PS_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
@@ -350,7 +351,7 @@ public class AbuseDetectionService implements Job {
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCode(),
-                                        Constants.PS_CLASSCODE))) {
+                                        ClassCode.PS_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
@@ -363,7 +364,7 @@ public class AbuseDetectionService implements Job {
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCode(),
-                                        Constants.EP_CLASSCODE))) {
+                                        ClassCode.EP_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
@@ -376,7 +377,7 @@ public class AbuseDetectionService implements Job {
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCode(),
-                                        Constants.EP_CLASSCODE))) {
+                                        ClassCode.EP_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
@@ -389,7 +390,7 @@ public class AbuseDetectionService implements Job {
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCode(),
-                                        Constants.EDD_CLASSCODE))) {
+                                        ClassCode.EDD_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XDR_SERVICE_REQUEST;
                 }

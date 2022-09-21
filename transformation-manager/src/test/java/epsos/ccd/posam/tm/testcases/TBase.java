@@ -3,12 +3,10 @@ package epsos.ccd.posam.tm.testcases;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tm.util.TMConfiguration;
 import epsos.ccd.posam.tm.util.XmlUtil;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import junit.framework.TestCase;
-import org.junit.Ignore;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -78,8 +76,8 @@ public class TBase extends TestCase {
         return document;
     }
 
-    protected boolean containsError(List<ITMTSAMEror> list, TMError error) {
-        for (ITMTSAMEror er : list) {
+    protected boolean containsError(List<ITMTSAMError> list, TMError error) {
+        for (ITMTSAMError er : list) {
             if (er.getCode().equals(error.getCode())) {
                 return true;
             }

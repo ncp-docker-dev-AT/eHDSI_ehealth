@@ -4,7 +4,7 @@ import epsos.ccd.posam.tsam.response.RetrievedConcept;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.h2.tools.RunScript;
 import org.junit.BeforeClass;
@@ -65,7 +65,7 @@ public class TerminologyTest {
         assertNotNull(response.getDesignation());
         assertEquals(response.getDesignation(), "diastolicky arteriovy tlak");
         assertTrue(response.getWarnings().size() > 0);
-        ITMTSAMEror warn = response.getWarnings().get(0);
+        ITMTSAMError warn = response.getWarnings().get(0);
         warn.getCode().equals(TSAMError.WARNING_CODE_SYSTEM_NAME_DOESNT_MATCH);
         log.info(response.getDesignation());
     }
@@ -141,7 +141,7 @@ public class TerminologyTest {
         CodedElement ce = new CodedElement("271650006", "SNOMED CT", "2.16.840.1.113883.6.96", null, "noexist");
         TSAMResponseStructure response = service.getDesignationByEpSOSConcept(ce, "sk-SK");
         assertTrue(response.getWarnings().size() > 0);
-        ITMTSAMEror warn = findWarning(response, TSAMError.WARNING_VS_DOESNT_MATCH);
+        ITMTSAMError warn = findWarning(response, TSAMError.WARNING_VS_DOESNT_MATCH);
         assertTrue(warn != null);
 
     }
@@ -151,7 +151,7 @@ public class TerminologyTest {
         CodedElement ce = new CodedElement("271650010", "SNOMED CT", "2.16.840.1.113883.6.96", null, null);
         TSAMResponseStructure response = service.getDesignationByEpSOSConcept(ce, "sk-SK");
         assertTrue(response.getErrors().size() > 0);
-        ITMTSAMEror error = findErrors(response, TSAMError.ERROR_NO_CURRENT_DESIGNATIONS);
+        ITMTSAMError error = findErrors(response, TSAMError.ERROR_NO_CURRENT_DESIGNATIONS);
         assertTrue(error != null);
 
     }
@@ -161,14 +161,14 @@ public class TerminologyTest {
         CodedElement ce = new CodedElement("271650011", "SNOMED CT", "2.16.840.1.113883.6.96", null, null);
         TSAMResponseStructure response = service.getDesignationByEpSOSConcept(ce, "sk-SK");
         assertTrue(response.getWarnings().size() > 0);
-        ITMTSAMEror warn = findWarning(response, TSAMError.WARNING_MANY_DESIGNATIONS);
+        ITMTSAMError warn = findWarning(response, TSAMError.WARNING_MANY_DESIGNATIONS);
         assertTrue(warn != null);
 
     }
 
-    private ITMTSAMEror findWarning(TSAMResponseStructure response, TSAMError w) {
-        ITMTSAMEror vsNoMatch = null;
-        for (ITMTSAMEror warning : response.getWarnings()) {
+    private ITMTSAMError findWarning(TSAMResponseStructure response, TSAMError w) {
+        ITMTSAMError vsNoMatch = null;
+        for (ITMTSAMError warning : response.getWarnings()) {
             if (warning.getCode() == w.getCode()) {
                 vsNoMatch = warning;
             }
@@ -176,9 +176,9 @@ public class TerminologyTest {
         return vsNoMatch;
     }
 
-    private ITMTSAMEror findErrors(TSAMResponseStructure response, TSAMError w) {
-        ITMTSAMEror vsNoMatch = null;
-        for (ITMTSAMEror warning : response.getErrors()) {
+    private ITMTSAMError findErrors(TSAMResponseStructure response, TSAMError w) {
+        ITMTSAMError vsNoMatch = null;
+        for (ITMTSAMError warning : response.getErrors()) {
             if (warning.getCode() == w.getCode()) {
                 vsNoMatch = warning;
             }
@@ -281,7 +281,7 @@ public class TerminologyTest {
         CodedElement ce = new CodedElement("271650006", "SNOMED CT", "2.16.840.1.113883.6.96", null, "noexist");
         TSAMResponseStructure response = service.getEpSOSConceptByCode(ce);
         assertTrue(response.getWarnings().size() > 0);
-        ITMTSAMEror vsNoMatch = findWarning(response, TSAMError.WARNING_VS_DOESNT_MATCH);
+        ITMTSAMError vsNoMatch = findWarning(response, TSAMError.WARNING_VS_DOESNT_MATCH);
         assertTrue(vsNoMatch != null);
     }
 

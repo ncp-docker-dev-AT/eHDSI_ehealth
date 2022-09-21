@@ -1,7 +1,6 @@
 package fi.kela.se.epsos.data.model;
 
 import java.util.Date;
-
 import java.util.List;
 
 /**
@@ -60,8 +59,6 @@ public interface OrCDDocumentMetaData extends EPSOSDocumentMetaData {
     }
 
     DocumentFileType getDocumentFileType();
-
-    long getSize();
 
     Date getServiceStartTime();
 

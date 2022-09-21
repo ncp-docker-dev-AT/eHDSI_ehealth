@@ -2,7 +2,7 @@ package epsos.ccd.posam.tm.testcases;
 
 import java.util.List;
 
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import org.junit.Ignore;
 import org.w3c.dom.Document;
@@ -25,7 +25,7 @@ public class TranslateNegativeTest extends TBase{
 		assertNotNull(response);
 		assertFalse(response.isStatusSuccess());
 
-		List<ITMTSAMEror> errors = response.getErrors();
+		List<ITMTSAMError> errors = response.getErrors();
 		assertNotNull(errors);
 		assertTrue(errors.contains(TMError.ERROR_NULL_INPUT_DOCUMENT));
 	}
@@ -39,7 +39,7 @@ public class TranslateNegativeTest extends TBase{
 		assertNotNull(response);
 		assertFalse(response.isStatusSuccess());
 		
-		List<ITMTSAMEror> errors =  response.getErrors();
+		List<ITMTSAMError> errors =  response.getErrors();
 		assertNotNull(errors);
 	}	
 }

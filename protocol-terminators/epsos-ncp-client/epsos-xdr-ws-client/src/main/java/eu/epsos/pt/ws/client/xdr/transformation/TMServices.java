@@ -2,7 +2,7 @@ package eu.epsos.pt.ws.client.xdr.transformation;
 
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.apache.axis2.util.XMLUtils;
@@ -95,11 +95,11 @@ public final class TMServices {
      *
      * @param errors
      */
-    private static void processErrors(List<ITMTSAMEror> errors) {
+    private static void processErrors(List<ITMTSAMError> errors) {
 
         LOGGER.debug("TRANSLATION PROCESS ERRORS:/n");
 
-        for (ITMTSAMEror error : errors) {
+        for (ITMTSAMError error : errors) {
             LOGGER.info("Error: (Code: " + error.getCode() + ", Description: " + error.getDescription());
         }
     }

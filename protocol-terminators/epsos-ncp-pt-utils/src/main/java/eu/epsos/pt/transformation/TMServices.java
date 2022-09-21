@@ -2,7 +2,7 @@ package eu.epsos.pt.transformation;
 
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
@@ -142,14 +142,14 @@ public final class TMServices {
      *
      * @param errors List of CDA transformation errors/warnings.
      */
-    private static String processErrors(List<ITMTSAMEror> errors) {
+    private static String processErrors(List<ITMTSAMError> errors) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("List of errors: ");
 
         LOGGER.debug("TRANSLATION PROCESS ERRORS:");
 
-        for (ITMTSAMEror error : errors) {
+        for (ITMTSAMError error : errors) {
             LOGGER.debug("Error: (Code: '{}', Description: '{}'", error.getCode(), error.getDescription());
             sb.append("Error: (Code: ").append(error.getCode()).append(", Description: ").append(error.getDescription());
             sb.append("\n");

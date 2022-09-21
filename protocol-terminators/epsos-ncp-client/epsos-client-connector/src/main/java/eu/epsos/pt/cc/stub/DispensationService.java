@@ -5,6 +5,7 @@ import epsos.openncp.protocolterminator.clientconnector.PatientDemographics;
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.XdrRequestDts;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public class DispensationService {
             Node search = nodeList.item(0);
             NamedNodeMap namedNodeMap = search.getAttributes();
             Node nodeAttr = namedNodeMap.getNamedItem("code");
-            nodeAttr.setTextContent(Constants.EDD_CLASSCODE);
+            nodeAttr.setTextContent(ClassCode.EDD_CLASSCODE.getCode());
 
             nodeList = dispense.getElementsByTagName("templateId");
             search = nodeList.item(0);

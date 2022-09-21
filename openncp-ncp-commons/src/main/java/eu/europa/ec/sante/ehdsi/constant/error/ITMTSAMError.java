@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.constant.error;
 
-public interface ITMTSAMEror {
+public interface ITMTSAMError {
 
     /**
      * @return String - code

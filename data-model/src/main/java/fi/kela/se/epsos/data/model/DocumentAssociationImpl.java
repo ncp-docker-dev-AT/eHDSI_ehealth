@@ -1,5 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+
 public class DocumentAssociationImpl<T extends EPSOSDocumentMetaData> implements DocumentAssociation<T> {
 	private T xmlDocument = null;
 	private T pdfDocument = null;
@@ -10,7 +12,7 @@ public class DocumentAssociationImpl<T extends EPSOSDocumentMetaData> implements
 	}
 
 	@Override
-	public String getDocumentClassCode(String documentId) {
+	public ClassCode getDocumentClassCode(String documentId) {
 		T document = getDocument(documentId);
 		return document == null ? null : document.getClassCode();
 	}

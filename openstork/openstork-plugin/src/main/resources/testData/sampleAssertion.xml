@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:stork="urn:eu:stork:names:tc:STORK:1.0:assertion" xmlns:storkp="urn:eu:stork:names:tc:STORK:1.0:protocol" xmlns:xs="http://www.w3.org/2001/XMLSchema" Consent="urn:oasis:names:tc:SAML:2.0:consent:obtained" Destination="https://vmepsos.hcuge.ch:14443/" ID="_7fab95a8b2c335af91922877293ed957" InResponseTo="_b44f384be3252c72dbe65415fee17862" IssueInstant="2015-03-24T09:05:30.993Z" Version="2.0">
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+                 xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+                 xmlns:stork="urn:eu:stork:names:tc:STORK:1.0:assertion"
+                 xmlns:xs="http://www.w3.org/2001/XMLSchema" Consent="urn:oasis:names:tc:SAML:2.0:consent:obtained"
+                 Destination="https://vmepsos.hcuge.ch:14443/" ID="_7fab95a8b2c335af91922877293ed957"
+                 InResponseTo="_b44f384be3252c72dbe65415fee17862" IssueInstant="2015-03-24T09:05:30.993Z" Version="2.0">
 <saml2:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">https://storkdemo2.bfh.ch</saml2:Issuer>
 <ds:Signature>
     <ds:SignedInfo>

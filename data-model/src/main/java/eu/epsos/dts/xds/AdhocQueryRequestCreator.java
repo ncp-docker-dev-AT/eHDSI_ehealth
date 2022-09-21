@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import tr.com.srdc.epsos.data.model.FilterParams;
 import tr.com.srdc.epsos.data.model.GenericDocumentCode;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class AdhocQueryRequestCreator {
