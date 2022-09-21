@@ -15,14 +15,14 @@
           :disable-items-per-page="true"
           :loading="loading"
         >
-          <template v-slot:[`item.anomalyDateTime`]="{ item }">
-            <span>{{ new Date(item.anomalyDateTime).toLocaleString() }}</span>
+          <template v-slot:[`item.eventDate`]="{ item }">
+            <span>{{ new Date(item.eventDate).toLocaleString() }}</span>
           </template>
-          <template v-slot:[`item.beginEventDateTime`]="{ item }">
-            <span>{{ new Date(item.beginEventDateTime).toLocaleString() }}</span>
+          <template v-slot:[`item.eventStartDate`]="{ item }">
+            <span>{{ new Date(item.eventStartDate).toLocaleString() }}</span>
           </template>
-          <template v-slot:[`item.endEventDateTime`]="{ item }">
-            <span>{{ new Date(item.endEventDateTime).toLocaleString() }}</span>
+          <template v-slot:[`item.eventEndDate`]="{ item }">
+            <span>{{ new Date(item.eventEndDate).toLocaleString() }}</span>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn
@@ -49,11 +49,11 @@ export default {
       dialog: false,
       headers: [
         { text: 'Id', value: 'id' },
-        { text: 'Description', value: 'anomalyDescription' },
-        { text: 'Type', value: 'anomalyType' },
-        { text: 'Detect Date', value: 'anomalyDateTime', dataType: 'Date' },
-        { text: 'Begin Date', value: 'beginEventDateTime', dataType: 'Date' },
-        { text: 'End Date', value: 'endEventDateTime', dataType: 'Date' },
+        { text: 'Description', value: 'description' },
+        { text: 'Type', value: 'type' },
+        { text: 'Detect Date', value: 'eventDate', dataType: 'Date' },
+        { text: 'Begin Date', value: 'eventStartDate', dataType: 'Date' },
+        { text: 'End Date', value: 'eventEndDate', dataType: 'Date' },
         { value: 'actions', sortable: false }
       ],
       anomalies: [],

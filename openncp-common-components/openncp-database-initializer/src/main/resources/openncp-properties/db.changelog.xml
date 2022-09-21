@@ -56,15 +56,15 @@
     </changeSet>
 
     <changeSet id="2" author="miorial">
-        <createTable tableName="EHNCP_ANOMALIES">
-            <column name="id" type="bigint" autoIncrement="true">
+        <createTable tableName="EHNCP_ANOMALY">
+            <column name="ID" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="AnomalyDescription" type="varchar(2000)" />
-            <column name="AnomalyType" type="varchar(20)"/>
-            <column name="AnomalyDateTime" type="datetime"/>
-            <column name="BeginEventDateTime" type="datetime"/>
-            <column name="EndEventDateTime" type="datetime"/>
+            <column name="DESCRIPTION" type="varchar(2000)" />
+            <column name="TYPE" type="varchar(20)"/>
+            <column name="EVENT_DATE" type="datetime"/>
+            <column name="EVENT_START_DATE" type="datetime"/>
+            <column name="EVENT_END_DATE" type="datetime"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
