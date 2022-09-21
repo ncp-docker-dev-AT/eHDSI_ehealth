@@ -1,23 +1,22 @@
 /**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
+ * Copyright (c) 2009-2011 University of Cardiff and others
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ * <p>
+ * Contributors:
+ * University of Cardiff - initial API and implementation
+ * -
  */
-
 package org.openhealthtools.openatna.all.test.persistence;
 
 import org.junit.Test;
@@ -31,15 +30,12 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Andrew Harrison
  * @version $Revision:$
- * @created Oct 2, 2009: 9:40:08 AM
- * @date $Date:$ modified by $Author:$
  */
-
 public class TestConvert {
 
     @Test
@@ -94,7 +90,7 @@ public class TestConvert {
         AtnaCode ac = as.getSourceTypeCodes().get(0);
         assertEquals(ac.getCode(), "1");
         assertEquals(ac.getCodeSystemName(), "RFC-3881");
-        assertEquals(ac.getCodeSystem(), null);
+        assertNull(ac.getCodeSystem());
 
         as = msg.getSource("cat2");
         assertEquals(as.getSourceId(), "cat2");
@@ -103,7 +99,7 @@ public class TestConvert {
         ac = as.getSourceTypeCodes().get(0);
         assertEquals(ac.getCode(), "1");
         assertEquals(ac.getCodeSystemName(), "RFC-3881");
-        assertEquals(ac.getCodeSystem(), null);
+        assertNull(ac.getCodeSystem());
 
         AtnaMessageParticipant amp = msg.getParticipants().get(0);
         AtnaParticipant ap = amp.getParticipant();
@@ -114,7 +110,7 @@ public class TestConvert {
         ac = ap.getRoleIDCodes().get(0);
         assertEquals(ac.getCode(), "110150");
         assertEquals(ac.getCodeSystemName(), "DCM");
-        assertEquals(ac.getCodeSystem(), null);
+        assertNull(ac.getCodeSystem());
         AtnaCode other = new AtnaCode(ac.getCodeType(), "110150", null, "DCM", null, null);
         assertEquals(ac, other);
         String napid = amp.getNetworkAccessPointId();
@@ -139,13 +135,11 @@ public class TestConvert {
         assertEquals(oe.getObjectIdTypeCode().getCodeSystemName(), "DCM");
         assertEquals(new String(amo.getObjectQuery()), Base64.encodeString("a query string"));
 
-
         MessageEntity msgEntity = EntityConverter.createMessage(msg);
         assertEquals(msgEnt, msgEntity);
 
         AtnaMessage am = EntityConverter.createMessage(msgEntity);
         assertEquals(msg, am);
-
     }
 
 
