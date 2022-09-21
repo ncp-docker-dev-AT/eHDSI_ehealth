@@ -1,5 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
+import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -12,17 +13,20 @@ public class AbuseEvent {
     String pointOfCare;
     String patientId;
     LocalDateTime requestDateTime;
-    String filename;
+    String recordId;
     AbuseTransactionType transactionType;
 
+    AuditMessage audit;
+
     public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
-                      String filename, AbuseTransactionType transactionType) {
+                      String recordId, AbuseTransactionType transactionType, AuditMessage audit) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
         this.patientId = patientId;
         this.requestDateTime = requestDateTime;
-        this.filename = filename;
+        this.recordId = recordId;
         this.transactionType = transactionType;
+        this.audit = audit;
     }
 
     public CodedValueType getRequestEventType() {
@@ -57,12 +61,12 @@ public class AbuseEvent {
         this.requestDateTime = requestDateTime;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getRecordId() {
+        return recordId;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public AbuseTransactionType getTransactionType() {
@@ -71,6 +75,14 @@ public class AbuseEvent {
 
     public void setTransactionType(AbuseTransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public AuditMessage getAudit() {
+        return audit;
+    }
+
+    public void setAudit(AuditMessage audit) {
+        this.audit = audit;
     }
 
     @Override
@@ -86,7 +98,7 @@ public class AbuseEvent {
                 .append(pointOfCare, that.pointOfCare)
                 .append(patientId, that.patientId)
                 .append(requestDateTime, that.requestDateTime)
-                .append(filename, that.filename)
+                .append(recordId, that.recordId)
                 .append(transactionType, that.transactionType).isEquals();
     }
 
@@ -97,7 +109,7 @@ public class AbuseEvent {
                 .append(pointOfCare)
                 .append(patientId)
                 .append(requestDateTime)
-                .append(filename)
+                .append(recordId)
                 .append(transactionType).toHashCode();
     }
 
@@ -108,7 +120,7 @@ public class AbuseEvent {
                 .append("pointOfCare", pointOfCare)
                 .append("patientId", patientId)
                 .append("requestDateTime", requestDateTime)
-                .append("filename", filename)
+                .append("recordId", recordId)
                 .append("transactionType", transactionType)
                 .toString();
     }
