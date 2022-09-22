@@ -137,12 +137,11 @@ public class AbuseDetectionService implements Job {
     private List<MessagesRecord> retrieveAuditEvents(String sqlSelect) throws Exception {
 
         List<MessagesRecord> listXmlRecords = new ArrayList<>();
-        Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_OPEN_ATNA);
 
-        try (StringReader stringReader = new StringReader(sqlSelect)) {
-            Statement stmt = sqlConnection.createStatement();
+        try (Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_OPEN_ATNA);
+             Statement stmt = sqlConnection.createStatement()) {
+
             ResultSet rs = stmt.executeQuery(sqlSelect);
-            int count = 0;
             while (rs.next()) {
                 MessagesRecord record = new MessagesRecord();
                 record.setId(rs.getLong("id"));
@@ -152,23 +151,18 @@ public class AbuseDetectionService implements Job {
                 if (record.getXml().startsWith("<?xml")) {
                     listXmlRecords.add(record);
                 }
-                count++;
             }
         } catch (Exception exception) {
             throw new Exception("The following error occurred during an SQL operation:", exception);
-        } finally {
-            if (sqlConnection != null) {
-                sqlConnection.close();
-            }
         }
         return listXmlRecords;
     }
 
     private void runSqlScript(String sqlScript) throws Exception {
 
-        Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_EHNCP_PROPERTY);
+        try (Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_EHNCP_PROPERTY);
+             StringReader stringReader = new StringReader(sqlScript)) {
 
-        try (StringReader stringReader = new StringReader(sqlScript)) {
             ScriptRunner objScriptRunner = new ScriptRunner(sqlConnection, false, true);
             objScriptRunner.setLogWriter(null);
             objScriptRunner.setErrorLogWriter(null);
@@ -176,10 +170,6 @@ public class AbuseDetectionService implements Job {
 
         } catch (Exception exception) {
             throw new Exception("The following error occurred during an SQL operation:", exception);
-        } finally {
-            if (sqlConnection != null) {
-                sqlConnection.close();
-            }
         }
     }
 
@@ -227,9 +217,8 @@ public class AbuseDetectionService implements Job {
                 "EVENT_END_DATE = '" + eventEndDate + "';";
 
         int recordCount = 0;
-        try (StringReader stringReader = new StringReader(sqlSelect)) {
-            Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_EHNCP_PROPERTY);
-            Statement stmt = sqlConnection.createStatement();
+        try (Connection sqlConnection = dbConnect(AbuseDetectionService.JDBC_EHNCP_PROPERTY);
+             Statement stmt = sqlConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sqlSelect);
             while (rs.next()) {
                 recordCount++;
