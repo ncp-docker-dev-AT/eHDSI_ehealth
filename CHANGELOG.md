@@ -3,6 +3,63 @@
 All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [6.1.0] - 21-09-2022
+The OpenNCP 6.1 is the Wave 6 Preparatory PPT release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
+in October 2022.
+A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical 
+Framework upgrade (SAML and XUA profile).
+Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/N4NbT
+
+Main changes in this release are:<br/>
+<ul>
+<li>Change Proposal 064: IHE ITI Tecnical Framework upgrade - XCPD, XCA, XDR and XDS profiles</li>
+<li>CDA and Semantic bug fixing and integration of the CDA Implementation Guidelines 6.3.0</li>
+<li>CDA DisplayTool alignment with Wave 6 requirements</li>
+<li>OpenNCP Gateway minor UI improvements (ATNA, Abuse Detection and eADC modules)</li>
+</ul>
+
+### Epic
+    [EHEALTH-7424] - CP-eHealthDSI-064: Upgrade IHE Technical Framework - OpenNCP implementation
+
+### Story
+    [EHEALTH-7482] - IHE ITI Revision 19 implementation - XDS Metadata
+    [EHEALTH-7483] - IHE ITI Revision 19 implementation - XDR Transaction
+    [EHEALTH-7484] - IHE ITI Revision 19 implementation - XCA Transaction
+    [EHEALTH-7485] - IHE ITI Revision 19 implementation - XCPD Transaction
+    [EHEALTH-8797] - CDA Display Tool bugfixes for OpenNCP 6.1.0
+
+### Task
+    [EHEALTH-8897] - Update IHE CDA Validators to version v6.3.0 in the configuration file
+    [EHEALTH-8908] - Adapt CDA Mock files to comply with IHE CDA validators based on CDA IG v6.2.0
+    [EHEALTH-8931] - OpenNCP Gateway UI - create menu for viewing anomalies events
+    [EHEALTH-8935] - Update Manual and Release Notes for OpenNCP 6.1.0
+
+### Technical Sub-task 
+    [EHEALTH-8399] - The type of address (/addr/@use) is not properly displayed
+    [EHEALTH-8731] - Gap analysis of XCA Profile upgrade
+    [EHEALTH-8732] - Implementation of XCA Profile upgrade
+    [EHEALTH-8753] - Gap analysis of XCPD Profile upgrade
+    [EHEALTH-8754] - Upgrade of XCPD Profile
+    [EHEALTH-8755] - Gap analysis of XDR Profile upgrade
+    [EHEALTH-8756] - Implementation of XDR Profile upgrade
+    [EHEALTH-8767] - Releasing OpenNCP 6.1.0
+    [EHEALTH-8798] - When parts contain different active ingredients they are not displayed correctly
+    [EHEALTH-8799] - Package size is not displayed correctly for the enclosing package in the case of parts
+
+### Bug
+    [EHEALTH-8758] - OpenNCP Gateway UI doesn't allow access to eADC error transactions
+    [EHEALTH-8766] - CP-59 - Anomalies for abuse detection not being logged in DB and Atna repository
+    [EHEALTH-8865] - For ePrescription the Package size unit is not being displayed as mL
+    [EHEALTH-8868] - eTransactionerror table is not existing in liquibase
+    [EHEALTH-8896] - The personal relationship between the patient and the guardian or other contact is not displayed in the CDA Display Tool
+    [EHEALTH-9034] - CDA Display Tool - template matches with wrong element for PS Header
+    [EHEALTH-9056] - Also allow for eHDSISubstance to be displayed as active ingredient in CDA Display Tool
+
+### Improvement
+    [EHEALTH-6526] - Remove static .aar files
+    [EHEALTH-7256] - Inconsistency in handling patient ID
+
 ## [6.0.0] - 19-07-2022
 The OpenNCP 6.0.0 is the Wave 6 Initial release including the implementation of the Wave 6 Change Proposals.
 This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 6 
