@@ -13,7 +13,7 @@ Detailed installation manual is available here: https://webgate.ec.europa.eu/fpf
 
 Main changes in this release are:<br/>
 <ul>
-<li>Change Proposal 064: IHE ITI Tecnical Framework upgrade - XCPD, XCA, XDR and XDS profiles</li>
+<li>Change Proposal 064: IHE ITI Technical Framework upgrade - XCPD, XCA, XDR and XDS profiles</li>
 <li>CDA and Semantic bug fixing and integration of the CDA Implementation Guidelines 6.3.0</li>
 <li>CDA DisplayTool alignment with Wave 6 requirements</li>
 <li>OpenNCP Gateway minor UI improvements (ATNA, Abuse Detection and eADC modules)</li>
