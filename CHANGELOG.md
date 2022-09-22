@@ -17,6 +17,7 @@ Main changes in this release are:<br/>
 <li>CDA and Semantic bug fixing and integration of the CDA Implementation Guidelines 6.3.0</li>
 <li>CDA DisplayTool alignment with Wave 6 requirements</li>
 <li>OpenNCP Gateway minor UI improvements (ATNA, Abuse Detection and eADC modules)</li>
+<li>Full patient identifier is passed to the National connector A (Root and Extension)</li>
 </ul>
 
 ### Epic
