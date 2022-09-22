@@ -7,7 +7,6 @@ import org.junit.BeforeClass;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.sql.Statement;
 
 public abstract class BaseEadcTest extends TestCase {
 

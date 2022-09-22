@@ -56,3 +56,13 @@ CREATE TABLE IF NOT EXISTS eTransactionData
 	KEY ITransactionData_PK (Transaction_FK),
 	CONSTRAINT Transaction_FK__TransactionDataPK FOREIGN KEY(Transaction_FK) REFERENCES eTransaction(Transaction_PK)
 ) ENGINE=INNODB CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS eTransactionError
+(
+    TransactionError_PK bigint(20) NOT NULL AUTO_INCREMENT,
+    Transaction_FK varchar(64) NOT NULL,
+    ErrorDescription varchar(500) NULL,
+    PRIMARY KEY (TransactionError_PK),
+    KEY ITransactionError_PK (Transaction_FK),
+    CONSTRAINT Transaction_FK__TransactionErrorPK FOREIGN KEY (Transaction_FK) REFERENCES eTransaction (Transaction_PK)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;

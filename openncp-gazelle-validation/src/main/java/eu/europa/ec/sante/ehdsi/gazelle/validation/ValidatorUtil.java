@@ -1,7 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
-import eu.europa.ec.sante.ehdsi.gazelle.validation.util.Constant;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.XdsModel;
 import org.apache.commons.lang3.StringUtils;
@@ -225,9 +225,9 @@ public class ValidatorUtil {
      * @param isScannedDocument The boolean flag stating if the document is a scanned document or not.
      * @return the correspondent CDA model.
      */
-    public static String obtainCdaModel(String classCode, boolean isPivot, boolean isScannedDocument) {
+    public static String obtainCdaModel(ClassCode classCode, boolean isPivot, boolean isScannedDocument) {
 
-        if (StringUtils.isBlank(classCode)) {
+        if (classCode == null) {
             return null;
         } else {
             if (isScannedDocument) {
@@ -254,11 +254,11 @@ public class ValidatorUtil {
 
         if (message.contains(PROVIDE_AND_REGISTER_REQUEST)) {
 
-            if (message.contains(Constant.CONSENT_CLASSCODE)) {
+            if (message.contains(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 result.setValidatorName(EHDSI_XDS_CS_PUT_REQUEST);
-            } else if (message.contains(Constant.EDD_CLASSCODE)) {
+            } else if (message.contains(ClassCode.EDD_CLASSCODE.getCode())) {
                 result.setValidatorName(EHDSI_XDS_ED_DISCARD_REQUEST);
-            } else if (message.contains(Constant.ED_CLASSCODE)) {
+            } else if (message.contains(ClassCode.ED_CLASSCODE.getCode())) {
                 result.setValidatorName(EHDSI_XDS_ED_INIT_REQUEST);
             } else {
                 result.setValidatorName(EHDSI_XDS_PROVIDE_DATA_REQUEST);
@@ -267,9 +267,9 @@ public class ValidatorUtil {
 
         } else if (message.contains(PROVIDE_AND_REGISTER_RESPONSE)) {
 
-            //  if (message.contains(Constant.EDD_CLASSCODE)) {
+            //  if (message.contains(ClassCode.EDD_CLASSCODE)) {
             //      result.setValidatorName(EHDSI_XDS_ED_DISCARD_RESPONSE);
-            //  } else if (message.contains(Constant.ED_CLASSCODE)) {
+            //  } else if (message.contains(ClassCode.ED_CLASSCODE)) {
             //      result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
             //  }
             result.setValidatorName(EHDSI_XDS_ED_INIT_RESPONSE);
@@ -285,7 +285,7 @@ public class ValidatorUtil {
      * @param classCodes
      * @return the proper model to be used in the validation
      */
-    public static XdsModel obtainModelXca(String message, List<String> classCodes) {
+    public static XdsModel obtainModelXca(String message, List<ClassCode> classCodes) {
 
         final String QUERY_REQUEST = "AdhocQueryRequest";
         final String QUERY_RESPONSE = "AdhocQueryResponse";
@@ -297,17 +297,17 @@ public class ValidatorUtil {
         // Query / List operations
         // Request
         if (message.contains(QUERY_REQUEST)) {
-            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, ClassCode.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_REQUEST);
@@ -315,17 +315,17 @@ public class ValidatorUtil {
             result.setObjectType(ObjectType.XCA_QUERY_REQUEST.toString());
             // Response
         } else if (message.contains(QUERY_RESPONSE)) {
-            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, ClassCode.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_LIST_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_LIST_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_LIST_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_QUERY_RESPONSE);
@@ -334,34 +334,34 @@ public class ValidatorUtil {
         }
         // Retrieve operations
         if (message.contains(RETRIEVE_REQUEST)) {  // Request
-            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, ClassCode.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_REQUEST_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_REQUEST);
             }
             result.setObjectType(ObjectType.XCA_RETRIEVE_REQUEST.toString());
         } else if (message.contains(RETRIEVE_RESPONSE)) { // Response
-            if (hasClassCode(message, classCodes, Constant.EP_CLASSCODE)) {
+            if (hasClassCode(message, classCodes, ClassCode.EP_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_OS_RETRIEVE_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.PS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.PS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_PS_RETRIEVE_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_DIS_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_HD_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_LR_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
-            } else if (hasClassCode(message, classCodes, Constant.ORCD_MI_CLASSCODE)) {
+            } else if (hasClassCode(message, classCodes, ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE)) {
                 result.setValidatorName(EHDSI_XDS_ORCD_RETRIEVE_RESPONSE_XCA);
             } else {
                 result.setValidatorName(EHDSI_XDS_FETCH_DOC_RETRIEVE_RESPONSE);
@@ -371,8 +371,8 @@ public class ValidatorUtil {
         return result;
     }
 
-    private static boolean hasClassCode(String message, List<String> classCodes, String classCodeToMatch) {
-        if (message.contains(classCodeToMatch)) {
+    private static boolean hasClassCode(String message, List<ClassCode> classCodes, ClassCode classCodeToMatch) {
+        if (message.contains(classCodeToMatch.getCode())) {
             return true;
         }
         if (classCodes != null && !classCodes.isEmpty()) {

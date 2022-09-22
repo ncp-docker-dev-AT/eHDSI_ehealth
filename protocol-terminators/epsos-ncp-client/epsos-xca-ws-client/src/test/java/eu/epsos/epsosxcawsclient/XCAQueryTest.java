@@ -6,6 +6,7 @@ import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.junit.Ignore;
@@ -36,7 +37,7 @@ public class XCAQueryTest {
     //parameters needed to run this test
     private static final String PATIENT_COUNTRY = TestConstants.PATIENT_COUNTRY;
     private static final String PATIENT_ID = TestConstants.PATIENT_ID;
-    private static final String CLASSCODE = Constants.EP_CLASSCODE;
+    private static final ClassCode CLASSCODE = ClassCode.EP_CLASSCODE;
     private static final String CLASSCODE_SCHEMA = IheConstants.CLASSCODE_SCHEME;
     private static final String HOME_COMMUNITY_ID = TestConstants.HOME_CUMMUNITY_ID;
 
@@ -66,7 +67,7 @@ public class XCAQueryTest {
         // build GenericDocumentCode
         GenericDocumentCode genericDocumentCode = new GenericDocumentCode();
         genericDocumentCode.setSchema(CLASSCODE_SCHEMA);
-        genericDocumentCode.setValue(CLASSCODE);
+        genericDocumentCode.setValue(CLASSCODE.getCode());
 
         // call the service
         QueryResponse result = XcaInitGateway.crossGatewayQuery(

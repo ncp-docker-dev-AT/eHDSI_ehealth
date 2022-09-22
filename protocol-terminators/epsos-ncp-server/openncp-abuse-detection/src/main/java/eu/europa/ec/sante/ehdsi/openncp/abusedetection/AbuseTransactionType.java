@@ -1,25 +1,27 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public enum AbuseTransactionType {
-        TRANSACTION_UNKNOWN("?"),
-        XCPD_SERVICE_REQUEST("XCPD_SERVICE_REQUEST"),
-        XCA_SERVICE_REQUEST("XCA_SERVICE_REQUEST"),
-        XDR_SERVICE_REQUEST("XDR_SERVICE_REQUEST");
+    TRANSACTION_UNKNOWN("?"),
+    XCPD_SERVICE_REQUEST("XCPD_SERVICE_REQUEST"),
+    XCA_SERVICE_REQUEST("XCA_SERVICE_REQUEST"),
+    XDR_SERVICE_REQUEST("XDR_SERVICE_REQUEST");
 
-        private String transaction;
-        AbuseTransactionType(String transaction) {
-            this.transaction = transaction;
-        }
+    private final String transaction;
 
-        public String getTransaction() {
-            return transaction;
-        }
+    AbuseTransactionType(String transaction) {
+        this.transaction = transaction;
+    }
 
-        @Override
-        public String toString() {
-            return "transactions{" +
-                    "transaction='" + transaction + '\'' +
-                    '}';
-        }
+    public String getTransaction() {
+        return transaction;
+    }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("transaction", transaction)
+                .toString();
+    }
 }

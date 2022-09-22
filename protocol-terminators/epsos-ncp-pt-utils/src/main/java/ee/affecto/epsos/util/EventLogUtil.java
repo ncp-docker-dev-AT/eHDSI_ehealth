@@ -2,6 +2,7 @@ package ee.affecto.epsos.util;
 
 import epsos.ccd.gnomon.auditmanager.*;
 import eu.epsos.util.xdr.XDRConstants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
@@ -108,25 +109,25 @@ public class EventLogUtil {
      * @param response
      * @param classCode
      */
-    public static void prepareXCACommonLogQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, String classCode) {
+    public static void prepareXCACommonLogQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, ClassCode classCode) {
 
         switch (classCode) {
-            case Constants.PS_CLASSCODE:
+            case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
                 break;
-            case Constants.EP_CLASSCODE:
+            case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
                 break;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+            case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
                 break;
-            case Constants.MRO_CLASSCODE:
+            case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
                 break;
@@ -198,25 +199,25 @@ public class EventLogUtil {
      * @param response
      * @param classCode
      */
-    public static void prepareXCACommonLogRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response, String classCode) {
+    public static void prepareXCACommonLogRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response, ClassCode classCode) {
 
         switch (classCode) {
-            case Constants.PS_CLASSCODE:
+            case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
                 break;
-            case Constants.EP_CLASSCODE:
+            case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
                 break;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+            case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
                 break;
-            case Constants.MRO_CLASSCODE:
+            case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
                 break;
@@ -311,7 +312,7 @@ public class EventLogUtil {
             }
         }
         LOGGER.info("EventLogUtil: '{}'", classCode);
-        if (StringUtils.equals(classCode, Constants.CONSENT_CLASSCODE) && eventCode != null) {
+        if (StringUtils.equals(classCode, ClassCode.CONSENT_CLASSCODE.getCode()) && eventCode != null) {
 
             if (eventCode.endsWith(Constants.CONSENT_PUT_SUFFIX)) {
 
@@ -324,12 +325,12 @@ public class EventLogUtil {
                 eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_DISCARD);
                 eventLog.setEI_EventActionCode(EventActionCode.DELETE);
             }
-        } else if (StringUtils.equals(classCode, Constants.ED_CLASSCODE)) {
+        } else if (StringUtils.equals(classCode, ClassCode.ED_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
 
-        } else if (StringUtils.equals(classCode, Constants.EDD_CLASSCODE)) {
+        } else if (StringUtils.equals(classCode, ClassCode.EDD_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
             eventLog.setEI_EventActionCode(EventActionCode.UPDATE);

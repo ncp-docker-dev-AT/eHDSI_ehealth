@@ -18,7 +18,7 @@ public class QuartzInitializerListener implements ServletContextListener {
         }
 
         try {
-            AbuseDetectionHelper.AbuseDetectionInit();
+            AbuseDetectionHelper.abuseDetectionInit();
         } catch (Exception e) {
             logger.debug(e.getMessage());
         }

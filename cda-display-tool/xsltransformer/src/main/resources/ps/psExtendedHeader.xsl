@@ -367,6 +367,13 @@
                                                 </xsl:call-template>
                                             </span>
                                         </xsl:if>
+                                        <xsl:if test="../n1:associatedEntity/n1:code and not(../n1:associatedEntity/n1:code/@nullFlavor)">
+                                            <span class="label otherContacts-personalRelationship">
+                                                <xsl:call-template name="show-eHDSIPersonalRelationship">
+                                                    <xsl:with-param name="node" select="../n1:associatedEntity/n1:code"/>
+                                                </xsl:call-template>
+                                            </span>
+                                        </xsl:if>
                                     </td>
                                     <td>
                                         <table class="contact_information_table">

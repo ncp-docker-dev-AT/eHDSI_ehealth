@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS eTransactionError
 (
     TransactionError_PK bigint(20) NOT NULL AUTO_INCREMENT,
     Transaction_FK varchar(64) NOT NULL,
-    ErrorDescription varchar(500) NULL,
+    ErrorDescription varchar(2000) NULL,
     PRIMARY KEY (TransactionError_PK),
     CONSTRAINT Transaction_FK__TransactionErrorPK FOREIGN KEY (Transaction_FK) REFERENCES eTransaction (Transaction_PK)
 );

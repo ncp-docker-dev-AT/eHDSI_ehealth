@@ -1,9 +1,11 @@
 package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
+import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.joda.time.LocalDateTime;
-
-import java.util.Objects;
 
 public class AbuseEvent {
 
@@ -11,16 +13,20 @@ public class AbuseEvent {
     String pointOfCare;
     String patientId;
     LocalDateTime requestDateTime;
-    String filename;
+    String recordId;
     AbuseTransactionType transactionType;
 
-    public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime, String filename, AbuseTransactionType transactionType) {
+    AuditMessage audit;
+
+    public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
+                      String recordId, AbuseTransactionType transactionType, AuditMessage audit) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
         this.patientId = patientId;
         this.requestDateTime = requestDateTime;
-        this.filename = filename;
+        this.recordId = recordId;
         this.transactionType = transactionType;
+        this.audit = audit;
     }
 
     public CodedValueType getRequestEventType() {
@@ -55,12 +61,12 @@ public class AbuseEvent {
         this.requestDateTime = requestDateTime;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getRecordId() {
+        return recordId;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public AbuseTransactionType getTransactionType() {
@@ -71,28 +77,51 @@ public class AbuseEvent {
         this.transactionType = transactionType;
     }
 
+    public AuditMessage getAudit() {
+        return audit;
+    }
+
+    public void setAudit(AuditMessage audit) {
+        this.audit = audit;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
+
         AbuseEvent that = (AbuseEvent) o;
-        return Objects.equals(requestEventType, that.requestEventType) && Objects.equals(pointOfCare, that.pointOfCare) && Objects.equals(patientId, that.patientId) && Objects.equals(requestDateTime, that.requestDateTime) && Objects.equals(filename, that.filename) && transactionType == that.transactionType;
+
+        return new EqualsBuilder()
+                .append(requestEventType, that.requestEventType)
+                .append(pointOfCare, that.pointOfCare)
+                .append(patientId, that.patientId)
+                .append(requestDateTime, that.requestDateTime)
+                .append(recordId, that.recordId)
+                .append(transactionType, that.transactionType).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestEventType, pointOfCare, patientId, requestDateTime, filename, transactionType);
+        return new HashCodeBuilder(17, 37)
+                .append(requestEventType)
+                .append(pointOfCare)
+                .append(patientId)
+                .append(requestDateTime)
+                .append(recordId)
+                .append(transactionType).toHashCode();
     }
 
     @Override
     public String toString() {
-        return "AbuseEventNew{" +
-                "requestEventType=" + requestEventType +
-                ", pointOfCare='" + pointOfCare + '\'' +
-                ", patientId='" + patientId + '\'' +
-                ", requestDateTime=" + requestDateTime +
-                ", filename='" + filename + '\'' +
-                ", transactionType=" + transactionType +
-                '}';
+        return new ToStringBuilder(this)
+                .append("requestEventType", requestEventType)
+                .append("pointOfCare", pointOfCare)
+                .append("patientId", patientId)
+                .append("requestDateTime", requestDateTime)
+                .append("recordId", recordId)
+                .append("transactionType", transactionType)
+                .toString();
     }
 }

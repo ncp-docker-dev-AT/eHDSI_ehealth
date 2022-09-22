@@ -2,7 +2,7 @@ package epsos.ccd.posam.tsam.response;
 
 import epsos.ccd.posam.tsam.exception.TSAMErrorCtx;
 import epsos.ccd.posam.tsam.util.CodedElement;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,12 +62,12 @@ public class TSAMResponseStructure {
     /**
      * List od Exceptions
      */
-    private List<ITMTSAMEror> errors;
+    private List<ITMTSAMError> errors;
 
     /**
      * List od Warnings
      */
-    private List<ITMTSAMEror> warnings;
+    private List<ITMTSAMError> warnings;
 
     /**
      * failure or success
@@ -157,26 +157,26 @@ public class TSAMResponseStructure {
     /**
      * @return List of TSAM errors
      */
-    public List<ITMTSAMEror> getErrors() {
-        return (errors == null ? new ArrayList<ITMTSAMEror>() : errors);
+    public List<ITMTSAMError> getErrors() {
+        return (errors == null ? new ArrayList<ITMTSAMError>() : errors);
     }
 
-    public void setErrors(List<ITMTSAMEror> errors) {
+    public void setErrors(List<ITMTSAMError> errors) {
         this.errors = errors;
     }
 
     /**
      * @return List of TSAM warnings
      */
-    public List<ITMTSAMEror> getWarnings() {
-        return (warnings == null ? new ArrayList<ITMTSAMEror>() : warnings);
+    public List<ITMTSAMError> getWarnings() {
+        return (warnings == null ? new ArrayList<ITMTSAMError>() : warnings);
     }
 
-    public void setWarnings(List<ITMTSAMEror> warnings) {
+    public void setWarnings(List<ITMTSAMError> warnings) {
         this.warnings = warnings;
     }
 
-    public void addError(ITMTSAMEror newError) {
+    public void addError(ITMTSAMError newError) {
         if (!errors.contains(newError)) {
             errors.add(newError);
         }
@@ -191,7 +191,7 @@ public class TSAMResponseStructure {
         addError(errCtx);
     }
 
-    public void addWarning(ITMTSAMEror newWarning) {
+    public void addWarning(ITMTSAMError newWarning) {
         if (!warnings.contains(newWarning)) {
             warnings.add(newWarning);
         }

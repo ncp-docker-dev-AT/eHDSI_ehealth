@@ -7,7 +7,7 @@ import epsos.ccd.posam.tm.exception.TmErrorCtx;
 import epsos.ccd.posam.tm.response.TMResponseStructure;
 import epsos.ccd.posam.tm.service.ITransformationService;
 import epsos.ccd.posam.tm.util.*;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import epsos.ccd.posam.tsam.response.TSAMResponseStructure;
 import epsos.ccd.posam.tsam.service.ITerminologyService;
 import epsos.ccd.posam.tsam.util.CodedElement;
@@ -172,8 +172,8 @@ public class TransformationService implements ITransformationService, TMConstant
                 inputDocument.toString(), targetLanguageCode, isTranscode);
         TMResponseStructure responseStructure;
         String status;
-        List<ITMTSAMEror> errors = new ArrayList<>();
-        List<ITMTSAMEror> warnings = new ArrayList<>();
+        List<ITMTSAMError> errors = new ArrayList<>();
+        List<ITMTSAMError> warnings = new ArrayList<>();
         byte[] inputDocbytes;
 
         try {
@@ -363,7 +363,7 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param cdaDocumentType Type of CDA document to process
      * @return String - Final status of transcoding
      */
-    private String transcodeDocument(Document document, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings, String cdaDocumentType) {
+    private String transcodeDocument(Document document, List<ITMTSAMError> errors, List<ITMTSAMError> warnings, String cdaDocumentType) {
 
         logger.info("Transcoding Document '{}'", cdaDocumentType);
         return processDocument(document, null, errors, warnings, cdaDocumentType, true);
@@ -438,7 +438,7 @@ public class TransformationService implements ITransformationService, TMConstant
      * @return boolean - true if SUCCES otherwise false
      */
     private boolean transcodeElement(Element originalElement, Document document, HashMap<String, String> hmReffIdDisplayName,
-                                     String valueSet, String valueSetVersion, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+                                     String valueSet, String valueSetVersion, List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
 
         return processElement(originalElement, document, null, hmReffIdDisplayName, valueSet,
                 valueSetVersion, true, errors, warnings);
@@ -491,8 +491,8 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param warnings           empty list for TMWarnings
      * @return String - final status of transcoding
      */
-    private String translateDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
-                                     List<ITMTSAMEror> warnings, String cdaDocumentType) {
+    private String translateDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
+                                     List<ITMTSAMError> warnings, String cdaDocumentType) {
 
         logger.info("Translating Document '{}' to target Language: '{}'", cdaDocumentType, targetLanguageCode);
         return processDocument(document, targetLanguageCode, errors, warnings,
@@ -508,8 +508,8 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param isTranscode
      * @return
      */
-    private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMEror> errors,
-                                   List<ITMTSAMEror> warnings, String cdaDocumentType, boolean isTranscode) {
+    private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
+                                   List<ITMTSAMError> warnings, String cdaDocumentType, boolean isTranscode) {
 
         //TODO: Check is an attribute shall/can also be translated anr/or transcoded like the XML element.
         logger.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}", cdaDocumentType, targetLanguageCode, isTranscode);
@@ -633,7 +633,7 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param originalElement
      * @param warnings
      */
-    private void checkCodedElementType(Element originalElement, List<ITMTSAMEror> warnings) {
+    private void checkCodedElementType(Element originalElement, List<ITMTSAMError> warnings) {
 
         if (originalElement != null && StringUtils.isNotBlank(originalElement.getAttribute(XSI_TYPE))) {
 
@@ -673,7 +673,7 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private boolean translateElement(Element originalElement, Document document, String targetLanguageCode,
                                      HashMap<String, String> hmReffIdDisplayName, String valueSet, String valueSetVersion,
-                                     List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+                                     List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
 
         return processElement(originalElement, document, targetLanguageCode, hmReffIdDisplayName, valueSet,
                 valueSetVersion, false, errors, warnings);
@@ -693,7 +693,7 @@ public class TransformationService implements ITransformationService, TMConstant
      */
     private boolean processElement(Element originalElement, Document document, String targetLanguageCode,
                                    HashMap<String, String> hmReffIdDisplayName, String valueSet, String valueSetVersion,
-                                   boolean isTranscode, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+                                   boolean isTranscode, List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
 
         //TODO: Update the translation Node while the translation/transcoding process
         try {
@@ -846,7 +846,7 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param warnings
      * @return Returns true if it is allowed not to have mandatory attributes, false if not, null if everything is ok
      */
-    private Boolean checkAttributes(Element originalElement, List<ITMTSAMEror> warnings) {
+    private Boolean checkAttributes(Element originalElement, List<ITMTSAMError> warnings) {
 
         String elName = XmlUtil.getElementPath(originalElement);
         if (logger.isDebugEnabled()) {

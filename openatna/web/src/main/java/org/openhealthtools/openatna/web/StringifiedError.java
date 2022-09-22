@@ -2,7 +2,6 @@ package org.openhealthtools.openatna.web;
 
 import org.openhealthtools.openatna.audit.persistence.model.ErrorEntity;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
