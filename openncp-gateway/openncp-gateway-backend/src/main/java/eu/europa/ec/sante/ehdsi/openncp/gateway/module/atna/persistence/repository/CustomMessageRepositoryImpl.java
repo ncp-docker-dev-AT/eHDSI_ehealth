@@ -58,7 +58,7 @@ public class CustomMessageRepositoryImpl extends QuerydslRepositorySupport imple
         long totalElements =  idQuery.distinct().fetchCount();
 
         JPQLQuery<MessageEntity> messagesQuery =
-                from(qMessage).where(qMessage.id.in(idQuery.fetch()));
+                from(qMessage).where(qMessage.id.in(idQuery));
 
         List<MessageEntity> result = Objects.requireNonNull(getQuerydsl()).applyPagination(pageable, messagesQuery).fetch();
         return new PageImpl<>(result, pageable, totalElements);
