@@ -31,7 +31,7 @@ public class EadcDbTimeConverter implements AttributeConverter<Instant, String> 
     public Instant convertToEntityAttribute(String s) {
         if(StringUtils.isBlank(s)) {
             logger.warn("date field is not populated!");
-            return Instant.EPOCH;
+            return null;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         try {
@@ -40,7 +40,7 @@ public class EadcDbTimeConverter implements AttributeConverter<Instant, String> 
             return Instant.from(timed);
         } catch (DateTimeParseException ex) {
             logger.warn(ex.getMessage());
-            return Instant.EPOCH;
+            return null;
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage());
             throw (ex);
