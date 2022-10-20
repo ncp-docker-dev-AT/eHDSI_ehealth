@@ -1,6 +1,6 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +11,10 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 @Converter
 public class EadcDbTimeConverter implements AttributeConverter<Instant, String> {
+
     private static final Logger logger = LoggerFactory.getLogger(EadcDbTimeConverter.class);
 
     private  final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss Z";
@@ -38,12 +38,9 @@ public class EadcDbTimeConverter implements AttributeConverter<Instant, String> 
             ZonedDateTime timed = ZonedDateTime.parse(s, formatter);
             timed.format(formatter);
             return Instant.from(timed);
-        } catch (DateTimeParseException ex) {
+        } catch (RuntimeException ex) {
             logger.warn(ex.getMessage());
             return null;
-        } catch (RuntimeException ex) {
-            logger.error(ex.getMessage());
-            throw (ex);
         }
     }
 }
