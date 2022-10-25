@@ -1,5 +1,7 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+
 import java.util.Date;
 
 /**
@@ -18,7 +20,7 @@ public interface EPSOSDocumentMetaData {
 
     Date getEffectiveTime();
 
-    String getClassCode();
+    ClassCode getClassCode();
 
     String getRepositoryId();
 
@@ -27,6 +29,10 @@ public interface EPSOSDocumentMetaData {
     String getAuthor();
 
     String getLanguage();
+
+    long getSize();
+
+    String getHash();
 
     ConfidentialityMetadata getConfidentiality();
 

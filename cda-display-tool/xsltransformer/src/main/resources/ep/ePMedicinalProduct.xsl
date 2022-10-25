@@ -32,7 +32,7 @@
                         Pharmaceutical Product Identifier
                     </th>
                     <td>
-                        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code[@codeSystem!='2.16.840.1.113883.6.73']/@code"/>
+                        <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code[@codeSystem!='2.16.840.1.113883.6.73']/@code"/>
                     </td>
                 </tr>
                 <tr>
@@ -176,12 +176,15 @@
                 <xsl:choose>
                     <xsl:when test="$manufacturedMaterial/pharm:part">
                         <xsl:for-each select="$manufacturedMaterial/pharm:part">
-                            <tr>
-                                <th>
-                                    <xsl:text>part </xsl:text>
-                                    <xsl:value-of select="position()"/>
-                                </th>
-                                <xsl:for-each select="pharm:partProduct/pharm:ingredient">
+                            <xsl:variable name="partNumber" select="position()"/>
+                            <xsl:for-each select="pharm:partProduct/pharm:ingredient">
+                                <tr>
+                                    <th>
+                                        <xsl:if test="position()=1">
+                                            <xsl:text>part </xsl:text>
+                                            <xsl:value-of select="$partNumber"/>
+                                        </xsl:if>
+                                    </th>
                                     <xsl:call-template name="show-active-ingredient">
                                         <xsl:with-param name="code"
                                                         select="pharm:ingredientSubstance/pharm:code"/>
@@ -190,8 +193,8 @@
                                         <xsl:with-param name="strength"
                                                         select="pharm:quantity"/>
                                     </xsl:call-template>
-                                </xsl:for-each>
-                            </tr>
+                                </tr>
+                            </xsl:for-each>
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>

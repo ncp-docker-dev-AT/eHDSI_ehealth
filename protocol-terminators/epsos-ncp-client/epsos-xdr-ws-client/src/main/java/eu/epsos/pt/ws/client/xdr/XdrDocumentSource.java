@@ -2,6 +2,7 @@ package eu.epsos.pt.ws.client.xdr;
 
 import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.ws.client.xdr.dts.XdrResponseDts;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
@@ -46,7 +47,7 @@ public final class XdrDocumentSource {
     public static XdrResponse discard(final XdrRequest request, final String countryCode,
                                       final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
 
-        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.EDD_CLASSCODE);
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, ClassCode.EDD_CLASSCODE);
     }
 
     /**
@@ -58,7 +59,7 @@ public final class XdrDocumentSource {
     public static XdrResponse initialize(final XdrRequest request, final String countryCode,
                                          final Map<AssertionEnum, Assertion> assertionMap) throws XDRException {
 
-        return provideAndRegisterDocSet(request, countryCode, assertionMap, Constants.ED_CLASSCODE);
+        return provideAndRegisterDocSet(request, countryCode, assertionMap, ClassCode.ED_CLASSCODE);
     }
 
     /**
@@ -68,7 +69,7 @@ public final class XdrDocumentSource {
      * @param countryCode - Country code of the requesting country in ISO format.
      */
     public static XdrResponse provideAndRegisterDocSet(final XdrRequest request, final String countryCode,
-                                                       final Map<AssertionEnum, Assertion> assertionMap, String docClassCode)
+                                                       final Map<AssertionEnum, Assertion> assertionMap, ClassCode docClassCode)
             throws XDRException {
 
         RegistryResponseType response;
@@ -130,11 +131,11 @@ public final class XdrDocumentSource {
         }
     }
 
-    private static OpenNCPErrorCode getErrorCode(String classCode){
+    private static OpenNCPErrorCode getErrorCode(ClassCode classCode){
         switch (classCode){
-            case Constants.ED_CLASSCODE:
+            case ED_CLASSCODE:
                 return OpenNCPErrorCode.ERROR_ED_GENERIC;
-            case Constants.EDD_CLASSCODE:
+            case EDD_CLASSCODE:
                 return OpenNCPErrorCode.ERROR_ED_DISCARD_FAILED;
         }
         return OpenNCPErrorCode.ERROR_GENERIC;

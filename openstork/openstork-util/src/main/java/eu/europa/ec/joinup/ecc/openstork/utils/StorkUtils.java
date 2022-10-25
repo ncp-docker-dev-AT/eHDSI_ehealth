@@ -5,7 +5,6 @@ import eu.europa.ec.joinup.ecc.openstork.utils.assertions.HCPIAssertionCreator;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.HcpRole;
 import eu.europa.ec.joinup.ecc.openstork.utils.datamodel.StorkAttributes;
 import eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml.HCPIAssertionBuilder;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.PropertyNotFoundException;
 import eu.stork.peps.auth.commons.IPersonalAttributeList;

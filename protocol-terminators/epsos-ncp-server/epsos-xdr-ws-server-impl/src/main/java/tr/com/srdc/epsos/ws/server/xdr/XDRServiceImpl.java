@@ -10,18 +10,22 @@ import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
 import eu.epsos.pt.transformation.TMServices;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InsufficientRightsException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.InvalidFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.MissingFieldException;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.OpenNCPErrorCodeException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
+import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -43,6 +47,7 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -111,7 +116,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @return Home Community ID URN encoded.
      */
     protected String getLocation(String location) {
-        return org.apache.commons.lang.StringUtils.isBlank(location)?  Constants.OID_PREFIX + Constants.HOME_COMM_ID : location;
+        return org.apache.commons.lang.StringUtils.isBlank(location) ? Constants.OID_PREFIX + Constants.HOME_COMM_ID : location;
     }
 
     private void prepareEventLogForDiscardMedication(EventLog eventLog, String discardId, ProvideAndRegisterDocumentSetRequestType request,
@@ -326,7 +331,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         String sealCountryCode = null;
 
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, Constants.EDD_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(soapHeaderElement, ClassCode.EDD_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -336,7 +341,8 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        String patientId = getPatientId(request);
+        //String patientId = getPatientId(request);
+        String fullPatientId = getDocumentEntryPatientId(request);
         String countryCode = "";
         String distinguishedName = eventLog.getSC_UserID();
         int cIndex = distinguishedName.indexOf("C=");
@@ -352,7 +358,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
         }
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
-        if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
+        if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -365,7 +371,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         try {
             org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
-            EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
+            EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
             documentId = getDocumentId(epsosDocument.getDocument());
             // Evidence for call to NI for XDR submit (dispensation)
             // Joao: here we have a Document so we can generate the mandatory NRO
@@ -409,7 +415,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             discardDetails.setDispenseId(documentId);
             discardDetails.setDiscardId(discardId);
             discardDetails.setDiscardDate(simpleDateFormat.parse(discardDate));
-            discardDetails.setPatientId(patientId);
+            discardDetails.setPatientId(fullPatientId);
             discardDetails.setHealthCareProvider(Helper.getAlternateUserID(soapHeaderElement));
             discardDetails.setHealthCareProviderId(Helper.getAssertionsSPProvidedId(soapHeaderElement));
             discardDetails.setHealthCareProviderFacility(Helper.getXSPALocality(soapHeaderElement));
@@ -420,7 +426,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (NationalInfrastructureException e) {
             logger.error("DocumentSubmitException: '{}'-'{}'", e.getOpenncpErrorCode(), e.getMessage());
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( "+ documentId +" )",  "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( " + documentId + " )", "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -465,7 +471,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList registryErrorList = ofRs.createRegistryErrorList();
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.ED_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, ClassCode.ED_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -475,8 +481,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        String patientId = getPatientId(request);
-        logger.info("Received an eDispensation document for patient: '{}'", patientId);
+        //String patientId = getPatientId(request);
+        String fullPatientId = getDocumentEntryPatientId(request);
+        logger.info("Received an eDispensation document for patient: '{}'", fullPatientId);
         String countryCode = "";
         String DN = eventLog.getSC_UserID();
         int cIndex = DN.indexOf("C=");
@@ -496,7 +503,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
         }
         logger.info("The client country code to be used by the PDP: '{}'", countryCode);
-        if (!SAML2Validator.isConsentGiven(patientId, countryCode)) {
+        if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -539,7 +546,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
                 try {
                     org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
-                    EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.ED_CLASSCODE, domDocument);
+                    EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
                     // Evidence for call to NI for XDR submit (dispensation)
                     // Joao: here we have a Document so we can generate the mandatory NRO
                     try {
@@ -576,7 +583,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                    }
                 } catch (NationalInfrastructureException e) {
                     logger.error("DocumentSubmitException: '{}'-'{}'", e.getOpenncpErrorCode(), e.getMessage());
-                    registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( "+ documentId +" )", "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                    registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( " + documentId + " )", "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 } catch (NIException e) {
                     logger.error("NIException: '{}'", e.getMessage());
                     registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -662,7 +669,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, Constants.CONSENT_CLASSCODE);
+            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, ClassCode.CONSENT_CLASSCODE);
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
@@ -672,8 +679,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        String patientId = getPatientId(request);
-        logger.info("Received a consent document for patient: '{}'", patientId);
+        //String patientId = getPatientId(request);
+        String fullPatientId = getDocumentEntryPatientId(request);
+        logger.info("Received a consent document for patient: '{}'", fullPatientId);
         /*
          * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
          * the consent document.
@@ -711,7 +719,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             }
             try {
                 org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
-                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.CONSENT_CLASSCODE, domDocument);
+                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.CONSENT_CLASSCODE, domDocument);
 
                 // Evidence for call to NI for XDR submit (patient consent)
                 // Joao: here we have a Document so we can generate the mandatory NRO
@@ -768,7 +776,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         return response;
     }
 
-    protected String validateXDRHeader(Element sh, String classCode) throws MissingFieldException, InvalidFieldException,
+    protected String validateXDRHeader(Element sh, ClassCode classCode) throws MissingFieldException, InvalidFieldException,
             SMgrException, InsufficientRightsException {
 
         return SAML2Validator.validateXDRHeader(sh, classCode);
@@ -796,7 +804,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         RegistryErrorList rel = ofRs.createRegistryErrorList();
         try {
-            sigCountryCode = validateXDRHeader(shElement, Constants.HCER_CLASSCODE);
+            sigCountryCode = validateXDRHeader(shElement, ClassCode.HCER_CLASSCODE);
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
             rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -805,8 +813,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        String patientId = getPatientId(request);
-        logger.info("Received a HCER document for patient: '{}' ", patientId);
+        //String patientId = getPatientId(request);
+        String fullPatientId = getDocumentEntryPatientId(request);
+        logger.info("Received a HCER document for patient: '{}' ", fullPatientId);
         /*
          * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
          * the consent document.
@@ -829,14 +838,14 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
                 org.w3c.dom.Document domDocument = XMLUtil.parseContent(documentString);
-                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(patientId, Constants.HCER_CLASSCODE, domDocument);
+                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.HCER_CLASSCODE, domDocument);
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage( e.getErrorCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
                 rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
@@ -873,7 +882,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
      * @param request the request containing the class code.
      * @return the class code.
      */
-    private String obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
+    private ClassCode obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
 
         if (request == null) {
             logger.error("The provided request message in order to extract the classcode is null.");
@@ -904,7 +913,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (result.isEmpty()) {
             logger.warn("No class code was found in request object.");
         }
-        return result;
+        return ClassCode.getByCode(result);
     }
 
     private String getDocumentId(org.w3c.dom.Document document) {

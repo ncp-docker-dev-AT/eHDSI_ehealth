@@ -3,7 +3,7 @@ package epsos.ccd.posam.tm.response;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import epsos.ccd.posam.tm.exception.TMException;
 import epsos.ccd.posam.tm.util.TMConstants;
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -51,19 +51,19 @@ public class TMResponseStructure implements TMConstants {
     /**
      * List of TM Errors
      */
-    private List<ITMTSAMEror> errors;
+    private List<ITMTSAMError> errors;
 
     /**
      * List of TM Warnings
      */
-    private List<ITMTSAMEror> warnings;
+    private List<ITMTSAMError> warnings;
 
     /**
      * failure or success
      */
     private String status;
 
-    public TMResponseStructure(Document responseCDA, String status, List<ITMTSAMEror> errors, List<ITMTSAMEror> warnings) {
+    public TMResponseStructure(Document responseCDA, String status, List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
         this.requestId = UUID.randomUUID().toString();
         this.responseCDA = responseCDA;
         this.errors = errors;
@@ -103,7 +103,7 @@ public class TMResponseStructure implements TMConstants {
             // errors
             Element errorsElement = document.createElement(ERRORS);
             if (!getErrors().isEmpty()) {
-                for (ITMTSAMEror tmException : uniqueList(getErrors())) {
+                for (ITMTSAMError tmException : uniqueList(getErrors())) {
 
                     Element errorElement = document.createElement(ERROR);
                     errorElement.setAttribute(CODE, tmException.getCode());
@@ -116,7 +116,7 @@ public class TMResponseStructure implements TMConstants {
             // warnings
             Element warningsElement = document.createElement(WARNINGS);
             if (!getWarnings().isEmpty()) {
-                for (ITMTSAMEror tmException : uniqueList(getWarnings())) {
+                for (ITMTSAMError tmException : uniqueList(getWarnings())) {
                     Element warningElement = document.createElement(WARNING);
                     warningElement.setAttribute(CODE, tmException.getCode());
                     warningElement.setAttribute(DESCRIPTION, tmException.getDescription());
@@ -140,12 +140,12 @@ public class TMResponseStructure implements TMConstants {
         this.status = status;
     }
 
-    private ArrayList<ITMTSAMEror> uniqueList(List<ITMTSAMEror> list) {
+    private ArrayList<ITMTSAMError> uniqueList(List<ITMTSAMError> list) {
 
-        ArrayList<ITMTSAMEror> result = new ArrayList<>();
-        for (ITMTSAMEror itmtsamEror : list) {
-            if (!result.contains(itmtsamEror)) {
-                result.add(itmtsamEror);
+        ArrayList<ITMTSAMError> result = new ArrayList<>();
+        for (ITMTSAMError itmtsamError : list) {
+            if (!result.contains(itmtsamError)) {
+                result.add(itmtsamError);
             }
         }
         return result;
@@ -172,32 +172,32 @@ public class TMResponseStructure implements TMConstants {
     /**
      * @return List of TMErrors
      */
-    public List<ITMTSAMEror> getErrors() {
+    public List<ITMTSAMError> getErrors() {
         return (errors == null ? new ArrayList<>() : errors);
     }
 
-    public void setErrors(List<ITMTSAMEror> errors) {
+    public void setErrors(List<ITMTSAMError> errors) {
         this.errors = errors;
     }
 
     /**
      * @return List of TMWarnings
      */
-    public List<ITMTSAMEror> getWarnings() {
+    public List<ITMTSAMError> getWarnings() {
         return (warnings == null ? new ArrayList<>() : warnings);
     }
 
-    public void setWarnings(List<ITMTSAMEror> warnings) {
+    public void setWarnings(List<ITMTSAMError> warnings) {
         this.warnings = warnings;
     }
 
-    public void addError(ITMTSAMEror newError) {
+    public void addError(ITMTSAMError newError) {
         if (!errors.contains(newError)) {
             errors.add(newError);
         }
     }
 
-    public void addWarning(ITMTSAMEror newWarning) {
+    public void addWarning(ITMTSAMError newWarning) {
         if (!warnings.contains(newWarning)) {
             warnings.add(newWarning);
         }
@@ -253,11 +253,11 @@ public class TMResponseStructure implements TMConstants {
         sb.append("TMResponseStructure.toString() BEGIN : ").append(NEWLINE);
         sb.append(STATUS).append(COLON).append(status).append(NEWLINE);
         sb.append(ERRORS).append(COLON).append(NEWLINE);
-        for (ITMTSAMEror tmError : errors) {
+        for (ITMTSAMError tmError : errors) {
             sb.append(tmError.toString()).append(NEWLINE);
         }
         sb.append(WARNINGS).append(COLON).append(NEWLINE);
-        for (ITMTSAMEror tmError : warnings) {
+        for (ITMTSAMError tmError : warnings) {
             sb.append(tmError.toString()).append(NEWLINE);
         }
         sb.append("TMResponseStructure.toString() END");

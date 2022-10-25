@@ -3,6 +3,7 @@ package eu.epsos.pt.cc.dts.axis2;
 import epsos.openncp.protocolterminator.clientconnector.Author;
 import epsos.openncp.protocolterminator.clientconnector.EpsosDocument1;
 import epsos.openncp.protocolterminator.clientconnector.ReasonOfHospitalisation;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -73,26 +74,27 @@ public class DocumentDts {
         result.setSubstitution(document.getSubstitution());
 
         if (result.getClassCode() != null && !result.getClassCode().getNodeRepresentation().isEmpty()) {
-            switch (result.getClassCode().getNodeRepresentation()) {
-                case Constants.PS_CLASSCODE:
+            var classCode = result.getClassCode().getNodeRepresentation();
+            switch (ClassCode.getByCode(classCode)) {
+                case PS_CLASSCODE:
                     result.setTitle(Constants.PS_TITLE);
                     break;
-                case Constants.EP_CLASSCODE:
+                case EP_CLASSCODE:
                     result.setTitle(Constants.EP_TITLE);
                     break;
-                case Constants.ED_CLASSCODE:
+                case ED_CLASSCODE:
                     result.setTitle(Constants.ED_TITLE);
                     break;
-                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_TITLE);
                     break;
-                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case ORCD_LABORATORY_RESULTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_LABORATORY_RESULTS_TITLE);
                     break;
-                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                     result.setTitle(Constants.ORCD_MEDICAL_IMAGING_REPORTS_TITLE);
                     break;
-                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                case ORCD_MEDICAL_IMAGES_CLASSCODE:
                     result.setTitle(Constants.ORCD_MEDICAL_IMAGES_TITLE);
                     break;
                 default:

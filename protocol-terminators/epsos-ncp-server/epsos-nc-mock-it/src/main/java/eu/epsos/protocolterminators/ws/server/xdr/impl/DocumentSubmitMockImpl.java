@@ -44,7 +44,7 @@ public class DocumentSubmitMockImpl extends NationalConnectorGateway implements 
     public void submitDispensation(EPSOSDocument dispensationDocument) throws NIException {
 
         if (logger.isInfoEnabled()) {
-            logger.info("[National Infrastructure Mock] Submit Dispense Document");
+            logger.info("[National Infrastructure Mock] Submit Dispense Document for Patient: '{}'", dispensationDocument.getPatientId());
         }
         String dispensation;
         try {
