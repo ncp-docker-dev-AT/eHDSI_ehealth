@@ -73,7 +73,7 @@
                                                         <xsl:with-param name="code" select="'69'"/>
                                                     </xsl:call-template>
                                                 </th>
-                                                <xsl:value-of select="/ClinicalDocument/author/assignedAuthor/code/@displayName"/>
+                                                <xsl:value-of select="/n1:ClinicalDocument/n1:author/n1:ssignedAuthor/n1:code/@displayName"/>
                                                 <td>
                                                 </td>
                                                 <th>
@@ -83,10 +83,11 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="telecom">
-                                                        <xsl:with-param name="telecomParam"
-                                                                        select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom"/>
-                                                    </xsl:call-template>
+                                                    <xsl:for-each select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:telecom">
+                                                        <xsl:call-template name="show-telecom">
+                                                            <xsl:with-param name="telecom" select="."/>
+                                                        </xsl:call-template>
+                                                    </xsl:for-each>
                                                 </td>
                                                 <th>
                                                     <!--  Organisation Name: -->
@@ -170,10 +171,11 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <td>
-                                                    <xsl:call-template name="telecom">
-                                                        <xsl:with-param name="telecomParam"
-                                                                        select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:telecom"/>
-                                                    </xsl:call-template>
+                                                    <xsl:for-each select="//n1:entry/n1:substanceAdministration[n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']]/n1:participant[@typeCode='AUT']/n1:participantRole[@classCode='LIC']/n1:telecom">
+                                                        <xsl:call-template name="show-telecom">
+                                                            <xsl:with-param name="telecom" select="."/>
+                                                        </xsl:call-template>
+                                                    </xsl:for-each>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -299,20 +301,6 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$id/@extension"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="telecom">
-        <xsl:param name="telecomParam"/>
-        <xsl:choose>
-            <xsl:when test="$telecomParam/@nullFlavor">
-                <xsl:call-template name="show-eHDSINullFlavor">
-                    <xsl:with-param name="code" select="$telecomParam/@nullFlavor"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="$telecomParam/@value"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

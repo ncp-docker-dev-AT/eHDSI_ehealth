@@ -110,8 +110,9 @@
                             <td>
                                 <!-- show person's name and if exists organization name -->
                                 <xsl:if test="not(n1:associatedPerson/n1:name/@nullFlavor)">
-                                    <xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
-                                    <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>
+                                    <xsl:call-template name="show-name">
+                                        <xsl:with-param name="name" select="n1:associatedPerson/n1:name"/>
+                                    </xsl:call-template>
                                 </xsl:if>
                                 <xsl:if test="n1:scopingOrganization">
                                     <xsl:if test="(n1:associatedPerson/n1:name/n1:given or n1:associatedPerson/n1:name/n1:family) and n1:scopingOrganization/n1:name">
@@ -202,12 +203,15 @@
                                     <xsl:when test="$assignedPerson">
                                         <xsl:choose>
                                             <xsl:when test="not($assignedPerson/n1:name/@nullFlavor)">
-                                                <xsl:value-of select="$assignedPerson/n1:name/n1:given"/>&#160;
-                                                <xsl:value-of select="$assignedPerson/n1:name/n1:family"/>&#160;
+                                                <xsl:call-template name="show-name">
+                                                    <xsl:with-param name="name" select="$assignedPerson/n1:name"/>
+                                                </xsl:call-template>
+                                                &#160;
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:value-of select="$assignedEntity/n1:assignedPerson/n1:name/n1:given"/>&#160;
-                                                <xsl:value-of select="$assignedEntity/n1:assignedPerson/n1:name/n1:family"/>&#160;
+                                                <xsl:call-template name="show-name">
+                                                    <xsl:with-param name="name" select="$assignedEntity/n1:assignedPerson/n1:name"/>
+                                                </xsl:call-template>
                                                 <xsl:value-of select="$assignedEntity/n1:representedOrganization/n1:name"/>
                                                 <xsl:call-template name="show-contactInfo">
                                                     <xsl:with-param name="contact" select="$assignedEntity/n1:representedOrganization"/>
@@ -293,8 +297,11 @@
                     </tr>
                     <tr>
                         <td>
-                            <xsl:value-of select="$LegalAuthenticator/n1:name/n1:given"/>&#160;
-                            <xsl:value-of select="$LegalAuthenticator/n1:name/n1:family"/>
+                            <xsl:if test="not($LegalAuthenticator/n1:name/@nullFlavor)">
+                                <xsl:call-template name="show-name">
+                                    <xsl:with-param name="name" select="$LegalAuthenticator/n1:name"/>
+                                </xsl:call-template>
+                            </xsl:if>
                             <xsl:if test="$LegalAuthenticator2/n1:name and not($LegalAuthenticator2/n1:name/@nullFlavor)">
                                 ,&#160;<xsl:value-of select="$LegalAuthenticator2/n1:name"/>&#160;
                             </xsl:if>
@@ -350,8 +357,11 @@
                             <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
                                 <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
                                     <td>
-                                        <xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
-                                        <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
+                                        <xsl:if test="not(n1:associatedPerson/n1:name/@nullFlavor)">
+                                            <xsl:call-template name="show-name">
+                                                <xsl:with-param name="name" select="n1:associatedPerson/n1:name"/>
+                                            </xsl:call-template>
+                                        </xsl:if>
                                         <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
                                         <xsl:if test="@classCode">
                                             <span class="label otherContacts-roleClass">
@@ -419,8 +429,14 @@
                     <xsl:for-each select="$patientGuardian">
                         <tr>
                             <td>
-                                <xsl:value-of select="n1:guardianPerson/n1:name/n1:given"/>&#160;
-                                <xsl:value-of select="n1:guardianPerson/n1:name/n1:family"/>&#160;
+                                <xsl:if test="not(n1:guardianPerson/n1:name/@nullFlavor)">
+                                    <xsl:for-each select="n1:guardianPerson/n1:name">
+                                        <xsl:call-template name="show-name">
+                                            <xsl:with-param name="name" select="."/>
+                                        </xsl:call-template>
+                                        &#160;
+                                    </xsl:for-each>
+                                </xsl:if>
                             </td>
                             <td>
                                 <table class="contact_information_table">
