@@ -368,23 +368,23 @@
         </repository>
         <repository>
             <id>cef-digital-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth/</url>
+            <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/eHealth/</url>
         </repository>
         <repository>
             <id>cef-digital-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eHealth-snapshots/</url>
+            <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/eHealth-snapshots/</url>
         </repository>
         <repository>
             <id>cef-digital-digit-releases</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery/</url>
+            <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/eDelivery/</url>
         </repository>
         <repository>
             <id>cef-digital-digit-snapshots</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/eDelivery-snapshots/</url>
+            <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/eDelivery-snapshots/</url>
         </repository>
         <repository>
             <id>cef-digital-third-party</id>
-            <url>https://ec.europa.eu/cefdigital/artifact/content/repositories/ehealth-third-party/</url>
+            <url>https://ec.europa.eu/digital-building-blocks/artifact/content/repositories/ehealth-third-party/</url>
         </repository>
         <repository>
             <id>maven2-repository.jboss.org</id>
