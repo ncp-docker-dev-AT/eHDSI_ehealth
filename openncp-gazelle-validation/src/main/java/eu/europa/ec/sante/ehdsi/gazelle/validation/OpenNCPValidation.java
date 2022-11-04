@@ -147,23 +147,21 @@ public class OpenNCPValidation {
     private static void validatePatientDemographic(String request, String validator, ObjectType objectType, NcpSide ncpSide) {
 
         LOGGER.info("[Validation Service: XCPD Validator]");
-        String base64 = DatatypeConverter.printBase64Binary(request.getBytes(StandardCharsets.UTF_8));
-
         if (isRemoteValidationEnable()) {
 
             new Thread(() -> {
                 StopWatch watch = new StopWatch();
                 watch.start();
-                SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
-                String xmlResult = schematronValidator.validateObject(base64, validator, validator);
+                HL7v3Validator hl7v3Validator = GazelleValidatorFactory.getHL7v3Validator();
+                String xmlResult = hl7v3Validator.validateDocument(request, validator, ncpSide);
                 DetailedResult detailedResult = DetailedResultUnMarshaller.unmarshal(xmlResult);
-                ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), base64, detailedResult, xmlResult, ncpSide);
+                ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), request, detailedResult, xmlResult, ncpSide);
                 watch.stop();
                 LOGGER.info(MSG_VALIDATION_EXECUTION, watch.getTime());
             }).start();
         } else {
 
-            ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), base64, ncpSide);
+            ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), request, ncpSide);
         }
     }
 

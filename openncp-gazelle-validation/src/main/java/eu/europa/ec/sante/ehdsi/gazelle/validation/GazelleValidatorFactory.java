@@ -28,6 +28,11 @@ public class GazelleValidatorFactory {
         return iGazelleValidatorFactory.getCertificateValidator();
     }
 
+    public static HL7v3Validator getHL7v3Validator() {
+        IGazelleValidatorFactory iGazelleValidatorFactory = getIGazelleValidatorFactory();
+        return iGazelleValidatorFactory.getHL7v3Validator();
+    }
+
     public static SchematronValidator getSchematronValidator() {
         IGazelleValidatorFactory iGazelleValidatorFactory = getIGazelleValidatorFactory();
         return iGazelleValidatorFactory.getSchematronValidator();
