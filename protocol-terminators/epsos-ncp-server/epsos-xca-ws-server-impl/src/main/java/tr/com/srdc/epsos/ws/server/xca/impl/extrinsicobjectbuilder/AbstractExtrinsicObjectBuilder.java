@@ -38,10 +38,16 @@ public abstract class AbstractExtrinsicObjectBuilder {
         eot.getSlot().add(SlotBuilder.build("sourcePatientId", getDocumentEntryPatientId(request)));
 
         // Size
-        eot.getSlot().add(SlotBuilder.build("size", String.valueOf(documentMetaData.getSize())));
+        // In the case of an On Demand document generation, no information on the size is available at the time of the XCA List
+        if (documentMetaData.getSize() != null) {
+            eot.getSlot().add(SlotBuilder.build("size", String.valueOf(documentMetaData.getSize())));
+        }
 
         // Hash
-        eot.getSlot().add(SlotBuilder.build("hash", String.valueOf(documentMetaData.getHash())));
+        // In the case of an On Demand document generation, no information on the hash is available at the time of the XCA List
+        if (documentMetaData.getHash() != null) {
+            eot.getSlot().add(SlotBuilder.build("hash", String.valueOf(documentMetaData.getHash())));
+        }
 
         // Creation Date (optional)
         eot.getSlot().add(SlotBuilder.build("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", documentMetaData.getEffectiveTime())));
