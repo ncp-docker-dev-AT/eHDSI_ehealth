@@ -1,11 +1,10 @@
 package eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc;
 
 import eu.europa.ec.sante.ehdsi.openncp.gateway.module.eadc.persistence.model.Transaction;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -40,12 +40,8 @@ public class ExportService {
     }
 
     public byte[] export(LocalDate fromDate, LocalDate toDate) {
-        // Why in develop branch was passed null to findTransactions ?????
-        // List<Transaction> transactions = transactionService.findTransactions(null).getContent();
 
-        // Added these two lines to test export of ErrorDescription data
-        Pageable paging = PageRequest.of(0, 200);
-        List<Transaction> transactions = transactionService.findTransactions(paging).getContent();
+        List<Transaction> transactions = transactionService.findTransactions(Pageable.unpaged()).getContent();
 
         //Filter transactions between the dates
         List<Transaction> filteredTransactions = transactions.stream().filter(t ->
@@ -55,11 +51,9 @@ public class ExportService {
 
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File file = new File(classLoader.getResource(TEMPLATE_FILE).getFile());
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        try (Workbook workbook = WorkbookFactory.create(file)) {
+        try (Workbook workbook = WorkbookFactory.create(Objects.requireNonNull(classLoader.getResource(TEMPLATE_FILE)).openStream())) {
 
             writeTransactions(workbook.getSheet(SHEET_KPI_1_2), getTransactionsForKPI_1_2(filteredTransactions));
             writeTransactions(workbook.getSheet(SHEET_KPI_1_3), getTransactionsForKPI_1_3(filteredTransactions));
@@ -175,7 +169,7 @@ public class ExportService {
         dataValues.add("1.3.6.1.4.1.12559.11.10.1.3.1.1.6");
 
         return transactions.stream().filter(transaction ->
-                transaction.getTransactionData() != null && !transaction.getTransactionData().isEmpty()
+                CollectionUtils.isNotEmpty(transaction.getTransactionData())
                         && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
 
     }
@@ -183,7 +177,7 @@ public class ExportService {
     private List<Transaction> getTransactionsForKPI_1_4(List<Transaction> transactions) {
         //eDispensation
         return transactions.stream().filter(transaction ->
-                transaction.getTransactionData() != null && !transaction.getTransactionData().isEmpty()
+                CollectionUtils.isNotEmpty(transaction.getTransactionData())
                         && transaction.getTransactionData().get(0).getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2")).collect(Collectors.toList());
     }
 
@@ -196,14 +190,14 @@ public class ExportService {
         dataValues.add("1.3.6.1.4.1.12559.11.10.1.3.1.1.7");
 
         return transactions.stream().filter(transaction ->
-                transaction.getTransactionData() != null && !transaction.getTransactionData().isEmpty()
+                CollectionUtils.isNotEmpty(transaction.getTransactionData())
                         && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
     }
 
     private List<Transaction> getTransactionsForKPI_1_6(List<Transaction> transactions) {
         //eDispensation discard
         return transactions.stream().filter(transaction ->
-                transaction.getTransactionData() != null && !transaction.getTransactionData().isEmpty()
+                CollectionUtils.isNotEmpty(transaction.getTransactionData())
                         && transaction.getTransactionData().get(0).getDataValue().equals("1.3.6.1.4.1.12559.11.10.1.3.1.1.2-DISCARD")).collect(Collectors.toList());
     }
 
@@ -219,7 +213,7 @@ public class ExportService {
         dataValues.add("1.3.6.1.4.1.12559.11.10.1.3.1.1.11");
 
         return transactions.stream().filter(transaction ->
-                transaction.getTransactionData() != null && !transaction.getTransactionData().isEmpty()
+                CollectionUtils.isNotEmpty(transaction.getTransactionData())
                         && dataValues.contains(transaction.getTransactionData().get(0).getDataValue())).collect(Collectors.toList());
     }
 }
