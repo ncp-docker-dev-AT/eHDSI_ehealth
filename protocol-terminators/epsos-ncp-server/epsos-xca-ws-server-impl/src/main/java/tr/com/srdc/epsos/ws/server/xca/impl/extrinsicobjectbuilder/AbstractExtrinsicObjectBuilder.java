@@ -2,7 +2,6 @@ package tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder;
 
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
-import eu.epsos.util.xdr.XDRConstants;
 import eu.europa.ec.sante.ehdsi.constant.codesystem.CodeSystem;
 import eu.europa.ec.sante.ehdsi.constant.ihe.ClassificationScheme;
 import eu.europa.ec.sante.ehdsi.constant.ihe.XDSMetaData;
@@ -10,17 +9,20 @@ import fi.kela.se.epsos.data.model.EPSOSDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
+import oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import org.springframework.http.MediaType;
 import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.ws.server.xca.impl.ClassificationBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.SlotBuilder;
-import oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory;
 
 import java.util.UUID;
 
 public abstract class AbstractExtrinsicObjectBuilder {
+
+    private AbstractExtrinsicObjectBuilder() {
+    }
 
     protected static ExtrinsicObjectType build(AdhocQueryRequest request, ExtrinsicObjectType eot, EPSOSDocumentMetaData documentMetaData, ObjectFactory ofRim, String uuid, String title) {
 
@@ -38,10 +40,16 @@ public abstract class AbstractExtrinsicObjectBuilder {
         eot.getSlot().add(SlotBuilder.build("sourcePatientId", getDocumentEntryPatientId(request)));
 
         // Size
-        eot.getSlot().add(SlotBuilder.build("size", String.valueOf(documentMetaData.getSize())));
+        // In the case of an On Demand document generation, no information on the size is available at the time of the XCA List
+        if (documentMetaData.getSize() != null) {
+            eot.getSlot().add(SlotBuilder.build("size", String.valueOf(documentMetaData.getSize())));
+        }
 
         // Hash
-        eot.getSlot().add(SlotBuilder.build("hash", String.valueOf(documentMetaData.getHash())));
+        // In the case of an On Demand document generation, no information on the hash is available at the time of the XCA List
+        if (documentMetaData.getHash() != null) {
+            eot.getSlot().add(SlotBuilder.build("hash", String.valueOf(documentMetaData.getHash())));
+        }
 
         // Creation Date (optional)
         eot.getSlot().add(SlotBuilder.build("creationTime", DateUtil.getDateByDateFormat("yyyyMMddHHmmss", documentMetaData.getEffectiveTime())));
