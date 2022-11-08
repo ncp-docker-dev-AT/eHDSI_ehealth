@@ -18,12 +18,12 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     private final String author;
     private final ConfidentialityMetadata confidentiality;
     private final String language;
-    private final long size;
+    private final Long size;
     private final String hash;
 
     @Deprecated
     public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-                                     ClassCode classCode, String repositoryId, String title, String author, long size, String hash) {
+                                     ClassCode classCode, String repositoryId, String title, String author, Long size, String hash) {
 
         this.id = id;
         this.patientId = patientId;
@@ -41,7 +41,7 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
 
     public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
                                      ClassCode classCode, String repositoryId, String title, String author,
-                                     ConfidentialityMetadata confidentiality, String language, long size, String hash) {
+                                     ConfidentialityMetadata confidentiality, String language, Long size, String hash) {
 
         this.id = id;
         this.patientId = patientId;
@@ -116,7 +116,7 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     }
 
     @Override
-    public long getSize() {
+    public Long getSize() {
         return size;
     }
 

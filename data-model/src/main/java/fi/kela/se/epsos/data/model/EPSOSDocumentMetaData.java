@@ -30,7 +30,7 @@ public interface EPSOSDocumentMetaData {
 
     String getLanguage();
 
-    long getSize();
+    Long getSize();
 
     String getHash();
 

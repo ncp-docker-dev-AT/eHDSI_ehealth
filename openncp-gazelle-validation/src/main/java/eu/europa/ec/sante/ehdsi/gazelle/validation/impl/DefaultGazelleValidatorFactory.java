@@ -38,6 +38,10 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
     public static final String GAZELLE_CERTIFICATE_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_CERTIFICATE_VALIDATOR_URI");
 
+    //  "https://gazelle.ehdsi.eu/GazelleHL7v2Validator-ejb/ModelBasedValidationWSService/ModelBasedValidationWS"
+    public static final String GAZELLE_HL7V3_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
+            .getProperty("GAZELLE_HL7V3_VALIDATOR_URI");
+
     //  "https://gazelle.ehdsi.eu/SchematronValidator-ejb/GazelleObjectValidatorService/GazelleObjectValidator";
     public static final String GAZELLE_SCHEMATRON_VALIDATOR_URI = (String) GazelleConfiguration.getInstance().getConfiguration()
             .getProperty("GAZELLE_SCHEMATRON_VALIDATOR_URI");
@@ -86,6 +90,14 @@ public class DefaultGazelleValidatorFactory implements IGazelleValidatorFactory 
         marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.certificate.sante");
 
         return new CertificateValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_CERTIFICATE_VALIDATOR_URI));
+    }
+
+    @Override
+    public HL7v3Validator getHL7v3Validator() {
+        Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+        marshaller.setPackagesToScan("net.ihe.gazelle.jaxb.hl7v3.sante");
+
+        return new HL7v3ValidatorImpl(createWebServiceTemplate(marshaller, GAZELLE_HL7V3_VALIDATOR_URI));
     }
 
     @Override

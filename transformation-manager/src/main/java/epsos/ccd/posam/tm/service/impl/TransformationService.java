@@ -718,7 +718,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 // +++++ Element editing BEGIN +++++
 
                 // NEW TRANSLATION element
-                Element newTranslation = document.createElementNS(originalElement.getNamespaceURI(), TRANSLATION);
+                Element newTranslation = document.createElementNS(EHDSI_HL7_NAMESPACE, TRANSLATION);
                 if (originalElement.getPrefix() != null) {
                     newTranslation.setPrefix(originalElement.getPrefix());
                 }
