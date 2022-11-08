@@ -14,7 +14,7 @@ public class DetailedResultUnMarshaller {
 
     private static final Logger logger = LoggerFactory.getLogger(DetailedResultUnMarshaller.class);
 
-    private static JAXBContext jaxbContext;
+    private static final JAXBContext jaxbContext;
 
     static {
         try {
