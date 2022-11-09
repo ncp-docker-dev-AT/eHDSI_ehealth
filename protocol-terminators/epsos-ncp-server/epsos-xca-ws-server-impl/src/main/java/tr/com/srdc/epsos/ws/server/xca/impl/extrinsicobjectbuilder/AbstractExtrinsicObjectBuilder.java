@@ -21,9 +21,6 @@ import java.util.UUID;
 
 public abstract class AbstractExtrinsicObjectBuilder {
 
-    private AbstractExtrinsicObjectBuilder() {
-    }
-
     protected static ExtrinsicObjectType build(AdhocQueryRequest request, ExtrinsicObjectType eot, EPSOSDocumentMetaData documentMetaData, ObjectFactory ofRim, String uuid, String title) {
 
         // Set Extrinsic Object
