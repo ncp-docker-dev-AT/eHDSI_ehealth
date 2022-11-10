@@ -1,5 +1,6 @@
 package org.openhealthtools.openatna.audit.persistence.model;
 
+import org.hibernate.annotations.Type;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventIdCodeEntity;
 import org.openhealthtools.openatna.audit.persistence.model.codes.EventTypeCodeEntity;
 
