@@ -145,6 +145,7 @@ public class MessageEntity extends PersistentEntity {
     }
 
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     public byte[] getMessageContent() {
         return messageContent;
     }

@@ -34,6 +34,7 @@ public class MessageEntity {
     private Set<MessageParticipantEntity> messageParticipants = new LinkedHashSet<>();
 
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     private byte[] messageContent = new byte[0];
 
     public Long getId() {
