@@ -21,6 +21,7 @@
         <module>epsos-ncp-server</module>
         <module>epsos-ncp-client-consumer</module>
         <module>epsos-ncp-server/openncp-abuse-detection</module>
+        <module>epsos-ncp-client/openncp-client-abuse-detection</module>
     </modules>
 
     <properties>
