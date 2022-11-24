@@ -1020,6 +1020,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
 
                                 OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.ERROR_TRANSCODING_ERROR;
+                                String openNcpErrorCodeDescription = openncpErrorCode.getDescription();
+                                String errorCodeContext = errorCode.getAttributeValue(QName.valueOf("codeContext"));
 
                                 switch (classCodeValue) {
                                     case EP_CLASSCODE:
@@ -1030,9 +1032,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                         break;
                                 }
 
+                                if(StringUtils.isNotBlank(errorCodeContext)) {
+                                    openNcpErrorCodeDescription = openncpErrorCode.getDescription() + " [" + errorCodeContext + "]";
+                                }
+
                                 RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList,
                                         openncpErrorCode,
-                                        openncpErrorCode.getDescription(),
+                                        openNcpErrorCodeDescription,
                                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                                 // If the error is FATAL flag failure has been set to true
                                 failure = true;
@@ -1134,16 +1140,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
         if (failure) {
             //Only XCA Error Code defined into the XCA Profile might be attached to the response in case of FAILURE.
             Iterator<OMElement> errors = registryErrorList.getChildElements();
+            List<String> list = Arrays.asList(OpenNCPErrorCode.ERROR_TRANSCODING_ERROR.getCode(),
+                    OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING.getCode(),
+                    OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING.getCode(),
+                    OpenNCPErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getCode());
             while (errors.hasNext()) {
-
                 OMElement errorCode = errors.next();
                 logger.error("Error: '{}'-'{}'", errorCode.getText(), errorCode.getAttributeValue(QName.valueOf("errorCode")));
-                List<String> list = Arrays.asList(OpenNCPErrorCode.ERROR_TRANSCODING_ERROR.getCode(),
-                        OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING.getCode(),
-                        OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING.getCode(),
-                        OpenNCPErrorCode.ERROR_ED_MISSING_EXPECTED_MAPPING.getCode());
                 if (!list.contains(errorCode.getAttributeValue(QName.valueOf("errorCode")))) {
-                    errors.remove();
+                   errors.remove();
                 }
             }
         }
