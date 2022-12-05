@@ -1,6 +1,8 @@
 package fi.kela.se.epsos.data.model;
 
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +14,10 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
     private static final String HL7_NAMESPACE = "urn:hl7-org:v3";
     private final Logger logger = LoggerFactory.getLogger(EPSOSDocumentImpl.class);
     private final String patientId;
-    private final String classCode;
+    private final ClassCode classCode;
     private final Document document;
 
-    public EPSOSDocumentImpl(String patientId, String classCode, Document document) {
+    public EPSOSDocumentImpl(String patientId, ClassCode classCode, Document document) {
         this.patientId = patientId;
         this.classCode = classCode;
         this.document = document;
@@ -32,7 +34,7 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
     }
 
     @Override
-    public String getClassCode() {
+    public ClassCode getClassCode() {
         return classCode;
     }
 
@@ -55,13 +57,15 @@ public class EPSOSDocumentImpl implements EPSOSDocument {
     public boolean matchesCriteria(SearchCriteria searchCriteria) {
 
         logger.debug("Processing Search Criteria");
-        String patientId = searchCriteria.getCriteriaValue(Criteria.PatientId);
-        String documentId = searchCriteria.getCriteriaValue(Criteria.DocumentId);
+        String patientIdCriteria = searchCriteria.getCriteriaValue(Criteria.PATIENT_ID);
+        String documentIdCriteria = searchCriteria.getCriteriaValue(Criteria.DOCUMENT_ID);
 
-        if (patientId != null && !patientId.isEmpty()) {
-            return patientId.equals(this.patientId) && documentId != null && documentId.equals(getDocumentId());
+        if (patientIdCriteria != null && !patientIdCriteria.isEmpty()) {
+            //TODO: EHNCP-2055 Inconsistency in handling patient id
+            return StringUtils.contains(patientIdCriteria, this.patientId) && documentIdCriteria != null
+                    && documentIdCriteria.equals(getDocumentId());
         } else {
-            return documentId != null && documentId.equals(getDocumentId());
+            return documentIdCriteria != null && StringUtils.equals(documentIdCriteria, getDocumentId());
         }
     }
 

@@ -7,6 +7,8 @@ import Login from '../views/Login'
 import Error404 from '../views/Error404'
 import Layout from '../views/Layout'
 import Dashboard from '../views/Dashboard'
+import Anomalies from '../views/anomalies-viewer/Anomalies'
+import AnomaliesDetails from '../views/anomalies-viewer/AnomaliesDetails'
 import AuditMessages from '../views/atna-viewer/AuditMessages'
 import AuditMessageDetails from '../views/atna-viewer/AuditMessageDetails'
 import Properties from '../views/Properties'
@@ -103,6 +105,23 @@ const routes = [
             component: SmpSynchronize
           }
         ]
+      }
+    ]
+  },
+  {
+    path: '/anomalies-viewer',
+    component: Layout,
+    children: [
+      {
+        path: 'anomalies-events',
+        name: 'anomalies',
+        component: Anomalies
+      },
+      {
+        path: 'anomalies-details/:id',
+        name: 'anomalies-details',
+        component: AnomaliesDetails,
+        props: true
       }
     ]
   },

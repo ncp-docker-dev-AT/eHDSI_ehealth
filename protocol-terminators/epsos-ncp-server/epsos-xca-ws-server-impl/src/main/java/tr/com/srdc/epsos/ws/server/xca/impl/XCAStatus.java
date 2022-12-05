@@ -4,7 +4,7 @@ public enum XCAStatus {
 
     SUCCESS("Success"), FAILURE("Failure");
 
-    private String status;
+    private final String status;
 
     XCAStatus(String status) {
         this.status = status;

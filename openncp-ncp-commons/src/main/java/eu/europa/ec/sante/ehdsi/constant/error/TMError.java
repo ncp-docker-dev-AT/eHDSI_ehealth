@@ -8,7 +8,7 @@ package eu.europa.ec.sante.ehdsi.constant.error;
  * @author mail:frantisek.rudik@posam.sk
  * @version 1.8, 2010, 20 October
  */
-public enum TMError implements ITMTSAMEror, ErrorCode {
+public enum TMError implements ITMTSAMError, ErrorCode {
 
     // ERRORS
     /**

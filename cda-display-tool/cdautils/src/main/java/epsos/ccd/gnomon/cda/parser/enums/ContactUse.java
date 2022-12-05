@@ -18,9 +18,9 @@ public enum ContactUse {
     WP("WP", "work place");
 
     // Use code
-    private String code;
+    private final String code;
     // Use display name
-    private String display;
+    private final String display;
 
     /**
      * A basic constructor initializing the contact use.

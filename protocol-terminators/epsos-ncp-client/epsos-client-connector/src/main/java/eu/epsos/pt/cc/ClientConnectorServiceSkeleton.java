@@ -7,6 +7,7 @@ import eu.epsos.exceptions.XDRException;
 import eu.epsos.pt.cc.dts.axis2.*;
 import eu.epsos.pt.cc.stub.*;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -120,29 +121,30 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
         try {
             QueryResponse response;
             if (documentCodes.size() == 1) {
-                switch (documentCodes.get(0).getValue()) {
-                    case Constants.PS_CLASSCODE:
+                String classCode = documentCodes.get(0).getValue();
+                switch (ClassCode.getByCode(classCode)) {
+                    case PS_CLASSCODE:
                         response = PatientService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
-                    case Constants.EP_CLASSCODE:
+                    case EP_CLASSCODE:
                         response = OrderService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
-                    case Constants.MRO_CLASSCODE:
+                    case MRO_CLASSCODE:
                         response = MroService.list(patientId, countryCode, documentCodes.get(0), assertionMap);
                         break;
-                    case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-                    case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                    case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                    case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                    case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                    case ORCD_LABORATORY_RESULTS_CLASSCODE:
+                    case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                    case ORCD_MEDICAL_IMAGES_CLASSCODE:
                         response = OrCDService.list(patientId, countryCode, List.of(documentCodes.get(0)), filterParams, assertionMap);
                         break;
                     default:
                         throw new ClientConnectorException(UNSUPPORTED_CLASS_CODE_EXCEPTION + Arrays.toString(documentCodes.toArray()));
                 }
             } else {
-                if (!documentCodes.contains(Constants.EP_CLASSCODE)
-                        && !documentCodes.contains(Constants.PS_CLASSCODE)
-                        && !documentCodes.contains(Constants.MRO_CLASSCODE)) {
+                if (!documentCodes.contains(ClassCode.EP_CLASSCODE.getCode())
+                        && !documentCodes.contains(ClassCode.PS_CLASSCODE.getCode())
+                        && !documentCodes.contains(ClassCode.MRO_CLASSCODE.getCode())) {
                     response = OrCDService.list(patientId, countryCode, documentCodes, filterParams, assertionMap);
                 } else {
                     throw new ClientConnectorException("Invalid combination of document codes provided: only OrCD document codes can be combined.");
@@ -208,22 +210,23 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             xdsDocument.setClassCode(documentCode);
 
             logger.info("[ClientConnector retrieveDocument()] homeCommunityId: '{}' targetLanguage: '{}'", homeCommunityId, targetLanguage);
-            switch (documentCode.getValue()) {
-                case Constants.PS_CLASSCODE:
+            ClassCode classCode = ClassCode.getByCode(documentCode.getValue());
+            switch (classCode) {
+                case PS_CLASSCODE:
                     response = PatientService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
                             assertionMap);
                     break;
-                case Constants.EP_CLASSCODE:
+                case EP_CLASSCODE:
                     response = OrderService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
                             assertionMap);
                     break;
-                case Constants.MRO_CLASSCODE:
+                case MRO_CLASSCODE:
                     response = MroService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage, assertionMap);
                     break;
-                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case ORCD_MEDICAL_IMAGES_CLASSCODE:
                     response = OrCDService.retrieve(xdsDocument, homeCommunityId, countryCode, targetLanguage,
                             assertionMap);
                     break;
@@ -281,14 +284,15 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
             logger.info("[Document] ClassCode: '{}' NodeRepresentation: '{}'", classCodeNode, nodeRepresentation);
             //TODO: CDA as input needs to be validated according XSD, Schematron or Validators.
             XdrResponse response;
-            switch (classCodeNode) {
+            var classCodeValue = ClassCode.getByCode(classCodeNode);
+            switch (classCodeValue) {
 
                 // call XDR Client for Consent
-                case Constants.CONSENT_CLASSCODE:
+                case CONSENT_CLASSCODE:
                     response = ConsentService.put(document, patientDemographics, countryCode, assertionMap);
                     break;
                 // call XDR Client for eP
-                case Constants.ED_CLASSCODE:
+                case ED_CLASSCODE:
                     if (StringUtils.equals(nodeRepresentation, "urn:eHDSI:ed:discard:2020")) {
                         response = DispensationService.discard(document, patientDemographics, countryCode, assertionMap);
                     } else {
@@ -296,10 +300,10 @@ public class ClientConnectorServiceSkeleton implements ClientConnectorServiceSke
                     }
                     break;
                 // call XDR Client for HCER
-                case Constants.HCER_CLASSCODE:
+                case HCER_CLASSCODE:
                     response = HcerService.submit(document, patientDemographics, countryCode, assertionMap);
                     break;
-                case Constants.EDD_CLASSCODE:
+                case EDD_CLASSCODE:
                     response = DispensationService.discard(document, patientDemographics, countryCode, assertionMap);
                     break;
                 default:

@@ -69,4 +69,15 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="3" author="miorial">
+    <createTable tableName="eTransactionError">
+        <column name="TransactionError_PK" type="bigint" autoIncrement="true">
+            <constraints primaryKey="true"/>
+        </column>
+        <column name="Transaction_FK" type="varchar(64)">
+            <constraints nullable="false" references="eTransaction(Transaction_PK)" foreignKeyName="Transaction_FK__TransactionErrorPK"/>
+        </column>
+        <column name="ErrorDescription" type="varchar(2000)"/>
+    </createTable>
+    </changeSet>
 </databaseChangeLog>

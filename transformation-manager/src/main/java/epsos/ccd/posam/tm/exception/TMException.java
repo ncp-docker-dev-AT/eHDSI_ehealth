@@ -1,6 +1,6 @@
 package epsos.ccd.posam.tm.exception;
 
-import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMEror;
+import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 
 /**
@@ -13,7 +13,7 @@ import eu.europa.ec.sante.ehdsi.constant.error.TMError;
  */
 public class TMException extends Exception {
 
-	private ITMTSAMEror reason;
+	private ITMTSAMError reason;
 
 	public TMException(TMError reason) {
 		this.reason = reason;
@@ -24,7 +24,7 @@ public class TMException extends Exception {
 	}
 
 
-	public ITMTSAMEror getReason() {
+	public ITMTSAMError getReason() {
 		return reason;
 	}
 

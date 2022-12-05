@@ -22,8 +22,8 @@ public enum RegisteredService {
     EHEALTH_107("ehealth-107", "urn:ehealth:ISM::InternationalSearchMask##ehealth-107");
 
     private static final Map<String, RegisteredService> MAP = Stream.of(RegisteredService.values()).collect(Collectors.toMap(RegisteredService::getServiceName, Function.identity()));
-    private String serviceName;
-    private String urn;
+    private final String serviceName;
+    private final String urn;
 
     RegisteredService(String serviceName, String urn) {
         this.serviceName = serviceName;

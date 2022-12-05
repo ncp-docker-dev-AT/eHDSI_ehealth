@@ -8,7 +8,9 @@ also resolve issues of interpretation raised during implementations based upon t
 which are considered to be neither contentious nor to change the fundamental TSL structure defined 
 in the original TS 102 231 document and its XSD counterpart.
 -->
-<xsd:schema targetNamespace="http://uri.etsi.org/02231/v2#" xmlns:tsl="http://uri.etsi.org/02231/v2#" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xsd:schema targetNamespace="http://uri.etsi.org/02231/v2#" xmlns:tsl="http://uri.etsi.org/02231/v2#"
+            xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- Imports -->
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
 	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"/>

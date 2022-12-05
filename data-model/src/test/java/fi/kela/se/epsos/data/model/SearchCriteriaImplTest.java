@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fi.kela.se.epsos.data.model;
 
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
@@ -51,8 +46,8 @@ public class SearchCriteriaImplTest {
         String patientId = "23q2e";
         String docId = "29846534324.123453";
         SearchCriteria sc = new SearchCriteriaImpl();
-        sc.add(Criteria.PatientId, patientId);
-        sc.add(Criteria.DocumentId, docId);
+        sc.add(Criteria.PATIENT_ID, patientId);
+        sc.add(Criteria.DOCUMENT_ID, docId);
         Document doc = sc.asXml();
         Element e = doc.getDocumentElement();
         String str = convertElementToString(e);

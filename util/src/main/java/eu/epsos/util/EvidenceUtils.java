@@ -465,6 +465,14 @@ public class EvidenceUtils {
         return documentBuilder.parse(new File(file));
     }
 
+    public static Document readXmlMessage(String xml) throws ParserConfigurationException, SAXException, IOException {
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        return documentBuilder.parse(xml);
+    }
+
     /**
      * @param keyStorePath
      * @param keyPassword
