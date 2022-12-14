@@ -73,7 +73,7 @@
                                                         <xsl:with-param name="code" select="'69'"/>
                                                     </xsl:call-template>
                                                 </th>
-                                                <xsl:value-of select="/n1:ClinicalDocument/n1:author/n1:ssignedAuthor/n1:code/@displayName"/>
+                                                <xsl:value-of select="/n1:ClinicalDocument/n1:author/n1:assignedAuthor/n1:code/@displayName"/>
                                                 <td>
                                                 </td>
                                                 <th>
