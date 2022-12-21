@@ -1039,11 +1039,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 break;
                             }
                         }
-                    }
-                    /* Validate CDA eHDSI Pivot */
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-                                NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                    } else {
+                        /* Validate CDA eHDSI Pivot */
+                        if (OpenNCPValidation.isValidationEnable()) {
+                            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                    NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                        }
                     }
                 }
 
