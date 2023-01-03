@@ -3,6 +3,7 @@ package org.openhealthtools.openatna.audit.persistence.model;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "message_participants")
@@ -11,7 +12,6 @@ public class MessageParticipantEntity extends PersistentEntity {
     private static final long serialVersionUID = -1L;
 
     private Long id;
-
     private ParticipantEntity participant;
     private Boolean userIsRequestor = Boolean.TRUE;
     private NetworkAccessPointEntity networkAccessPoint;
@@ -25,8 +25,6 @@ public class MessageParticipantEntity extends PersistentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    //@GenericGenerator(name = "native", strategy = "native")
     public Long getId() {
         return id;
     }
@@ -80,7 +78,7 @@ public class MessageParticipantEntity extends PersistentEntity {
                 : that.getParticipant() != null) {
             return false;
         }
-        return userIsRequestor != null ? userIsRequestor.equals(that.userIsRequestor) : that.userIsRequestor == null;
+        return Objects.equals(userIsRequestor, that.userIsRequestor);
     }
 
     @Override
