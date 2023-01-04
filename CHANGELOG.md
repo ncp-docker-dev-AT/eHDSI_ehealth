@@ -3,13 +3,62 @@
 All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [6.1.1] - 07-11-2022
+The OpenNCP 6.1.1 is the Wave 6 Preparatory PPT HotFix release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
+if some blocking issues are encountered.
+A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical
+Framework upgrade (SAML and XUA profile).
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/koASTw
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Gateway - SMP Editor bug fixing and improvements</li>
+<li>Gazelle validators - TLS connections bug fixing</li>
+<li>TSAM Synchronizer - Mappings retrieval improvements</li>
+<li>OpenNCP libraries - Fixing vulnerabilities</li>
+<li>XCPD request and response: alignment of the implementation and the specifications</li>
+<li>XCA metadata: alignment of the implementation and the specifications</li>
+</ul>
+
+### Bug
+    [EHEALTH-8129] - TM code_element_list.xml: wrong XPath for Substitution flag in ePrescription
+    [EHEALTH-8551] - OpenNCP Gateway doesn't support properly Oracle database LOB type
+    [EHEALTH-8892] - Problem with OpenNCP version 5.2.5 openatna viewer
+    [EHEALTH-8923] - OpenNCP-Gateway - SMP-Editor: Delete dialog box is not closed after deletion of SMP file
+    [EHEALTH-8924] - OpenNCP-Gateway - SMP-Editor: no feedback to user after SMP file upload
+    [EHEALTH-8925] - OpenNCP-Gateway - EADC-Viewer: columns header doesn't change order of presentation
+    [EHEALTH-8927] - OpenNCP-WS-Server fails to establish TLS connection to remote Gazelle validators
+    [EHEALTH-9040] - Pagination issue with ATNA viewer
+    [EHEALTH-9116] - OpenNCP-Gateway: cannot export EADC from 2022 onwards (hardcoded values)
+    [EHEALTH-9142] - OpenATNA: issue while storing events information during ISM synchronizing
+    [EHEALTH-9165] - Pagination in eADC generate exception if startDate or endDate fields are empty
+    [EHEALTH-9227] - [IHE Gazelle EVS Client] Transformation manager generates translation elements with parent prefix
+    [EHEALTH-9249] - TSAM Sync doesn't export the mappings from CTS server
+    [EHEALTH-9280] - Modify XCA Server implementation to handle empty hash and size metadata attributes
+
+### New Feature
+    [EHEALTH-9243] - Make IHE HL7v3 XCPD validator work the remote validation
+
+### Task
+    [EHEALTH-9115] - Fix failing unit tests in Bamboo
+    [EHEALTH-9131] - Update IHE CDA Validators to version v6.4.0 in the configuration file
+    [EHEALTH-9255] - Releasing OpenNCP 6.1.1
+
+### Technical Sub-task
+    [EHEALTH-8399] - The type of address (/addr/@use) is not properly displayed
+
+### Improvement
+    [EHEALTH-8778] - OpenNCP Gateway Backend - Spring Security warning
+    [EHEALTH-9239] - Apache Commons Text vulnerability
+
 ## [6.1.0] - 21-09-2022
-The OpenNCP 6.1 is the Wave 6 Preparatory PPT release including the implementation of the Wave 6 Change Proposals.
+The OpenNCP 6.1.0 is the Wave 6 Preparatory PPT release including the implementation of the Wave 6 Change Proposals.
 This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
 in October 2022.
 A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical 
 Framework upgrade (SAML and XUA profile).
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/N4NbT
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/N4NbT
 
 Main changes in this release are:<br/>
 <ul>
@@ -66,7 +115,7 @@ The OpenNCP 6.0.0 is the Wave 6 Initial release including the implementation of 
 This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 6 
 from October 2022 for their National implementation of the Wave 6 Change Proposals.
 A new release (6.1.0) is expected in August 2022 providing the implementation of the Change Proposal 064: IHE Technical Framework upgrade.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/QIUDSQ
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/QIUDSQ
 
 Main changes in this release are:<br/>
 <ul>
@@ -141,7 +190,7 @@ Main changes in this release are:<br/>
 ## [5.2.6] - 13-06-2022
 The OpenNCP 5.2.6 is the Wave 5 Operation Ready release.
 This version is planned to be used during the eHDSI Wave 5 Routine Operations.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/zwVGRw
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/zwVGRw
 
 Main changes in this release are:<br/>
 <ul>
@@ -200,7 +249,7 @@ Main changes in this release are:<br/>
 ## [5.2.5] - 21-02-2022
 The OpenNCP 5.2.5 is the Wave 5 Formal Test Event HotFix release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ
 
 Main changes in this release are:<br/>
 <ul>
@@ -253,7 +302,7 @@ Main changes in this release are:<br/>
 ## [5.2.4] - 25-01-2021
 The OpenNCP 5.2.4 is the Wave 5 Formal Test Event release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/ogARPw
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/ogARPw
 
 Main changes in this release are:<br/>
 <ul>
@@ -295,7 +344,7 @@ Main changes in this release are:<br/>
 ## [5.2.3] - 17-11-2021
 The OpenNCP 5.2.3 is the Wave 5 Preparatory Test Event HotFix release.
 This version is an emergency version planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021 as a replacement of version 5.2.2.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>
@@ -312,7 +361,7 @@ Main changes in this release are:<br/>
 ## [5.2.2] - 15-11-2021
 The OpenNCP 5.2.2 is the Wave 5 Preparatory Test Event HotFix release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>
@@ -347,7 +396,7 @@ Main changes in this release are:<br/>
 ## [5.2.1] - 27-09-2021
 The OpenNCP 5.2.1 is the Wave 5 Preparatory Test Event release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>
