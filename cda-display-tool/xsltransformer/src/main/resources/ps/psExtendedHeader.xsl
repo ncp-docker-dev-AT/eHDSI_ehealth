@@ -266,22 +266,16 @@
                                     <td>
                                         <table class="contact_information_table">
                                             <tr>
-                                                <th>
+                                                <th colspan="2">
                                                     <!-- Contact Information -->
                                                     <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'12'"/>
                                                     </xsl:call-template>
                                                 </th>
                                             </tr>
-                                            <tr>
-                                                <td>
-                                                    <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
-                                                        <xsl:call-template name="show-contactInfo">
-                                                            <xsl:with-param name="contact" select="."/>
-                                                        </xsl:call-template>
-                                                    </xsl:if>
-                                                </td>
-                                            </tr>
+                                            <xsl:call-template name="show-contactInfo">
+                                                <xsl:with-param name="contact" select="."/>
+                                            </xsl:call-template>
                                         </table>
                                     </td>
                                 </xsl:if>
