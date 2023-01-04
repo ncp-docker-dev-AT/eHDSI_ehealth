@@ -44,7 +44,9 @@ public class ExportService {
         List<Transaction> transactions = transactionService.findTransactions(Pageable.unpaged()).getContent();
 
         //Filter transactions between the dates
-        List<Transaction> filteredTransactions = transactions.stream().filter(t ->
+        List<Transaction> filteredTransactions = transactions.stream().
+                filter(t -> t.getStartTime() != null).
+                filter(t ->
                         t.getStartTime().compareTo(fromDate.atStartOfDay(zoneId).toInstant()) > 0
                                 && t.getStartTime().compareTo(toDate.atStartOfDay(zoneId).toInstant()) < 0)
                 .collect(Collectors.toList());
