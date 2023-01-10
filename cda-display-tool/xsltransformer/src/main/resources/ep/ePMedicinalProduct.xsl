@@ -59,7 +59,7 @@
                         <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:name"/>
                     </td>
                 </tr>
-                <xsl:if test="n1:consumable/n1:manufacturedProduct/pharm:marketingAuthorizationHolder">
+                <xsl:if test="n1:consumable/n1:manufacturedProduct/n1:manufacturerOrganization">
                     <tr>
                         <th>
                             <!-- Marketing Authorization Holder -->
@@ -68,7 +68,7 @@
                             </xsl:call-template>
                         </th>
                         <td>
-                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/pharm:marketingAuthorizationHolder/pharm:name"/>
+                            <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturerOrganization/n1:name"/>
                         </td>
                     </tr>
                 </xsl:if>
