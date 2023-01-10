@@ -50,8 +50,8 @@ public class WebSecurityConfiguration {
     SecurityFilterChain resources(HttpSecurity http) throws Exception {
         // @formatter:off
         http
-                .requestMatchers((matchers) -> matchers.antMatchers("/webjars/**"))
-                .authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
+                .requestMatchers(matchers -> matchers.antMatchers("/webjars/**"))
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .requestCache().disable()
                 .securityContext().disable()
                 .sessionManagement().disable();
