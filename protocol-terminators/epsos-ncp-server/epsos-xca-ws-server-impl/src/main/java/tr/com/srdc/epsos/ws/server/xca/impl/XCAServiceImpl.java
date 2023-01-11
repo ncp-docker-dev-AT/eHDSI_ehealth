@@ -1039,11 +1039,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 break;
                             }
                         }
-                    }
-                    /* Validate CDA eHDSI Pivot */
-                    if (OpenNCPValidation.isValidationEnable()) {
-                        OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
-                                NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                    } else {
+                        /* Validate CDA eHDSI Pivot if no error during the transformation */
+                        if (OpenNCPValidation.isValidationEnable()) {
+                            OpenNCPValidation.validateCdaDocument(XMLUtils.toOM(doc.getDocumentElement()).toString(),
+                                    NcpSide.NCP_A, epsosDoc.getClassCode(), true);
+                        }
                     }
                 }
 
@@ -1158,11 +1159,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
         var onlyWarnings = true;
         OMElement element;
-        Iterator it = registryErrorList.getChildElements();
+        Iterator<OMElement> it = registryErrorList.getChildElements();
 
         while (it.hasNext()) {
 
-            element = (OMElement) it.next();
+            element = it.next();
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText())) {
                 logger.debug("Error has been detected for Element: '{}'", element.getText());
@@ -1173,7 +1174,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * Method responsible of the AdhocQueryResponse message if the operation requested is not supported by the server.
+     * Method responsible for the AdhocQueryResponse message if the operation requested is not supported by the server.
      * RegistryError shall contain:
      * errorCode: required.
      * codeContext: required - Supplies additional detail for the errorCode.
