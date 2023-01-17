@@ -5,9 +5,6 @@ package epsos.ccd.gnomon.auditmanager;
  * One of the available eHDSI event ids:
  *
  * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
- * @version 1.0, 2010, 30 Jun
  */
 public enum TransactionName {
 
@@ -36,7 +33,7 @@ public enum TransactionName {
     SMP_QUERY("SMP::Query"),
     SMP_PUSH("SMP::Push");
 
-    private String code;
+    private final String code;
 
     TransactionName(String c) {
         code = c;

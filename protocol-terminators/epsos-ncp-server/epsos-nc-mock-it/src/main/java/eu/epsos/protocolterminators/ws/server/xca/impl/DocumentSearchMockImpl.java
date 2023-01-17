@@ -536,7 +536,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
             }
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.startsWith(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), documentAssociation.getXMLDocumentMetaData().getPatientId())) {
-                    //&& StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
+                //&& StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
                 logger.debug("getPSDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 if (documentAssociation.getPDFDocumentMetaData() == null) {
                     OriginalDataMissingException ex = new OriginalDataMissingException("[National Infrastructure Mock] No PDF found associated for the CDA");
@@ -563,7 +563,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.startsWith(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), documentAssociation.getXMLDocumentMetaData().getPatientId())) {
-                    //&& StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
+                //&& StringUtils.equals(documentAssociation.getXMLDocumentMetaData().getPatientId(), searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
                 metaDatas.add(documentAssociation);
                 logger.debug("getEPDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 if (documentAssociation.getPDFDocumentMetaData() == null) {
@@ -635,7 +635,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         for (OrCDDocumentMetaData orCDDocumentMetaData : orCDMetaDataList) {
             var creationInstant = orCDDocumentMetaData.getEffectiveTime().toInstant();
             //if (StringUtils.equals(orCDDocumentMetaData.getPatientId(), searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))
-            if(StringUtils.startsWith(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), orCDDocumentMetaData.getPatientId())
+            if (StringUtils.startsWith(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), orCDDocumentMetaData.getPatientId())
                     && (maximumSize == null || orCDDocumentMetaData.getSize() <= maximumSize)
                     && (createdBefore == null || (creationInstant.compareTo(createdBefore) <= 0))
                     && (createdAfter == null || (createdAfter.compareTo(creationInstant) <= 0))) {
@@ -651,13 +651,16 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
         logger.info("[National Infrastructure Mock] Retrieve Document: '{}', '{}', '{}'", searchCriteria.getCriteriaValue(Criteria.DOCUMENT_ID),
                 searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), searchCriteria.getCriteriaValue(Criteria.REPOSITORY_ID));
+        if (StringUtils.equals("2-9999^^^&2.16.17.710.850.1000.990.1.1000&ISO", searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
+            throw new NIException(OpenNCPErrorCode.ERROR_GENERIC_DOCUMENT_MISSING, "[National Infrastructure Mock] Error Retrieving Document for Patient: " +
+                    searchCriteria.getCriteriaValue(Criteria.PATIENT_ID));
+        }
         for (EPSOSDocument epsosDocument : documents) {
             if (epsosDocument.matchesCriteria(searchCriteria)) {
                 logger.debug("getDocument(SearchCriteria searchCriteria): '{}'", epsosDocument);
                 return epsosDocument;
             }
         }
-
         throw new NIException(OpenNCPErrorCode.ERROR_GENERIC, "[National Infrastructure Mock] Error Retrieving Document");
     }
 
@@ -669,7 +672,7 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
 
             if (documentAssociation.getXMLDocumentMetaData() != null
                     && StringUtils.startsWith(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), documentAssociation.getXMLDocumentMetaData().getPatientId())) {
-                    //&& documentAssociation.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
+                //&& documentAssociation.getXMLDocumentMetaData().getPatientId().equals(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID))) {
                 logger.debug("getMroDocumentList(SearchCriteria searchCriteria): '{}'", documentAssociation);
                 return documentAssociation;
             }

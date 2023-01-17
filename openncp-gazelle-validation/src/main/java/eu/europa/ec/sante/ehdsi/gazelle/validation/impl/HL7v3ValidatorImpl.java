@@ -28,7 +28,6 @@ public class HL7v3ValidatorImpl extends AbstractValidator implements HL7v3Valida
 
         try {
             ValidateDocumentResponse response = (ValidateDocumentResponse) webServiceTemplate.marshalSendAndReceive(request);
-            logger.info("*** {}", response.getDetailedResult());
             return response.getDetailedResult();
 
         } catch (WebServiceClientException e) {
