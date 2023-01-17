@@ -208,6 +208,13 @@ public class SAML {
 
         Conditions conditions = create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
         conditions.setNotBefore(issueInstant);
+
+        AudienceRestriction audienceRestriction = create(AudienceRestriction.class, AudienceRestriction.DEFAULT_ELEMENT_NAME);
+        Audience audience = create(Audience.class, Audience.DEFAULT_ELEMENT_NAME);
+        audience.setURI("urn:ehdsi:restriction:ehdsi1");
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+
         conditions.setNotOnOrAfter(issueInstant.plus(Duration.ofHours(4)));
         assertion.setConditions(conditions);
 

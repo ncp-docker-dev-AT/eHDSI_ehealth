@@ -127,6 +127,13 @@ public class SamlNextOfKinIssuer {
         //Create and add conditions
         Conditions conditions = AssertionUtil.create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
         conditions.setNotBefore(issuanceInstant);
+
+        AudienceRestriction audienceRestriction = AssertionUtil.create(AudienceRestriction.class, AudienceRestriction.DEFAULT_ELEMENT_NAME);
+        Audience audience = AssertionUtil.create(Audience.class, Audience.DEFAULT_ELEMENT_NAME);
+        audience.setURI("urn:ehdsi:restriction:ehdsi1");
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+
         conditions.setNotOnOrAfter(issuanceInstant.plus(Duration.ofHours(2)));
         assertion.setConditions(conditions);
 
