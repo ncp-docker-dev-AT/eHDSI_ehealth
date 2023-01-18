@@ -50,4 +50,21 @@
         <servlet-name>ClientConnectorInit</servlet-name>
         <url-pattern>/ClientConnectorInit</url-pattern>
     </servlet-mapping>
+    <context-param>
+        <param-name>quartz:shutdown-on-unload</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>quartz:wait-on-shutdown</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>quartz:start-scheduler-on-load</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            eu.europa.ec.sante.ehdsi.openncp.cc.QuartzInitializerListener
+        </listener-class>
+    </listener>
 </web-app>
