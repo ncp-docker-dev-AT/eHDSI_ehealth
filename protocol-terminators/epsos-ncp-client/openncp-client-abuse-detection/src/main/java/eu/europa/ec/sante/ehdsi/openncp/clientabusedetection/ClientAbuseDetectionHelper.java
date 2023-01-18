@@ -1,4 +1,4 @@
-package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
+package eu.europa.ec.sante.ehdsi.openncp.clientabusedetection;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -9,18 +9,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import tr.com.srdc.epsos.util.Constants;
 
-public class AbuseDetectionHelper implements ApplicationContextAware {
+public class ClientAbuseDetectionHelper implements ApplicationContextAware {
 
     public static final String NAME_OF_JOB = "AbuseDetectionJob";
-    public static final String NAME_OF_GROUP = "OpenNCPServer";
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbuseDetectionHelper.class);
+    public static final String NAME_OF_GROUP = "OpenNCPClient";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientAbuseDetectionService.class);
     private static final String NAME_OF_TRIGGER = "triggerStart";
 
     //create variable scheduler of type Scheduler
     private static Scheduler scheduler;
     private static ApplicationContext applicationContext;
 
-    private AbuseDetectionHelper() {
+    private ClientAbuseDetectionHelper() {
     }
 
     public static void abuseDetectionShutdown() {
@@ -58,7 +58,7 @@ public class AbuseDetectionHelper implements ApplicationContextAware {
     private static void scheduleJob(Trigger triggerNew) throws SchedulerException {
 
         //create an instance of the JoDetails to connect Quartz job to the CreateQuartzJob
-        JobDetail jobInstance = JobBuilder.newJob(AbuseDetectionService.class).withIdentity(NAME_OF_JOB, NAME_OF_GROUP).build();
+        JobDetail jobInstance = JobBuilder.newJob(ClientAbuseDetectionService.class).withIdentity(NAME_OF_JOB, NAME_OF_GROUP).build();
 
         //invoke scheduleJob method to connect the Quartz scheduler to the jobInstance and the triggerNew
         scheduler.scheduleJob(jobInstance, triggerNew);
