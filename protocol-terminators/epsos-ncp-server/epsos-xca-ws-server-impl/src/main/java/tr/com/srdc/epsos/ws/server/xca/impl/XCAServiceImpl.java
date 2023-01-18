@@ -1027,16 +1027,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 String openNcpErrorCodeDescription = openncpErrorCode.getDescription();
                                 String errorCodeContext = errorCode.getAttributeValue(QName.valueOf("codeContext"));
 
-                                switch (classCodeValue) {
-                                    case EP_CLASSCODE:
-                                        openncpErrorCode = OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
-                                        break;
-                                    case PS_CLASSCODE:
-                                        openncpErrorCode = OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING;
-                                        break;
+                                if (Objects.requireNonNull(classCodeValue) == EP_CLASSCODE) {
+                                    openncpErrorCode = OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
+                                } else if (classCodeValue == PS_CLASSCODE) {
+                                    openncpErrorCode = OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING;
                                 }
-
-                                if(StringUtils.isNotBlank(errorCodeContext)) {
+                                if (StringUtils.isNotBlank(errorCodeContext)) {
                                     openNcpErrorCodeDescription = openncpErrorCode.getDescription() + " [" + errorCodeContext + "]";
                                 }
 
