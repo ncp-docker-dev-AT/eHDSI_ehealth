@@ -1024,19 +1024,21 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             if (StringUtils.startsWith(errorCode.getAttributeValue(QName.valueOf("errorCode")), "45")) {
 
                                 OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.ERROR_TRANSCODING_ERROR;
+                                String openNcpErrorCodeDescription = openncpErrorCode.getDescription();
+                                String errorCodeContext = errorCode.getAttributeValue(QName.valueOf("codeContext"));
 
-                                switch (classCodeValue) {
-                                    case EP_CLASSCODE:
-                                        openncpErrorCode = OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
-                                        break;
-                                    case PS_CLASSCODE:
-                                        openncpErrorCode = OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING;
-                                        break;
+                                if (Objects.requireNonNull(classCodeValue) == EP_CLASSCODE) {
+                                    openncpErrorCode = OpenNCPErrorCode.ERROR_EP_MISSING_EXPECTED_MAPPING;
+                                } else if (classCodeValue == PS_CLASSCODE) {
+                                    openncpErrorCode = OpenNCPErrorCode.ERROR_PS_MISSING_EXPECTED_MAPPING;
+                                }
+                                if (StringUtils.isNotBlank(errorCodeContext)) {
+                                    openNcpErrorCodeDescription = openncpErrorCode.getDescription() + " [" + errorCodeContext + "]";
                                 }
 
                                 RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList,
                                         openncpErrorCode,
-                                        openncpErrorCode.getDescription(),
+                                        openNcpErrorCodeDescription,
                                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                                 // If the error is FATAL flag failure has been set to true
                                 failure = true;

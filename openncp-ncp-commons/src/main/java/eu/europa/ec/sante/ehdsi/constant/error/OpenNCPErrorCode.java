@@ -32,8 +32,8 @@ public enum OpenNCPErrorCode implements ErrorCode {
     WARNING_PS_GENERIC("WARNING_PS_GENERIC", "Patient Summary generic warning"),
     ERROR_PS_MISSING_BASIC_SECTIONS("ERROR_PS_MISSING_BASIC_SECTIONS", "Any or all of the 5 basic sections are missing, and no reason is communicated for this missing."),
     WARNING_PS_MISSING_BASIC_DATA("WARNING_PS_MISSING_BASIC_DATA", "Any or all of the basic data set is missing."),
-    ERROR_PS_MISSING_EXPECTED_MAPPING("ERROR_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
-    WARNING_PS_MISSING_EXPECTED_MAPPING("WARNING_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
+    ERROR_PS_MISSING_EXPECTED_MAPPING("ERROR_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing for the patient summary."),
+    WARNING_PS_MISSING_EXPECTED_MAPPING("WARNING_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing for the patient summary."),
     WARNING_PS_MISSING_EXPECTED_TRANSLATION("EHDSI_WARNING_PS_MISSING_EXPECTED_TRANSLATION", "An expected translation of the Patient Summary is missing."),
     ERROR_PS_PDF_FORMAT_NOT_PROVIDED("ERROR_PS_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
 
@@ -41,8 +41,8 @@ public enum OpenNCPErrorCode implements ErrorCode {
     ERROR_EP_GENERIC("ERROR_EP_GENERIC", "ePrescription generic error"),
     WARNING_EP_GENERIC("WARNING_EP_GENERIC", "ePrescription generic warning"),
     WARNING_EP_MISSING_BASIC_DATA("WARNING_EP_MISSING_BASIC_DATA", "Any or all of the basic data set is missing, and no reason is communicated for this missing."),
-    ERROR_EP_MISSING_EXPECTED_MAPPING("ERROR_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
-    WARNING_EP_MISSING_EXPECTED_MAPPING("WARNING_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
+    ERROR_EP_MISSING_EXPECTED_MAPPING("ERROR_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing for the prescription."),
+    WARNING_EP_MISSING_EXPECTED_MAPPING("WARNING_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing for the prescription."),
     WARNING_EP_MISSING_EXPECTED_TRANSLATION("WARNING_EP_MISSING_EXPECTED_TRANSLATION", "An expected translation of the ePrescription is missing."),
     ERROR_EP_PDF_FORMAT_NOT_PROVIDED("ERROR_EP_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
 
