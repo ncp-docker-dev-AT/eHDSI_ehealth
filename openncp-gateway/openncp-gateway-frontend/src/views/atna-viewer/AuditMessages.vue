@@ -176,11 +176,15 @@ export default {
         }
       ],
       EventIdCodeItems: [
+        'EHDSI-91',
         'EHDSI-92',
+        'EHDSI-93',
         'EHDSI-94',
         'EHDSI-96',
+        'EHDSI-CF',
         'ITI-38',
         'ITI-39',
+        'ITI-40',
         'ITI-41',
         'ITI-55'
       ],
@@ -271,14 +275,6 @@ export default {
       }
     },
     apiCall () {
-      let endDate
-      if (this.searchEventEndDate) {
-        endDate = new Date(this.searchEventEndDate).setHours(23, 59, 59, 999)
-        endDate = new Date(endDate)
-        endDate = endDate.toISOString()
-      } else {
-        endDate = ''
-      }
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/search_messages', {
         params: {
           pageNumber: this.options.page - 1,
@@ -289,7 +285,9 @@ export default {
           searchEventStartDate: this.searchEventStartDate
             ? new Date(this.searchEventStartDate).toISOString()
             : '',
-          searchEventEndDate: endDate
+          searchEventEndDate: this.searchEventEndDate
+            ? new Date(this.searchEventEndDate).toISOString()
+            : ''
         }
       })
     },

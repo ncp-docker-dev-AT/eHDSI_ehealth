@@ -7,5 +7,4 @@ public interface ErrorCode {
     String getDescription();
 
     String getCodeSystem();
-
 }

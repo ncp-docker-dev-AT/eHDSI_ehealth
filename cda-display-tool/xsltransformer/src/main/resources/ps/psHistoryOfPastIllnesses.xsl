@@ -43,7 +43,7 @@
                                     <tbody>
                                         <tr>
                                             <th>
-                                                <!-- Closed Inactive Problem Heade -->
+                                                <!-- Closed Inactive Problem Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'11'"/>
                                                 </xsl:call-template>
