@@ -10,6 +10,8 @@ public interface IGazelleValidatorFactory {
 
     CertificateValidator getCertificateValidator();
 
+    HL7v3Validator getHL7v3Validator();
+
     SchematronValidator getSchematronValidator();
 
     XdsValidator getXdsValidator();

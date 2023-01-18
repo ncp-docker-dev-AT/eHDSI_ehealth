@@ -238,8 +238,9 @@
                         <xsl:value-of select="round(1 div $medPeriod/@value)"/>
                         <xsl:text> </xsl:text>
                         <!-- Time(s) per -->
-                        <!-- TODO Concept to be added to eHDSIDisplayLabel value set -->
-                        Time(s) per
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'190'"/>
+                        </xsl:call-template>
                         <xsl:text> </xsl:text>
                         <xsl:if test="$medPeriod/@unit">
                             <xsl:call-template name="show-eHDSIUnit">
@@ -250,8 +251,9 @@
                     <xsl:otherwise>
                         <xsl:text>1 </xsl:text>
                         <!-- Time(s) per -->
-                        <!-- TODO Concept to be added to eHDSIDisplayLabel value set -->
-                        Time(s) per
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'190'"/>
+                        </xsl:call-template>
                         <xsl:text> </xsl:text>
                         <xsl:value-of select="$medPeriod/@value"/>
                         <xsl:text> </xsl:text>

@@ -50,8 +50,9 @@
                                             </th>
                                             <th>
                                                 <!-- Duration  -->
-                                                <!-- TODO Label needs to be added to eHDSIDisplayLabel value set -->
-                                                Duration
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'155'"/>
+                                                </xsl:call-template>
                                             </th>
                                             <th>
                                                 <!--  Observation Value -->

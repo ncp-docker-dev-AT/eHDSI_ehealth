@@ -1,7 +1,7 @@
 package eu.epsos.validation.datamodel.xd;
 
 import eu.epsos.validation.datamodel.common.ObjectType;
-import tr.com.srdc.epsos.util.Constants;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 
 /**
  * This enumerator gathers all the models used in the XD* Validator at EVS Client.
@@ -76,17 +76,17 @@ public enum XdModel {
 
         // Query / List operations
         if (message.contains(QUERY_REQUEST)) { // Request
-            if (message.contains(Constants.EP_CLASSCODE)) {
+            if (message.contains(ClassCode.EP_CLASSCODE.getCode())) {
                 result = EPSOS_OS_LIST_REQUEST_XCA;
-            } else if (message.contains(Constants.PS_CLASSCODE)) {
+            } else if (message.contains(ClassCode.PS_CLASSCODE.getCode())) {
                 result = EPSOS_PS_LIST_REQUEST_XCA;
             } else {
                 result = EPSOS2_FETCH_DOC_QUERY_REQUEST;
             }
         } else if (message.contains(QUERY_RESPONSE)) { // Response
-            if (message.contains(Constants.EP_CLASSCODE)) {
+            if (message.contains(ClassCode.EP_CLASSCODE.getCode())) {
                 result = EPSOS_OS_LIST_RESPONSE_XCA;
-            } else if (message.contains(Constants.PS_CLASSCODE)) {
+            } else if (message.contains(ClassCode.PS_CLASSCODE.getCode())) {
                 result = EPSOS_PS_LIST_RESPONSE_XCA;
             } else {
                 result = EPSOS2_FETCH_DOC_QUERY_RESPONSE;
@@ -94,17 +94,17 @@ public enum XdModel {
         }
         // Retrieve operations
         if (message.contains(RETRIEVE_REQUEST)) {  // Request
-            if (message.contains(Constants.EP_CLASSCODE)) {
+            if (message.contains(ClassCode.EP_CLASSCODE.getCode())) {
                 result = EPSOS_OS_RETRIEVE_REQUEST_XCA;
-            } else if (message.contains(Constants.PS_CLASSCODE)) {
+            } else if (message.contains(ClassCode.PS_CLASSCODE.getCode())) {
                 result = EPSOS_PS_RETRIEVE_REQUEST_XCA;
             } else {
                 result = EPSOS2_FETCH_DOC_RETRIEVE_REQUEST;
             }
         } else if (message.contains(RETRIEVE_RESPONSE)) { // Response
-            if (message.contains(Constants.EP_CLASSCODE)) {
+            if (message.contains(ClassCode.EP_CLASSCODE.getCode())) {
                 result = EPSOS_OS_RETRIEVE_RESPONSE_XCA;
-            } else if (message.contains(Constants.PS_CLASSCODE)) {
+            } else if (message.contains(ClassCode.PS_CLASSCODE.getCode())) {
                 result = EPSOS_PS_RETRIEVE_RESPONSE_XCA;
             } else {
                 result = EPSOS2_FETCH_DOC_RETRIEVE_RESPONSE;
@@ -129,17 +129,17 @@ public enum XdModel {
 
 
         if (message.contains(PROVIDE_AND_REGISTER_REQUEST)) {
-            if (message.contains(Constants.CONSENT_CLASSCODE)) {
+            if (message.contains(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 result = EPSOS_CS_PUT_REQUEST;
-            } else if (message.contains(Constants.ED_CLASSCODE)) {
+            } else if (message.contains(ClassCode.ED_CLASSCODE.getCode())) {
                 result = EPSOS_ED_INIT_REQUEST;
             } else {
                 result = EPSOS2_PROVIDE_DATA_REQUEST;
             }
         } else if (message.contains(PROVIDE_AND_REGISTER_RESPONSE)) {
-            if (message.contains(Constants.CONSENT_CLASSCODE)) {
+            if (message.contains(ClassCode.CONSENT_CLASSCODE.getCode())) {
                 result = EPSOS_CS_PUT_RESPONSE;
-            } else if (message.contains(Constants.ED_CLASSCODE)) {
+            } else if (message.contains(ClassCode.ED_CLASSCODE.getCode())) {
                 result = EPSOS_ED_INIT_RESPONSE;
             } else {
                 result = EPSOS2_PROVIDE_DATA_RESPONSE;
@@ -152,9 +152,9 @@ public enum XdModel {
 
         XdModel result;
 
-        if (message.contains(Constants.CONSENT_CLASSCODE)) {
+        if (message.contains(ClassCode.CONSENT_CLASSCODE.getCode())) {
             result = EPSOS_CS_PUT_RESPONSE;
-        } else if (message.contains(Constants.ED_CLASSCODE)) {
+        } else if (message.contains(ClassCode.ED_CLASSCODE.getCode())) {
             result = EPSOS_ED_INIT_RESPONSE;
         } else {
             result = EPSOS2_PROVIDE_DATA_RESPONSE;

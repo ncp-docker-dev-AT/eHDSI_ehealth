@@ -4,9 +4,6 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Constants {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Constants.class);
@@ -14,20 +11,6 @@ public class Constants {
     public static final String UUID_PREFIX = "urn:uuid:";
     public static final String OID_PREFIX = "urn:oid:";
     public static final String HL7II_PREFIX = "urn:hl7ii";
-
-    public static final String EP_CLASSCODE = "57833-6";
-    public static final String PS_CLASSCODE = "60591-5";
-    public static final String EDD_CLASSCODE = "DISCARD-60593-1";
-    public static final String ED_CLASSCODE = "60593-1";
-    public static final String MRO_CLASSCODE = "56445-0";
-    public static final String ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE= "34105-7";
-    public static final String ORCD_LABORATORY_RESULTS_CLASSCODE = "11502-2";
-    public static final String ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE= "18748-4";
-    public static final String ORCD_MEDICAL_IMAGES_CLASSCODE= "x-clinical-image";
-    public static final String CONSENT_CLASSCODE = "57016-8";
-    public static final String HCER_CLASSCODE = "34133-9";
-    public static final int FORMAT_XML = 1;
-    public static final int FORMAT_PDF = 2;
 
     public static final String PatientIdentificationService = "PatientIdentificationService";
     public static final String PatientService = "PatientService";
@@ -79,6 +62,15 @@ public class Constants {
     public static final String NCP_SIG_PRIVATEKEY_ALIAS;
     public static final String NCP_SIG_PRIVATEKEY_PASSWORD;
 
+    public static final String ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD;
+    public static final String ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_UNIQUE_POC_REQUEST_THRESHOLD;
+    public static final String ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_ALL_REQUEST_THRESHOLD;
+    public static final String ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD;
+    public static final String ABUSE_SCHEDULER_TIME_INTERVAL;
+    public static final String ABUSE_SCHEDULER_ENABLE;
+
     /**
      * Name of the System Variable containing the path to the folder containing the configuration files.
      */
@@ -117,6 +109,15 @@ public class Constants {
         NCP_SIG_KEYSTORE_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_KEYSTORE_PASSWORD");
         NCP_SIG_PRIVATEKEY_ALIAS = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_ALIAS");
         NCP_SIG_PRIVATEKEY_PASSWORD = ConfigurationManagerFactory.getConfigurationManager().getProperty("NCP_SIG_PRIVATEKEY_PASSWORD");
+
+        ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD");
+        ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD");
+        ABUSE_UNIQUE_POC_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_POC_REQUEST_THRESHOLD");
+        ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD");
+        ABUSE_ALL_REQUEST_THRESHOLD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_THRESHOLD");
+        ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD");
+        ABUSE_SCHEDULER_TIME_INTERVAL = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_TIME_INTERVAL");
+        ABUSE_SCHEDULER_ENABLE = ConfigurationManagerFactory.getConfigurationManager().getProperty("ABUSE_SCHEDULER_ENABLE");
     }
 
     private Constants() {
@@ -138,14 +139,5 @@ public class Constants {
         }
 
         return path;
-    }
-
-    public static List<String> getClassCodesOrCD() {
-        List<String> list = new ArrayList<>();
-        list.add(ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE);
-        list.add(ORCD_LABORATORY_RESULTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE);
-        list.add(ORCD_MEDICAL_IMAGES_CLASSCODE);
-        return list;
     }
 }

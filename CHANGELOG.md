@@ -1,12 +1,196 @@
 # Change Log
 
-All notable changes to the <a href="https://ec.europa.eu/cefdigital/wiki/x/8CEZAg" rel="nofollow">CEF EHDSI project</a> will be documented in this file.<br/>
+All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
+
+## [6.1.1] - 07-11-2022
+The OpenNCP 6.1.1 is the Wave 6 Preparatory PPT HotFix release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
+if some blocking issues are encountered.
+A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical
+Framework upgrade (SAML and XUA profile).
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/koASTw
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Gateway - SMP Editor bug fixing and improvements</li>
+<li>Gazelle validators - TLS connections bug fixing</li>
+<li>TSAM Synchronizer - Mappings retrieval improvements</li>
+<li>OpenNCP libraries - Fixing vulnerabilities</li>
+<li>XCPD request and response: alignment of the implementation and the specifications</li>
+<li>XCA metadata: alignment of the implementation and the specifications</li>
+</ul>
+
+### Bug
+    [EHEALTH-8129] - TM code_element_list.xml: wrong XPath for Substitution flag in ePrescription
+    [EHEALTH-8551] - OpenNCP Gateway doesn't support properly Oracle database LOB type
+    [EHEALTH-8892] - Problem with OpenNCP version 5.2.5 openatna viewer
+    [EHEALTH-8923] - OpenNCP-Gateway - SMP-Editor: Delete dialog box is not closed after deletion of SMP file
+    [EHEALTH-8924] - OpenNCP-Gateway - SMP-Editor: no feedback to user after SMP file upload
+    [EHEALTH-8925] - OpenNCP-Gateway - EADC-Viewer: columns header doesn't change order of presentation
+    [EHEALTH-8927] - OpenNCP-WS-Server fails to establish TLS connection to remote Gazelle validators
+    [EHEALTH-9040] - Pagination issue with ATNA viewer
+    [EHEALTH-9116] - OpenNCP-Gateway: cannot export EADC from 2022 onwards (hardcoded values)
+    [EHEALTH-9142] - OpenATNA: issue while storing events information during ISM synchronizing
+    [EHEALTH-9165] - Pagination in eADC generate exception if startDate or endDate fields are empty
+    [EHEALTH-9227] - [IHE Gazelle EVS Client] Transformation manager generates translation elements with parent prefix
+    [EHEALTH-9249] - TSAM Sync doesn't export the mappings from CTS server
+    [EHEALTH-9280] - Modify XCA Server implementation to handle empty hash and size metadata attributes
+
+### New Feature
+    [EHEALTH-9243] - Make IHE HL7v3 XCPD validator work the remote validation
+
+### Task
+    [EHEALTH-9115] - Fix failing unit tests in Bamboo
+    [EHEALTH-9131] - Update IHE CDA Validators to version v6.4.0 in the configuration file
+    [EHEALTH-9255] - Releasing OpenNCP 6.1.1
+
+### Technical Sub-task
+    [EHEALTH-8399] - The type of address (/addr/@use) is not properly displayed
+
+### Improvement
+    [EHEALTH-8778] - OpenNCP Gateway Backend - Spring Security warning
+    [EHEALTH-9239] - Apache Commons Text vulnerability
+
+## [6.1.0] - 21-09-2022
+The OpenNCP 6.1.0 is the Wave 6 Preparatory PPT release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
+in October 2022.
+A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical 
+Framework upgrade (SAML and XUA profile).
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/N4NbT
+
+Main changes in this release are:<br/>
+<ul>
+<li>Change Proposal 064: IHE ITI Technical Framework upgrade - XCPD, XCA, XDR and XDS profiles</li>
+<li>CDA and Semantic bug fixing and integration of the CDA Implementation Guidelines 6.3.0</li>
+<li>CDA DisplayTool alignment with Wave 6 requirements</li>
+<li>OpenNCP Gateway minor UI improvements (ATNA, Abuse Detection and eADC modules)</li>
+<li>Full patient identifier is passed to the National connector A (Root and Extension)</li>
+</ul>
+
+### Epic
+    [EHEALTH-7424] - CP-eHealthDSI-064: Upgrade IHE Technical Framework - OpenNCP implementation
+
+### Story
+    [EHEALTH-7482] - IHE ITI Revision 19 implementation - XDS Metadata
+    [EHEALTH-7483] - IHE ITI Revision 19 implementation - XDR Transaction
+    [EHEALTH-7484] - IHE ITI Revision 19 implementation - XCA Transaction
+    [EHEALTH-7485] - IHE ITI Revision 19 implementation - XCPD Transaction
+    [EHEALTH-8797] - CDA Display Tool bugfixes for OpenNCP 6.1.0
+
+### Task
+    [EHEALTH-8897] - Update IHE CDA Validators to version v6.3.0 in the configuration file
+    [EHEALTH-8908] - Adapt CDA Mock files to comply with IHE CDA validators based on CDA IG v6.2.0
+    [EHEALTH-8931] - OpenNCP Gateway UI - create menu for viewing anomalies events
+    [EHEALTH-8935] - Update Manual and Release Notes for OpenNCP 6.1.0
+
+### Technical Sub-task 
+    [EHEALTH-8399] - The type of address (/addr/@use) is not properly displayed
+    [EHEALTH-8731] - Gap analysis of XCA Profile upgrade
+    [EHEALTH-8732] - Implementation of XCA Profile upgrade
+    [EHEALTH-8753] - Gap analysis of XCPD Profile upgrade
+    [EHEALTH-8754] - Upgrade of XCPD Profile
+    [EHEALTH-8755] - Gap analysis of XDR Profile upgrade
+    [EHEALTH-8756] - Implementation of XDR Profile upgrade
+    [EHEALTH-8767] - Releasing OpenNCP 6.1.0
+    [EHEALTH-8798] - When parts contain different active ingredients they are not displayed correctly
+    [EHEALTH-8799] - Package size is not displayed correctly for the enclosing package in the case of parts
+
+### Bug
+    [EHEALTH-8758] - OpenNCP Gateway UI doesn't allow access to eADC error transactions
+    [EHEALTH-8766] - CP-59 - Anomalies for abuse detection not being logged in DB and Atna repository
+    [EHEALTH-8865] - For ePrescription the Package size unit is not being displayed as mL
+    [EHEALTH-8868] - eTransactionerror table is not existing in liquibase
+    [EHEALTH-8896] - The personal relationship between the patient and the guardian or other contact is not displayed in the CDA Display Tool
+    [EHEALTH-9034] - CDA Display Tool - template matches with wrong element for PS Header
+    [EHEALTH-9056] - Also allow for eHDSISubstance to be displayed as active ingredient in CDA Display Tool
+
+### Improvement
+    [EHEALTH-6526] - Remove static .aar files
+    [EHEALTH-7256] - Inconsistency in handling patient ID
+
+## [6.0.0] - 19-07-2022
+The OpenNCP 6.0.0 is the Wave 6 Initial release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States as preparation for the eHDSI Preparatory Test event for Wave 6 
+from October 2022 for their National implementation of the Wave 6 Change Proposals.
+A new release (6.1.0) is expected in August 2022 providing the implementation of the Change Proposal 064: IHE Technical Framework upgrade.
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/QIUDSQ
+
+Main changes in this release are:<br/>
+<ul>
+<li>Change Proposal 054: Remove PDF representation of eDispensation</li>
+<li>Change Proposal 055: Improve Automatic Data Collector with technical error logging</li>
+<li>Change Proposal 058: Create a Business Error Code layer</li>
+<li>Change Proposal 059: Implement an Abuse Detection System</li>
+<li>Change Proposal 060: Split the Allergy Reaction Manifestation Template</li>
+<li>Change Proposal 062: Split eHDSI Manufactured Product template between PS and eP/eD</li>
+<li>Change Proposal 065: Align Patient Summary with PS Guidelines v3</li>
+<li>Change Proposal 066: Prepare eHDSI Requirements Catalogue for ISO IDMP</li>
+<li>Change Proposal 067: Facilitate the exchange of coded information (Part A)</li>
+<li>CDA DisplayTool alignment with Wave 6 requirements</li>
+<li>OpenNCP Gateway minor UI improvements (ATNA module)</li>
+<li>OpenNCP vulnerabilities fix and Apache Axis2 framework upgrade</li>
+</ul>
+
+### Story
+    [EHEALTH-6681] - CP-eHealthDSI-059: Implement an Abuse Detection System - OpenNCP implementation
+    [EHEALTH-6686] - CP-eHealthDSI-055: Improve Automatic Data Collector with technical error logging - OpenNCP implementation
+    [EHEALTH-6689] - CP-eHealthDSI-067: Facilitate the exchange of coded information - OpenNCP implementation
+    [EHEALTH-6693] - CP-eHealthDSI-058: Create a Business Error Code layer - OpenNCP implementation
+    [EHEALTH-6698] - CP-eHealthDSI-066: Prepare eHDSI Requirements Catalogue for ISO IDMP - CDA Display Tool implementation
+    [EHEALTH-6704] - CP-eHealthDSI-065: Align Patient Summary with PS Guidelines v3 - OpenNCP implementation preparation
+    [EHEALTH-6706] - CP-eHealthDSI-060: Split the Allergy Reaction Manifestation Template - OpenNCP implementation
+    [EHEALTH-7565] - CP-eHealthDSI-062: Split eHDSI Manufactured Product template between PS and ePeD - OpenNCP implementation
+    [EHEALTH-7962] - CP-eHealthDSI-054: Remove PDF representation of eDispensation - OpenNCP Implementation
+    [EHEALTH-8521] - Load new XML Schema definitions in OpenNCP
+    [EHEALTH-8578] - CP-eHealthDSI-063: CP-eHealthDSI-063: Improve Medication Information Representation - OpenNCP implementation
+    [EHEALTH-8658] - Update hardcoded labels with concepts from MVC 6.1.0 eHDSIDisplayLabel
+
+### Task
+    [EHEALTH-5606] - Modify CDA Display Tool to reflect the changes done in the CDA IGs
+
+### Technical Sub-task
+    [EHEALTH-8143] - Change Database Initializer to include eTransactionError table
+    [EHEALTH-8144] - eADC Schema modification for new eTransactionError table
+    [EHEALTH-8145] - Implementation of error logging in eADC eTransationError table
+    [EHEALTH-8397] - Ambiguity in the frequency of intakes for the PIVL_TS.
+    [EHEALTH-8398] - Review representation of Social History observation end date
+    [EHEALTH-8525] - CDA Display Tool implementation - Allergies and intolerances section
+    [EHEALTH-8526] - CDA Display Tool implementation - Medical alert information
+    [EHEALTH-8527] - CDA Display Tool implementation - Vaccinations section
+    [EHEALTH-8528] - CDA Display Tool implementation - List of Resolved, Closed or Inactive problems section
+    [EHEALTH-8529] - CDA Display Tool implementation - Medical History section
+    [EHEALTH-8530] - CDA Display Tool implementation - Social History section
+    [EHEALTH-8531] - CDA Display Tool implementation - List of current problems/diagnosis section
+    [EHEALTH-8532] - CDA Display Tool implementation - Medical devices section
+    [EHEALTH-8533] - CDA Display Tool implementation - Procedures section
+    [EHEALTH-8534] - CDA Display Tool implementation - Functional Status section
+    [EHEALTH-8535] - CDA Display Tool implementation - Medication Summary section
+    [EHEALTH-8536] - CDA Display Tool implementation - History of pregnancies section
+    [EHEALTH-8537] - CDA Display Tool implementation - Advance Directive section
+    [EHEALTH-8538] - CDA Display Tool implementation - Result observations section
+    [EHEALTH-8550] - Social History section - Units of observation value are never displayed
+    [EHEALTH-8593] - CDA Display Tool implementation for unmappable concepts
+    [EHEALTH-8660] - Upgrade to Axis2 1.8.1
+    [EHEALTH-8661] - Modify transformation manager configuration file with updated template IDs
+    [EHEALTH-8690] - CDA Display Tool implementation for CP-063
+    [EHEALTH-8697] - Provide CDA Mock messages for Wave 6
+    [EHEALTH-8711] - Releasing OpenNCP 6.0.0
+
+### Bug
+    [EHEALTH-8123] - Wrong validator used for failed Order list response
+    [EHEALTH-8402] - CDA Display Tool bugfixes for Wave 6
+    [EHEALTH-8710] - Transformation Manager cannot retrieve a Concept without version if multiple CS versions available
+    [EHEALTH-8715] - Wave 6 Patient Summary Level 3 error/warning during the retrieve
+
+### Improvement
+    [EHEALTH-8503] - Cosmetic issues - OpenNCP-Gateway ATNA-Viewer main page lacks functionality
 
 ## [5.2.6] - 13-06-2022
 The OpenNCP 5.2.6 is the Wave 5 Operation Ready release.
 This version is planned to be used during the eHDSI Wave 5 Routine Operations.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/zwVGRw
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/zwVGRw
 
 Main changes in this release are:<br/>
 <ul>
@@ -65,7 +249,7 @@ Main changes in this release are:<br/>
 ## [5.2.5] - 21-02-2022
 The OpenNCP 5.2.5 is the Wave 5 Formal Test Event HotFix release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/E4pMQ
 
 Main changes in this release are:<br/>
 <ul>
@@ -118,7 +302,7 @@ Main changes in this release are:<br/>
 ## [5.2.4] - 25-01-2021
 The OpenNCP 5.2.4 is the Wave 5 Formal Test Event release.
 This version is planned to be used during the eHDSI Formal Test event in February 2022.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/ogARPw
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/ogARPw
 
 Main changes in this release are:<br/>
 <ul>
@@ -160,7 +344,7 @@ Main changes in this release are:<br/>
 ## [5.2.3] - 17-11-2021
 The OpenNCP 5.2.3 is the Wave 5 Preparatory Test Event HotFix release.
 This version is an emergency version planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021 as a replacement of version 5.2.2.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>
@@ -177,7 +361,7 @@ Main changes in this release are:<br/>
 ## [5.2.2] - 15-11-2021
 The OpenNCP 5.2.2 is the Wave 5 Preparatory Test Event HotFix release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>
@@ -212,7 +396,7 @@ Main changes in this release are:<br/>
 ## [5.2.1] - 27-09-2021
 The OpenNCP 5.2.1 is the Wave 5 Preparatory Test Event release.
 This version is planned to be used by the Member States during the eHDSI Preparatory Test event for Wave 5 from October 2021.
-Detailed installation manual is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/GALmNg
 
 Main changes in this release are:<br/>
 <ul>

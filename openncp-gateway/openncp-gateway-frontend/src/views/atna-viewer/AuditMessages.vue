@@ -94,7 +94,7 @@
                 <input type="datetime-local" v-model="searchEventEndDate" />
               </v-menu>
             </v-col>
-            <v-col><v-btn block @click="searchDataFromApi"> Search </v-btn></v-col>
+            <v-col><v-btn block @click="searchDataFromApi(true)"> Search </v-btn></v-col>
           </v-row>
         </v-card-title>
         <v-data-table
@@ -176,11 +176,15 @@ export default {
         }
       ],
       EventIdCodeItems: [
+        'EHDSI-91',
         'EHDSI-92',
+        'EHDSI-93',
         'EHDSI-94',
         'EHDSI-96',
+        'EHDSI-CF',
         'ITI-38',
         'ITI-39',
+        'ITI-40',
         'ITI-41',
         'ITI-55'
       ],
@@ -193,7 +197,6 @@ export default {
     }
   },
   mounted () {
-    console.log('okok')
     // this.getDataFromApi()
     const d = new Date()
     const a = d.getUTCHours()
@@ -206,7 +209,7 @@ export default {
     options: {
       handler () {
         if (this.filteredData) {
-          this.searchDataFromApi()
+          this.searchDataFromApi(false)
         } else {
           this.getDataFromApi()
         }
@@ -256,7 +259,7 @@ export default {
     }
   },
   methods: {
-    searchDataFromApi () {
+    searchDataFromApi (resetToFirstPage) {
       if (!this.loading) {
         this.loading = true
         this.apiCall().then((data) => {
@@ -265,18 +268,13 @@ export default {
           this.options.page = data.data.number + 1
           this.loading = false
           this.filteredData = true
+          if (resetToFirstPage) {
+            this.$set(this.options, 'page', 1)
+          }
         })
       }
     },
     apiCall () {
-      let endDate
-      if (this.searchEventEndDate) {
-        endDate = new Date(this.searchEventEndDate).setHours(23, 59, 59, 999)
-        endDate = new Date(endDate)
-        endDate = endDate.toISOString()
-      } else {
-        endDate = ''
-      }
       return axios.get(process.env.VUE_APP_SERVER_URL + '/api/atna/search_messages', {
         params: {
           pageNumber: this.options.page - 1,
@@ -287,7 +285,9 @@ export default {
           searchEventStartDate: this.searchEventStartDate
             ? new Date(this.searchEventStartDate).toISOString()
             : '',
-          searchEventEndDate: endDate
+          searchEventEndDate: this.searchEventEndDate
+            ? new Date(this.searchEventEndDate).toISOString()
+            : ''
         }
       })
     },

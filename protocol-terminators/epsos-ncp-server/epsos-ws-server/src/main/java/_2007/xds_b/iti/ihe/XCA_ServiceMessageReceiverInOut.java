@@ -7,6 +7,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
@@ -86,24 +87,37 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
     }
 
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
+        String eadcError = "";
+
+        // Start Date for eADC
+        Date startTime = new Date();
+
+        // End Date for eADC
+        Date endTime = new Date();
+
+        // Out Envelop
+        SOAPEnvelope envelope = null;
 
         ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType retrieveDocumentSetResponseType = null;
-        ServiceType serviceType;
+        ServiceType serviceType = null;
         Document clinicalDocument = null;
         try {
-            Date startTime = new Date();
             // get the implementation class for the Web Service
             Object obj = getTheImplementationObject(msgContext);
 
             XCA_ServiceSkeleton skel = (XCA_ServiceSkeleton) obj;
-            // Out Envelop
-            SOAPEnvelope envelope;
+
             // Find the axisOperation that has been set by the Dispatch phase.
             AxisOperation op = msgContext.getOperationContext().getAxisOperation();
 
             if (op == null) {
-                throw new AxisFault(
-                        "Operation is not located, if this is doclit style the SOAP-ACTION should specified via the SOAP Action to use the RawXMLProvider");
+                String err = "Operation is not located, if this is doclit style the SOAP-ACTION should specified via the SOAP Action to use the RawXMLProvider";
+
+                //eadcFailure(msgContext, err, ServiceType.DOCUMENT_LIST_RESPONSE);
+                eadcError = err;
+                serviceType = ServiceType.DOCUMENT_LIST_RESPONSE;
+
+                throw new AxisFault(err);
             }
 
             String randomUUID = tr.com.srdc.epsos.util.Constants.UUID_PREFIX + UUID.randomUUID();
@@ -136,7 +150,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                             msgContext.getEnvelope().getBody().getFirstElement(), AdhocQueryRequest.class,
                             getEnvelopeNamespaces(msgContext.getEnvelope()));
 
-                    List<String> classCodes = extractClassCodesFromQueryRequest(wrappedParam);
+                    List<ClassCode> classCodes = extractClassCodesFromQueryRequest(wrappedParam);
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCrossCommunityAccess(requestMessage, NcpSide.NCP_A, classCodes);
                     }
@@ -204,32 +218,55 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     if (OpenNCPValidation.isValidationEnable()) {
                         OpenNCPValidation.validateCrossCommunityAccess(responseMessage, NcpSide.NCP_A, null);
                     }
-                    serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
+
                     RetrieveDocumentSetResponseType responseType = (RetrieveDocumentSetResponseType) fromOM(
                             omElement, RetrieveDocumentSetResponseType.class, null);
 
                     clinicalDocument = EadcUtilWrapper.getCDA(responseType);
 
+                    serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
                 } else {
-                    LOGGER.error("Method not found: '{}'", methodName);
-                    throw new java.lang.RuntimeException("method not found");
+                    String err = "Method not found: '"+ methodName + "'";
+                    LOGGER.error(err);
+
+                    //eadcFailure(msgContext, err, ServiceType.DOCUMENT_EXCHANGED_RESPONSE);
+                    eadcError = err;
+                    serviceType = ServiceType.DOCUMENT_EXCHANGED_RESPONSE;
+
+                    throw new java.lang.RuntimeException(err);
                 }
 
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
-                Date endTime = new Date();
-                EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
-                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType);
+                endTime = new Date();
+
+                if(!EadcUtilWrapper.hasTransactionErrors(envelope)) {
+                    EadcUtilWrapper.invokeEadc(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                            tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType);
+                } else {
+                    eadcError = EadcUtilWrapper.getTransactionErrorDescription(envelope);
+                }
 
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+
+            //eadcFailure(msgContext, e.getMessage(), ServiceType.DOCUMENT_LIST_RESPONSE);
+            eadcError = e.getMessage();
+            serviceType = ServiceType.DOCUMENT_LIST_RESPONSE;
+
             throw AxisFault.makeFault(e);
+        } finally {
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, clinicalDocument, startTime, endTime,
+                        tr.com.srdc.epsos.util.Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND, serviceType, eadcError);
+                eadcError = "";
+            }
         }
     }
 
-    private List<String> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
-        ArrayList<String> list = new ArrayList<>();
+    private List<ClassCode> extractClassCodesFromQueryRequest(AdhocQueryRequest wrappedParam) {
+        ArrayList<ClassCode> list = new ArrayList<>();
         if (wrappedParam != null) {
             wrappedParam.getAdhocQuery().getSlot().forEach(slot -> {
                 if (StringUtils.equals(XCAConstants.AdHocQueryRequest.XDS_DOCUMENT_ENTRY_CLASSCODE_SLOT_NAME, slot.getName())) {
@@ -237,7 +274,7 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                         for (int i = 0; i < slot.getValueList().getValue().size(); i++) {
                             String item = StringUtils.substringBetween(slot.getValueList().getValue().get(i), "('", "^^");
                             if (StringUtils.isNotBlank(item)) {
-                                list.add(item);
+                                list.add(ClassCode.getByCode(item));
                             }
                         }
                     }

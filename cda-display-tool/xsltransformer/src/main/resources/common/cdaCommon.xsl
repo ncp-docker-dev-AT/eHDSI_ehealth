@@ -33,7 +33,7 @@
             <xsl:with-param name="name" select="$node/n1:assignedEntity/n1:assignedPerson/n1:name"/>
         </xsl:call-template>
     </xsl:template>
-    
+
     <!-- show-author -->
     <xsl:template name="show-author">
         <xsl:param name="node"/>
@@ -54,7 +54,7 @@
             <xsl:value-of select="$node/n1:assignedAuthor/n1:representedOrganization/n1:name"/>
         </xsl:if>
     </xsl:template>
-    
+
     <!-- show-name -->
     <xsl:template name="show-name">
         <xsl:param name="name"/>
@@ -81,15 +81,36 @@
     <!-- show-contactInfo -->
     <xsl:template name="show-contactInfo">
         <xsl:param name="contact"/>
-        <xsl:call-template name="show-address">
-            <xsl:with-param name="address" select="$contact/n1:addr"/>
-        </xsl:call-template>
-
-        <xsl:for-each select="$contact/n1:telecom">
-            <xsl:call-template name="show-telecom">
-                <xsl:with-param name="telecom" select="."/>
-            </xsl:call-template>
-        </xsl:for-each>
+        <tr>
+            <th>
+                <!-- Address -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'187'"/>
+                </xsl:call-template>
+            </th>
+            <td>
+                <xsl:for-each select="$contact/n1:addr">
+                    <xsl:call-template name="show-address">
+                        <xsl:with-param name="address" select="."/>
+                    </xsl:call-template>
+                </xsl:for-each>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <!-- Telecom -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'188'"/>
+                </xsl:call-template>
+            </th>
+            <td>
+                <xsl:for-each select="$contact/n1:telecom">
+                    <xsl:call-template name="show-telecom">
+                        <xsl:with-param name="telecom" select="."/>
+                    </xsl:call-template>
+                </xsl:for-each>
+            </td>
+        </tr>
         <br/>
     </xsl:template>
 
@@ -98,9 +119,14 @@
         <xsl:param name="address"/>
         <xsl:choose>
             <xsl:when test="$address">
+                <xsl:if test="$address/@nullFlavor">
+                    <xsl:call-template name="show-eHDSINullFlavor">
+                        <xsl:with-param name="code" select="$address/@nullFlavor"/>
+                    </xsl:call-template>
+                </xsl:if>
                 <xsl:if test="$address/@use">
                     <xsl:text> </xsl:text>
-                    <xsl:call-template name="translateTelecomCode">
+                    <xsl:call-template name="show-eHDSITelecomAddress">
                         <xsl:with-param name="code" select="$address/@use"/>
                     </xsl:call-template>
                     <xsl:text>:</xsl:text>
@@ -144,6 +170,11 @@
         <xsl:param name="telecom"/>
         <xsl:choose>
             <xsl:when test="$telecom">
+                <xsl:if test="$telecom/@nullFlavor">
+                    <xsl:call-template name="show-eHDSINullFlavor">
+                        <xsl:with-param name="code" select="$telecom/@nullFlavor"/>
+                    </xsl:call-template>
+                </xsl:if>
                 <xsl:variable name="type"
                               select="substring-before($telecom/@value, ':')"/>
                 <xsl:variable name="value"
@@ -159,9 +190,9 @@
                         <xsl:with-param name="code" select="@use"/>
                     </xsl:call-template>
                     <xsl:text>)</xsl:text>
+                    <xsl:text>: </xsl:text>
+                    <xsl:text> </xsl:text>
                 </xsl:if>
-                <xsl:text>: </xsl:text>
-                <xsl:text> </xsl:text>
                 <xsl:value-of select="$value"/>
             </xsl:when>
             <xsl:otherwise>

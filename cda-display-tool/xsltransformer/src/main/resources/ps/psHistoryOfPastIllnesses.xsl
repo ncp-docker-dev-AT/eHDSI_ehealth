@@ -43,27 +43,28 @@
                                     <tbody>
                                         <tr>
                                             <th>
-                                                <!-- Closed Inactive Problem -->
+                                                <!-- Closed Inactive Problem Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'11'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- OnSet Date -->
+                                                <!-- OnSet Date Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'45'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- End Date -->
+                                                <!-- End Date Header -->
                                                 <xsl:call-template name="show-eHDSIDisplayLabel">
                                                     <xsl:with-param name="code" select="'26'"/>
                                                 </xsl:call-template>
                                             </th>
                                             <th>
-                                                <!-- Problem status code -->
-                                                <!-- TODO concept to be added to the eHDSIDisplayLabel value set -->
-                                                Problem Status Code
+                                                <!-- Problem Status Code Header -->
+                                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                                    <xsl:with-param name="code" select="'167'"/>
+                                                </xsl:call-template>
                                             </th>
                                         </tr>
                                         <xsl:apply-templates select="n1:entry/n1:act" mode="historyOfPastIllnesses"/>

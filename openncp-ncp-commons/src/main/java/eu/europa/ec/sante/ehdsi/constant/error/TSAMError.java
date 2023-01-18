@@ -5,7 +5,7 @@ package eu.europa.ec.sante.ehdsi.constant.error;
  * <p>
  * Provides get/set methods for code and description
  */
-public enum TSAMError implements ITMTSAMEror, ErrorCode {
+public enum TSAMError implements ITMTSAMError, ErrorCode {
     // ERRORS
     /**
      * Error; Software processing error (e.g. "out of memory" )<br>

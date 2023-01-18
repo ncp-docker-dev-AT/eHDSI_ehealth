@@ -1,6 +1,7 @@
 package eu.europa.ec.sante.ehdsi.gazelle.validation;
 
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.reporting.ReportBuilder;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.DetailedResultUnMarshaller;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.util.ObjectType;
@@ -146,23 +147,21 @@ public class OpenNCPValidation {
     private static void validatePatientDemographic(String request, String validator, ObjectType objectType, NcpSide ncpSide) {
 
         LOGGER.info("[Validation Service: XCPD Validator]");
-        String base64 = DatatypeConverter.printBase64Binary(request.getBytes(StandardCharsets.UTF_8));
-
         if (isRemoteValidationEnable()) {
 
             new Thread(() -> {
                 StopWatch watch = new StopWatch();
                 watch.start();
-                SchematronValidator schematronValidator = GazelleValidatorFactory.getSchematronValidator();
-                String xmlResult = schematronValidator.validateObject(base64, validator, validator);
+                HL7v3Validator hl7v3Validator = GazelleValidatorFactory.getHL7v3Validator();
+                String xmlResult = hl7v3Validator.validateDocument(request, validator, ncpSide);
                 DetailedResult detailedResult = DetailedResultUnMarshaller.unmarshal(xmlResult);
-                ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), base64, detailedResult, xmlResult, ncpSide);
+                ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), request, detailedResult, xmlResult, ncpSide);
                 watch.stop();
                 LOGGER.info(MSG_VALIDATION_EXECUTION, watch.getTime());
             }).start();
         } else {
 
-            ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), base64, ncpSide);
+            ReportBuilder.build(ReportBuilder.formatDate(), validator, objectType.toString(), request, ncpSide);
         }
     }
 
@@ -170,7 +169,7 @@ public class OpenNCPValidation {
      * @param message
      * @param ncpSide
      */
-    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide, List<String> classCodes) {
+    public static void validateCrossCommunityAccess(String message, NcpSide ncpSide, List<ClassCode> classCodes) {
 
         LOGGER.info("[Validation Service: XCA Validator]");
         XdsModel xdsModel = ValidatorUtil.obtainModelXca(message, classCodes);
@@ -213,7 +212,7 @@ public class OpenNCPValidation {
      * @param classCode
      * @param isPivot
      */
-    public static void validateCdaDocument(String cda, NcpSide ncpSide, String classCode, boolean isPivot) {
+    public static void validateCdaDocument(String cda, NcpSide ncpSide, ClassCode classCode, boolean isPivot) {
 
         LOGGER.info("[Validation Service: CDA Validator]");
         boolean isScannedDocument = cda.contains("nonXMLBody");

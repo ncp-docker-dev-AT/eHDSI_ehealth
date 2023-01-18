@@ -5,14 +5,14 @@ import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.PatientSearchInterfaceWithDemographics;
 import eu.epsos.protocolterminators.ws.server.xcpd.XCPDServiceInterface;
 import eu.epsos.protocolterminators.ws.server.xcpd.exception.XCPDNIException;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.epsos.util.EvidenceUtils;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.Helper;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.*;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.OpenNCPErrorCodeException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.ehdsi.constant.error.XCPDErrorCode;
 import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -263,26 +263,33 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         return result;
     }
 
-    private AD getAddress(PatientDemographics pd) {
-        // Adding the city
+    private AD getAddress(PatientDemographics patientDemographics) {
+
         var result = objectFactory.createAD();
-        var city = objectFactory.createAdxpCity();
-        city.setContent(pd.getCity());
-        result.getContent().add(objectFactory.createADCity(city));
+        // Adding the city
+        if (StringUtils.isNotBlank(patientDemographics.getCity())) {
+            var city = objectFactory.createAdxpCity();
+            city.setContent(StringUtils.strip(patientDemographics.getCity()));
+            result.getContent().add(objectFactory.createADCity(city));
+        }
 
         // Adding the postal code
-        var postal = objectFactory.createAdxpPostalCode();
-        postal.setContent(pd.getPostalCode());
-        result.getContent().add(objectFactory.createADPostalCode(postal));
+        if (StringUtils.isNotBlank(patientDemographics.getPostalCode())) {
+            var postal = objectFactory.createAdxpPostalCode();
+            postal.setContent(StringUtils.strip(patientDemographics.getPostalCode()));
+            result.getContent().add(objectFactory.createADPostalCode(postal));
+        }
 
         // Adding the address street line
-        var street = objectFactory.createAdxpStreetAddressLine();
-        street.setContent(pd.getStreetAddress());
-        result.getContent().add(objectFactory.createADStreetAddressLine(street));
+        if (StringUtils.isNotBlank(patientDemographics.getStreetAddress())) {
+            var street = objectFactory.createAdxpStreetAddressLine();
+            street.setContent(StringUtils.strip(patientDemographics.getStreetAddress()));
+            result.getContent().add(objectFactory.createADStreetAddressLine(street));
+        }
 
         // Adding the country
         var country = objectFactory.createAdxpCountry();
-        country.setContent(pd.getCountry());
+        country.setContent(patientDemographics.getCountry());
         result.getContent().add(objectFactory.createADCountry(country));
 
         return result;
@@ -306,7 +313,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCode("ActAdministrativeDetectedIssueCode");
         mfmimt700711UV01Reason.getDetectedIssueEvent().getCode().setCodeSystem("2.16.840.1.113883.5.4");
 
-        if( xcpdErrorCode == XCPDErrorCode.DemographicsQueryNotAllowed) {
+        if (xcpdErrorCode == XCPDErrorCode.DemographicsQueryNotAllowed) {
             // Set detectedIssueEvent/triggerFor
             MCAIMT900001UV01Requires mcaimt900001UV01Requires = objectFactory.createMCAIMT900001UV01Requires();
             mfmimt700711UV01Reason.getDetectedIssueEvent().getTriggerFor().add(mcaimt900001UV01Requires);
@@ -347,12 +354,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context) {
-        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context,  "AE");
+        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context, "AE");
     }
 
     private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code) {
 
-        // Set queryAck/queryResponseCode
+        // Set queryAck/statusCode and queryAck/queryResponseCode
+        outputMessage.getControlActProcess().getQueryAck().setStatusCode(objectFactory.createCS());
+        outputMessage.getControlActProcess().getQueryAck().getStatusCode().setCode(code);
         outputMessage.getControlActProcess().getQueryAck().setQueryResponseCode(objectFactory.createCS());
         outputMessage.getControlActProcess().getQueryAck().getQueryResponseCode().setCode(code);
 
@@ -427,16 +436,16 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                                 String eName = element.getName().getLocalPart();
                                 if (StringUtils.equals("city", eName)) {
                                     AdxpCity ac = (AdxpCity) element.getValue();
-                                    patientDemographics.setCity(ac.getContent());
+                                    patientDemographics.setCity(StringUtils.strip(ac.getContent()));
                                 } else if (StringUtils.equals("streetName", eName)) {
                                     AdxpStreetName asn = (AdxpStreetName) element.getValue();
-                                    patientDemographics.setStreetAddress(asn.getContent());
+                                    patientDemographics.setStreetAddress(StringUtils.strip(asn.getContent()));
                                 } else if (StringUtils.equals("country", eName)) {
                                     AdxpCountry ac = (AdxpCountry) element.getValue();
-                                    patientDemographics.setCountry(ac.getContent());
+                                    patientDemographics.setCountry(StringUtils.strip(ac.getContent()));
                                 } else if (StringUtils.equals("postalCode", eName)) {
                                     AdxpPostalCode apc = (AdxpPostalCode) element.getValue();
-                                    patientDemographics.setPostalCode(apc.getContent());
+                                    patientDemographics.setPostalCode(StringUtils.strip(apc.getContent()));
                                 }
                             }
                         }
@@ -530,7 +539,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         outputMessage.setProcessingModeCode(objectFactory.createCS());
         outputMessage.getProcessingModeCode().setCode("T");
 
-        // Set Accept act code
+        // Set Accept ACK code
         outputMessage.setAcceptAckCode(objectFactory.createCS());
         outputMessage.getAcceptAckCode().setCode("NE");
 
@@ -711,15 +720,15 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                     }
                     if (!demographicsList.isEmpty()) {
                         // There are patient data to be sent, OK
-                        fillOutputMessage(outputMessage, null, null, null,"OK");
+                        fillOutputMessage(outputMessage, null, null, null, "OK");
                     } else {
                         // No patient data can be sent to Country B.
                         fillOutputMessage(outputMessage,
                                 XCPDErrorCode.InsufficientRights,
                                 OpenNCPErrorCode.ERROR_PI_GENERIC,
-                                 " : Either the security policy of country A or a privacy " +
-                                "policy of the patient (that was given in country A) does not allow the requested operation " +
-                                "to be performed by the HCP .");
+                                " : Either the security policy of country A or a privacy " +
+                                        "policy of the patient (that was given in country A) does not allow the requested operation " +
+                                        "to be performed by the HCP .");
                         outputMessage.getAcknowledgement().get(0).getTypeCode().setCode("AE");
                     }
                 }
@@ -729,11 +738,11 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             }
         } catch (OpenNCPErrorCodeException e) {
 
-            fillOutputMessage(outputMessage, XCPDErrorCode.InsufficientRights, e.getErrorCode(), e.getMessage()) ;
+            fillOutputMessage(outputMessage, XCPDErrorCode.InsufficientRights, e.getErrorCode(), e.getMessage());
             logger.error(e.getMessage(), e);
         } catch (XCPDNIException e) {
 
-            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage()) ;
+            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage());
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
 
@@ -745,7 +754,8 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         prpamt201306UV02QueryByParameter.setQueryId(inputQBP.getQueryId());
         prpamt201306UV02QueryByParameter.setStatusCode(inputQBP.getStatusCode());
         prpamt201306UV02QueryByParameter.setParameterList(inputQBP.getParameterList());
-        outputMessage.getControlActProcess().setQueryByParameter(objectFactory.createPRPAIN201306UV02MFMIMT700711UV01ControlActProcessQueryByParameter(prpamt201306UV02QueryByParameter));
+        outputMessage.getControlActProcess().setQueryByParameter(
+                objectFactory.createPRPAIN201306UV02MFMIMT700711UV01ControlActProcessQueryByParameter(prpamt201306UV02QueryByParameter));
 
         // Set sender of the input to receiver of the output
         var mccimt000300UV01Receiver = objectFactory.createMCCIMT000300UV01Receiver();

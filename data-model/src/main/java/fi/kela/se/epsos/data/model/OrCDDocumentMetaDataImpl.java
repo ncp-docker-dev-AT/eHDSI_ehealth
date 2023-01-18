@@ -12,20 +12,17 @@ import java.util.List;
 public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implements OrCDDocumentMetaData {
 
     private DocumentFileType documentFileType;
-    private long size;
     private Date serviceStartTime;
     private List<Author> authors;
     private ReasonOfHospitalisation reasonOfHospitalisation;
 
     public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData,
                                     DocumentFileType documentFileType,
-                                    long size,
                                     Date serviceStartTime,
                                     List<Author> authors,
                                     ReasonOfHospitalisation reasonOfHospitalisation) {
         super(metaData);
         this.documentFileType = documentFileType;
-        this.size = size;
         this.serviceStartTime = serviceStartTime;
         this.authors = authors;
         this.reasonOfHospitalisation = reasonOfHospitalisation;
@@ -34,11 +31,6 @@ public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implemen
     @Override
     public DocumentFileType getDocumentFileType() {
         return documentFileType;
-    }
-
-    @Override
-    public long getSize() {
-        return size;
     }
 
     @Override

@@ -9,6 +9,7 @@ import eu.epsos.pt.eadc.EadcUtilWrapper;
 import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
+import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -217,10 +218,13 @@ public class RespondingGateway_ServiceStub extends Stub {
      */
     public AdhocQueryResponse respondingGateway_CrossGatewayQuery(AdhocQueryRequest adhocQueryRequest,
                                                                   Map<AssertionEnum, Assertion> assertionMap,
-                                                                  List<String> classCodes)
+                                                                  List<ClassCode> classCodes)
             throws java.rmi.RemoteException, XCAException {
 
+        String eadcError = "";
+
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
         try {
             // TMP
             // XCA list request start time
@@ -427,12 +431,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC, e.getMessage(), null);
                 }
             }
-
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             SOAPEnvelope _returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -485,10 +489,13 @@ public class RespondingGateway_ServiceStub extends Stub {
 //            }
 
             //  Invoke eADC
-            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
-
+            if(!EadcUtilWrapper.hasTransactionErrors(_returnEnv)) {
+                EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY);
+            } else {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(_returnEnv);
+            }
             // eADC end time
             end = System.currentTimeMillis();
             LOGGER.info("XCA LIST eADC TIME: '{}' ms", (end - start) / 1000.0);
@@ -503,7 +510,7 @@ public class RespondingGateway_ServiceStub extends Stub {
                     AdhocQueryResponse.class,
                     getEnvelopeNamespaces(_returnEnv));
             AdhocQueryResponse adhocQueryResponse = (AdhocQueryResponse) object;
-            for (String classCode : classCodes) {
+            for (ClassCode classCode : classCodes) {
                 createAndSendEventLogQuery(adhocQueryRequest, adhocQueryResponse,
                         _messageContext, _returnEnv, env, assertionMap.get(AssertionEnum.CLINICIAN), assertionMap.get(AssertionEnum.TREATMENT),
                         this._getServiceClient().getOptions().getTo().getAddress(),
@@ -516,9 +523,9 @@ public class RespondingGateway_ServiceStub extends Stub {
 
             return adhocQueryResponse;
 
-        } catch (AxisFault f) {
+        } catch (AxisFault axisFault) {
             // TODO A.R. Audit log SOAP Fault is still missing
-            OMElement faultElt = f.getDetail();
+            OMElement faultElt = axisFault.getDetail();
 
             if (faultElt != null) {
 
@@ -540,41 +547,48 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                         /* we cannot intantiate the class - throw the original Axis fault */
                     } catch (Exception e) {
+                        eadcError = e.getMessage();
                         throw new RuntimeException(e.getMessage(), e);
                     }
                 }
             }
+            eadcError = OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE.getCode();
             throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, "AxisFault", null);
 
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
             }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), null,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_LIST_QUERY, eadcError);
+            }
         }
     }
 
-    private RegisteredService getRegisteredService(List<String> classCodes) {
+    private RegisteredService getRegisteredService(List<ClassCode> classCodes) {
         RegisteredService registeredService = null;
-        for (String classCode : classCodes) {
+        for (ClassCode classCode : classCodes) {
             switch (classCode) {
-                case Constants.EP_CLASSCODE:
+                case EP_CLASSCODE:
                     if (registeredService == null) {
                         registeredService = RegisteredService.ORDER_SERVICE;
                     } else {
-                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.EP_CLASSCODE);
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", ClassCode.EP_CLASSCODE.getCode());
                     }
                     break;
-                case Constants.PS_CLASSCODE:
+                case PS_CLASSCODE:
                     if (registeredService == null) {
                         registeredService = RegisteredService.PATIENT_SERVICE;
                     } else {
-                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", Constants.PS_CLASSCODE);
+                        LOGGER.error("It is not allowed to pass more than one classCode when the classCode '{}' is used.", ClassCode.PS_CLASSCODE.getCode());
                     }
                     break;
-                case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-                case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
-                case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
+                case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+                case ORCD_LABORATORY_RESULTS_CLASSCODE:
+                case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+                case ORCD_MEDICAL_IMAGES_CLASSCODE:
                     if (registeredService == null || registeredService == RegisteredService.ORCD_SERVICE) {
                         registeredService = RegisteredService.ORCD_SERVICE;
                     } else {
@@ -599,9 +613,14 @@ public class RespondingGateway_ServiceStub extends Stub {
      */
     public RetrieveDocumentSetResponseType respondingGateway_CrossGatewayRetrieve(RetrieveDocumentSetRequestType retrieveDocumentSetRequest,
                                                                                   Map<AssertionEnum, Assertion> assertionMap,
-                                                                                  String classCode)
+                                                                                  ClassCode classCode)
             throws java.rmi.RemoteException, XCAException {
+
+        String eadcError = "";
         MessageContext _messageContext = null;
+        MessageContext _returnMessageContext = null;
+        Document cda = null;
+
         SOAPEnvelope env;
         try {
             OperationClient _operationClient = _serviceClient.createClient(_operations[1].getName());
@@ -727,11 +746,11 @@ public class RespondingGateway_ServiceStub extends Stub {
                 LOGGER.debug("ClassCode: " + classCode);
                 DynamicDiscoveryService dynamicDiscoveryService = new DynamicDiscoveryService();
                 switch (classCode) {
-                    case Constants.PS_CLASSCODE:
+                    case PS_CLASSCODE:
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.PATIENT_SERVICE, true);
                         break;
-                    case Constants.EP_CLASSCODE:
+                    case EP_CLASSCODE:
                         endpoint = dynamicDiscoveryService.getEndpointUrl(
                                 this.countryCode.toLowerCase(Locale.ENGLISH), RegisteredService.ORDER_SERVICE, true);
                         break;
@@ -799,11 +818,12 @@ public class RespondingGateway_ServiceStub extends Stub {
                     LOGGER.debug("Successfully retried the request! Proceeding with the normal workflow...");
                 } else {
                     /* if we cannot solve this issue through the Central Services, then there's nothing we can do, so we let it be thrown */
-                    LOGGER.error("Could not find configurations in the Central Services for [{}], the service will fail.", endpoint);
+                    eadcError = "Could not find configurations in the Central Services for [" + endpoint + "], the service will fail.";
+                    LOGGER.error(eadcError);
                     throw new XCAException(getErrorCode(classCode), e.getMessage(), null);
                 }
             }
-            MessageContext _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+            _returnMessageContext = _operationClient.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
             returnEnv = _returnMessageContext.getEnvelope();
             transactionEndTime = new Date();
 
@@ -836,7 +856,6 @@ public class RespondingGateway_ServiceStub extends Stub {
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
             // Invoke eADC
-            Document cda = null;
             if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
 
                 cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
@@ -875,13 +894,20 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                 } catch (Exception e) {
                     // Cannot instantiate the class - throw the original Axis fault
+                    eadcError = e.getMessage();
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+            eadcError = axisFault.getMessage();
             throw new XCAException(OpenNCPErrorCode.ERROR_GENERIC_CONNECTION_NOT_POSSIBLE, axisFault.getMessage(), null);
         } finally {
             if (_messageContext != null && _messageContext.getTransportOut() != null && _messageContext.getTransportOut().getSender() != null) {
                 _messageContext.getTransportOut().getSender().cleanup(_messageContext);
+            }
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY, eadcError);
             }
         }
     }
@@ -1049,7 +1075,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
     private EventLog createAndSendEventLogQuery(AdhocQueryRequest request, AdhocQueryResponse response, MessageContext msgContext,
                                                 SOAPEnvelope _returnEnv, SOAPEnvelope env, Assertion idAssertion, Assertion trcAssertion,
-                                                String address, String classCode) {
+                                                String address, ClassCode classCode) {
 
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
@@ -1063,7 +1089,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
     private EventLog createAndSendEventLogRetrieve(RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response,
                                                    MessageContext msgContext, SOAPEnvelope _returnEnv, SOAPEnvelope env,
-                                                   Assertion idAssertion, Assertion trcAssertion, String address, String classCode) {
+                                                   Assertion idAssertion, Assertion trcAssertion, String address, ClassCode classCode) {
 
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
@@ -1074,16 +1100,16 @@ public class RespondingGateway_ServiceStub extends Stub {
 
         return eventLog;
     }
-    public OpenNCPErrorCode getErrorCode(String classCode) {
+    public OpenNCPErrorCode getErrorCode(ClassCode classCode) {
         switch (classCode) {
-            case Constants.PS_CLASSCODE:
+            case PS_CLASSCODE:
                 return OpenNCPErrorCode.ERROR_PS_GENERIC;
-            case Constants.EP_CLASSCODE:
+            case EP_CLASSCODE:
                 return OpenNCPErrorCode.ERROR_EP_GENERIC;
-            case Constants.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
-            case Constants.ORCD_LABORATORY_RESULTS_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGES_CLASSCODE:
-            case Constants.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
+            case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
+            case ORCD_LABORATORY_RESULTS_CLASSCODE:
+            case ORCD_MEDICAL_IMAGES_CLASSCODE:
+            case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 return OpenNCPErrorCode.ERROR_ORCD_GENERIC;
         }
 

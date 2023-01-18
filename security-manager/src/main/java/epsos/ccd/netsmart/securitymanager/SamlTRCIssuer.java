@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.core.xml.schema.XSURI;
 import org.opensaml.saml.common.SAMLVersion;
@@ -21,6 +22,7 @@ import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.namespace.QName;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -118,6 +120,13 @@ public class SamlTRCIssuer {
             //Create and add conditions
             Conditions conditions = AssertionUtil.create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
             conditions.setNotBefore(issuanceInstant);
+
+            AudienceRestriction audienceRestriction = AssertionUtil.create(AudienceRestriction.class, AudienceRestriction.DEFAULT_ELEMENT_NAME);
+            Audience audience = AssertionUtil.create(Audience.class, Audience.DEFAULT_ELEMENT_NAME);
+            audience.setURI("urn:ehdsi:assertions.audience:x-border");
+            audienceRestriction.getAudiences().add(audience);
+            conditions.getAudienceRestrictions().add(audienceRestriction);
+
             conditions.setNotOnOrAfter(issuanceInstant.plus(Duration.ofHours(2))); // According to Spec
             trc.setConditions(conditions);
 
@@ -169,7 +178,7 @@ public class SamlTRCIssuer {
             attrPoU.setName("urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
             attrPoU.setNameFormat(Attribute.URI_REFERENCE);
             if (purposeOfUse == null) {
-                attrPoU = AssertionUtil.createAttribute(purposeOfUse, "Purpose Of Use", Attribute.NAME_FORMAT_ATTRIB_NAME,
+                attrPoU = AssertionUtil.createAttributePurposeOfUse(purposeOfUse, "Purpose Of Use", Attribute.NAME_FORMAT_ATTRIB_NAME,
                         "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse");
                 if (attrPoU == null) {
                     throw new SMgrException("Purpose of use not found in the assertion and is not passed as a parameter");
@@ -302,6 +311,13 @@ public class SamlTRCIssuer {
         //Create and add conditions according specifications (validity 2 hours)
         Conditions conditions = AssertionUtil.create(Conditions.class, Conditions.DEFAULT_ELEMENT_NAME);
         conditions.setNotBefore(issuanceInstant);
+
+        AudienceRestriction audienceRestriction = AssertionUtil.create(AudienceRestriction.class, AudienceRestriction.DEFAULT_ELEMENT_NAME);
+        Audience audience = AssertionUtil.create(Audience.class, Audience.DEFAULT_ELEMENT_NAME);
+        audience.setURI("urn:ehdsi:assertions.audience:x-border");
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+
         conditions.setNotOnOrAfter(issuanceInstant.plus(Duration.ofHours(2)));
         trc.setConditions(conditions);
 
@@ -358,9 +374,14 @@ public class SamlTRCIssuer {
                 throw new SMgrException("Purpose of Use not found in the assertion and is not passed as a parameter");
             }
         } else {
-            XSString attrValPoU = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
-            attrValPoU.setValue(purposeOfUse);
-            attrPoU.getAttributeValues().add(attrValPoU);
+
+            XMLObjectBuilder<XSAny> xsAnyBuilder = (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+            XSAny pou = xsAnyBuilder.buildObject("urn:hl7-org:v3", "PurposeOfUse", "");
+            pou.getUnknownAttributes().put(new QName("codeSystem"), "9.3032.1");
+            pou.setTextContent(purposeOfUse);
+            XSAny pouAttributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            pouAttributeValue.getUnknownXMLObjects().add(pou);
+            attrPoU.getAttributeValues().add(pouAttributeValue);
         }
         attrStmt.getAttributes().add(attrPoU);
 

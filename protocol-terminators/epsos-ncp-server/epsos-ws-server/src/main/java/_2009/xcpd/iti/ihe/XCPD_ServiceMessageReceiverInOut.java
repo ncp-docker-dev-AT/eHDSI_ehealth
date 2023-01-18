@@ -79,11 +79,12 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
     }
 
     public void invokeBusinessLogic(MessageContext msgContext, MessageContext newMsgContext) throws AxisFault {
+        String eadcError = "";
+
+        // Start Date for eADC
+        Date startTime = new Date();
 
         try {
-            // Start Date for eADC
-            Date startTime = new Date();
-
             //  Identification of the TLS Common Name of the client.
             String clientCommonName = EventLogUtil.getClientCommonName(msgContext);
             LOGGER.info("[ITI-55] Incoming XCPD Request from '{}'", clientCommonName);
@@ -116,8 +117,10 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
             // Find the axisOperation that has been set by the Dispatch phase.
             AxisOperation axisOperation = msgContext.getOperationContext().getAxisOperation();
             if (axisOperation == null) {
-                throw new AxisFault("Operation is not located, if this is doclit style the SOAP-ACTION " +
-                        "should specified via the SOAP Action to use the RawXMLProvider");
+                String err = "Operation is not located, if this is doclit style the SOAP-ACTION " +
+                        "should specified via the SOAP Action to use the RawXMLProvider";
+                eadcError = err;
+                throw new AxisFault(err);
             }
 
             String randomUUID = Constants.UUID_PREFIX + UUID.randomUUID();
@@ -151,8 +154,10 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     }
 
                 } else {
-                    LOGGER.error("Method not Found: '{}'", methodName);
-                    throw new RuntimeException("method not found");
+                    String err = "Method not Found: '" + methodName + "'";
+                    LOGGER.error(err);
+                    eadcError = err;
+                    throw new RuntimeException(err);
                 }
                 newMsgContext.setEnvelope(envelope);
                 newMsgContext.getOptions().setMessageId(randomUUID);
@@ -162,9 +167,16 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                         ServiceType.PATIENT_IDENTIFICATION_RESPONSE);
             }
         } catch (Exception e) {
-
             LOGGER.error(e.getMessage(), e);
+            eadcError = e.getMessage();
             throw AxisFault.makeFault(e);
+        } finally {
+            if(!eadcError.isEmpty()) {
+                EadcUtilWrapper.invokeEadcFailure(msgContext, newMsgContext, null, null, startTime,
+                        new Date(), Constants.COUNTRY_CODE, EadcEntry.DsTypes.EADC, EadcUtil.Direction.INBOUND,
+                        ServiceType.PATIENT_IDENTIFICATION_RESPONSE, eadcError);
+                eadcError = "";
+            }
         }
     }
 

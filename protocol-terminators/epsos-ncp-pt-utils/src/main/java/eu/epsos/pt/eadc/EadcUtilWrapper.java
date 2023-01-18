@@ -15,6 +15,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -83,6 +84,90 @@ public class EadcUtilWrapper {
                 }
             }
         }).start();
+    }
+
+    /**
+     * Main EADC Wrapper operation. It receives as input all the required information to successfully fill a transaction object.
+     *
+     * @param requestMsgCtx  the request Servlet Message Context
+     * @param responseMsgCtx the response Servlet Message Context
+     * @param serviceClient  the Axis2 Service Client
+     * @param cda            the (optional) CDA document*
+     * @param startTime      the transaction start time
+     * @param endTime        the transaction end time
+     * @param receivingIso   the country A ISO Code
+     * @param dsType         the JDBC Datasource corresponding to the IHE operation
+     * @param direction      the Operation type: INBOUND or OUTBOUND
+     * @param serviceType    the Service Type representing the action executed to prevent processing of personal data
+     */
+    public static void invokeEadcFailure(MessageContext requestMsgCtx, MessageContext responseMsgCtx, ServiceClient serviceClient,
+                                  Document cda, Date startTime, Date endTime, String receivingIso, EadcEntry.DsTypes dsType,
+                                  Direction direction, ServiceType serviceType, String errorDescription) {
+
+        new Thread(() -> {
+            var watch = new StopWatch();
+            watch.start();
+            try {
+                EadcUtil.invokeEadcFailure(requestMsgCtx, responseMsgCtx, cda, buildTransactionInfo(requestMsgCtx, responseMsgCtx,
+                        serviceClient, direction, startTime, endTime, receivingIso, serviceType), dsType, errorDescription);
+            } catch (Exception e) {
+                LOGGER.error("[EADC Failure] Invocation Failed - Exception: '{}'", e.getMessage(), e);
+            } finally {
+                watch.stop();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("EADC Failure invocation executed in: '{}ms'", watch.getTime());
+                }
+            }
+        }).start();
+    }
+
+    public static boolean hasTransactionErrors(SOAPEnvelope envelope) {
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            while (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+
+                if (StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                    String severity = elementDocSet.getAttributeValue(QName.valueOf("severity"));
+                    if (StringUtils.equals(severity, "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error")) {
+                        return true;
+                    }
+                }
+                it = elementDocSet.getChildElements();
+            }
+        }
+
+        return false;
+    }
+
+    public static String getTransactionErrorDescription(SOAPEnvelope envelope) {
+        String errorDescription = "unknown";
+
+        if(envelope != null) {
+            Iterator<OMElement> it = envelope.getBody().getChildElements();
+            while (it.hasNext()) {
+                OMElement elementDocSet = it.next();
+
+            /* example element
+                <RegistryError
+                        xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rs:3.0"
+                        codeContext="The requested encoding cannot be provided due to a transcoding error."
+                        errorCode="4203"
+                        severity="urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error"
+                        location="urn:oid:2.16.17.710.823.1000.990.1"/>
+            */
+                if (StringUtils.equals(elementDocSet.getLocalName(), "RegistryError")) {
+                    String err = elementDocSet.getAttributeValue(QName.valueOf("errorCode"));
+                    String cod = elementDocSet.getAttributeValue(QName.valueOf("codeContext"));
+                    errorDescription = cod + " [" + err + "]";
+                    break;
+                }
+                it = elementDocSet.getChildElements();
+            }
+        } else {
+            errorDescription = "envelope is null!";
+        }
+        return errorDescription;
     }
 
     /**
@@ -185,7 +270,9 @@ public class EadcUtilWrapper {
      * @return a string representing the information presented on the specified node
      */
     private static String extractAssertionInfo(Assertion idAssertion, String expression) {
-
+        if(idAssertion == null) {
+            return null;
+        }
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
                 if (attribute.getName().equals(expression)) {
@@ -257,6 +344,9 @@ public class EadcUtilWrapper {
      */
     private static String extractAuthenticationMethodFromAssertion(Assertion idAssertion) {
 
+        if(idAssertion == null) {
+            return null;
+        }
         if (!idAssertion.getAuthnStatements().isEmpty()) {
             var authnStatement = idAssertion.getAuthnStatements().get(0);
             String authnContextClassRef = authnStatement.getAuthnContext().getAuthnContextClassRef().getURI();
@@ -285,6 +375,8 @@ public class EadcUtilWrapper {
      * @return String containing the assertion issuer's ISO country code
      */
     private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
+        if(idAssertion == null)
+            return null;
         return idAssertion.getIssuer().getValue().split(":")[2];
     }
 

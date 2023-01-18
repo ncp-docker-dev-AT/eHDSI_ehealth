@@ -555,6 +555,16 @@
         </xsl:call-template>
     </xsl:template>
 
+    <!-- eHDSISubstance -->
+    <xsl:template name="show-eHDSISubstance">
+        <xsl:param name="node"/>
+        <xsl:call-template name="show-codedElement">
+            <xsl:with-param name="node" select="$node"/>
+            <xsl:with-param name="xmlFile" select="'1.3.6.1.4.1.12559.11.10.1.3.1.42.61.xml'"/>
+            <xsl:with-param name="codeSystem" select="'1.3.6.1.4.1.12559.11.10.1.3.1.44.100000075825'"/>
+        </xsl:call-template>
+    </xsl:template>
+
     <!-- eHDSISubstitutionCode -->
     <xsl:template name="show-eHDSISubstitutionCode">
         <xsl:param name="node"/>
@@ -637,8 +647,10 @@
                         <div class="tooltip-right">
                             <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
                             <span class="tooltiptext">
-                                <!-- TODO Concept needs to be added to eHDSIDisplayLabel value set -->
-                                Unmapped concept
+                                <!-- Unmapped concept. Nationally used concept for which no translations are available and no safe mappings are possible. -->
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                    <xsl:with-param name="code" select="'153'"/>
+                                </xsl:call-template>
                             </span>
                         </div>
                         <xsl:text> </xsl:text>

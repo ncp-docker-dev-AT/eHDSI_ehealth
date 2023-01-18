@@ -20,15 +20,13 @@ package epsos.ccd.gnomon.auditmanager;
  * EHDSI-94:    epsosPivotTranslation
  * EHDSI-95:    epsosPACRetrieve
  * EHDSI-96:    epsosHCERPut
- * EHDSI-193: ehealthSMPQuery
- * EHDSI-194: ehealthSMPPush
+ * EHDSI-193:   ehealthSMPQuery
+ * EHDSI-194:   ehealthSMPPush
  * EHDSI-CF:    epsosCommunicationFailure
  * ITI-38:      epsosMroList
  * ITI-39       epsosMroRetrieve
  *
  * @author Kostas Karkaletsis
- * @author Organization: Gnomon
- * @author mail:k.karkaletsis@gnomon.com.gr
  */
 public enum EventType {
 

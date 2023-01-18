@@ -16,13 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
+import javax.xml.bind.*;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -161,6 +162,22 @@ public enum AuditTrailUtils {
         marshaller.marshal(auditMessage, sw);
         LOGGER.debug("Audit Messaged converted in XML stream");
         return sw.toString();
+    }
+
+    public static synchronized AuditMessage convertXMLToAuditObject(File xml) throws JAXBException {
+        LOGGER.debug("Converting message - JAXB unmarshalling the Audit Object");
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        AuditMessage auditMessage = (AuditMessage) unmarshaller.unmarshal(xml);
+        LOGGER.debug("XML converted in Audit Messaged");
+        return auditMessage;
+    }
+
+    public static synchronized AuditMessage convertXMLToAuditObject(InputStream xml) throws JAXBException {
+        LOGGER.debug("Converting message - JAXB unmarshalling the Audit Object");
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        AuditMessage auditMessage = (AuditMessage) unmarshaller.unmarshal(xml);
+        LOGGER.debug("XML converted in Audit Messaged");
+        return auditMessage;
     }
 
     /**
