@@ -38,3 +38,4 @@ atlassian-ide-plugin.xml
 /cda-display-tool/xsltransformer/nb-configuration.xml
 /openncp-gazelle-validation/nb-configuration.xml
 /openatna/web/nb-configuration.xml
+/openncp-gateway/openncp-gateway-frontend/env.local
