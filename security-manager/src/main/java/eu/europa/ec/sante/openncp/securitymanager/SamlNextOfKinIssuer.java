@@ -130,7 +130,7 @@ public class SamlNextOfKinIssuer {
 
         AudienceRestriction audienceRestriction = AssertionUtil.create(AudienceRestriction.class, AudienceRestriction.DEFAULT_ELEMENT_NAME);
         Audience audience = AssertionUtil.create(Audience.class, Audience.DEFAULT_ELEMENT_NAME);
-        audience.setURI("urn:ehdsi:restriction:ehdsi1");
+        audience.setURI("urn:ehdsi:assertions.audience:x-border");
         audienceRestriction.getAudiences().add(audience);
         conditions.getAudienceRestrictions().add(audienceRestriction);
 
