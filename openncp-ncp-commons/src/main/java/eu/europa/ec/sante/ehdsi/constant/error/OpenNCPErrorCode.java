@@ -4,10 +4,8 @@ import java.util.Arrays;
 
 public enum OpenNCPErrorCode implements ErrorCode {
 
-    //------ Below new error defined in CP-58 --------
-
-    ERROR_GENERIC("ERROR_GENERIC", ""),
-    WARNING_GENERIC("WARNING_GENERIC", ""),
+    ERROR_GENERIC("ERROR_GENERIC", "Internal Server Error - Please retry or contact the server administrator and inform them of the time the error occurred"),
+    WARNING_GENERIC("WARNING_GENERIC", "Internal Server Warning"),
     ERROR_GENERIC_CONNECTION_NOT_POSSIBLE("ERROR_CONNECTION_NOT_POSSIBLE", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
     ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING", "The document requested was not found"),
     ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN", "Class code not supported"),
@@ -24,18 +22,14 @@ public enum OpenNCPErrorCode implements ErrorCode {
     ERROR_HPI_AUTHENTICATION_NOT_RECEIVED("ERROR_HPI_AUTHENTICATION_NOT_RECEIVED", "HP authentication method has not been received by the Country of Affiliation"),
 
     // 02. Ensure Patient Identification
-
     ERROR_PI_GENERIC("ERROR_PI_GENERIC", "Patient Identification generic error"),
     WARNING_PI_GENERIC("WARNING_PI_GENERIC", "Patient Identification generic warning"),
-
     ERROR_PI_NO_MATCH("ERROR_PI_NO_MATCH", "The identification and authentication used in the Country of Treatment (Country B) are not correctly provided or does not match any existing patient."),
     ERROR_PI_MULTIPLE_MATCHES("ERROR_PI_MULTIPLE_MATCHES", "The identification and authentication used in the Country of Treatment (Country B) match multiple patients, instead of only one patient."),
 
     // 05. Make Patient Summary available to HP
-
     ERROR_PS_GENERIC("ERROR_PS_GENERIC", "Patient Summary generic error"),
     WARNING_PS_GENERIC("WARNING_PS_GENERIC", "Patient Summary generic warning"),
-
     ERROR_PS_MISSING_BASIC_SECTIONS("ERROR_PS_MISSING_BASIC_SECTIONS", "Any or all of the 5 basic sections are missing, and no reason is communicated for this missing."),
     WARNING_PS_MISSING_BASIC_DATA("WARNING_PS_MISSING_BASIC_DATA", "Any or all of the basic data set is missing."),
     ERROR_PS_MISSING_EXPECTED_MAPPING("ERROR_PS_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
@@ -44,10 +38,8 @@ public enum OpenNCPErrorCode implements ErrorCode {
     ERROR_PS_PDF_FORMAT_NOT_PROVIDED("ERROR_PS_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
 
     // 06. Make ePrescription available to HP
-
     ERROR_EP_GENERIC("ERROR_EP_GENERIC", "ePrescription generic error"),
     WARNING_EP_GENERIC("WARNING_EP_GENERIC", "ePrescription generic warning"),
-
     WARNING_EP_MISSING_BASIC_DATA("WARNING_EP_MISSING_BASIC_DATA", "Any or all of the basic data set is missing, and no reason is communicated for this missing."),
     ERROR_EP_MISSING_EXPECTED_MAPPING("ERROR_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
     WARNING_EP_MISSING_EXPECTED_MAPPING("WARNING_EP_MISSING_EXPECTED_MAPPING", "A needed code mapping is missing."),
@@ -55,10 +47,8 @@ public enum OpenNCPErrorCode implements ErrorCode {
     ERROR_EP_PDF_FORMAT_NOT_PROVIDED("ERROR_EP_PDF_FORMAT_NOT_PROVIDED", "A PDF has not been provided."),
 
     // 07. Handle Dispensation of medicine and Substitution
-
     ERROR_ED_GENERIC("ERROR_ED_GENERIC", "Dispensation generic error"),
     WARNING_ED_GENERIC("WARNING_ED_GENERIC", "Dispensation generic warning"),
-
     ERROR_ED_NOT_DISPENSABLE_EPRESCRIPTION("ERROR_ED_NOT_DISPENSABLE_EPRESCRIPTION", "The selected ePrescription is not dispensable"),
     ERROR_ED_SUBSTITUTION_INFORMATION_NOT_ALLOWED("ERROR_ED_SUBSTITUTION_INFORMATION_NOT_ALLOWED", "Country of Affiliation has received an information of substitution when it was not allowed based on its national legislation."),
     ERROR_ED_EPRESCRIPTION_NOT_IDENTIFIABLE("ERROR_ED_EPRESCRIPTION_NOT_IDENTIFIABLE", "Some of the necessary information to allow the identification of the ePrescription and the related medicinal product are missing."),
@@ -74,36 +64,29 @@ public enum OpenNCPErrorCode implements ErrorCode {
     WARNING_ED_DISCARD_MISSING_MANDATORY_DATA("WARNING_ED_DISCARD_MISSING_MANDATORY_DATA", "Any or all of the mandatory elements are missing."),
 
     // 08. Make Original Clinical Documents available to HP
-
     ERROR_ORCD_GENERIC("ERROR_ORCD_GENERIC", "Original Clinical Documents generic error"),
     WARNING_ORCD_GENERIC("WARNING_ORCD_GENERIC", "Original Clinical Documents generic error"),
-
     ERROR_ORCD_SERVICE_NOT_AVAILABLE("ERROR_ORCD_SERVICE_NOT_AVAILABLE", "The Country of Treatment cannot contact the ORCD service of the Country of Affiliation"),
     WARNING_ORCD_MISSING_MANDATORY_DATA("WARNING_ORCD_MISSING_MANDATORY_DATA", "Any or all of the mandatory elements are missing."),
     ERROR_ORCD_INCORRECT_FORMAT("ERROR_ORCD_INCORRECT_FORMAT", "The format of the provided file is not one of the authorized ones"),
     WARNING_ORCD_MISSING_MANDATORY_METADATA("WARNING_ORCD_MISSING_MANDATORY_METADATA", "Any or all of the mandatory metadata are missing."),
 
     // 09. Ensure high quality information (structured, equivalent, understandable) is exchanged between countries
-
     ERROR_HQI_GENERIC("ERROR_HQI_GENERIC", "High quality information error"),
     WARNING_HQI_GENERIC("WARNING_HQI_GENERIC", "High quality information warning"),
-
     WARNING_HQI_B_INFORMATION_NOT_PROPERLY_STRUCTURED("WARNING_HQI_B_INFORMATION_NOT_PROPERLY_STRUCTURED", "Information provided by the Country of Treatment is not properly structured."),
     WARNING_HQI_A_INFORMATION_NOT_PROPERLY_STRUCTURED("WARNING_HQI_A_INFORMATION_NOT_PROPERLY_STRUCTURED", "Information provided by the Country of Affiliation is not properly structured."),
 
     // 10. Ensure the security, performance, traceability and auditability of the services, data and systems
-
     ERROR_SEC_GENERIC("ERROR_SEC_GENERIC", "SEC generic error"),
     WARNING_SEC_GENERIC("WARNING_SEC_GENERIC", "SEC generic warning"),
 
     ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED("ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED", "Integrity of the exchanged data cannot be ensured by the Country of Affiliation, such as with an insufficient/invalidated SAML assertions,"),
-
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT", "An unexpected number of requests has been detected for one specific patient"),
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE", "An unexpected number of requests has been detected from one specific Point of Care"),
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS", "An unexpected number of requests has been detected"),
 
-    // Old error code --------------------------
-
+    //  Old MyHealth@EU error codes
     ERROR_NOT_VALID_ASSERTION("1001", "Assertion is not valid."),
     ERROR_NOT_VALID_TRC_ASSERTION("1002", "The given TRC Assertion does not validate against the Identity Assertion"),
     ERROR_EP_NOT_FOUND("1101", "No ePrescription is registered for the given patient. "),
@@ -132,7 +115,6 @@ public enum OpenNCPErrorCode implements ErrorCode {
     ERROR_NO_SIGNATURE("4704", "The Provide Data service provider only accepts data of the given kind if it is digitally signed by an HP. "),
     ERROR_POLICY_VIOLATION("4705", "Policy violation"),
     ERROR_UNKNOWN_POLICY("4706", "Unknown Policy"),
-
     ERROR_UNKNOWN_SIGNIFIER("4202", "Class code not supported");
 
     private final String code;

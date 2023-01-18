@@ -83,8 +83,10 @@
         <xsl:param name="contact"/>
         <tr>
             <th>
-                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                Address
+                <!-- Address -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'187'"/>
+                </xsl:call-template>
             </th>
             <td>
                 <xsl:for-each select="$contact/n1:addr">
@@ -96,8 +98,10 @@
         </tr>
         <tr>
             <th>
-                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                Telecom
+                <!-- Telecom -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'188'"/>
+                </xsl:call-template>
             </th>
             <td>
                 <xsl:for-each select="$contact/n1:telecom">

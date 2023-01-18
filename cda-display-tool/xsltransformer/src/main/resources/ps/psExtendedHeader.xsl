@@ -7,6 +7,10 @@
             name="patientRole"
             select="/n1:ClinicalDocument/n1:recordTarget/n1:patientRole"/>
 
+    <xsl:variable
+            name="patientPreferLang"
+            select="$patientRole/n1:patient/n1:languageCommunication/n1:languageCode"/>
+
     <!-- guardian -->
     <xsl:variable
             name="patientGuardian"
@@ -144,12 +148,15 @@
                                     <xsl:when test="$assignedPerson">
                                         <xsl:choose>
                                             <xsl:when test="not($assignedPerson/n1:name/@nullFlavor)">
-                                                <xsl:value-of select="$assignedPerson/n1:name/n1:given"/>&#160;
-                                                <xsl:value-of select="$assignedPerson/n1:name/n1:family"/>&#160;
+                                                <xsl:call-template name="show-name">
+                                                    <xsl:with-param name="name" select="$assignedPerson/n1:name"/>
+                                                </xsl:call-template>
+                                                &#160;
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xsl:value-of select="$assignedEntity/n1:assignedPerson/n1:name/n1:given"/>&#160;
-                                                <xsl:value-of select="$assignedEntity/n1:assignedPerson/n1:name/n1:family"/>&#160;
+                                                <xsl:call-template name="show-name">
+                                                    <xsl:with-param name="name" select="$assignedEntity/n1:assignedPerson/n1:name"/>
+                                                </xsl:call-template>
                                                 <xsl:value-of select="$assignedEntity/n1:representedOrganization/n1:name"/>
                                                 <xsl:call-template name="show-contactInfo">
                                                     <xsl:with-param name="contact" select="$assignedEntity/n1:representedOrganization"/>
@@ -228,8 +235,11 @@
                             <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
                                 <xsl:if test="n1:associatedPerson/n1:name/* or n1:scopingOrganization">
                                     <td>
-                                        <xsl:value-of select="n1:associatedPerson/n1:name/n1:given"/>&#160;
-                                        <xsl:value-of select="n1:associatedPerson/n1:name/n1:family"/>&#160;
+                                        <xsl:if test="not(n1:associatedPerson/n1:name/@nullFlavor)">
+                                            <xsl:call-template name="show-name">
+                                                <xsl:with-param name="name" select="n1:associatedPerson/n1:name"/>
+                                            </xsl:call-template>
+                                        </xsl:if>
                                         <xsl:value-of select="n1:scopingOrganization/n1:name"/>&#160;
                                         <xsl:if test="@classCode">
                                             <span class="label otherContacts-roleClass">
@@ -256,22 +266,16 @@
                                     <td>
                                         <table class="contact_information_table">
                                             <tr>
-                                                <th>
+                                                <th colspan="2">
                                                     <!-- Contact Information -->
                                                     <xsl:call-template name="show-eHDSIDisplayLabel">
                                                         <xsl:with-param name="code" select="'12'"/>
                                                     </xsl:call-template>
                                                 </th>
                                             </tr>
-                                            <tr>
-                                                <td>
-                                                    <xsl:if test="not(../n1:functionCode) or not(../n1:functionCode/@code='PCP')">
-                                                        <xsl:call-template name="show-contactInfo">
-                                                            <xsl:with-param name="contact" select="."/>
-                                                        </xsl:call-template>
-                                                    </xsl:if>
-                                                </td>
-                                            </tr>
+                                            <xsl:call-template name="show-contactInfo">
+                                                <xsl:with-param name="contact" select="."/>
+                                            </xsl:call-template>
                                         </table>
                                     </td>
                                 </xsl:if>

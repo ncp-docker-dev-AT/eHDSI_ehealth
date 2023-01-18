@@ -18,8 +18,9 @@
                 <tr>
                     <th>
                         <!-- Medicinal Product Identifier Header -->
-                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                        Medicinal Product Identifier
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'184'"/>
+                        </xsl:call-template>
                     </th>
                     <td>
                         <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/n1:code/@code"/>
@@ -28,8 +29,9 @@
                 <tr>
                     <th>
                         <!-- Pharmaceutical Product Identifier Header -->
-                        <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                        Pharmaceutical Product Identifier
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'186'"/>
+                        </xsl:call-template>
                     </th>
                     <td>
                         <xsl:value-of select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code[@codeSystem!='2.16.840.1.113883.6.73']/@code"/>

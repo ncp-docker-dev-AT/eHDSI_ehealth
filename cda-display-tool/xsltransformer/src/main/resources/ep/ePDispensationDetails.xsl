@@ -439,8 +439,11 @@
     <xsl:template match="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packagingDispense">
         <tr>
             <th>
-                <!-- TODO this concept needs to be added to the eHDSIDisplayLabel value set -->
-                <xsl:text>Part </xsl:text>
+                <!-- Part -->
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'189'"/>
+                </xsl:call-template>
+                <xsl:text> </xsl:text>
                 <xsl:value-of select="position()"/>
             </th>
             <td>
