@@ -8,16 +8,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Does some basic validation on message contents
- *
- * @author Andrew Harrison
- * @version $Revision:$
+ * ATNA messages validation utility class on message content
  */
 public class ValidationProcessor implements AtnaProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidationProcessor.class);
 
-    private static ObjectTypeCodeRole[] persons = {
+    private static final ObjectTypeCodeRole[] persons = {
             ObjectTypeCodeRole.CUSTOMER,
             ObjectTypeCodeRole.PATIENT,
             ObjectTypeCodeRole.DOCTOR,
@@ -28,7 +25,7 @@ public class ValidationProcessor implements AtnaProcessor {
             ObjectTypeCodeRole.PROVIDER
     };
 
-    private static ObjectTypeCodeRole[] systemObjects = {
+    private static final ObjectTypeCodeRole[] systemObjects = {
             ObjectTypeCodeRole.REPORT,
             ObjectTypeCodeRole.MASTER_FILE,
             ObjectTypeCodeRole.USER,
@@ -47,7 +44,7 @@ public class ValidationProcessor implements AtnaProcessor {
             ObjectTypeCodeRole.QUERY
     };
 
-    private static ObjectTypeCodeRole[] organisations = {
+    private static final ObjectTypeCodeRole[] organisations = {
             ObjectTypeCodeRole.LOCATION,
             ObjectTypeCodeRole.RESOURCE,
             ObjectTypeCodeRole.SUBSCRIBER,
@@ -56,11 +53,9 @@ public class ValidationProcessor implements AtnaProcessor {
             ObjectTypeCodeRole.CUSTOMER,
     };
 
-    private static String[] personIds = {"1", "2", "3", "4", "5", "6", "7", "11"};
-
-    private static String[] systemObjectIds = {"8", "9", "10", "11", "12"};
-
-    private static String[] organisationIds = {"6", "7"};
+    private static final String[] personIds = {"1", "2", "3", "4", "5", "6", "7", "11"};
+    private static final String[] systemObjectIds = {"8", "9", "10", "11", "12"};
+    private static final String[] organisationIds = {"6", "7"};
 
     public void process(ProcessContext context) throws Exception {
 
@@ -71,7 +66,6 @@ public class ValidationProcessor implements AtnaProcessor {
     public void error(ProcessContext context) {
         // Processing Error messages not implemented
     }
-
 
     protected void validate(ProcessContext context) throws AtnaException {
 
@@ -152,8 +146,8 @@ public class ValidationProcessor implements AtnaProcessor {
         AtnaObject obj = object.getObject();
         if (obj.getObjectId() == null) {
             LOGGER.error("ATNA Error: ATNAObject does not contain ID - TOTO: Review implementation");
-            //TODO: Review this Error management
-            //throw new AtnaException("no participant object id defined",AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
+            //  TODO: Review this Error management
+            //  throw new AtnaException("no participant object id defined",AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
         }
         if (obj.getObjectIdTypeCode() == null || obj.getObjectIdTypeCode().getCode() == null) {
             throw new AtnaException("No object id type code", AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID_TYPE_CODE);
@@ -194,7 +188,6 @@ public class ValidationProcessor implements AtnaProcessor {
         return false;
     }
 
-
     private void validateObjectTypeCodeRole(ObjectTypeCodeRole role, ObjectType type) throws AtnaException {
 
         switch (type) {
@@ -209,10 +202,11 @@ public class ValidationProcessor implements AtnaProcessor {
                 }
                 break;
             case SYSTEM_OBJECT:
-                if (!isInArray(role, systemObjects)) {
-                    //TODO: We had to remove this control, since epSOS specs need role: resource and type: system object together
-                    LOGGER.warn("Invalid combination of role and type. Role: '{}' type: '{}'. But we had to skip to be compliant with the specifications.", role, type);
-                    //throw new AtnaException("Invalid combination of role and type. Role:" + role + " type:" + type);
+                if (!isInArray(role, systemObjects) && role != ObjectTypeCodeRole.RESOURCE) {
+                    //  TODO: Review the MyHealth@EU specifications if this implementation is still accurate
+                    //  Control removed to be compliant with the specifications. Role: RESOURCE and Type: SYSTEM_OBJECT
+                    LOGGER.warn("Invalid combination of role and type. Role: '{}' type: '{}'.", role, type);
+                    throw new AtnaException("Invalid combination of role and type. Role:" + role + " type:" + type);
                 }
                 break;
             case OTHER:
@@ -221,7 +215,6 @@ public class ValidationProcessor implements AtnaProcessor {
             default:
                 throw new AtnaException("Unknown Object type.");
         }
-
     }
 
     private void validateObjectIdTypeCode(AtnaCode code, ObjectType type) throws AtnaException {
