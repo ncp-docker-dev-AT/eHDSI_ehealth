@@ -86,8 +86,8 @@ public abstract class AbstractExtrinsicObjectBuilder {
 
         // Class code
         eot.getClassification().add(
-                ClassificationBuilder.build(ClassificationScheme.CLASS_CODE.getUuid(), uuid, documentMetaData.getClassCode().getCode()
-                        , CodeSystem.LOINC.getOID(), title));
+                ClassificationBuilder.build(ClassificationScheme.CLASS_CODE.getUuid(), uuid,
+                        documentMetaData.getClassCode().getCode(), CodeSystem.LOINC.getOID(), title));
 
         // Type code
         eot.getClassification().add(ClassificationBuilder.build(ClassificationScheme.TYPE_CODE.getUuid(),
@@ -120,7 +120,8 @@ public abstract class AbstractExtrinsicObjectBuilder {
         return "$XDSDocumentEntryPatientId Not Found!";
     }
 
-    protected static ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject, String value, String name) {
+    protected static ExternalIdentifierType makeExternalIdentifier(String identificationScheme, String registryObject,
+                                                                   String value, String name) {
 
         var ofRim = new oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory();
         var uuid = Constants.UUID_PREFIX + UUID.randomUUID();
