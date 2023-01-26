@@ -43,9 +43,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AbuseDetectionService implements Job {
-    public static final String DESCRIPTION_ALL = "Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
-    public static final String DESCRIPTION_POC = "Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
-    public static final String DESCRIPTION_PAT = "Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_ALL = "[NCP-A] Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
+    public static final String DESCRIPTION_POC = "[NCP-A] Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_PAT = "[NCP-A] Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
     private static final int ANOMALY_DESCRIPTION_SIZE = 2000;
     private static final int ANOMALY_TYPE_SIZE = 20;
     private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
