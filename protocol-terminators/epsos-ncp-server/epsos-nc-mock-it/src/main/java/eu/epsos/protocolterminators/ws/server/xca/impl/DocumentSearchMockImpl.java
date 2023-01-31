@@ -87,7 +87,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         for (String xmlFilename : documentlist) {
 
             logger.debug("Reading file '{}'", xmlFilename);
-
             String pdfFilename = xmlFilename.substring(0, xmlFilename.length() - 4) + ".pdf";
 
             try {
@@ -98,7 +97,6 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
 
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
-
                 String productCode = null;
                 String productName = null;
                 Element element = getProductFromPrescription(xmlDoc);
@@ -117,10 +115,20 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 boolean dispensable = getDispensable(xmlDoc);
 
                 var epListParam = new EpListParam(dispensable, atcCode, atcName, doseFormCode, doseFormName, strength, substitution);
+                EPDocumentMetaData epdXml;
+                logger.info("Document ID: '{}' parsed for Patient ID: '{}'", getOIDFromDocument(xmlDoc), pd.getId());
+                if (StringUtils.contains(pd.getId(), "-1234-W6")) {
+                    epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(), new Date(),
+                            Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                            description, productCode, productName, epListParam, getClinicalDocumentConfidentialityEnum(xmlDoc),
+                            this.getClinicalDocumentLanguage(xmlDoc));
+                } else {
+                    epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(), new Date(),
+                            Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
+                            description, productCode, productName, epListParam, getClinicalDocumentConfidentialityEnum(xmlDoc),
+                            this.getClinicalDocumentLanguage(xmlDoc), size, hash);
+                }
 
-                EPDocumentMetaData epdXml = DocumentFactory.createEPDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                        getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
                 logger.debug("Placed XML doc id='{}' HomeCommId='{}', Patient Id: '{}' into eP repository",
                         epdXml.getId(), Constants.HOME_COMM_ID, pd.getId());
                 documents.add(DocumentFactory.createEPSOSDocument(epdXml.getPatientId(), epdXml.getClassCode(), xmlDoc));
@@ -133,9 +141,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         byte[] pdfcontents = resourceLoader.getResourceAsByteArray(pdfFilename);
                         wrapPDFinCDA(pdfcontents, pdfDoc);
                         addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                        epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                                new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
-                                getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
+                        if (StringUtils.contains(pd.getId(), "-1234-W6")) {
+                            epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                    new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc),
+                                    getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
+                                    getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc));
+                        } else {
+                            epdPdf = DocumentFactory.createEPDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                    new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc),
+                                    getClinicalDocumentAuthor(xmlDoc), description, productCode, productName, epListParam,
+                                    getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc)
+                                    , size, hash);
+                        }
                         logger.debug("Placed PDF doc id='{}' into eP repository", epdPdf.getId());
                         documents.add(DocumentFactory.createEPSOSDocument(epdPdf.getPatientId(), epdPdf.getClassCode(), pdfDoc));
                     } catch (Exception e) {
@@ -164,9 +181,18 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                 addFormatToOID(xmlDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML);
                 logger.debug("Parsing PS patient demographics");
                 PatientDemographics pd = CdaUtils.getPatientDemographicsFromXMLDocument(xmlDoc);
-                PSDocumentMetaData psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
-                        new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc), getClinicalDocumentAuthor(xmlDoc),
-                        this.getClinicalDocumentConfidentialityEnum(xmlDoc), this.getClinicalDocumentLanguage(xmlDoc), size, hash);
+                PSDocumentMetaData psdXml;
+                if (StringUtils.contains(pd.getId(), "-1234-W6")) {
+                    psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
+                            new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc),
+                            getClinicalDocumentAuthor(xmlDoc), this.getClinicalDocumentConfidentialityEnum(xmlDoc),
+                            this.getClinicalDocumentLanguage(xmlDoc));
+                } else {
+                    psdXml = DocumentFactory.createPSDocumentXML(getOIDFromDocument(xmlDoc), pd.getId(),
+                            new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(xmlDoc),
+                            getClinicalDocumentAuthor(xmlDoc), this.getClinicalDocumentConfidentialityEnum(xmlDoc),
+                            this.getClinicalDocumentLanguage(xmlDoc), size, hash);
+                }
                 documents.add(DocumentFactory.createEPSOSDocument(psdXml.getPatientId(), psdXml.getClassCode(), xmlDoc));
 
                 if (!StringUtils.endsWith(pdfFilename, "-NO-PDF.pdf")) {
@@ -179,9 +205,17 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
                         wrapPDFinCDA(pdfcontents, pdfDoc);
                         logger.debug("Adding format to the document's OID");
                         addFormatToOID(pdfDoc, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_PDF);
-                        psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
-                                new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc), getClinicalDocumentAuthor(xmlDoc),
-                                this.getClinicalDocumentConfidentialityEnum(pdfDoc), this.getClinicalDocumentLanguage(pdfDoc), size, hash);
+                        if (StringUtils.contains(pd.getId(), "-1234-W6")) {
+                            psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                    new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc),
+                                    getClinicalDocumentAuthor(xmlDoc), this.getClinicalDocumentConfidentialityEnum(pdfDoc),
+                                    this.getClinicalDocumentLanguage(pdfDoc));
+                        } else {
+                            psdPdf = DocumentFactory.createPSDocumentPDF(getOIDFromDocument(pdfDoc), pd.getId(),
+                                    new Date(), Constants.HOME_COMM_ID, getTitleFromDocument(pdfDoc),
+                                    getClinicalDocumentAuthor(xmlDoc), this.getClinicalDocumentConfidentialityEnum(pdfDoc),
+                                    this.getClinicalDocumentLanguage(pdfDoc), size, hash);
+                        }
                         documents.add(DocumentFactory.createEPSOSDocument(psdPdf.getPatientId(), psdPdf.getClassCode(), pdfDoc));
                     } catch (Exception e) {
                         logger.warn("Could not read file at '{}'", pdfFilename, e);
