@@ -9,7 +9,8 @@ public class EpListParam {
     private String strength;
     private EPDocumentMetaData.SubstitutionMetaData substitution;
 
-    public EpListParam(boolean dispensable, String atcCode, String atcName, String doseFormCode, String doseFormName, String strength, EPDocumentMetaData.SubstitutionMetaData substitution) {
+    public EpListParam(boolean dispensable, String atcCode, String atcName, String doseFormCode, String doseFormName,
+                       String strength, EPDocumentMetaData.SubstitutionMetaData substitution) {
         this.dispensable = dispensable;
         this.atcCode = atcCode;
         this.atcName = atcName;
@@ -23,36 +24,40 @@ public class EpListParam {
         return dispensable;
     }
 
-    public void setDispensable(boolean dispensable) { this.dispensable = dispensable; }
+    public void setDispensable(boolean dispensable) {
+        this.dispensable = dispensable;
+    }
 
     public String getAtcCode() {
         return atcCode;
+    }
+
+    public void setAtcCode(String atcCode) {
+        this.atcCode = atcCode;
     }
 
     public String getDoseFormCode() {
         return doseFormCode;
     }
 
+    public void setDoseFormCode(String doseFormCode) {
+        this.doseFormCode = doseFormCode;
+    }
+
     public String getStrength() {
         return strength;
     }
 
-    public void setAtcCode(String atcCode) { this.atcCode = atcCode; }
+    public void setStrength(String strength) {
+        this.strength = strength;
+    }
 
     public String getAtcName() {
         return atcName;
     }
 
-    public void setDoseFormCode(String doseFormCode) {
-        this.doseFormCode = doseFormCode;
-    }
-
     public String getDoseFormName() {
         return doseFormName;
-    }
-
-    public void setStrength(String strength) {
-        this.strength = strength;
     }
 
     public EPDocumentMetaData.SubstitutionMetaData getSubstitution() {
