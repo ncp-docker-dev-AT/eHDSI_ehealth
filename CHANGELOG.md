@@ -3,10 +3,96 @@
 All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [6.2.0] - 31-01-2023
+The OpenNCP 6.2.0 is the Wave 6 Formal PPT HotFix release including the implementation of the Wave 6 Change Proposals.
+This version is planned to be used by the Member States during the eHDSI Wave 6 - Formal Test event taking place
+in February/March 2023.
+
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/7oDwUg
+
+Main changes in this release are:<br/>
+<ul>
+<li>OpenNCP Gateway - SMP Editor bug fixing and improvements</li>
+<li>Gazelle validators - TLS connections bug fixing</li>
+<li>TSAM Synchronizer - Mappings retrieval improvements</li>
+<li>OpenNCP libraries - Fixing vulnerabilities</li>
+<li>XCPD request and response: alignment of the implementation and the specifications</li>
+<li>XCA metadata: alignment of the implementation and the specifications</li>
+</ul>
+
+### Epic
+    [EHEALTH-7424] - CP-eHealthDSI-064: Upgrade IHE Technical Framework - OpenNCP implementation
+
+### Story
+    [EHEALTH-8929] - IHE ITI Revision 19 implementation - XUA Assertions alignment
+
+### Task
+    [EHEALTH-8500] - Investigation - Identify all all the CDA sequence element that doesn't render CDA Display Tool (except for : guardian, participant, ingredients)
+    [EHEALTH-9515] - Releasing OpenNCP 6.2.0
+    [EHEALTH-9645] - Update IHE CDA Validators to version v6.5.0 in the configuration file
+
+### Sub-task
+    [EHEALTH-9033] - [CP-064] XUA and SAML 2.0 implementation
+
+### Bug
+    [EHEALTH-8725] - CP-58- Needed Client-Connector Code system mapping is missing in the error message
+    [EHEALTH-8726] - CP-58 CDA Pivot documents generated at NCP-A even when CDA not available in OpenNCP Portal
+    [EHEALTH-8823] - Incoherent XCA Retrieve ResponseStatusType if no document available
+    [EHEALTH-8928] - OpenATNA log shows IO error
+    [EHEALTH-9190] - WebSecurityConfigurerAdapter is deprecated in Spring Boot 2.7.0
+    [EHEALTH-9245] - OpenNCP Gateway- Export not possible when end date or start date is empty in eADC transaction table
+    [EHEALTH-9246] - OpenNCP Gateway - In SMP Editor, it is not possible to sign a document
+    [EHEALTH-9256] - Anomaly Detection System implementation is incomplete
+    [EHEALTH-9335] - OpenNCP-Gateway - ATNA Viewer: missing EventIDs in dropdown list
+    [EHEALTH-9340] - Inconsistency at XCA List Response
+    [EHEALTH-9350] - IHE ITI Responses with empty elements (optional) should not be present into the XML
+    [EHEALTH-9394] - [CDA Display Tool] Legal authenticator and Participant contact info for Organization not displayed
+    [EHEALTH-9462] - [CDA Display Tool] XPath used to retrieve the MarketingAuthorizationHolder needs to be updated.
+    [EHEALTH-9490] - Date format not ok in exported KPI file from OpenNCP gateway ATNA eADC
+    [EHEALTH-9497] - eP - On CDA- Substitue checkbox not working
+    [EHEALTH-9536] - OpenNCP Gateway ATNA Viewer - Filtering on Time doesn't work as expected
+    [EHEALTH-9549] - Security Manager accepts an AuthN method which is not allowed in eHDSI
+    [EHEALTH-9618] - OpenNCP doesn't respect IHE specifications for hash and size metadata attributes
+    [EHEALTH-9629] - [GDPR] Personal data logged in XDR
+
+### Improvement
+    [EHEALTH-9550] - CDA Display Tool - Remove hardcoded labels and make them translatable
+    [EHEALTH-9596] - Remove useless Warning logs in OpenATNA module
+
+### Test
+    [EHEALTH-9180] - Test - OpenATNA log shows IO error
+    [EHEALTH-9182] - Test - OpenNCP AuditServer fails to start due to duplicate records in table ehealth_openatna.codes
+    [EHEALTH-9194] - Test - OpenNCP-WS-Server fails to establish TLS connection to remote Gazelle validators
+    [EHEALTH-9196] - Test - Problem with OpenNCP version 5.2.5 openatna viewer
+    [EHEALTH-9198] - Test - OpenNCP-Gateway - EADC-Viewer: columns header doesn't change order of presentation
+    [EHEALTH-9201] - Test - Pagination in eADC generate exception if startDate or endDate fields are empty
+    [EHEALTH-9202] - Test - Pagination issue with ATNA viewer
+    [EHEALTH-9203] - Test - TM code_element_list.xml: wrong XPath for Substitution flag in ePrescription
+    [EHEALTH-9441] - Test - IHE ITI Responses with empty elements (optional) should not be present into the XML
+    [EHEALTH-9442] - Test - Investigation - Identify all all the CDA sequence element that doesn't render CDA Display Tool (except for : guardian, participant, ingredients)
+    [EHEALTH-9443] - Test - OpenNCP-Gateway - ATNA Viewer: missing EventIDs in dropdown list
+    [EHEALTH-9444] - Test - eHDSI Monitoring Framework (KPIs) - implementation guides
+    [EHEALTH-9459] - Test - [CDA Display Tool] Legal authenticator and Participant contact info for Organization not displayed
+    [EHEALTH-9460] - Test - Anomaly Detection System implementation is incomplete
+    [EHEALTH-9500] - Test - [CDA Display Tool] XPath used to retrieve the MarketingAuthorizationHolder needs to be updated.
+    [EHEALTH-9501] - Test - eP - On CDA- Substitue checkbox not working
+    [EHEALTH-9506] - Test - [CP-064] XUA and SAML 2.0 implementation
+    [EHEALTH-9507] - Test - Incoherent XCA Retrieve ResponseStatusType if no document available
+    [EHEALTH-9513] - Regression - PS/eP/OrCD
+    [EHEALTH-9624] - Test - CDA Display Tool - Remove hardcoded labels and make them translatable
+    [EHEALTH-9625] - Test - OpenNCP Gateway ATNA Viewer - Filtering on Time doesn't work as expected
+    [EHEALTH-9636] - Test - Remove useless Warning logs in OpenATNA module
+    [EHEALTH-9638] - Test - Security Manager accepts an AuthN method which is not allowed in eHDSI
+    [EHEALTH-9639] - Test - [GDPR] Personal data logged in XDR
+
+### SMT Incident
+    [EHEALTH-9580] - FI - [IM0022663147] OpenNCP: Empty ATNA error message with ERROR_GENERIC
+    [EHEALTH-9581] - FI - [IM0022664459] OpenNCP: OpenATNA's unnecessary logging
+
 ## [6.1.1] - 07-11-2022
 The OpenNCP 6.1.1 is the Wave 6 Preparatory PPT HotFix release including the implementation of the Wave 6 Change Proposals.
 This version is planned to be used by the Member States during the eHDSI Wave 6 - Preparatory Test event taking place
-if some blocking issues are encountered.
+in October 2022.
 A new release (6.2.0) is expected in January 2023 providing a second part of Change Proposal 064: IHE ITI Technical
 Framework upgrade (SAML and XUA profile).
 Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/koASTw
