@@ -26,6 +26,8 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import fi.kela.se.epsos.data.model.DocumentFactory;
 import fi.kela.se.epsos.data.model.EPSOSDocument;
 import ihe.iti.xds_b._2007.ProvideAndRegisterDocumentSetRequestType;
@@ -72,6 +74,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
     }
 
     private final Logger logger = LoggerFactory.getLogger(XDRServiceImpl.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs;
     private final DocumentSubmitInterface documentSubmitService;
 
@@ -341,8 +344,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        //String patientId = getPatientId(request);
         String fullPatientId = getDocumentEntryPatientId(request);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.info("Received a Discard eDispense document for patient: '{}'", fullPatientId);
+        }
         String countryCode = "";
         String distinguishedName = eventLog.getSC_UserID();
         int cIndex = distinguishedName.indexOf("C=");
@@ -374,7 +379,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
             EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
             documentId = getDocumentId(epsosDocument.getDocument());
             // Evidence for call to NI for XDR submit (dispensation)
-            // Joao: here we have a Document so we can generate the mandatory NRO
+            // Joao: here we have a Document, so we can generate the mandatory NRO
             try {
                 EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
                         Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
@@ -481,15 +486,16 @@ public class XDRServiceImpl implements XDRServiceInterface {
             registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        //String patientId = getPatientId(request);
         String fullPatientId = getDocumentEntryPatientId(request);
-        logger.info("Received an eDispensation document for patient: '{}'", fullPatientId);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.info("Received a eDispense document for patient: '{}'", fullPatientId);
+        }
         String countryCode = "";
-        String DN = eventLog.getSC_UserID();
-        int cIndex = DN.indexOf("C=");
+        String distinguishedName = eventLog.getSC_UserID();
+        int cIndex = distinguishedName.indexOf("C=");
 
         if (cIndex > 0) {
-            countryCode = DN.substring(cIndex + 2, cIndex + 4);
+            countryCode = distinguishedName.substring(cIndex + 2, cIndex + 4);
         }
         // Mustafa: This part is added for handling consents when the call is not https.
         // In this case, we check the country code of the signature certificate that ships within the HCP assertion.
@@ -548,7 +554,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
                     EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
                     // Evidence for call to NI for XDR submit (dispensation)
-                    // Joao: here we have a Document so we can generate the mandatory NRO
+                    // Joao: here we have a Document, so we can generate the mandatory NRO
                     try {
                         EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
                                 Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
@@ -679,9 +685,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        //String patientId = getPatientId(request);
         String fullPatientId = getDocumentEntryPatientId(request);
-        logger.info("Received a consent document for patient: '{}'", fullPatientId);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.info("Received a eConsent document for patient: '{}'", fullPatientId);
+        }
         /*
          * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
          * the consent document.
@@ -722,7 +729,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.CONSENT_CLASSCODE, domDocument);
 
                 // Evidence for call to NI for XDR submit (patient consent)
-                // Joao: here we have a Document so we can generate the mandatory NRO
+                // Joao: here we have a Document, so we can generate the mandatory NRO
                 try {
                     EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
                             Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH,
@@ -813,9 +820,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
             rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         }
 
-        //String patientId = getPatientId(request);
         String fullPatientId = getDocumentEntryPatientId(request);
-        logger.info("Received a HCER document for patient: '{}' ", fullPatientId);
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            loggerClinical.info("Received a HCER document for patient: '{}'", fullPatientId);
+        }
         /*
          * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
          * the consent document.
@@ -885,7 +893,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
     private ClassCode obtainClassCode(final ProvideAndRegisterDocumentSetRequestType request) {
 
         if (request == null) {
-            logger.error("The provided request message in order to extract the classcode is null.");
+            logger.error("The provided request message in order to extract the classCode is null.");
             return null;
         }
 

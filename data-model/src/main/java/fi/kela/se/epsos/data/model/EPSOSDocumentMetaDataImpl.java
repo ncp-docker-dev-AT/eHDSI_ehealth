@@ -21,9 +21,12 @@ public class EPSOSDocumentMetaDataImpl implements EPSOSDocumentMetaData {
     private final Long size;
     private final String hash;
 
-    @Deprecated
-    public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate,
-                                     ClassCode classCode, String repositoryId, String title, String author, Long size, String hash) {
+    /**
+     * @deprecated public constructor doesn't support language of the document, recommendation is to use the new implementation.
+     */
+    @Deprecated(since = "5.1.4", forRemoval = true)
+    public EPSOSDocumentMetaDataImpl(String id, String patientId, int documentFormat, Date effectiveDate, ClassCode classCode,
+                                     String repositoryId, String title, String author, Long size, String hash) {
 
         this.id = id;
         this.patientId = patientId;

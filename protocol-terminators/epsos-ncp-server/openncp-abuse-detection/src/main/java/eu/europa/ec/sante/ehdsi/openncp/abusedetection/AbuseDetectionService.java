@@ -43,9 +43,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AbuseDetectionService implements Job {
-    public static final String DESCRIPTION_ALL = "Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
-    public static final String DESCRIPTION_POC = "Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
-    public static final String DESCRIPTION_PAT = "Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_ALL = "[NCP-A] Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
+    public static final String DESCRIPTION_POC = "[NCP-A] Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_PAT = "[NCP-A] Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
     private static final int ANOMALY_DESCRIPTION_SIZE = 2000;
     private static final int ANOMALY_TYPE_SIZE = 20;
     private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -461,7 +461,8 @@ public class AbuseDetectionService implements Job {
 
         int areqr = Integer.parseInt(Constants.ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD);
         int upatr = Integer.parseInt(Constants.ABUSE_UNIQUE_PATIENT_REFERENCE_REQUEST_PERIOD);
-        int upocr = Integer.parseInt(Constants.ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD);
+        // No Point of Care discovery on Server, only on Client
+        int upocr = 0; // Integer.parseInt(Constants.ABUSE_UNIQUE_POC_REFERENCE_REQUEST_PERIOD);
 
         int areqThreshold = Integer.parseInt(Constants.ABUSE_ALL_REQUEST_THRESHOLD);
         int upatThreshold = Integer.parseInt(Constants.ABUSE_UNIQUE_PATIENT_REQUEST_THRESHOLD);
@@ -530,56 +531,57 @@ public class AbuseDetectionService implements Job {
 
         //////////////////////////////////////////////////////////////////////
 
-        List<AbuseEvent> distinctPointOfCareIds = list.stream()
-                .filter(distinctByKey(AbuseEvent::getPointOfCare))
-                .collect(Collectors.toList());
-        if (upocr > 0 && sortedAllList.size() > upocThreshold) { // analyze unique POC requests
-            if (!distinctPointOfCareIds.isEmpty()) {
-                distinctPointOfCareIds.forEach(poc -> {
-                    List<AbuseEvent> sortedPocList = list.stream()
-                            .filter(p -> p.getPointOfCare().equals(poc.getPointOfCare()))
-                            .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
-                            .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-                            .collect(Collectors.toList());
-
-                    Period diff = Period.ZERO;
-                    int index = 0;
-                    int lastValidIndex = 0;
-                    do {
-                        int tot = 0;
-                        int beg = 0;
-                        int end = 0;
-                        for (index = lastValidIndex; index < sortedPocList.size(); index++) {
-                            beg = lastValidIndex;
-                            end = index;
-                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
-                            if (elapsed > upocr) {
-                                lastValidIndex = index;
-                                break;
-                            }
-                            tot++;
-                        }
-                        if (tot > upocThreshold) {
-                            if (lastValidIndex > 0 && index < sortedPocList.size()) {
-                                end = lastValidIndex - 1;
-                            } else {
-                                end = sortedPocList.size() - 1;
-                            }
-                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
-                            if (elapsed < upocr) {
-                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
-                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
-                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
-                                        tot, upocThreshold, elapsed,
-                                        sortedPocList.get(beg), sortedPocList.get(end));
-                                String abuseDescription = String.format(DESCRIPTION_POC, tot, elapsed, upocThreshold);
-                                setAbuseErrorEvent(AbuseType.POC, abuseDescription, tot, sortedPocList.get(beg), sortedPocList.get(end));
-                            }
-                        }
-                    } while (index < sortedPocList.size() && lastValidIndex < sortedPocList.size());
-                });
-            }
-        }
+        // No Point of Care discovery on Server, only on Client
+//        List<AbuseEvent> distinctPointOfCareIds = list.stream()
+//                .filter(distinctByKey(AbuseEvent::getPointOfCare))
+//                .collect(Collectors.toList());
+//        if (upocr > 0 && sortedAllList.size() > upocThreshold) { // analyze unique POC requests
+//            if (!distinctPointOfCareIds.isEmpty()) {
+//                distinctPointOfCareIds.forEach(poc -> {
+//                    List<AbuseEvent> sortedPocList = list.stream()
+//                            .filter(p -> p.getPointOfCare().equals(poc.getPointOfCare()))
+//                            .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
+//                            .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
+//                            .collect(Collectors.toList());
+//
+//                    Period diff = Period.ZERO;
+//                    int index = 0;
+//                    int lastValidIndex = 0;
+//                    do {
+//                        int tot = 0;
+//                        int beg = 0;
+//                        int end = 0;
+//                        for (index = lastValidIndex; index < sortedPocList.size(); index++) {
+//                            beg = lastValidIndex;
+//                            end = index;
+//                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
+//                            if (elapsed > upocr) {
+//                                lastValidIndex = index;
+//                                break;
+//                            }
+//                            tot++;
+//                        }
+//                        if (tot > upocThreshold) {
+//                            if (lastValidIndex > 0 && index < sortedPocList.size()) {
+//                                end = lastValidIndex - 1;
+//                            } else {
+//                                end = sortedPocList.size() - 1;
+//                            }
+//                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
+//                            if (elapsed < upocr) {
+//                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
+//                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
+//                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
+//                                        tot, upocThreshold, elapsed,
+//                                        sortedPocList.get(beg), sortedPocList.get(end));
+//                                String abuseDescription = String.format(DESCRIPTION_POC, tot, elapsed, upocThreshold);
+//                                setAbuseErrorEvent(AbuseType.POC, abuseDescription, tot, sortedPocList.get(beg), sortedPocList.get(end));
+//                            }
+//                        }
+//                    } while (index < sortedPocList.size() && lastValidIndex < sortedPocList.size());
+//                });
+//            }
+//        }
 
         List<AbuseEvent> distinctPatientIds = list.stream()
                 .filter(distinctByKey(AbuseEvent::getPatientId))

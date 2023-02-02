@@ -2,7 +2,6 @@ package tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.orcd;
 
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xca.XCAConstants;
-import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.ihe.ClassificationScheme;
 import fi.kela.se.epsos.data.model.OrCDDocumentMetaData;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;

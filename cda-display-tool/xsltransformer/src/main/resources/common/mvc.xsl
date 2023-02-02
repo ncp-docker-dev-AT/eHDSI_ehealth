@@ -647,8 +647,10 @@
                         <div class="tooltip-right">
                             <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
                             <span class="tooltiptext">
-                                <!-- TODO Concept needs to be added to eHDSIDisplayLabel value set -->
-                                Unmapped concept
+                                <!-- Unmapped concept. Nationally used concept for which no translations are available and no safe mappings are possible. -->
+                                <xsl:call-template name="show-eHDSIDisplayLabel">
+                                    <xsl:with-param name="code" select="'153'"/>
+                                </xsl:call-template>
                             </span>
                         </div>
                         <xsl:text> </xsl:text>

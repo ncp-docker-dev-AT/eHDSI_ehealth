@@ -142,7 +142,7 @@
 
     <!-- Prescription - Classification of the substance -->
     <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.2']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMaterialKind/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -161,7 +161,7 @@
     </codedElement>
     <!-- Dispensation - Classification of the substance -->
     <codedElement>
-        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <elementPath>//entry/supply[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.3']/product/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMaterialKind/code</elementPath>
         <usage>
             <patientSummaryCDAl3>NA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>
@@ -614,7 +614,7 @@
     </codedElement>
     <!-- Medication Summary - Classification of the substance -->
     <codedElement>
-        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMedicineClass/code</elementPath>
+        <elementPath>//entry/substanceAdministration[templateId/@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.4']/consumable/manufacturedProduct/manufacturedMaterial/asSpecializedKind/generalizedMaterialKind/code</elementPath>
         <usage>
             <patientSummaryCDAl3>RNFA</patientSummaryCDAl3>
             <patientSummaryCDAl1pdf>NA</patientSummaryCDAl1pdf>

@@ -386,7 +386,7 @@ public class AssertionsConverter {
                     "urn:epsos:names:wp3.4:subject:healthcare-facility-type", facilityType, "", "");
             attrStmt.getAttributes().add(attrPID_5);
             // XSPA Purpose of Use
-            var attrPID_6 = createAttribute(builderFactory, "XSPA Purpose Of Use",
+            var attrPID_6 = createAttributePurposeOfUse(builderFactory, "XSPA Purpose Of Use",
                     "urn:oasis:names:tc:xspa:1.0:subject:purposeofuse", purposeOfUse, "", "");
             attrStmt.getAttributes().add(attrPID_6);
             // XSPA Locality
@@ -614,6 +614,37 @@ public class AssertionsConverter {
 
         return attrPID;
     }
+
+    private static Attribute createAttributePurposeOfUse(XMLObjectBuilderFactory builderFactory, String FriendlyName, String oasisName,
+                                             String value, String namespace, String xmlschema) {
+
+        Attribute attrPID = create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+        attrPID.setFriendlyName(FriendlyName);
+        attrPID.setName(oasisName);
+        attrPID.setNameFormat(Attribute.URI_REFERENCE);
+        // Create and add the Attribute Value
+
+        XMLObjectBuilder stringBuilder;
+
+        if (namespace.equals("")) {
+
+            XSString attrValPID;
+            stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
+            attrValPID = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
+            attrValPID.setValue(value);
+            attrPID.getAttributeValues().add(attrValPID);
+        } else {
+
+            XSURI attrValPID;
+            stringBuilder = builderFactory.getBuilder(XSURI.TYPE_NAME);
+            attrValPID = (XSURI) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSURI.TYPE_NAME);
+            attrValPID.setURI(value);
+            attrPID.getAttributeValues().add(attrValPID);
+        }
+
+        return attrPID;
+    }
+
 
     protected static Attribute findStringInAttributeStatement(List<AttributeStatement> statements, String attrName) {
 

@@ -98,6 +98,48 @@ public class HCPIAssertionCreator {
         var ns1 = new Namespace(XMLConstants.W3C_XML_SCHEMA_NS_URI, "xs");
         var ns2 = new Namespace(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "xsi");
 
+        // Set HC Identifier
+        if (true) {
+            Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+            att.setFriendlyName("HCI Identifier");
+            att.setName("urn:ihe:iti:xca:2010:homeCommunityId");
+            att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
+
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+
+            XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            attVal.setTextContent(Constants.HOME_COMM_ID);
+
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
+            attVal.getUnknownAttributes().put(attributeName, "xs:string");
+
+            att.getAttributeValues().add(attVal);
+            attributeStatement.getAttributes().add(att);
+        }
+
+        // Set NP Identifier
+        if (true) {
+            Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
+            att.setFriendlyName("NPI Identifier");
+            att.setName("urn:oasis:names:tc:xspa:1.0:subject:npi");
+            att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
+
+            XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+
+            XSAny attVal = (XSAny) builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            attVal.setTextContent(Constants.COUNTRY_NAME);
+
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
+            attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
+            QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
+            attVal.getUnknownAttributes().put(attributeName, "xs:string");
+
+            att.getAttributeValues().add(attVal);
+            attributeStatement.getAttributes().add(att);
+        }
+
         // Set HCP Identifier
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);

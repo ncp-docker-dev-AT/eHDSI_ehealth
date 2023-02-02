@@ -12,7 +12,7 @@ import tr.com.srdc.epsos.util.Constants;
 public class AbuseDetectionHelper implements ApplicationContextAware {
 
     public static final String NAME_OF_JOB = "AbuseDetectionJob";
-    public static final String NAME_OF_GROUP = "OpenNCP";
+    public static final String NAME_OF_GROUP = "OpenNCPServer";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbuseDetectionHelper.class);
     private static final String NAME_OF_TRIGGER = "triggerStart";
 

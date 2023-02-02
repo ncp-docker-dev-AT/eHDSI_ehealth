@@ -8,8 +8,9 @@
         <fieldset style="min-height:100px;">
             <legend>
                 <!-- Packaging Details -->
-                <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                Packaging Details
+                <xsl:call-template name="show-eHDSIDisplayLabel">
+                    <xsl:with-param name="code" select="'191'"/>
+                </xsl:call-template>
             </legend>
             <table class="ep_table">
                 <tbody>
@@ -18,9 +19,10 @@
                     <xsl:variable name="asContent_level3" select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent/pharm:containerPackagedProduct/pharm:asContent"/>
                     <tr>
                         <th>
-                            <!-- Package Identifier Header -->
-                            <!-- TODO Add concept to eHDSIDisplayLabel value set -->
-                            Package Identifier
+                            <!-- Medicinal Product Package Identifier Header -->
+                            <xsl:call-template name="show-eHDSIDisplayLabel">
+                                <xsl:with-param name="code" select="'185'"/>
+                            </xsl:call-template>
                         </th>
                         <td>
                             <xsl:choose>
@@ -76,7 +78,7 @@
         <tr>
             <th>
                 <center>
-                    <!-- TODO this concept needs to be added to the eHDSIDisplayLabel value set -->
+                    <!-- Part -->
                     <xsl:text>Part </xsl:text>
                     <xsl:value-of select="position()"/>
                 </center>
