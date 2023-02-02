@@ -12,12 +12,10 @@ Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wiki
 
 Main changes in this release are:<br/>
 <ul>
-<li>OpenNCP Gateway - SMP Editor bug fixing and improvements</li>
-<li>Gazelle validators - TLS connections bug fixing</li>
-<li>TSAM Synchronizer - Mappings retrieval improvements</li>
-<li>OpenNCP libraries - Fixing vulnerabilities</li>
-<li>XCPD request and response: alignment of the implementation and the specifications</li>
-<li>XCA metadata: alignment of the implementation and the specifications</li>
+<li>Upgrade IHE Technical Framework to revision 19 – CP064 – XUA assertion update.</li>
+<li>Transformation Manager: coded elements configuration update.</li>
+<li>OpenNCP Gateway improvements - ATNA Viewer & SMP Editor & eADC.</li>
+<li>CDA Display tool improvements (Wave 6 alignments and improvements).</li>
 </ul>
 
 ### Epic
@@ -54,6 +52,7 @@ Main changes in this release are:<br/>
     [EHEALTH-9549] - Security Manager accepts an AuthN method which is not allowed in eHDSI
     [EHEALTH-9618] - OpenNCP doesn't respect IHE specifications for hash and size metadata attributes
     [EHEALTH-9629] - [GDPR] Personal data logged in XDR
+    [EHEALTH-9653] - Fix wrong Xpath expressions in coded_element_list_ehdsi.xml
 
 ### Improvement
     [EHEALTH-9550] - CDA Display Tool - Remove hardcoded labels and make them translatable
