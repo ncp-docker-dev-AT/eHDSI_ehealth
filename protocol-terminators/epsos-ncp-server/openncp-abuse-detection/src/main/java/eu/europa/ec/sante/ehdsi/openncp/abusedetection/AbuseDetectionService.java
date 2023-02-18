@@ -5,6 +5,8 @@ import epsos.ccd.gnomon.auditmanager.AuditTrailUtils;
 import epsos.ccd.gnomon.auditmanager.EventType;
 import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.RFC3881.ActiveParticipantType;
 import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
@@ -54,6 +56,7 @@ public class AbuseDetectionService implements Job {
     private static List<AbuseEvent> abuseList = new ArrayList<>();
     private static long lastIdAnalyzed = -1;
     private final Logger logger = LoggerFactory.getLogger(AbuseDetectionService.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     public AbuseDetectionService() {
     }
@@ -173,7 +176,7 @@ public class AbuseDetectionService implements Job {
         }
     }
 
-    private void setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests, AbuseEvent eventBegin, AbuseEvent eventEnd) {
+    private boolean setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests, AbuseEvent eventBegin, AbuseEvent eventEnd) {
         String eventDescription = description.substring(0, Math.min(description.length(), ANOMALY_DESCRIPTION_SIZE));
 
         String type = abuseType.getType();
@@ -204,8 +207,10 @@ public class AbuseDetectionService implements Job {
                 throw new RuntimeException(e);
             }
         } else {
-            logger.info("Anomaly already persisted. Skipping.");
+            //logger.info("Anomaly already persisted. Skipping.");
+            return false;
         }
+        return true;
     }
 
     private boolean anomalyNotPresent(String description, String type, String eventStartDate, String eventEndDate) {
@@ -403,11 +408,13 @@ public class AbuseDetectionService implements Job {
                 }
 
                 if (evtPresent) {
-                    logger.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
-                                    "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
-                            dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
-                            au.getEventIdentification().getEventID().getCodeSystemName(),
-                            getTypeCodes(au.getEventIdentification().getEventTypeCode()), getActiveParticipants(au.getActiveParticipant()));
+//                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+//                        logger.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
+//                                        "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
+//                                dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
+//                                au.getEventIdentification().getEventID().getCodeSystemName(),
+//                                getTypeCodes(au.getEventIdentification().getEventTypeCode()), getActiveParticipants(au.getActiveParticipant()));
+//                    }
 
                     String joinedPoc = au.getActiveParticipant().stream()
                             .filter(ActiveParticipantType::isUserIsRequestor)
@@ -519,11 +526,14 @@ public class AbuseDetectionService implements Job {
                     }
                     int elapsed = getElapsedTimeBetweenEvents(sortedAllList, beg, end);
                     if (elapsed < areqr) {
-                        logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
-                                        "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
-                                tot, areqThreshold, elapsed, sortedAllList.get(beg), sortedAllList.get(end));
                         String abuseDescription = String.format(DESCRIPTION_ALL, tot, elapsed, areqThreshold);
-                        setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end));
+                        if(setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end))) {
+                            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                                loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
+                                                "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
+                                        tot, areqThreshold, elapsed, sortedAllList.get(beg), sortedAllList.get(end));
+                            }
+                        }
                     }
                 }
             } while (index < sortedAllList.size() && lastValidIndex < sortedAllList.size());
@@ -621,13 +631,16 @@ public class AbuseDetectionService implements Job {
                             }
                             int elapsed = getElapsedTimeBetweenEvents(sortedXcpdList, beg, end);
                             if (elapsed < upatr) {
-                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : " +
-                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
-                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
-                                        tot, upatThreshold, elapsed,
-                                        sortedXcpdList.get(beg), sortedXcpdList.get(end));
                                 String abuseDescription = String.format(DESCRIPTION_PAT, tot, elapsed, upatThreshold);
-                                setAbuseErrorEvent(AbuseType.PAT, abuseDescription, tot, sortedXcpdList.get(beg), sortedXcpdList.get(end));
+                                if(setAbuseErrorEvent(AbuseType.PAT, abuseDescription, tot, sortedXcpdList.get(beg), sortedXcpdList.get(end))) {
+                                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                                        loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : " +
+                                                        "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
+                                                        "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
+                                                tot, upatThreshold, elapsed,
+                                                sortedXcpdList.get(beg), sortedXcpdList.get(end));
+                                    }
+                                }
                             }
                         }
                     } while (index < sortedXcpdList.size() && lastValidIndex < sortedXcpdList.size());
@@ -644,10 +657,12 @@ public class AbuseDetectionService implements Job {
                         .toStandardSeconds().getSeconds() <= purgeLimit)
                 .collect(Collectors.toList());
 
-        if (ret.size() < list.size()) {
-            logger.info("'{}' events purged from active list, new list size; '{}'", list.size() - ret.size(), ret.size());
-        } else {
-            logger.info("Events in active list: '{}'", list.size());
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            if (ret.size() < list.size()) {
+                loggerClinical.info("'{}' events purged from active list, new list size; '{}'", list.size() - ret.size(), ret.size());
+            } else {
+                loggerClinical.info("Events in active list: '{}'", list.size());
+            }
         }
         return ret;
     }
