@@ -299,22 +299,24 @@
                     <packagingExcludes>
                         WEB-INF/lib/checker-qual-3.8.0.jar,
                         WEB-INF/lib/commons-codec-1.11.jar,
-                        WEB-INF/lib/commons-logging-1.1.1.jar
+                        WEB-INF/lib/commons-logging-1.1.1.jar,
                         WEB-INF/lib/error_prone_annotations-2.5.1.jar,
+                        WEB-INF/lib/error_prone_annotations-2.7.1.jar,
                         WEB-INF/lib/guava-30.1.1-jre.jar,
+                        WEB-INF/lib/guava-31.0.1-jre.jar,
                         WEB-INF/lib/httpcore-4.4.13.jar,
                         WEB-INF/lib/istack-commons-runtime-3.0.7.jar,
                         WEB-INF/lib/jakarta.activation-1.2.1.jar,
+                        WEB-INF/lib/jakarta.activation-api-1.2.1.jar,
                         WEB-INF/lib/jaxb-runtime-2.3.1.jar,
                         WEB-INF/lib/jaxen-1.1.6.jar,
                         WEB-INF/lib/joda-time-2.10.5.jar,
-<!--                        WEB-INF/lib/log4j-api-2.17.2.jar,-->
-<!--                        WEB-INF/lib/log4j-core-2.17.2.jar,-->
-<!--                        WEB-INF/lib/log4j-jcl-2.17.2.jar,-->
                         WEB-INF/lib/neethi-3.1.1.jar,
                         WEB-INF/lib/spring-aop-5.3.9.jar,
+                        WEB-INF/lib/spring-aop-5.3.20.jar,
                         WEB-INF/lib/spring-expression-5.3.9.jar,
                         WEB-INF/lib/spring-jcl-5.3.9.jar,
+                        WEB-INF/lib/spring-jcl-5.3.20.jar,
                         WEB-INF/lib/txw2-2.3.1.jar,
                         WEB-INF/lib/xercesImpl-${xerces.version}.jar
                     </packagingExcludes>
