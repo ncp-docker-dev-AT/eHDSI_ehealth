@@ -49,10 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/api")
@@ -104,46 +101,52 @@ public class SMPDeleteFileController {
         List<ReferenceCollection> referenceCollection = new ArrayList<>();
         URI smpURI = null;
         int i = 0;
-        for (DocumentIdentifier documentIdentifier : documentIdentifiers) {
-            String smptype = "Unknown type";
-            String documentID = "";
-            Map<String, String> propertiesMap = readProperties.readPropertiesFile();
-            Set set2 = propertiesMap.entrySet();
-            for (Object aSet2 : set2) {
-                Map.Entry mentry2 = (Map.Entry) aSet2;
-                if (StringUtils.equalsIgnoreCase(documentIdentifier.getIdentifier(), mentry2.getKey().toString())) {
-                    String[] docs = mentry2.getValue().toString().split("\\.");
-                    documentID = docs[0];
-                    break;
+
+        if(!documentIdentifiers.isEmpty()) {
+            for (DocumentIdentifier documentIdentifier : documentIdentifiers) {
+                String smptype = "Unknown type";
+                String documentID = "";
+                Map<String, String> propertiesMap = readProperties.readPropertiesFile();
+                Set set2 = propertiesMap.entrySet();
+                for (Object aSet2 : set2) {
+                    Map.Entry mentry2 = (Map.Entry) aSet2;
+                    if (StringUtils.equalsIgnoreCase(documentIdentifier.getIdentifier(), mentry2.getKey().toString())) {
+                        String[] docs = mentry2.getValue().toString().split("\\.");
+                        documentID = docs[0];
+                        break;
+                    }
                 }
-            }
-            String smpType = documentID;
-            logger.debug("\n******** DOC ID - '{}'", documentIdentifier.getIdentifier());
-            logger.debug("\n******** SMP Type - '{}'", smpType);
+                String smpType = documentID;
+                logger.debug("\n******** DOC ID - '{}'", documentIdentifier.getIdentifier());
+                logger.debug("\n******** SMP Type - '{}'", smpType);
 
-            for (SMPType smptype1 : SMPType.values()) {
-                if (smptype1.name().equals(smpType)) {
-                    smptype = smptype1.getDescription();
-                    break;
+                for (SMPType smptype1 : SMPType.values()) {
+                    if (smptype1.name().equals(smpType)) {
+                        smptype = smptype1.getDescription();
+                        break;
+                    }
                 }
-            }
 
-            try {
-                smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
-            } catch (TechnicalException ex) {
-                success = false;
-                errorType = "TechnicalException";
-                logger.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-            }
-            URI uri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifier);
-            ReferenceCollection reference = new ReferenceCollection();
-            reference.setReference(uri.toString());
-            reference.setSmpType(smptype);
-            reference.setSmpUri(smpURI.toString());
-            reference.setId(i++);
-            referenceCollection.add(reference);
+                try {
+                    smpURI = smpClient.getService().getMetadataLocator().lookup(participantIdentifier);
+                } catch (TechnicalException ex) {
+                    success = false;
+                    errorType = "TechnicalException";
+                    logger.error("\n TechnicalException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
+                }
+                URI uri = smpClient.getService().getMetadataProvider().resolveServiceMetadata(smpURI, participantIdentifier, documentIdentifier);
+                ReferenceCollection reference = new ReferenceCollection();
+                reference.setReference(uri.toString());
+                reference.setSmpType(smptype);
+                reference.setSmpUri(smpURI.toString());
+                reference.setId(i++);
+                referenceCollection.add(reference);
 
-            serviceGroup = smpClient.getService().getMetadataProvider().resolveDocumentIdentifiers(smpURI, participantIdentifier);
+                serviceGroup = smpClient.getService().getMetadataProvider().resolveDocumentIdentifiers(smpURI, participantIdentifier);
+            }
+        } else {
+            logger.info("Smp file list is empty");
+            return ResponseEntity.ok(Collections.EMPTY_LIST);
         }
 
         //Audit
