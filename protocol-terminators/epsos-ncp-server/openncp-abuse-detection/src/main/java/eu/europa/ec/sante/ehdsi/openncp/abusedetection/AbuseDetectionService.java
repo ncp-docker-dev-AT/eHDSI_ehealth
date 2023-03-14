@@ -45,9 +45,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AbuseDetectionService implements Job {
-    public static final String DESCRIPTION_ALL = "[NCP-A] Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
-    public static final String DESCRIPTION_POC = "[NCP-A] Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
-    public static final String DESCRIPTION_PAT = "[NCP-A] Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_ALL = "[NCP-A] Detected %d transactions within an interval of %d seconds. " +
+            "This is exceeding the indicated threshold of %d transactions for the defined time interval";
+    public static final String DESCRIPTION_POC = "[NCP-A] Detected %d transactions within an interval of %d seconds " +
+            "from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_PAT = "[NCP-A] Detected %d transactions within an interval of %d seconds " +
+            "for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
     private static final int ANOMALY_DESCRIPTION_SIZE = 2000;
     private static final int ANOMALY_TYPE_SIZE = 20;
     private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -75,8 +78,6 @@ public class AbuseDetectionService implements Job {
         try {
             logger.info("AbuseDetectionService Job paused");
             scheduler.pauseJob(jobExecutionContext.getJobDetail().getKey());
-
-            //Long res = (Long)jobExecutionContext.getMergedJobDataMap().get("myKey");
 
             try {
                 String query;
@@ -176,7 +177,9 @@ public class AbuseDetectionService implements Job {
         }
     }
 
-    private boolean setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests, AbuseEvent eventBegin, AbuseEvent eventEnd) {
+    private boolean setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests,
+                                       AbuseEvent eventBegin, AbuseEvent eventEnd) {
+
         String eventDescription = description.substring(0, Math.min(description.length(), ANOMALY_DESCRIPTION_SIZE));
 
         String type = abuseType.getType();
@@ -207,7 +210,7 @@ public class AbuseDetectionService implements Job {
                 throw new RuntimeException(e);
             }
         } else {
-            //logger.info("Anomaly already persisted. Skipping.");
+            //  Anomaly already persisted. Skipping.
             return false;
         }
         return true;
@@ -234,62 +237,6 @@ public class AbuseDetectionService implements Job {
         return recordCount == 0;
     }
 
-    /*
-    private void setAbuseErrorEventOld(AbuseEvent abuseEvent) {
-        EventLog eventLog = new EventLog();
-
-        eventLog.setEI_EventActionCode(EventActionCode.CREATE);
-        eventLog.setEI_EventDateTime(abuseEvent.audit.getEventIdentification().getEventDateTime());
-        eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
-
-        eventLog.setAS_AuditSourceId(abuseEvent.audit.getAuditSourceIdentification().get(0).getAuditSourceID());
-
-        Optional<ParticipantObjectIdentificationType> req = abuseEvent.audit.getParticipantObjectIdentification()
-                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "req")).findFirst();
-        Optional<ParticipantObjectIdentificationType> rsp = abuseEvent.audit.getParticipantObjectIdentification()
-                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "rsp")).findFirst();
-
-        eventLog.setReqM_ParticipantObjectID(req.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
-        eventLog.setReqM_ParticipantObjectDetail(req.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
-
-        Optional<AuditMessage.ActiveParticipant> cons = abuseEvent.audit.getActiveParticipant()
-                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceConsumer")).findFirst();
-        Optional<AuditMessage.ActiveParticipant> prov = abuseEvent.audit.getActiveParticipant()
-                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
-
-        Optional<AuditMessage.ActiveParticipant> prov2 = abuseEvent.audit.getActiveParticipant()
-                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
-
-        eventLog.setEI_TransactionName(TransactionName.ANOMALY_DETECTED);
-
-        eventLog.setSC_UserID(cons.get().getUserID()); //clientCommonName
-        eventLog.setSP_UserID(prov.get().getUserID()); //clientCommonName
-        eventLog.setHR_UserID(cons.get().getUserID());
-        for(ActiveParticipantType a : abuseEvent.audit.getActiveParticipant()) {
-            if(XSPAFunctionalRole.containsLabel(a.getRoleIDCode().get(0).getCode())) {
-                eventLog.setHR_UserID(a.getUserID());
-                eventLog.setHR_RoleID(a.getRoleIDCode().get(0).getCode());
-                eventLog.setHR_UserName(a.getUserName());
-                eventLog.setHR_AlternativeUserID(a.getAlternativeUserID());
-                break;
-            }
-        }
-
-        eventLog.setSourceip(cons.get().getNetworkAccessPointID());
-        eventLog.setTargetip(prov.get().getNetworkAccessPointID());
-
-        eventLog.setResM_ParticipantObjectID(rsp.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
-        eventLog.setResM_ParticipantObjectDetail(rsp.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
-
-        eventLog.setNcpSide(NcpSide.NCP_A);
-        eventLog.setEventType(EventType.ANOMALY_DETECTED);
-
-        AuditService auditService = AuditServiceFactory.getInstance();
-        auditService.write(eventLog, "", "1");
-        logger.info("EventLog: '{}' generated.", eventLog.getEventType());
-    }
-    */
-
     private AuditMessage readAuditString(MessagesRecord rec) throws JAXBException {
 
         try {
@@ -304,13 +251,6 @@ public class AbuseDetectionService implements Job {
                         .toInstant()
                         .toEpochMilli(),
                         DateTimeZone.forTimeZone(TimeZone.getDefault()));
-
-//                LocalDateTime now = new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault()));
-//                int val = Math.max(3600, Integer.parseInt(Constants.ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD));
-//                Period diff = new Period(dt, now);
-//                if (diff.toStandardSeconds().getSeconds() > val) {
-//                    return null; // do not process file
-//                }
 
                 boolean evtPresent = false;
                 AbuseTransactionType transactionType = AbuseTransactionType.TRANSACTION_UNKNOWN;
@@ -408,13 +348,6 @@ public class AbuseDetectionService implements Job {
                 }
 
                 if (evtPresent) {
-//                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-//                        logger.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
-//                                        "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
-//                                dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
-//                                au.getEventIdentification().getEventID().getCodeSystemName(),
-//                                getTypeCodes(au.getEventIdentification().getEventTypeCode()), getActiveParticipants(au.getActiveParticipant()));
-//                    }
 
                     String joinedPoc = au.getActiveParticipant().stream()
                             .filter(ActiveParticipantType::isUserIsRequestor)
@@ -483,31 +416,13 @@ public class AbuseDetectionService implements Job {
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
         if (areqr > 0 && sortedAllList.size() > areqThreshold) { // Analyze ALL requests
-            //            for (int i = 0; i < sortedAllList.size(); i++) {
-            //                int begin;
-            //                int end;
-            //                begin = i;
-            //                end = begin + Math.min(begin + areq_threshold, sortedAllList.size() - 1 - begin);
-            //                LocalDateTime t1 = sortedAllList.get(begin).getRequestDateTime();
-            //                LocalDateTime t2 = sortedAllList.get(end).getRequestDateTime();
-            //                Period diff = new Period(t1, t2); // time elapsed between first and last request
-            //                if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
-            //                    int totreq = end - begin + 1;
-            //                    if (totreq > areq_threshold) {
-            //                        logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
-            //                                        "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
-            //                                totreq, areq_threshold, diff.toStandardSeconds().getSeconds(), sortedAllList.get(begin), sortedAllList.get(end));
-            //                        String abuseDescription = String.format(DESCRIPTION_ALL, totreq, diff.toStandardSeconds().getSeconds(), areq_threshold);
-            //                        setAbuseErrorEvent(AbuseType.ALL, abuseDescription, totreq, sortedAllList.get(begin), sortedAllList.get(end));
-            //                    }
-            //                }
-            //            }
-            int index = 0;
+
+            int index;
             int lastValidIndex = 0;
             do {
                 int tot = 0;
                 int beg = 0;
-                int end = 0;
+                int end;
                 for (index = lastValidIndex; index < sortedAllList.size(); index++) {
                     beg = lastValidIndex;
                     end = index;
@@ -527,7 +442,7 @@ public class AbuseDetectionService implements Job {
                     int elapsed = getElapsedTimeBetweenEvents(sortedAllList, beg, end);
                     if (elapsed < areqr) {
                         String abuseDescription = String.format(DESCRIPTION_ALL, tot, elapsed, areqThreshold);
-                        if(setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end))) {
+                        if (setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end))) {
                             if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                                 loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
                                                 "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
@@ -538,60 +453,6 @@ public class AbuseDetectionService implements Job {
                 }
             } while (index < sortedAllList.size() && lastValidIndex < sortedAllList.size());
         }
-
-        //////////////////////////////////////////////////////////////////////
-
-        // No Point of Care discovery on Server, only on Client
-//        List<AbuseEvent> distinctPointOfCareIds = list.stream()
-//                .filter(distinctByKey(AbuseEvent::getPointOfCare))
-//                .collect(Collectors.toList());
-//        if (upocr > 0 && sortedAllList.size() > upocThreshold) { // analyze unique POC requests
-//            if (!distinctPointOfCareIds.isEmpty()) {
-//                distinctPointOfCareIds.forEach(poc -> {
-//                    List<AbuseEvent> sortedPocList = list.stream()
-//                            .filter(p -> p.getPointOfCare().equals(poc.getPointOfCare()))
-//                            .sorted(Comparator.comparing(AbuseEvent::getPointOfCare))
-//                            .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-//                            .collect(Collectors.toList());
-//
-//                    Period diff = Period.ZERO;
-//                    int index = 0;
-//                    int lastValidIndex = 0;
-//                    do {
-//                        int tot = 0;
-//                        int beg = 0;
-//                        int end = 0;
-//                        for (index = lastValidIndex; index < sortedPocList.size(); index++) {
-//                            beg = lastValidIndex;
-//                            end = index;
-//                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
-//                            if (elapsed > upocr) {
-//                                lastValidIndex = index;
-//                                break;
-//                            }
-//                            tot++;
-//                        }
-//                        if (tot > upocThreshold) {
-//                            if (lastValidIndex > 0 && index < sortedPocList.size()) {
-//                                end = lastValidIndex - 1;
-//                            } else {
-//                                end = sortedPocList.size() - 1;
-//                            }
-//                            int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
-//                            if (elapsed < upocr) {
-//                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
-//                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
-//                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
-//                                        tot, upocThreshold, elapsed,
-//                                        sortedPocList.get(beg), sortedPocList.get(end));
-//                                String abuseDescription = String.format(DESCRIPTION_POC, tot, elapsed, upocThreshold);
-//                                setAbuseErrorEvent(AbuseType.POC, abuseDescription, tot, sortedPocList.get(beg), sortedPocList.get(end));
-//                            }
-//                        }
-//                    } while (index < sortedPocList.size() && lastValidIndex < sortedPocList.size());
-//                });
-//            }
-//        }
 
         List<AbuseEvent> distinctPatientIds = list.stream()
                 .filter(distinctByKey(AbuseEvent::getPatientId))
@@ -607,12 +468,12 @@ public class AbuseDetectionService implements Job {
                             .collect(Collectors.toList());
 
                     Period diff = Period.ZERO;
-                    int index = 0;
+                    int index;
                     int lastValidIndex = 0;
                     do {
                         int tot = 0;
                         int beg = 0;
-                        int end = 0;
+                        int end;
                         for (index = lastValidIndex; index < sortedXcpdList.size(); index++) {
                             beg = lastValidIndex;
                             end = index;
@@ -632,7 +493,7 @@ public class AbuseDetectionService implements Job {
                             int elapsed = getElapsedTimeBetweenEvents(sortedXcpdList, beg, end);
                             if (elapsed < upatr) {
                                 String abuseDescription = String.format(DESCRIPTION_PAT, tot, elapsed, upatThreshold);
-                                if(setAbuseErrorEvent(AbuseType.PAT, abuseDescription, tot, sortedXcpdList.get(beg), sortedXcpdList.get(end))) {
+                                if (setAbuseErrorEvent(AbuseType.PAT, abuseDescription, tot, sortedXcpdList.get(beg), sortedXcpdList.get(end))) {
                                     if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
                                         loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : " +
                                                         "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
