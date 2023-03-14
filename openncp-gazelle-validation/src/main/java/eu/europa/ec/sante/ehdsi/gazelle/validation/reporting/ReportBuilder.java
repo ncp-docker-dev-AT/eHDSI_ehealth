@@ -36,21 +36,13 @@ public class ReportBuilder {
     private ReportBuilder() {
     }
 
-    /**
-     * @param reportDate
-     * @param model
-     * @param objectType
-     * @param validationObject
-     * @param ncpSide
-     * @return
-     */
     public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject, final NcpSide ncpSide) {
 
         return build(reportDate, model, objectType, validationObject, null, null, ncpSide);
     }
 
     /**
-     * This is the main operation in the report building process. It main responsibility is to generate a report based
+     * This is the main operation in the report building process. Its main responsibility is to generate a report based
      * on a supplied model, validation object and detailed result.
      *
      * @param model            the model used in the Web Service invocation.
@@ -130,7 +122,7 @@ public class ReportBuilder {
                     LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
                     htmlReport.write(reportTransformer.getHtmlReport());
                 } catch (IOException e) {
-                    LOGGER.error("An I/O error has occurred while writting the HTML report file, please check the stack trace for more information.", e);
+                    LOGGER.error("An I/O error has occurred while writing the HTML report file, please check the stack trace for more information.", e);
                 }
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
@@ -160,7 +152,6 @@ public class ReportBuilder {
                 LOGGER.error("An I/O error has occurred while writing the report file, please check the stack trace for more information.", ex);
                 return false;
             }
-
         }
         return false;
     }
@@ -178,21 +169,22 @@ public class ReportBuilder {
         final String SEPARATOR = "_";
         final String FILE_EXTENSION = ".xml";
         final String modelNormalized = model.replace(" ", "-");
+        final String objectTypeNormalized = objectType.replace(":", "_");
 
         StringBuilder fileName = new StringBuilder();
         fileName.append(reportDate);
 
-        if (objectType != null && !objectType.isEmpty()) {
+        if (StringUtils.isNotBlank(objectTypeNormalized)) {
             fileName.append(SEPARATOR);
-            fileName.append(objectType);
+            fileName.append(objectTypeNormalized);
         }
 
-        if (modelNormalized != null && !modelNormalized.isEmpty()) {
+        if (StringUtils.isNotBlank(modelNormalized)) {
             fileName.append(SEPARATOR);
             fileName.append(modelNormalized.toUpperCase());
         }
 
-        if (validationTestResult != null && !validationTestResult.isEmpty()) {
+        if (StringUtils.isNotBlank(validationTestResult)) {
             fileName.append(SEPARATOR);
             fileName.append(validationTestResult.toUpperCase());
         } else {
