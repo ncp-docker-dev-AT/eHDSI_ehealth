@@ -84,7 +84,8 @@ public class SMPDeleteFileController {
             success = false;
             errorType = "ConnectionException";
             logger.error("\n ConnectionException - " + SimpleErrorHandler.printExceptionStackTrace(ex));
-        } catch (TechnicalException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+        } catch (TechnicalException | CertificateException | KeyStoreException | IOException |
+                 NoSuchAlgorithmException e) {
             logger.error("Technical Exception: '{}'", e.getMessage(), e);
         }
 
@@ -102,7 +103,7 @@ public class SMPDeleteFileController {
         URI smpURI = null;
         int i = 0;
 
-        if(!documentIdentifiers.isEmpty()) {
+        if (!documentIdentifiers.isEmpty()) {
             for (DocumentIdentifier documentIdentifier : documentIdentifiers) {
                 String smptype = "Unknown type";
                 String documentID = "";
@@ -146,7 +147,8 @@ public class SMPDeleteFileController {
             }
         } else {
             logger.info("Smp file list is empty");
-            return ResponseEntity.ok(Collections.EMPTY_LIST);
+            //  Returning empty List and  no Audit message expected in this case.
+            return ResponseEntity.ok(Collections.emptyList());
         }
 
         //Audit
