@@ -29,14 +29,17 @@ public class ReportBuilder {
     private static final boolean GAZELLE_FORMATTED_REPORT;
 
     static {
-        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
-        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
+        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance()
+                .getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
+        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance()
+                .getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
     }
 
     private ReportBuilder() {
     }
 
-    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject, final NcpSide ncpSide) {
+    public static boolean build(final String reportDate, final String model, final String objectType,
+                                final String validationObject, final NcpSide ncpSide) {
 
         return build(reportDate, model, objectType, validationObject, null, null, ncpSide);
     }
@@ -50,8 +53,9 @@ public class ReportBuilder {
      * @param validationResult the validation result.
      * @return A boolean flag, indicating if the reporting process succeed or not.
      */
-    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject,
-                                final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
+    public static boolean build(final String reportDate, final String model, final String objectType,
+                                final String validationObject, final DetailedResult validationResult,
+                                String validationResponse, final NcpSide ncpSide) {
 
         String sideFolder;
         if (ncpSide == null || StringUtils.isEmpty(ncpSide.getName())) {
@@ -164,19 +168,20 @@ public class ReportBuilder {
      * @param validationTestResult the validation result object.
      * @return a report file name.
      */
-    private static String buildReportFileName(final String reportDate, final String model, final String objectType, final String validationTestResult) {
+    private static String buildReportFileName(final String reportDate, final String model, final String objectType,
+                                              final String validationTestResult) {
 
         final String SEPARATOR = "_";
         final String FILE_EXTENSION = ".xml";
-        final String modelNormalized = model.replace(" ", "-");
-        final String objectTypeNormalized = objectType.replace(":", "_");
+        String modelNormalized = model.replace(" ", "-");
+        modelNormalized = modelNormalized.replace(":", "_");
 
         StringBuilder fileName = new StringBuilder();
         fileName.append(reportDate);
 
-        if (StringUtils.isNotBlank(objectTypeNormalized)) {
+        if (StringUtils.isNotBlank(objectType)) {
             fileName.append(SEPARATOR);
-            fileName.append(objectTypeNormalized);
+            fileName.append(objectType);
         }
 
         if (StringUtils.isNotBlank(modelNormalized)) {
