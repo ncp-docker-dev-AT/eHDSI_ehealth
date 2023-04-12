@@ -377,7 +377,7 @@ public class EadcUtilWrapper {
     private static String extractSendingCountryIsoFromAssertion(Assertion idAssertion) {
         if(idAssertion == null)
             return null;
-        return idAssertion.getIssuer().getValue().split(":")[2];
+        return idAssertion.getIssuer().getValue().toUpperCase().split(":")[2];
     }
 
     /**
