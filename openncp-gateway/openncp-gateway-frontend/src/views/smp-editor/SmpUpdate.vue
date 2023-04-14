@@ -32,6 +32,7 @@
               dense
               type="text"
               :mandatory="item.mandatory"
+              v-if="!item.isDate"
             >
               <template v-slot:prepend>
                 <v-tooltip bottom>
@@ -42,6 +43,13 @@
                 </v-tooltip>
               </template>
             </v-text-field>
+            <VueCtkDateTimePicker
+              v-model="dataset[item.id]"
+              v-label="item.name"
+              format="YYYY-MM-DD HH:mm"
+              dark
+              v-if="item.isDate"
+            />
           </v-row>
           <v-row>
             <v-btn color="blue" class="ma-2 white--text" @click="update">
@@ -106,6 +114,9 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker)
 
 export default {
   data () {
@@ -162,6 +173,7 @@ export default {
           console.log('Data for file', reponse.data)
           this.fields = _.map(response.data.fields, (item, key) => {
             item.id = key
+            item.isDate = item.id.toLower.indexOf('Date') > -1
             this.dataset[item.id] = item.currValue
             return item
           }).filter((item) => {
@@ -169,7 +181,10 @@ export default {
           })
           this.showXml = false
           this.showSignedXml = false
+
           if (
+            response.status === 200 ||
+            response.status === 201 ||
             response.data.statusCode === 200 ||
             response.data.statusCode === 201
           ) {
