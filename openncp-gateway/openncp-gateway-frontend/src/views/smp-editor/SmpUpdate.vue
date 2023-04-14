@@ -171,7 +171,7 @@ export default {
         )
         .then((response) => {
           this.data = response.data
-          console.log('Data for file', reponse.data)
+          console.log('Data for file', response.data)
           this.fields = _.map(response.data.fields, (item, key) => {
             item.id = key
             item.isDate = item.id.toLower.indexOf('Date') > -1
