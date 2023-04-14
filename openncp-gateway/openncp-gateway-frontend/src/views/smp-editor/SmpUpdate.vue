@@ -112,6 +112,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import axios from 'axios'
 import _ from 'lodash'
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
