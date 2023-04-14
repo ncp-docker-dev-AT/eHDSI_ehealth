@@ -335,6 +335,6 @@ export default {
 }
 
 .date-time-picker {
-  padding: 1rem;
+  padding: 0 1rem 1rem 1rem;
 }
 </style>
