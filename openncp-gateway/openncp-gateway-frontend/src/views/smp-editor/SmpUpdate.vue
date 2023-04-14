@@ -27,7 +27,7 @@
         <v-col cols="6">
           <v-row v-for="item in fields" :key="item.id">
             <v-text-field
-              :label="item.name"
+              :label="item.name || item.id"
               v-model="dataset[item.id]"
               dense
               type="text"
