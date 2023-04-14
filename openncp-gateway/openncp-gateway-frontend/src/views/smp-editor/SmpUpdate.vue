@@ -159,6 +159,7 @@ export default {
         )
         .then((response) => {
           this.data = response.data
+          console.log('Data for file', reponse.data)
           this.fields = _.map(response.data.fields, (item, key) => {
             item.id = key
             this.dataset[item.id] = item.currValue
