@@ -174,7 +174,7 @@ export default {
           console.log('Data for file', response.data)
           this.fields = _.map(response.data.fields, (item, key) => {
             item.id = key
-            item.isDate = item.id.toLower.indexOf('Date') > -1
+            item.isDate = item.id.toLowerCase().indexOf('date') > -1
             this.dataset[item.id] = item.currValue
             return item
           }).filter((item) => {
@@ -332,5 +332,9 @@ export default {
 <style scoped>
 .wrapper {
   padding: 2rem;
+}
+
+.date-time-picker {
+  padding: 1rem;
 }
 </style>
