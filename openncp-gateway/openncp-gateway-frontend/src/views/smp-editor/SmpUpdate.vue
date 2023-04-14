@@ -39,7 +39,7 @@
                   <template v-slot:activator="{ on }">
                     <v-icon v-on="on"> mdi-help-circle-outline </v-icon>
                   </template>
-                  {{ item.name }}
+                  {{ item.name || item.id }}
                 </v-tooltip>
               </template>
             </v-text-field>
