@@ -199,14 +199,21 @@
                                 </td>
                                 <td>
                                     <!-- Strength -->
-                                    <xsl:for-each select="pharm:ingredient[@classCode='ACTI']">
-                                        <xsl:if test="position()=1">
-                                            <xsl:variable name="medStrength" select="pharm:quantity"/>
-                                            <xsl:call-template name="show-strength">
-                                                <xsl:with-param name="node" select="$medStrength"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:for-each>
+                                    <xsl:choose>
+                                        <xsl:when test="not(pharm:ingredient[@classCode='ACTI'])">
+                                            <xsl:value-of select="pharm:desc"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:for-each select="pharm:ingredient[@classCode='ACTI']">
+                                                <xsl:if test="position()=1">
+                                                    <xsl:variable name="medStrength" select="pharm:quantity"/>
+                                                    <xsl:call-template name="show-strength">
+                                                        <xsl:with-param name="node" select="$medStrength"/>
+                                                    </xsl:call-template>
+                                                </xsl:if>
+                                            </xsl:for-each>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <!-- Dose form -->
