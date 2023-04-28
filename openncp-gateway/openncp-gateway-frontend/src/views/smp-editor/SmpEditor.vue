@@ -3,7 +3,7 @@
     <span class="display-2">SMP Editor</span>
     <v-tabs v-model="selectedTab" optional>
       <v-tab :to="{ name: 'SmpGenerate' }">Generate</v-tab>
-      <v-tab :to="{ name: 'SmpUpdate' }">Update</v-tab>
+      <v-tab :to="{ name: 'SmpUpdate' }" :disabled="true">Update</v-tab>
       <v-tab :to="{ name: 'SmpSign' }">Sign </v-tab>
       <v-tab :to="{ name: 'SmpUpload' }">Upload File to SMP Server</v-tab>
       <v-tab :to="{ name: 'SmpDelete' }">List SMP services</v-tab>
@@ -42,7 +42,7 @@ export default {
       .catch((err) => {
         this.error(
           'An error occurs. The operations is not completed! <br/>' +
-          err.response.data.message
+            err.response.data.message
         )
       })
   }
