@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -86,14 +87,20 @@ public class Utils {
      */
     public static boolean validateSchema(String xmlDocumentUrl) throws SAXException, IOException {
 
-        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881.xsd");
+        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881_Unsig.xsd");
         if (streamXsd == null || streamXsd.available() == 0) {
-            LOGGER.error("Cannot load XSD resource: \"RFC3881.xsd\"");
+            LOGGER.error("Cannot load XSD resource: \"RFC3881_Unsig.xsd\"");
             return false;
         }
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource streamSource = new StreamSource(streamXsd);
-        Schema schema = factory.newSchema(streamSource);
+        Schema schema = null;
+        try {
+            schema = factory.newSchema(streamSource);
+        } catch (SAXParseException e) {
+            LOGGER.error("XML Document not valid according XSD: '{}'", e.getMessage());
+            return false;
+        }
         javax.xml.validation.Validator validator = schema.newValidator();
         Source source = new StreamSource(stringToStream(xmlDocumentUrl));
 
