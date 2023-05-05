@@ -13,9 +13,7 @@ import net.RFC3881.CodedValueType;
 import net.RFC3881.ParticipantObjectIdentificationType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.quartz.Job;
@@ -51,6 +49,7 @@ public class AbuseDetectionService implements Job {
             "from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
     public static final String DESCRIPTION_PAT = "[NCP-A] Detected %d transactions within an interval of %d seconds " +
             "for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    private static final int NUM_DAYS_LOOK_BACK = 3;
     private static final int ANOMALY_DESCRIPTION_SIZE = 2000;
     private static final int ANOMALY_TYPE_SIZE = 20;
     private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -82,7 +81,7 @@ public class AbuseDetectionService implements Job {
             try {
                 String query;
                 if (lastIdAnalyzed < 0) { // If no lastId is available it starts to analyze records from n days back
-                    long lastFileTimeAnalyzed = LocalDateTime.now().minusDays(3).toDate().toInstant().toEpochMilli();
+                    long lastFileTimeAnalyzed = LocalDateTime.now().minusDays(NUM_DAYS_LOOK_BACK).toDate().toInstant().toEpochMilli();
                     LocalDateTime dt = new LocalDateTime(lastFileTimeAnalyzed, DateTimeZone.forTimeZone(TimeZone.getDefault()));
                     DateTimeFormatter dtf = DateTimeFormat.forPattern(AbuseDetectionService.PATTERN);
                     String lastDateTimeFileAnalyzed = dt.toString(dtf);
@@ -236,6 +235,62 @@ public class AbuseDetectionService implements Job {
         }
         return recordCount == 0;
     }
+
+    /*
+    private void setAbuseErrorEventOld(AbuseEvent abuseEvent) {
+        EventLog eventLog = new EventLog();
+
+        eventLog.setEI_EventActionCode(EventActionCode.CREATE);
+        eventLog.setEI_EventDateTime(abuseEvent.audit.getEventIdentification().getEventDateTime());
+        eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.TEMPORAL_FAILURE);
+
+        eventLog.setAS_AuditSourceId(abuseEvent.audit.getAuditSourceIdentification().get(0).getAuditSourceID());
+
+        Optional<ParticipantObjectIdentificationType> req = abuseEvent.audit.getParticipantObjectIdentification()
+                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "req")).findFirst();
+        Optional<ParticipantObjectIdentificationType> rsp = abuseEvent.audit.getParticipantObjectIdentification()
+                .stream().filter(p -> StringUtils.equals(p.getParticipantObjectIDTypeCode().getCode(), "rsp")).findFirst();
+
+        eventLog.setReqM_ParticipantObjectID(req.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
+        eventLog.setReqM_ParticipantObjectDetail(req.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
+
+        Optional<AuditMessage.ActiveParticipant> cons = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceConsumer")).findFirst();
+        Optional<AuditMessage.ActiveParticipant> prov = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
+
+        Optional<AuditMessage.ActiveParticipant> prov2 = abuseEvent.audit.getActiveParticipant()
+                .stream().filter(p -> StringUtils.equals(p.getRoleIDCode().get(0).getCode(), "ServiceProvider")).findFirst();
+
+        eventLog.setEI_TransactionName(TransactionName.ANOMALY_DETECTED);
+
+        eventLog.setSC_UserID(cons.get().getUserID()); //clientCommonName
+        eventLog.setSP_UserID(prov.get().getUserID()); //clientCommonName
+        eventLog.setHR_UserID(cons.get().getUserID());
+        for(ActiveParticipantType a : abuseEvent.audit.getActiveParticipant()) {
+            if(XSPAFunctionalRole.containsLabel(a.getRoleIDCode().get(0).getCode())) {
+                eventLog.setHR_UserID(a.getUserID());
+                eventLog.setHR_RoleID(a.getRoleIDCode().get(0).getCode());
+                eventLog.setHR_UserName(a.getUserName());
+                eventLog.setHR_AlternativeUserID(a.getAlternativeUserID());
+                break;
+            }
+        }
+
+        eventLog.setSourceip(cons.get().getNetworkAccessPointID());
+        eventLog.setTargetip(prov.get().getNetworkAccessPointID());
+
+        eventLog.setResM_ParticipantObjectID(rsp.get().getParticipantObjectID()); // getMessageID(msgContext.getEnvelope())
+        eventLog.setResM_ParticipantObjectDetail(rsp.get().getParticipantObjectDetail().get(0).getValue()); // msgContext.getEnvelope().getHeader().toString()".getBytes());
+
+        eventLog.setNcpSide(NcpSide.NCP_A);
+        eventLog.setEventType(EventType.ANOMALY_DETECTED);
+
+        AuditService auditService = AuditServiceFactory.getInstance();
+        auditService.write(eventLog, "", "1");
+        logger.info("EventLog: '{}' generated.", eventLog.getEventType());
+    }
+    */
 
     private AuditMessage readAuditString(MessagesRecord rec) throws JAXBException {
 
@@ -393,8 +448,15 @@ public class AbuseDetectionService implements Job {
         }
         LocalDateTime t1 = listEvt.get(beg).getRequestDateTime();
         LocalDateTime t2 = listEvt.get(end).getRequestDateTime();
+        return getElapsedSecondsBetweenDateTime(t1, t2);
+    }
+
+    protected int getElapsedSecondsBetweenDateTime(LocalDateTime t1, LocalDateTime t2) {
         Period diff = new Period(t1, t2); // time elapsed between first and last request
-        return diff.toStandardSeconds().getSeconds();
+        // able to calculate whole days between two dates easily
+        Days days = Days.daysBetween(t1, t2);
+        //return diff.toStandardSeconds().getSeconds();
+        return Seconds.secondsBetween(t1, t2).getSeconds();
     }
 
     private List<AbuseEvent> checkAnomalies(List<AbuseEvent> list) {
@@ -416,13 +478,12 @@ public class AbuseDetectionService implements Job {
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
         if (areqr > 0 && sortedAllList.size() > areqThreshold) { // Analyze ALL requests
-
-            int index;
+            int index = 0;
             int lastValidIndex = 0;
             do {
                 int tot = 0;
                 int beg = 0;
-                int end;
+                int end = 0;
                 for (index = lastValidIndex; index < sortedAllList.size(); index++) {
                     beg = lastValidIndex;
                     end = index;
@@ -454,6 +515,12 @@ public class AbuseDetectionService implements Job {
             } while (index < sortedAllList.size() && lastValidIndex < sortedAllList.size());
         }
 
+        //////////////////////////////////////////////////////////////////////
+
+        // No Point of Care discovery on Server, only on Client
+
+        //////////////////////////////////////////////////////////////////////
+
         List<AbuseEvent> distinctPatientIds = list.stream()
                 .filter(distinctByKey(AbuseEvent::getPatientId))
                 .collect(Collectors.toList());
@@ -468,12 +535,12 @@ public class AbuseDetectionService implements Job {
                             .collect(Collectors.toList());
 
                     Period diff = Period.ZERO;
-                    int index;
+                    int index = 0;
                     int lastValidIndex = 0;
                     do {
                         int tot = 0;
                         int beg = 0;
-                        int end;
+                        int end = 0;
                         for (index = lastValidIndex; index < sortedXcpdList.size(); index++) {
                             beg = lastValidIndex;
                             end = index;
@@ -513,9 +580,16 @@ public class AbuseDetectionService implements Job {
         int purgeLimit = NumberUtils.max(new int[]{areqr, upocr, upatr});
         List<AbuseEvent> ret = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-                .filter(p -> Period.fieldDifference(p.getRequestDateTime(),
-                                new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault())))
-                        .toStandardSeconds().getSeconds() <= purgeLimit)
+                .filter(p -> getElapsedSecondsBetweenDateTime(
+                                p.getRequestDateTime(),
+                                new LocalDateTime(
+                                        DateTimeZone.forTimeZone(TimeZone.getDefault())
+                                )) <= purgeLimit
+                        //Period.fieldDifference(p.getRequestDateTime(),
+                        // new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault())))
+                        // .toStandardSeconds().getSeconds() <= purgeLimit
+
+                )
                 .collect(Collectors.toList());
 
         if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
