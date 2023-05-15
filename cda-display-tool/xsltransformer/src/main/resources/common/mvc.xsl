@@ -642,26 +642,33 @@
                 </xsl:choose>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:choose>
-                    <xsl:when test="$node/@nullFlavor='OTH'">
-                        <div class="tooltip-right">
-                            <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
-                            <span class="tooltiptext">
-                                <!-- Unmapped concept. Nationally used concept for which no translations are available and no safe mappings are possible. -->
-                                <xsl:call-template name="show-eHDSIDisplayLabel">
-                                    <xsl:with-param name="code" select="'153'"/>
-                                </xsl:call-template>
-                            </span>
-                        </div>
-                        <xsl:text> </xsl:text>
-                        <i><xsl:value-of select="$node/n1:translation/@displayName"/></i>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="show-eHDSINullFlavor">
-                            <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                <xsl:call-template name="handle-nullFlavor">
+                    <xsl:with-param name="node" select="$node"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="handle-nullFlavor">
+        <xsl:param name="node"/>
+        <xsl:choose>
+            <xsl:when test="$node/@nullFlavor='OTH'">
+                <div class="tooltip-right">
+                    <i class="fas fa-exclamation-circle" style="color:#085a9f" aria-hidden="true"/>
+                    <span class="tooltiptext">
+                        <!-- Unmapped concept. Nationally used concept for which no translations are available and no safe mappings are possible. -->
+                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                            <xsl:with-param name="code" select="'153'"/>
                         </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    </span>
+                </div>
+                <xsl:text> </xsl:text>
+                <i><xsl:value-of select="$node/n1:translation/@displayName"/></i>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="show-eHDSINullFlavor">
+                    <xsl:with-param name="code" select="$node/@nullFlavor"/>
+                </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

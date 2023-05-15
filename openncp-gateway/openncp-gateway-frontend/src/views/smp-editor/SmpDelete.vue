@@ -1,6 +1,9 @@
 <template>
   <v-container fluid>
     <v-card class="" tile>
+      <template v-if="!files || !files.length">
+        <v-alert>No files</v-alert>
+      </template>
       <v-list-item
         two-line
         v-for="item in files"

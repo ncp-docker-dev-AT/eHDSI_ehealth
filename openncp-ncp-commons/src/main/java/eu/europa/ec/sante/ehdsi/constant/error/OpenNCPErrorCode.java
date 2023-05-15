@@ -6,7 +6,7 @@ public enum OpenNCPErrorCode implements ErrorCode {
 
     ERROR_GENERIC("ERROR_GENERIC", "Internal Server Error - Please retry or contact the server administrator and inform them of the time the error occurred"),
     WARNING_GENERIC("WARNING_GENERIC", "Internal Server Warning"),
-    ERROR_GENERIC_CONNECTION_NOT_POSSIBLE("ERROR_CONNECTION_NOT_POSSIBLE", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
+    ERROR_GENERIC_CONNECTION_NOT_POSSIBLE("ERROR_GENERIC_CONNECTION_NOT_POSSIBLE", "The Country of Treatment (Country B) is unable to contact the Patient Country of Affiliation."),
     ERROR_GENERIC_DOCUMENT_MISSING("ERROR_GENERIC_DOCUMENT_MISSING", "The document requested was not found"),
     ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN("ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN", "Class code not supported"),
 

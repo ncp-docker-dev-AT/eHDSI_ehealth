@@ -31,7 +31,7 @@
         <xsl:value-of select="n1:name"/>
         <xsl:choose>
             <xsl:when test="pharm:asSpecializedKind">
-                <xsl:variable name="code" select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code"/>
+                <xsl:variable name="code" select="pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code"/>
                 <xsl:choose>
                     <xsl:when test="not($code/@nullFlavor)">
                         <xsl:if test="$code/@codeSystem='2.16.840.1.113883.6.73'">
@@ -49,7 +49,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:text> - </xsl:text>
-                        <xsl:value-of select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:name"/>
+                        <xsl:value-of select="pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:name"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
