@@ -76,6 +76,11 @@
                                                         </xsl:call-template>
                                                     </th>
                                                     <th>
+                                                        <!-- Device ID -->
+                                                        <!-- TODO Add Concept to eHDSIDisplayLabel value set -->
+                                                        <xsl:text>Device ID</xsl:text>
+                                                    </th>
+                                                    <th>
                                                         <!-- Implant Date -->
                                                         <xsl:call-template name="show-eHDSIDisplayLabel">
                                                             <xsl:with-param name="code" select="'36'"/>
@@ -98,6 +103,8 @@
     <xsl:template match="n1:entry/n1:supply">
         <xsl:variable name="medDeviceImplant"
                       select="n1:participant[@typeCode='DEV']/n1:participantRole/n1:playingDevice/n1:code"/>
+        <xsl:variable name="medDeviceId"
+                      select="n1:participant[@typeCode='DEV']/n1:participantRole/n1:id"/>
         <xsl:variable name="medDeviceImplantDate"
                       select="n1:effectiveTime"/>
         <xsl:choose>
@@ -109,6 +116,10 @@
                         <xsl:call-template name="show-eHDSIMedicalDevice">
                             <xsl:with-param name="node" select="$medDeviceImplant"/>
                         </xsl:call-template>
+                    </td>
+                    <td>
+                        <!-- Device ID -->
+                        <xsl:apply-templates select="n1:participant[@typeCode='DEV']/n1:participantRole/n1:id"/>
                     </td>
                     <td>
                         <!-- Implant Date -->
@@ -129,4 +140,12 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <xsl:template match="n1:participant[@typeCode='DEV']/n1:participantRole/n1:id">
+        <xsl:call-template name="show-id">
+            <xsl:with-param name="id" select="."/>
+        </xsl:call-template>
+        &#160;
+    </xsl:template>
+
 </xsl:stylesheet>
