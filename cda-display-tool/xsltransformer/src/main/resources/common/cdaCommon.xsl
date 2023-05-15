@@ -26,6 +26,17 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- show-patient-id -->
+    <xsl:template name="show-patient-id">
+        <xsl:param name="id"/>
+        <xsl:if test="not($id/@nullFlavor)">
+            <xsl:if test="$id/@extension">
+                    <xsl:value-of select="$id/@extension"/>
+            </xsl:if>
+        </xsl:if>
+    </xsl:template>
+
+
     <!-- show-performer -->
     <xsl:template name="show-performer">
         <xsl:param name="node"/>

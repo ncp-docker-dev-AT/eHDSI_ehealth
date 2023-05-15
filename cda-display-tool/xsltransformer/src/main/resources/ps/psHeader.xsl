@@ -89,7 +89,7 @@
                                     </xsl:call-template>
                                 </th>
                                 <td>
-                                    <xsl:call-template name="show-id">
+                                    <xsl:call-template name="show-patient-id">
                                         <xsl:with-param name="id" select="n1:id[1]"/>
                                     </xsl:call-template>
                                 </td>
@@ -101,7 +101,7 @@
                                         </xsl:call-template>
                                     </th>
                                     <td>
-                                        <xsl:call-template name="show-id">
+                                        <xsl:call-template name="show-patient-id">
                                             <xsl:with-param name="id" select="n1:id[2]"/>
                                         </xsl:call-template>
                                     </td>
