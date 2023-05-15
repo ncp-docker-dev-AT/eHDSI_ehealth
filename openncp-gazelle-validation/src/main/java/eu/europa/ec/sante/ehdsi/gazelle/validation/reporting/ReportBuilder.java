@@ -29,28 +29,23 @@ public class ReportBuilder {
     private static final boolean GAZELLE_FORMATTED_REPORT;
 
     static {
-        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
-        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance().getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
+        GAZELLE_HTML_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance()
+                .getConfiguration().getProperty("GAZELLE_HTML_REPORT"));
+        GAZELLE_FORMATTED_REPORT = Boolean.parseBoolean((String) GazelleConfiguration.getInstance()
+                .getConfiguration().getProperty("GAZELLE_FORMATTED_REPORT"));
     }
 
     private ReportBuilder() {
     }
 
-    /**
-     * @param reportDate
-     * @param model
-     * @param objectType
-     * @param validationObject
-     * @param ncpSide
-     * @return
-     */
-    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject, final NcpSide ncpSide) {
+    public static boolean build(final String reportDate, final String model, final String objectType,
+                                final String validationObject, final NcpSide ncpSide) {
 
         return build(reportDate, model, objectType, validationObject, null, null, ncpSide);
     }
 
     /**
-     * This is the main operation in the report building process. It main responsibility is to generate a report based
+     * This is the main operation in the report building process. Its main responsibility is to generate a report based
      * on a supplied model, validation object and detailed result.
      *
      * @param model            the model used in the Web Service invocation.
@@ -58,8 +53,9 @@ public class ReportBuilder {
      * @param validationResult the validation result.
      * @return A boolean flag, indicating if the reporting process succeed or not.
      */
-    public static boolean build(final String reportDate, final String model, final String objectType, final String validationObject,
-                                final DetailedResult validationResult, String validationResponse, final NcpSide ncpSide) {
+    public static boolean build(final String reportDate, final String model, final String objectType,
+                                final String validationObject, final DetailedResult validationResult,
+                                String validationResponse, final NcpSide ncpSide) {
 
         String sideFolder;
         if (ncpSide == null || StringUtils.isEmpty(ncpSide.getName())) {
@@ -130,7 +126,7 @@ public class ReportBuilder {
                     LOGGER.info("HTML:\n{}", reportTransformer.getHtmlReport());
                     htmlReport.write(reportTransformer.getHtmlReport());
                 } catch (IOException e) {
-                    LOGGER.error("An I/O error has occurred while writting the HTML report file, please check the stack trace for more information.", e);
+                    LOGGER.error("An I/O error has occurred while writing the HTML report file, please check the stack trace for more information.", e);
                 }
             }
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(reportFile.getAbsoluteFile()))) {
@@ -160,7 +156,6 @@ public class ReportBuilder {
                 LOGGER.error("An I/O error has occurred while writing the report file, please check the stack trace for more information.", ex);
                 return false;
             }
-
         }
         return false;
     }
@@ -173,26 +168,28 @@ public class ReportBuilder {
      * @param validationTestResult the validation result object.
      * @return a report file name.
      */
-    private static String buildReportFileName(final String reportDate, final String model, final String objectType, final String validationTestResult) {
+    private static String buildReportFileName(final String reportDate, final String model, final String objectType,
+                                              final String validationTestResult) {
 
         final String SEPARATOR = "_";
         final String FILE_EXTENSION = ".xml";
-        final String modelNormalized = model.replace(" ", "-");
+        String modelNormalized = model.replace(" ", "-");
+        modelNormalized = modelNormalized.replace(":", "_");
 
         StringBuilder fileName = new StringBuilder();
         fileName.append(reportDate);
 
-        if (objectType != null && !objectType.isEmpty()) {
+        if (StringUtils.isNotBlank(objectType)) {
             fileName.append(SEPARATOR);
             fileName.append(objectType);
         }
 
-        if (modelNormalized != null && !modelNormalized.isEmpty()) {
+        if (StringUtils.isNotBlank(modelNormalized)) {
             fileName.append(SEPARATOR);
             fileName.append(modelNormalized.toUpperCase());
         }
 
-        if (validationTestResult != null && !validationTestResult.isEmpty()) {
+        if (StringUtils.isNotBlank(validationTestResult)) {
             fileName.append(SEPARATOR);
             fileName.append(validationTestResult.toUpperCase());
         } else {

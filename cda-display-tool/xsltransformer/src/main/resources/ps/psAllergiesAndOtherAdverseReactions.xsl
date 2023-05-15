@@ -242,8 +242,8 @@
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:call-template name="show-eHDSINullFlavor">
-                    <xsl:with-param name="code" select="n1:code/@nullFlavor"/>
+                <xsl:call-template name="handle-nullFlavor">
+                    <xsl:with-param name="node" select="n1:code"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>

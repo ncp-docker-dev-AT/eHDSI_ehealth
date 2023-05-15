@@ -314,12 +314,12 @@
     </xsl:template>
 
     <xsl:template name="show-medicinalProduct">
-        <xsl:variable name="generalizedMedicineClassCode"
-                      select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code"/>
+        <xsl:variable name="generalizedMaterialKindCode"
+                      select="pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code"/>
         <xsl:choose>
-            <xsl:when test="$generalizedMedicineClassCode and not($generalizedMedicineClassCode/@nullFlavor)">
+            <xsl:when test="$generalizedMaterialKindCode and not($generalizedMaterialKindCode/@nullFlavor)">
                 <xsl:call-template name="show-eHDSIActiveIngredient">
-                    <xsl:with-param name="node" select="$generalizedMedicineClassCode"/>
+                    <xsl:with-param name="node" select="$generalizedMaterialKindCode"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
