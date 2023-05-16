@@ -5,7 +5,7 @@
     <parent>
         <artifactId>openncp-gateway</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>6.2.1-SNAPSHOT</version>
+        <version>6.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <passay.version>1.6.1</passay.version>
         <poi-ooxml.version>5.2.2</poi-ooxml.version>
         <querydsl.version>5.0.0</querydsl.version>
-        <spring-boot.version>2.7.8</spring-boot.version>
+        <spring-boot.version>2.7.11</spring-boot.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <xmlbean.version>5.0.3</xmlbean.version>
     </properties>
@@ -100,7 +100,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/rfc_3881.xsd</source>
+                                <source>src/main/resources/RFC3881.xsd</source>
                             </sources>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>
@@ -133,9 +133,10 @@
             <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql-connector.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -177,6 +178,7 @@
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>${mariadb-connector.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.querydsl</groupId>

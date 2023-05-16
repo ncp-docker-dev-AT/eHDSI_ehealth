@@ -2,8 +2,6 @@ package fi.kela.se.epsos.data.model;
 
 import fi.kela.se.epsos.data.model.SearchCriteria.Criteria;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -16,12 +14,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 /**
  * @author jgoncalves
  */
 public class SearchCriteriaImplTest {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchCriteriaImplTest.class);
 
     public SearchCriteriaImplTest() {
     }
@@ -38,19 +37,46 @@ public class SearchCriteriaImplTest {
     }
 
     /**
-     * Test of asXml method, of class SearchCriteriaImpl.
+     * Test of testAddPatientId() method, of class SearchCriteriaImpl.
+     */
+    @Test
+    public void testAddPatientId() {
+
+
+        String patientId = "0QROL2G9M";
+        SearchCriteria criteria = new SearchCriteriaImpl();
+        criteria.addPatientId(patientId);
+        assertEquals("0QROL2G9M", criteria.getPatientId().getExtension());
+        assertNull(criteria.getPatientId().getRoot());
+
+        patientId = "1501987681058^^^&2.16.17.710.822.1000.990.1&ISO";
+        criteria.addPatientId(patientId);
+        assertEquals("2.16.17.710.822.1000.990.1", criteria.getPatientId().getRoot());
+        assertEquals("1501987681058", criteria.getPatientId().getExtension());
+
+        patientId = "1501987681058^^^&amp;2.16.17.710.822.1000.990.1&amp;ISO";
+        criteria.addPatientId(patientId);
+        assertEquals("2.16.17.710.822.1000.990.1", criteria.getPatientId().getRoot());
+        assertEquals("1501987681058", criteria.getPatientId().getExtension());
+    }
+
+
+    /**
+     * Test of testAsXml() method, of class SearchCriteriaImpl.
+     *
+     * @throws TransformerException - If XML fragment cannot be parsed properly
      */
     @Test
     public void testAsXml() throws TransformerException {
 
         String patientId = "23q2e";
         String docId = "29846534324.123453";
-        SearchCriteria sc = new SearchCriteriaImpl();
-        sc.add(Criteria.PATIENT_ID, patientId);
-        sc.add(Criteria.DOCUMENT_ID, docId);
-        Document doc = sc.asXml();
-        Element e = doc.getDocumentElement();
-        String str = convertElementToString(e);
-        LOGGER.info("testAsXml(): '{}'", str);
+        SearchCriteria searchCriteria = new SearchCriteriaImpl();
+        searchCriteria.add(Criteria.PATIENT_ID, patientId);
+        searchCriteria.add(Criteria.DOCUMENT_ID, docId);
+        Document doc = searchCriteria.asXml();
+        Element element = doc.getDocumentElement();
+        String str = convertElementToString(element);
+        assertEquals("<SearchCriteria><PatientId>23q2e</PatientId><DocumentId>29846534324.123453</DocumentId></SearchCriteria>", str);
     }
 }

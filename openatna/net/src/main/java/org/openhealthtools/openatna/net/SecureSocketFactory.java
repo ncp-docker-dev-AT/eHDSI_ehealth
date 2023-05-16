@@ -1,32 +1,9 @@
-/**
- * Copyright (c) 2009-2011 Misys Open Source Solutions (MOSS) and others
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- * <p>
- * Contributors:
- * Misys Open Source Solutions - initial API and implementation
- * -
- */
-
 package org.openhealthtools.openatna.net;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -41,7 +18,7 @@ import java.security.NoSuchAlgorithmException;
  * Used by the connection factory to create customized secure sockets. <p> SecureSocketFactory can be used to validate
  * the identity of the HTTPS server against a list of trusted certificates and to authenticate to the HTTPS server using
  * a private key. </p> <p/> <p> SecureSocketFactory will enable server authentication when supplied with a {@link
- * KeyStore truststore} file containg one or several trusted certificates. The client secure socket will reject the
+ * KeyStore truststore} file contain one or several trusted certificates. The client secure socket will reject the
  * connection during the SSL session handshake if the target HTTPS server attempts to authenticate itself with a
  * non-trusted certificate. </p> <p/> <p> Use JDK keytool utility to import a trusted certificate and generate a
  * truststore file:
@@ -97,47 +74,38 @@ import java.security.NoSuchAlgorithmException;
  *     client.executeMethod(httpget);
  *     </pre>
  * </p>
- *
- * @author Josh Flachsbart
  */
-
-public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
-
-    /**
-     * Log object for this class.
-     */
+public class SecureSocketFactory {
 
     static Logger log = LoggerFactory.getLogger("org.openhealthtools.openatna.net.SecureSocketFactory");
-
-    private URL keystoreUrl = null;
-    private String keystorePassword = null;
-    private URL truststoreUrl = null;
-    private String truststorePassword = null;
+    private final SecureConnectionDescription scd;
+    private final URL keystoreUrl;
+    private final String keystorePassword;
+    private final URL truststoreUrl;
+    private final String truststorePassword;
     private SSLContext sslcontext = null;
-    private SecureConnectionDescription scd;
 
     /**
-     * Constructor for HttpStreamHandler. Either a keystore or truststore file must be given. Otherwise SSL context
-     * initialization error will result.
+     * Constructor for HttpStreamHandler. Either a keystore or truststore file must be given.
+     * Otherwise, SSL context initialization error will result.
      *
-     * @param scd The secure connection description
+     * @param secureConnectionDescription The secure connection description
      */
-    public SecureSocketFactory(SecureConnectionDescription scd) {
+    public SecureSocketFactory(SecureConnectionDescription secureConnectionDescription) {
         super();
-
-        this.keystoreUrl = scd.getKeyStore();
-        this.keystorePassword = scd.getKeyStorePassword();
-        this.truststoreUrl = scd.getTrustStore();
-        this.truststorePassword = scd.getTrustStorePassword();
-        this.scd = scd;
+        this.keystoreUrl = secureConnectionDescription.getKeyStore();
+        this.keystorePassword = secureConnectionDescription.getKeyStorePassword();
+        this.truststoreUrl = secureConnectionDescription.getTrustStore();
+        this.truststorePassword = secureConnectionDescription.getTrustStorePassword();
+        this.scd = secureConnectionDescription;
     }
 
     private SSLContext createSSLContext() throws IOException {
 
         try {
             log.debug("Attempting to create ssl context.");
-            KeyManager[] keymanagers = null;
-            TrustManager[] trustmanagers = null;
+            KeyManager[] keyManagers;
+            TrustManager[] trustManagers = null;
             if (this.keystoreUrl == null) {
                 throw new IOException("Cannot create SSL context without keystore");
             } else {
@@ -146,7 +114,7 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
                 if (log.isDebugEnabled()) {
                     ConnectionCertificateHandler.printKeyCertificates(keystore);
                 }
-                keymanagers = ConnectionCertificateHandler.createKeyManagers(keystore, this.keystorePassword);
+                keyManagers = ConnectionCertificateHandler.createKeyManagers(keystore, this.keystorePassword);
             }
             if (this.truststoreUrl != null) {
                 KeyStore keystore = ConnectionCertificateHandler
@@ -154,10 +122,10 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
                 if (log.isDebugEnabled()) {
                     ConnectionCertificateHandler.printTrustCerts(keystore);
                 }
-                trustmanagers = ConnectionCertificateHandler.createTrustManagers(keystore, this.scd);
+                trustManagers = ConnectionCertificateHandler.createTrustManagers(keystore, this.scd);
             }
             SSLContext sslcontext = SSLContext.getInstance("TLSv1.2");
-            sslcontext.init(keymanagers, trustmanagers, null);
+            sslcontext.init(keyManagers, trustManagers, null);
 
             return sslcontext;
         } catch (NoSuchAlgorithmException e) {
@@ -204,9 +172,6 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
                 "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_DES_CBC_SHA"};
     }
 
-    /**
-     * @see SecureProtocolSocketFactory#createSocket(java.lang.String, int, java.net.InetAddress, int)
-     */
     public Socket createSocket(String host, int port, InetAddress clientHost, int clientPort) {
         Socket socket = null;
         try {
@@ -222,9 +187,6 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
         return socket;
     }
 
-    /**
-     * @see SecureProtocolSocketFactory#createSocket(java.lang.String, int)
-     */
     public Socket createSocket(String host, int port) {
         Socket socket = null;
         try {
@@ -240,9 +202,6 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
         return socket;
     }
 
-    /**
-     * @see SecureProtocolSocketFactory#createSocket(java.net.Socket, java.lang.String, int, boolean)
-     */
     public Socket createSocket(Socket socket, String host, int port, boolean autoClose) {
         Socket lsocket = null;
         try {
@@ -258,35 +217,25 @@ public class SecureSocketFactory {//implements SecureProtocolSocketFactory {
         return lsocket;
     }
 
-    /*public Socket createSocket(String host, int port, InetAddress clientHost, int clientPort, HttpConnectionParams params) {
-         Socket lsocket = null;
-         try {
-             lsocket = getSSLContext().getSocketFactory().createSocket(host, port, clientHost, clientPort);
-             setAtnaProtocols((SSLSocket) lsocket);
-         } catch (java.net.ConnectException e) {
-             log.error("Connection was refused when connecting to socket.", e);
-         } catch (IOException e) {
-             log.error("I/O problem creating socket.", e);
-         } catch (Exception e) {
-             log.error("Problem creating socket.", e);
-         }
-         return lsocket;
-     }*/
-
     /**
      * Extra socket creation for servers only.
      */
     public ServerSocket createServerSocket(int port) {
-        javax.net.ssl.SSLServerSocket ss = null;
+        log.info("createServerSocket on port: '{}'", port);
+        SSLServerSocket sslServerSocket = null;
         try {
-            ss = (javax.net.ssl.SSLServerSocket) getSSLContext().getServerSocketFactory().createServerSocket(port);
-            ss.setNeedClientAuth(true);
-            String[] strings = {"SSL_RSA_WITH_NULL_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA",
-                    "SSL_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_DES_CBC_SHA"};
-            ss.setEnabledCipherSuites(strings);
+            sslServerSocket = (SSLServerSocket) getSSLContext().getServerSocketFactory().createServerSocket(port);
+            //sslServerSocket.setNeedClientAuth(true);
+            sslServerSocket.setWantClientAuth(true);
+            String[] strings = {
+                    "SSL_RSA_WITH_NULL_SHA",
+                    "TLS_RSA_WITH_AES_128_CBC_SHA",
+                    "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+                    "SSL_RSA_WITH_DES_CBC_SHA"};
+            sslServerSocket.setEnabledCipherSuites(strings);
         } catch (IOException e) {
             log.error("I/O problem creating server socket.", e);
         }
-        return ss;
+        return sslServerSocket;
     }
 }

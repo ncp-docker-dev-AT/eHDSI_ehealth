@@ -18,15 +18,13 @@ import java.util.concurrent.Executors;
 public class AtnaServer {
 
     private final Logger logger = LoggerFactory.getLogger(AtnaServer.class);
-
     private final IConnectionDescription tlsConnection;
     private final IConnectionDescription udpConnection;
+    private final boolean nio;
+    private final ExecutorService exec;
     private Server tcpServer = null;
     private Server udpServer = null;
-    private final boolean nio;
     private MessageQueue queue = null;
-
-    private final ExecutorService exec;
 
     public AtnaServer(IConnectionDescription tlsConnection, IConnectionDescription udpConnection, int threads, boolean nio) {
         this.tlsConnection = tlsConnection;
@@ -40,6 +38,8 @@ public class AtnaServer {
     }
 
     public void start(SyslogListener listener) {
+
+        logger.info("[ATNAServer] Server starting...");
         queue = new MessageQueue(listener);
         queue.start();
         if (tlsConnection != null) {
@@ -61,7 +61,8 @@ public class AtnaServer {
     }
 
     public void stop() {
-        logger.info("AtnaServer shutting down...");
+
+        logger.info("[ATNAServer] Server shutdown...");
         if (tcpServer != null) {
             tcpServer.stop();
         }
@@ -71,7 +72,6 @@ public class AtnaServer {
         if (queue != null) {
             queue.stop();
         }
-
         exec.shutdown();
     }
 

@@ -8,7 +8,7 @@ import java.net.URL;
 /**
  * A description of a secure (SSL/TLS) connection. <p />
  * <p/>
- * This description contains all of the additional information required by secure connections.
+ * This description contains all the additional information required by secure connections.
  * In general this should be obtained by a call to the getConnectionDescription function
  * in the ConnectionFactory, and not created directly.
  *
@@ -34,6 +34,7 @@ public class SecureConnectionDescription extends StandardConnectionDescription {
     /* (non-Javadoc)
      * @see org.openhealthtools.openatna.net.IConnectionDescription#isSecure()
      */
+    @Override
     public boolean isSecure() {
         return true;
     }
@@ -43,6 +44,7 @@ public class SecureConnectionDescription extends StandardConnectionDescription {
      * <p/>
      * Currently bidirectional authentication is true.
      */
+    @Override
     public boolean complete() {
         boolean complete = super.complete();
         //If there is an invoked level, the description is not finished processing.
@@ -50,8 +52,8 @@ public class SecureConnectionDescription extends StandardConnectionDescription {
             return false;
         }
         //  one directional or no authentication may work.
-        if (((keyStorePassword != null && keyStoreLocation != null)) &&
-                ((trustStorePassword != null && trustStoreLocation != null))) {
+        if ((keyStorePassword != null && keyStoreLocation != null) &&
+                (trustStorePassword != null && trustStoreLocation != null)) {
             this.complete = complete;
         } else {
             LOGGER.warn("Attempt to complete invalid secure connection description.");
