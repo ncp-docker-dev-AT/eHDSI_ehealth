@@ -36,9 +36,9 @@ import java.util.Map;
 public class AuditServiceImpl implements AuditService {
 
     private final Logger logger = LoggerFactory.getLogger(AuditServiceImpl.class);
+    private final ProcessorChain chain = new ProcessorChain();
     private ServerConfiguration serverConfig;
     private ServiceConfiguration serviceConfig = new ServiceConfiguration();
-    private ProcessorChain chain = new ProcessorChain();
     private AtnaServer syslogServer;
     private FailedLogsHandlerService failedLogsHandlerService = null;
 
@@ -74,7 +74,9 @@ public class AuditServiceImpl implements AuditService {
             if (servers.isEmpty()) {
                 logger.warn("Could not start service. No AtnaServers were loaded!");
             } else {
-
+                for (AtnaServer atnaServer : servers) {
+                    logger.info("Server: '{}'", atnaServer.getTlsConnection().getName());
+                }
                 this.syslogServer = servers.get(0);
                 if (syslogServer != null) {
 
@@ -95,19 +97,17 @@ public class AuditServiceImpl implements AuditService {
             serviceConfig.addCodeUrl(defCodes.toString());
         }
         CodeParser.parse(serviceConfig.getCodeUrls());
-        List<AtnaCode> l = CodeRegistry.allCodes();
-        CodeDao dao = AtnaFactory.codeDao();
-        for (AtnaCode atnaCode : l) {
+        List<AtnaCode> atnaCodes = CodeRegistry.allCodes();
+        CodeDao codeDao = AtnaFactory.codeDao();
+        for (AtnaCode atnaCode : atnaCodes) {
 
             CodeEntity ce = EntityConverter.createCode(atnaCode, EntityConverter.getCodeType(atnaCode));
-            PersistencePolicies pp = new PersistencePolicies();
-            pp.setErrorOnDuplicateInsert(false);
-            pp.setAllowNewCodes(true);
+            PersistencePolicies policies = new PersistencePolicies();
+            policies.setErrorOnDuplicateInsert(false);
+            policies.setAllowNewCodes(true);
             try {
-                if (dao.save(ce, pp)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Saving loaded codes: '{}'", atnaCode);
-                    }
+                if (codeDao.save(ce, policies) && logger.isDebugEnabled()) {
+                    logger.debug("Saving loaded codes: '{}'", atnaCode);
                 }
             } catch (AtnaPersistenceException e) {
                 logger.error("Exception thrown while storing code: '{}'", e.getMessage(), e);

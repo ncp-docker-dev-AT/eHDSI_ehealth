@@ -21,8 +21,8 @@ import java.nio.charset.StandardCharsets;
 public class TcpServer implements Server {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TcpServer.class);
-    private AtnaServer atnaServer;
-    private IConnectionDescription tlsConnection;
+    private final AtnaServer atnaServer;
+    private final IConnectionDescription tlsConnection;
     private IServerConnection tlsConn = null;
     private boolean running = false;
     private TcpServerThread thread;
@@ -39,7 +39,7 @@ public class TcpServer implements Server {
         running = true;
         thread = new TcpServerThread(ss);
         thread.start();
-        LOGGER.info("TLS Server running on port:" + tlsConnection.getPort());
+        LOGGER.info("TLS Secured Server running on port: '{}'", tlsConnection.getPort());
     }
 
     public void stop() {
@@ -56,7 +56,7 @@ public class TcpServer implements Server {
 
     private class TcpServerThread extends Thread {
 
-        private ServerSocket server;
+        private final ServerSocket server;
 
         public TcpServerThread(ServerSocket server) {
             this.server = server;
@@ -102,7 +102,7 @@ public class TcpServer implements Server {
     }
 
     private class WorkerThread extends Thread {
-        private Socket socket;
+        private final Socket socket;
 
         private WorkerThread(Socket socket) {
             this.socket = socket;
