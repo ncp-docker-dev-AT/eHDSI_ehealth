@@ -2,18 +2,18 @@ package epsos.openncp.protocolterminator;
 
 import epsos.openncp.protocolterminator.clientconnector.*;
 import epsos.openncp.pt.client.ClientConnectorServiceStub;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.AssertionHelper;
 import eu.europa.ec.sante.ehdsi.openncp.evidence.utils.OutFlowEvidenceEmitterHandler;
-import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.HandlerDescription;
 import org.apache.axis2.engine.Phase;
-import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.kernel.http.HTTPConstants;
+import org.apache.axis2.phaseresolver.PhaseException;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
@@ -139,7 +139,7 @@ public class ClientConnectorConsumer {
         } catch (ClientConnectorConsumerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_PI_GENERIC, ex.getMessage(), null,  ex);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_PI_GENERIC, ex.getMessage(), null, ex);
         }
     }
 
@@ -274,7 +274,7 @@ public class ClientConnectorConsumer {
                                Map<AssertionEnum, Assertion> assertions) throws Exception {
 
         if (!assertions.containsKey(AssertionEnum.CLINICIAN)) {
-            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_HPI_AUTHENTICATION_NOT_RECEIVED, "HCP Assertion expired", null);
+            throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_GENERIC, "HCP Assertion element is required.", null);
         }
 
         if (AssertionHelper.isExpired(assertions.get(AssertionEnum.CLINICIAN))) {
@@ -325,7 +325,7 @@ public class ClientConnectorConsumer {
 
             return builder.build();
         } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | CertificateException |
-                IOException | KeyManagementException e) {
+                 IOException | KeyManagementException e) {
             throw new ClientConnectorConsumerException(OpenNCPErrorCode.ERROR_SEC_DATA_INTEGRITY_NOT_ENSURED, "SSL Context cannot be initialized: " + e.getMessage(), null, e);
         }
     }
@@ -448,10 +448,10 @@ public class ClientConnectorConsumer {
         }
     }
 
-    private ClientConnectorConsumerException createClientConnectorConsumerException(AxisFault axisFault){
+    private ClientConnectorConsumerException createClientConnectorConsumerException(AxisFault axisFault) {
 
         String errorCode = axisFault.getFaultCode() != null ? axisFault.getFaultCode().getLocalPart() : null;
-        String message  = axisFault.getMessage();
+        String message = axisFault.getMessage();
         String context = axisFault.getDetail() != null ? axisFault.getDetail().getText() : null;
 
         OpenNCPErrorCode openncpErrorCode = OpenNCPErrorCode.getErrorCode(errorCode);

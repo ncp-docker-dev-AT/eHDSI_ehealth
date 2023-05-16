@@ -545,7 +545,7 @@ public class RespondingGateway_ServiceStub extends Stub {
 
                         throw new java.rmi.RemoteException(ex.getMessage(), ex);
 
-                        /* we cannot intantiate the class - throw the original Axis fault */
+                        /* we cannot instantiate the class - throw the original Axis fault */
                     } catch (Exception e) {
                         eadcError = e.getMessage();
                         throw new RuntimeException(e.getMessage(), e);
