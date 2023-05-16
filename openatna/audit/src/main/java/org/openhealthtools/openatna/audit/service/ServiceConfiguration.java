@@ -1,58 +1,24 @@
-/**
- *  Copyright (c) 2009-2011 University of Cardiff and others
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- *  implied. See the License for the specific language governing
- *  permissions and limitations under the License.
- *
- *  Contributors:
- *    University of Cardiff - initial API and implementation
- *    -
- */
-
 package org.openhealthtools.openatna.audit.service;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openhealthtools.openatna.audit.persistence.PersistencePolicies;
 import org.openhealthtools.openatna.audit.process.ProcessorChain;
 import org.openhealthtools.openatna.syslog.LogMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author Andrew Harrison
- * @version $Revision:$
- * @created Oct 24, 2009: 4:39:30 PM
- * @date $Date:$ modified by $Author:$
- */
+import java.util.*;
 
 public class ServiceConfiguration {
 
-    private static Log log = LogFactory.getLog("org.openhealthtools.openatna.audit.service.ServiceConfiguration");
+    private final Logger logger = LoggerFactory.getLogger(ServiceConfiguration.class);
 
     private PersistencePolicies persistencePolicies = new PersistencePolicies();
     private Class<? extends LogMessage> logMessageClass;
-    private List<String> preVerifyProcessors = new ArrayList<String>();
-    private List<String> postVerifyProcessors = new ArrayList<String>();
-    private List<String> postPersistProcessors = new ArrayList<String>();
-
+    private List<String> preVerifyProcessors = new ArrayList<>();
+    private List<String> postVerifyProcessors = new ArrayList<>();
+    private List<String> postPersistProcessors = new ArrayList<>();
     private boolean validationProcessor = true;
-    private Set<String> codeUrls = new HashSet<String>();
+    private Set<String> codeUrls = new HashSet<>();
 
 
     public PersistencePolicies getPersistencePolicies() {
@@ -72,7 +38,7 @@ public class ServiceConfiguration {
     }
 
     public Map<ProcessorChain.PHASE, List<String>> getProcessors() {
-        Map<ProcessorChain.PHASE, List<String>> map = new HashMap<ProcessorChain.PHASE, List<String>>();
+        Map<ProcessorChain.PHASE, List<String>> map = new HashMap<>();
         map.put(ProcessorChain.PHASE.PRE_VERIFY, preVerifyProcessors);
         map.put(ProcessorChain.PHASE.POST_VERIFY, postVerifyProcessors);
         map.put(ProcessorChain.PHASE.POST_PERSIST, postPersistProcessors);
@@ -128,7 +94,6 @@ public class ServiceConfiguration {
                 break;
             default:
                 break;
-
         }
     }
 

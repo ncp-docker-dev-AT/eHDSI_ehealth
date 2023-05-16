@@ -3,7 +3,7 @@
     <CodeType name="EventId">
         <Code code="110100" codingScheme="DCM" display="Application Activity"/>
         <Code code="110101" codingScheme="DCM" display="Audit Log Used"/>
-        <Code code="110102" codingScheme="DCM" display="Being Transfering DICOM Instances"/>
+        <Code code="110102" codingScheme="DCM" display="Being Transferring DICOM Instances"/>
         <Code code="110103" codingScheme="DCM" display="DICOM Instances Accessed"/>
         <Code code="110104" codingScheme="DCM" display="DICOM Instances Transferred"/>
         <Code code="110105" codingScheme="DCM" display="DICOM Study Deleted"/>
@@ -12,7 +12,7 @@
         <Code code="110108" codingScheme="DCM" display="Network Entry"/>
         <Code code="110109" codingScheme="DCM" display="Order Record"/>
         <Code code="110110" codingScheme="DCM" display="Patient Record"/>
-        <Code code="110111" codingScheme="DCM" display="Proceedure Record"/>
+        <Code code="110111" codingScheme="DCM" display="Procedure Record"/>
         <Code code="110112" codingScheme="DCM" display="Query"/>
         <Code code="110113" codingScheme="DCM" display="Security Alert"/>
         <Code code="110114" codingScheme="DCM" display="User Authentication"/>
@@ -71,7 +71,7 @@
         <Code code="110129" codingScheme="DCM" display="Security Configuration"/>
         <Code code="110130" codingScheme="DCM" display="Hardware Configuration"/>
         <Code code="110131" codingScheme="DCM" display="Software Configuration"/>
-        <Code code="110132" codingScheme="DCM" display="Use of Restritcted Function"/>
+        <Code code="110132" codingScheme="DCM" display="Use of Restricted Function"/>
         <Code code="110133" codingScheme="DCM" display="Audit Recording Stopped"/>
         <Code code="110134" codingScheme="DCM" display="Audit Recording Started"/>
         <Code code="110135" codingScheme="DCM" display="Object Security Attributes Changed"/>
@@ -90,7 +90,7 @@
         <Code code="6" codingScheme="RFC-3881" display="Account Number"/>
         <Code code="7" codingScheme="RFC-3881" display="Guarantor Number"/>
         <Code code="8" codingScheme="RFC-3881" display="Report Name"/>
-        <Code code="9" codingScheme="RFC-3881" display="Report Nunber"/>
+        <Code code="9" codingScheme="RFC-3881" display="Report Number"/>
         <Code code="10" codingScheme="RFC-3881" display="Search Criteria"/>
         <Code code="11" codingScheme="RFC-3881" display="User Identifier"/>
         <Code code="12" codingScheme="RFC-3881" display="URI"/>

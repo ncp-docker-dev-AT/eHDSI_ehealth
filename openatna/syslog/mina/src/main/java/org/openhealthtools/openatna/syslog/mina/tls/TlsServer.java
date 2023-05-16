@@ -53,6 +53,7 @@ public class TlsServer implements Notifier {
         if (ctx != null) {
             logger.info("Communication over TLS enabled...");
             SSLFilter sslFilter = new SSLFilter(ctx);
+            //sslFilter.setNeedClientAuth(true);
             chain.addLast("sslFilter", sslFilter);
         }
         chain.addLast("codec", new ProtocolCodecFilter(new SyslogProtocolCodecFactory()));
@@ -65,7 +66,6 @@ public class TlsServer implements Notifier {
             }
         }
         logger.info("TLS Server started on port: '{}'", tlsconfig.getPort());
-
     }
 
     public void stop() {

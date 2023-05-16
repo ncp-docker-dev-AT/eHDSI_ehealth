@@ -25,7 +25,6 @@ import java.util.Set;
 public class ServerConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(ServerConfiguration.class);
-
     private final Set<AtnaServer> servers = new HashSet<>();
     private String actorDir;
     private String actorFile;
