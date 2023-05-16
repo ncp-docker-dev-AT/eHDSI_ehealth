@@ -13,8 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
-import javax.net.ssl.*;
-import java.io.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -25,7 +30,7 @@ import java.util.TimeZone;
 
 /**
  * Thread for sending the messages to the syslog repository. Each message is being sent using a different thread.
- * If a message can't be send immediately, it tries for a time interval.
+ * If a message can't be sent immediately, it tries for a time interval.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -43,86 +48,6 @@ public class MessageSender {
     private AuditLogSerializer auditLogSerializer;
     private String facility;
     private String severity;
-
-    public static void main(String[] args) throws Exception {
-
-        String[] protocols = new String[]{"TLSv1.2"};
-        //String[] cipher_suites = new String[]{"TLS_AES_128_GCM_SHA256"};
-        SSLSocket socket = null;
-        PrintWriter out = null;
-        BufferedReader in = null;
-
-        try {
-
-            // Install the all-trusting trust manager
-            var keyStore = KeyStore.getInstance("JKS");
-            var keystoreInputStream = new FileInputStream(ResourceUtils.getFile("/opt/ehealth-openncp/openncp-configuration/security/keystore/tls-eu-keystore.jks"));
-            keyStore.load(keystoreInputStream, "MyKeystorePwd".toCharArray());
-
-
-            KeyStore trustStore = KeyStore.getInstance("JKS");
-            var is = new FileInputStream(ResourceUtils.getFile("/opt/ehealth-openncp/openncp-configuration/security/keystore/eu-truststore.jks"));
-            trustStore.load(is, "changeit".toCharArray());
-
-            //SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            SSLSocketFactory factory = createSSLSocketFactory(keyStore, trustStore);
-            socket =
-                    (SSLSocket) factory.createSocket("127.0.0.1", 2862);
-
-            socket.setEnabledProtocols(enabledProtocols);
-            socket.setEnabledCipherSuites(socket.getSupportedCipherSuites());
-
-            socket.startHandshake();
-            System.out.println("Socket: " + socket.getNeedClientAuth());
-            for (String cipher : socket.getSupportedCipherSuites()) {
-                System.out.println("Socket: " + cipher);
-            }
-            out = new PrintWriter(
-                    new BufferedWriter(
-                            new OutputStreamWriter(
-                                    socket.getOutputStream())));
-
-            out.println("GET / HTTP/1.0");
-            out.println();
-            out.flush();
-
-            if (out.checkError())
-                System.out.println("SSLSocketClient:  java.io.PrintWriter error");
-
-            /* read response */
-            in = new BufferedReader(
-                    new InputStreamReader(
-                            socket.getInputStream()));
-
-            String inputLine;
-            while ((inputLine = in.readLine()) != null)
-                System.out.println(inputLine);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (socket != null)
-                socket.close();
-            if (out != null)
-                out.close();
-            if (in != null)
-                in.close();
-        }
-    }
-
-    private static SSLSocketFactory createSSLSocketFactory(KeyStore keyStore, KeyStore trustStore) throws GeneralSecurityException {
-
-        var keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-        keyManagerFactory.init(keyStore, "MyKeystorePwd".toCharArray());
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(trustStore);
-        TrustManager[] trustManagers = tmf.getTrustManagers();
-
-        SSLContext sslContext = SSLContext.getInstance("SSL");
-        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagers, null);
-        return sslContext.getSocketFactory();
-    }
 
     /**
      * @param auditLogSerializer
@@ -190,7 +115,7 @@ public class MessageSender {
      * @param auditMessage
      * @param facility
      * @param severity
-     * @return true/false depending of the success of sending the message
+     * @return true/false depending on the success of sending the message
      */
     private boolean sendMessage(String auditMessage, String facility, String severity) {
 
@@ -199,9 +124,9 @@ public class MessageSender {
         String facsev = facility + severity;
 
         try {
-            //  sslsocket = createAuditSecuredSocket();
-            sslsocket = buildSSLSocket();
-        } catch (IOException | GeneralSecurityException e) {
+            //  EHEALTH-9771: sslsocket = buildSSLSocket();
+            sslsocket = createAuditSecuredSocket();
+        } catch (IOException e) {
             logger.error("IOException: Cannot contact Secured Audit Server '{}'", e.getMessage());
             return false;
         }

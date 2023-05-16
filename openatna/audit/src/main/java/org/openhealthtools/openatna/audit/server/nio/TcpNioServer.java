@@ -50,6 +50,7 @@ public class TcpNioServer implements Notifier, Server {
                 SSLContext sslContext = factory.getSSLContext();
                 if (sslContext != null) {
                     SSLFilter sslFilter = new SSLFilter(sslContext);
+                    //  EHEALTH-9771: sslFilter.setWantClientAuth(true);
                     sslFilter.setNeedClientAuth(true);
                     sslFilter.setEnabledProtocols(factory.getAtnaProtocols());
                     sslFilter.setEnabledCipherSuites(factory.getAtnaCipherSuites());
