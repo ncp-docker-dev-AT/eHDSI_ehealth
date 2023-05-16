@@ -147,6 +147,7 @@
             <xs:enumeration value="ES"/>
             <xs:enumeration value="FR"/>
             <xs:enumeration value="HR"/>
+            <xs:enumeration value="IS"/>
             <xs:enumeration value="IT"/>
             <xs:enumeration value="CY"/>
             <xs:enumeration value="LV"/>
@@ -155,6 +156,7 @@
             <xs:enumeration value="HU"/>
             <xs:enumeration value="MT"/>
             <xs:enumeration value="NL"/>
+            <xs:enumeration value="NO"/>
             <xs:enumeration value="AT"/>
             <xs:enumeration value="PL"/>
             <xs:enumeration value="PT"/>
