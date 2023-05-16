@@ -20,9 +20,7 @@ public class OpenATNAServiceLoaderListener implements ApplicationContextAware {
 
         if (service == null) {
             logger.info("[ATNA Service] Starting OpenATNA service...");
-
             AtnaFactory.initialize(context);
-
             service = (AuditService) context.getBean("auditService");
             try {
                 service.start();

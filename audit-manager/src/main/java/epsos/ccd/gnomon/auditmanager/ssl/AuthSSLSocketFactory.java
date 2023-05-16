@@ -20,11 +20,10 @@ import java.util.Enumeration;
 public class AuthSSLSocketFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthSSLSocketFactory.class);
-
+    private final X509TrustManager defaultTrustManager;
     private KeystoreDetails details = null;
     private KeystoreDetails truststore = null;
     private SSLContext sslcontext = null;
-    private X509TrustManager defaultTrustManager;
 
     /**
      * @param details
@@ -141,11 +140,11 @@ public class AuthSSLSocketFactory {
             throw new IllegalArgumentException("Keystore may not be null");
         }
         LOGGER.debug("Initializing key manager");
-        KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(details.getAlgType());
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(details.getAlgType());
         String password = details.getKeyPassword();
-        kmfactory.init(keystore, (password == null || password.length() == 0) ?
+        keyManagerFactory.init(keystore, (password == null || password.length() == 0) ?
                 details.getKeystorePassword().toCharArray() : password.toCharArray());
-        return kmfactory.getKeyManagers();
+        return keyManagerFactory.getKeyManagers();
     }
 
     /**
@@ -162,17 +161,17 @@ public class AuthSSLSocketFactory {
         if (keystore == null) {
             throw new IllegalArgumentException("Keystore may not be null");
         }
-        TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmfactory.init(keystore);
-        TrustManager[] trustmanagers = tmfactory.getTrustManagers();
-        for (TrustManager trustmanager : trustmanagers) {
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keystore);
+        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        for (TrustManager trustmanager : trustManagers) {
 
             if (trustmanager instanceof X509TrustManager) {
                 return new TrustManager[]{
                         new AuthSSLX509TrustManager((X509TrustManager) trustmanager, defaultTrustManager, truststore.getAuthorizedDNs())};
             }
         }
-        return trustmanagers;
+        return trustManagers;
     }
 
     /**
@@ -182,8 +181,8 @@ public class AuthSSLSocketFactory {
     private SSLContext createSSLContext() throws IOException {
 
         try {
-            KeyManager[] keymanagers = null;
-            TrustManager[] trustmanagers = null;
+            KeyManager[] keyManagers = null;
+            TrustManager[] trustManagers = null;
             if (this.details != null) {
                 KeyStore keystore = createKeyStore(details);
                 Enumeration aliases = keystore.aliases();
@@ -206,7 +205,7 @@ public class AuthSSLSocketFactory {
                         }
                     }
                 }
-                keymanagers = createKeyManagers(keystore, details);
+                keyManagers = createKeyManagers(keystore, details);
             }
             if (this.truststore != null) {
                 KeyStore keystore = createKeyStore(truststore);
@@ -225,16 +224,16 @@ public class AuthSSLSocketFactory {
                         LOGGER.debug("   Issuer: '{}'", cert.getIssuerDN());
                     }
                 }
-                trustmanagers = createTrustManagers(truststore, keystore, defaultTrustManager);
+                trustManagers = createTrustManagers(truststore, keystore, defaultTrustManager);
             }
-            if (trustmanagers == null) {
+            if (trustManagers == null) {
                 LOGGER.debug("Created Trust Managers from the default...");
-                trustmanagers = new TrustManager[]{defaultTrustManager};
+                trustManagers = new TrustManager[]{defaultTrustManager};
             }
 
-            SSLContext sslcontextLocal = SSLContext.getInstance("TLSv1.2");
-            sslcontextLocal.init(keymanagers, trustmanagers, null);
-            return sslcontextLocal;
+            SSLContext localSSLContext = SSLContext.getInstance("TLSv1.2");
+            localSSLContext.init(keyManagers, trustManagers, null);
+            return localSSLContext;
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("NoSuchAlgorithmException: '{}'", e.getMessage(), e);
             throw new IOException("Unsupported algorithm exception: " + e.getMessage());
