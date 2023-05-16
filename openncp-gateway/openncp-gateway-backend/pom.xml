@@ -5,7 +5,7 @@
     <parent>
         <artifactId>openncp-gateway</artifactId>
         <groupId>eu.europa.ec.sante.ehdsi</groupId>
-        <version>6.2.1-SNAPSHOT</version>
+        <version>6.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -100,7 +100,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/rfc_3881.xsd</source>
+                                <source>src/main/resources/RFC3881.xsd</source>
                             </sources>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>

@@ -10,21 +10,27 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import net.RFC3881.AuditMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
 import tr.com.srdc.epsos.util.http.IPUtil;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
 /**
  * Thread for sending the messages to the syslog repository. Each message is being sent using a different thread.
- * If a message can't be send immediately, it tries for a time interval.
+ * If a message can't be sent immediately, it tries for a time interval.
  *
  * @author Kostas Karkaletsis
  * @author Organization: Gnomon
@@ -35,10 +41,9 @@ public class MessageSender {
 
     private static final String AUDIT_REPOSITORY_URL = "audit.repository.url";
     private static final String AUDIT_REPOSITORY_PORT = "audit.repository.port";
-    private static final String KEYSTORE_FILE = "NCP_SIG_KEYSTORE_PATH";
     private static final String TRUSTSTORE = "TRUSTSTORE_PATH";
     private static final String KEY_ALIAS = "NCP_SIG_PRIVATEKEY_ALIAS";
-    private static String[] enabledProtocols = {"TLSv1.2"};
+    private static final String[] enabledProtocols = {"TLSv1.2"};
     private final Logger logger = LoggerFactory.getLogger(MessageSender.class);
     private AuditLogSerializer auditLogSerializer;
     private String facility;
@@ -59,7 +64,7 @@ public class MessageSender {
         this.severity = severity;
 
         try {
-            if(auditmessage.getEventIdentification() != null && auditmessage.getEventIdentification().getEventTypeCode() != null) {
+            if (auditmessage.getEventIdentification() != null && auditmessage.getEventIdentification().getEventTypeCode() != null) {
                 logger.info("Try to construct the Audit Message type: '{}'", auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode());
             } else {
                 logger.info("Try to construct the Audit Message type: '{}'", "N/A");
@@ -110,7 +115,7 @@ public class MessageSender {
      * @param auditMessage
      * @param facility
      * @param severity
-     * @return true/false depending of the success of sending the message
+     * @return true/false depending on the success of sending the message
      */
     private boolean sendMessage(String auditMessage, String facility, String severity) {
 
@@ -119,6 +124,7 @@ public class MessageSender {
         String facsev = facility + severity;
 
         try {
+            //  EHEALTH-9771: sslsocket = buildSSLSocket();
             sslsocket = createAuditSecuredSocket();
         } catch (IOException e) {
             logger.error("IOException: Cannot contact Secured Audit Server '{}'", e.getMessage());
@@ -179,6 +185,7 @@ public class MessageSender {
      */
     private SSLSocket createAuditSecuredSocket() throws IOException {
 
+        logger.info("Initialization SSLSocket...");
         String host = ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_URL);
         int port = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_PORT));
 
@@ -186,18 +193,42 @@ public class MessageSender {
         KeystoreDetails trust = new KeystoreDetails(u.toString(),
                 ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()),
                 ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS));
-        File uu = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(KEYSTORE_FILE));
+        File uu = new File(ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TLS_KEYSTORE_FILE.getValue()));
         KeystoreDetails key = new KeystoreDetails(uu.toString(),
-                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.KEYSTORE_PWD.getValue()),
-                ConfigurationManagerFactory.getConfigurationManager().getProperty(KEY_ALIAS),
-                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.PRIVATE_KEY_PWD.getValue()));
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TLS_KEYSTORE_PWD.getValue()),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TLS_PRIVATE_KEY_ALIAS.getValue()),
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TLS_PRIVATE_KEY_PWD.getValue()));
         AuthSSLSocketFactory authSSLSocketFactory = new AuthSSLSocketFactory(key, trust);
         SSLSocket sslsocket = (SSLSocket) authSSLSocketFactory.createSecureSocket(host, port);
         sslsocket.setEnabledProtocols(enabledProtocols);
-
         String[] suites = sslsocket.getSupportedCipherSuites();
         sslsocket.setEnabledCipherSuites(suites);
 
         return sslsocket;
+    }
+
+    public SSLSocket buildSSLSocket() throws GeneralSecurityException, IOException {
+
+        String host = ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_URL);
+        int port = Integer.parseInt(ConfigurationManagerFactory.getConfigurationManager().getProperty(AUDIT_REPOSITORY_PORT));
+
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        var is = new FileInputStream(ResourceUtils.getFile(
+                ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE.getValue())));
+        keyStore.load(is, ConfigurationManagerFactory.getConfigurationManager().getProperty(Configuration.TRUSTSTORE_PWD.getValue()).toCharArray());
+
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+
+        SSLContext sslContext = SSLContext.getInstance(enabledProtocols[0]);
+        sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+
+        SSLSocket socket = (SSLSocket) sslContext.getSocketFactory().createSocket(host, port);
+        socket.setEnabledProtocols(enabledProtocols);
+
+        String[] suites = socket.getSupportedCipherSuites();
+        socket.setEnabledCipherSuites(suites);
+
+        return socket;
     }
 }
