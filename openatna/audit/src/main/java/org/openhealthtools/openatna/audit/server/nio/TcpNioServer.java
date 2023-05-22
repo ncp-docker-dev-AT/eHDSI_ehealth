@@ -26,11 +26,9 @@ import java.util.concurrent.Executors;
 public class TcpNioServer implements Notifier, Server {
 
     private final Logger logger = LoggerFactory.getLogger(TcpNioServer.class);
-
     private final AtnaServer atnaServer;
     private final IConnectionDescription tlsConnection;
     private IoAcceptor acceptor;
-
 
     public TcpNioServer(AtnaServer atnaServer, IConnectionDescription tlsConnection) {
         this.atnaServer = atnaServer;
@@ -38,18 +36,22 @@ public class TcpNioServer implements Notifier, Server {
     }
 
     public void start() {
-
+        logger.info("Starting server");
         try {
             ByteBuffer.setUseDirectBuffers(false);
-            acceptor = new SocketAcceptor(Runtime.getRuntime().availableProcessors() + 1, Executors.newCachedThreadPool());
+            acceptor = new SocketAcceptor(Runtime.getRuntime().availableProcessors() + 1,
+                    Executors.newCachedThreadPool());
             acceptor.getDefaultConfig().setThreadModel(ThreadModel.MANUAL);
             IoAcceptorConfig config = new SocketAcceptorConfig();
             DefaultIoFilterChainBuilder chain = config.getFilterChain();
             if (tlsConnection instanceof SecureConnectionDescription) {
+                logger.info("Secured connection initialization");
                 SecureSocketFactory factory = new SecureSocketFactory((SecureConnectionDescription) tlsConnection);
-                SSLContext ctx = factory.getSSLContext();
-                if (ctx != null) {
-                    SSLFilter sslFilter = new SSLFilter(ctx);
+                SSLContext sslContext = factory.getSSLContext();
+                if (sslContext != null) {
+                    SSLFilter sslFilter = new SSLFilter(sslContext);
+                    //  EHEALTH-9771: sslFilter.setWantClientAuth(true);
+                    sslFilter.setNeedClientAuth(true);
                     sslFilter.setEnabledProtocols(factory.getAtnaProtocols());
                     sslFilter.setEnabledCipherSuites(factory.getAtnaCipherSuites());
                     chain.addLast("sslFilter", sslFilter);

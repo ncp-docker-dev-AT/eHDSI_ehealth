@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.mro;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -53,27 +53,27 @@ public class XCA_Query_MroServiceIT extends ServerGenericIT {
      */
     @Test
     public void testQueryDocuments() {
-        this.assertions = this.getAssertions(QUERY_FILE, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE, XSPARoleDeprecated.LICENSED_HCP);
         testGood("testQueryDocuments", QUERY_FILE);
     }
 
     @Test
     @Ignore
     public void testQueryDocumentInvalidId() {
-        this.assertions = this.getAssertions(QUERY_FILE_INVALID_ID, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE_INVALID_ID, XSPARoleDeprecated.LICENSED_HCP);
         testFail("testQueryInvalidDocument", "errorCode=\"1101\"", QUERY_FILE_INVALID_ID);
     }
 
     @Test
     @Ignore
     public void testQueryDocumentEmptyId() {
-        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARoleDeprecated.LICENSED_HCP);
         testFail("testQueryDocumentEmptyId", "errorCode=\"1101\"", QUERY_FILE_EMPTY_ID);
     }
 
     @Override
     @Ignore
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(getPatientIdIso(requestPath), role);
     }
 }

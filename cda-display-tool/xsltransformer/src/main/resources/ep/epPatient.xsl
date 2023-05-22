@@ -83,11 +83,15 @@
                                 </td>
                                 <td>
                                     <!--  Regional/National Health ID: -->
-                                    <xsl:apply-templates select="n1:id[1]"/>
+                                    <xsl:call-template name="show-patient-id">
+                                        <xsl:with-param name="id" select="n1:id[1]"/>
+                                    </xsl:call-template>
                                 </td>
                                 <td>
                                     <!--  National Insurance number: -->
-                                    <xsl:apply-templates select="n1:id[2]"/>
+                                    <xsl:call-template name="show-patient-id">
+                                        <xsl:with-param name="id" select="n1:id[2]"/>
+                                    </xsl:call-template>
                                 </td>
                             </tr>
                         </tbody>
@@ -121,13 +125,5 @@
         <xsl:call-template name="show-eHDSIAdministrativeGender">
             <xsl:with-param name="node" select="."/>
         </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template match="n1:id[1]">
-        <xsl:value-of select="./@extension"/>
-    </xsl:template>
-
-    <xsl:template match="n1:id[2]">
-        <xsl:value-of select="./@extension"/>
     </xsl:template>
 </xsl:stylesheet>

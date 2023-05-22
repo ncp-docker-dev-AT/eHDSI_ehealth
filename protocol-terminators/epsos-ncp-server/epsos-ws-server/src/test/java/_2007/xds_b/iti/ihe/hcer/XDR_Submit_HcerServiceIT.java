@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.hcer;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -45,7 +45,7 @@ public class XDR_Submit_HcerServiceIT extends ServerGenericIT {
     }
 
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(role);
     }
 
@@ -55,7 +55,7 @@ public class XDR_Submit_HcerServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitHcer() {
-        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions("xdr/hcer/testSubmitHcer.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("testSubmitHcer", "xdr/hcer/testSubmitHcer.xml");
     }
 }

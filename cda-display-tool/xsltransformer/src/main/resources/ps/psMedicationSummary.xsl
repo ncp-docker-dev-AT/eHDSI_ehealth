@@ -199,14 +199,21 @@
                                 </td>
                                 <td>
                                     <!-- Strength -->
-                                    <xsl:for-each select="pharm:ingredient[@classCode='ACTI']">
-                                        <xsl:if test="position()=1">
-                                            <xsl:variable name="medStrength" select="pharm:quantity"/>
-                                            <xsl:call-template name="show-strength">
-                                                <xsl:with-param name="node" select="$medStrength"/>
-                                            </xsl:call-template>
-                                        </xsl:if>
-                                    </xsl:for-each>
+                                    <xsl:choose>
+                                        <xsl:when test="not(pharm:ingredient[@classCode='ACTI'])">
+                                            <xsl:value-of select="pharm:desc"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:for-each select="pharm:ingredient[@classCode='ACTI']">
+                                                <xsl:if test="position()=1">
+                                                    <xsl:variable name="medStrength" select="pharm:quantity"/>
+                                                    <xsl:call-template name="show-strength">
+                                                        <xsl:with-param name="node" select="$medStrength"/>
+                                                    </xsl:call-template>
+                                                </xsl:if>
+                                            </xsl:for-each>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </td>
                                 <td>
                                     <!-- Dose form -->
@@ -307,12 +314,12 @@
     </xsl:template>
 
     <xsl:template name="show-medicinalProduct">
-        <xsl:variable name="generalizedMedicineClassCode"
-                      select="pharm:asSpecializedKind/pharm:generalizedMedicineClass/pharm:code"/>
+        <xsl:variable name="generalizedMaterialKindCode"
+                      select="pharm:asSpecializedKind/pharm:generalizedMaterialKind/pharm:code"/>
         <xsl:choose>
-            <xsl:when test="$generalizedMedicineClassCode and not($generalizedMedicineClassCode/@nullFlavor)">
+            <xsl:when test="$generalizedMaterialKindCode and not($generalizedMaterialKindCode/@nullFlavor)">
                 <xsl:call-template name="show-eHDSIActiveIngredient">
-                    <xsl:with-param name="node" select="$generalizedMedicineClassCode"/>
+                    <xsl:with-param name="node" select="$generalizedMaterialKindCode"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>

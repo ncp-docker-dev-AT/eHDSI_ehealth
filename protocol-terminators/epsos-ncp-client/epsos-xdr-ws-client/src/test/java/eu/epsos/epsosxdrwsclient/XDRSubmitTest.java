@@ -6,7 +6,7 @@ import eu.epsos.protocolterminators.integrationtest.common.ResourceLoader;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xdr.XdrDocumentSource;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -53,7 +53,7 @@ public class XDRSubmitTest {
     public void doSubmit() throws XDRException, ParseException {
 
         // build assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARoleDeprecated.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
         Map<AssertionEnum, Assertion> assertionMap = new EnumMap<>(AssertionEnum.class);
         assertionMap.put(AssertionEnum.CLINICIAN, idAssertion);

@@ -9,7 +9,7 @@
     <parent>
         <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
         <artifactId>openncp-openatna</artifactId>
-        <version>6.2.0</version>
+        <version>6.3.0</version>
     </parent>
 
     <artifactId>openatna-audit</artifactId>
@@ -72,9 +72,10 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                     <version>${mysql-connector.version}</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>

@@ -1,6 +1,5 @@
 package eu.europa.ec.joinup.ecc.openstork.utils.datamodel;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPAFunctionalRole;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 
 /**
@@ -10,18 +9,17 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
  */
 public enum HcpRole {
 
-    PHYSICIAN("physician", XSPARole.LICENSED_HCP, XSPAFunctionalRole.MEDICAL_DOCTORS),
-    PHARMACIST("pharmacist", XSPARole.LICENSED_HCP, XSPAFunctionalRole.PHARMACIST),
-    NURSE("nurse", XSPARole.LICENSED_HCP, XSPAFunctionalRole.NURSE);
+    PHYSICIAN("physician", XSPARole.MEDICAL_DOCTORS),
+    PHARMACIST("pharmacist", XSPARole.PHARMACIST),
+    NURSE("nurse", XSPARole.NURSE);
 
     private final String designation;
-    private final XSPARole xspaRole;
-    private final XSPAFunctionalRole xspaFunctionalRole;
 
-    HcpRole(String s, XSPARole xspaRole, XSPAFunctionalRole xspaFunctionalRole) {
-        designation = s;
+    private final XSPARole xspaRole;
+
+    HcpRole(String designation, XSPARole xspaRole) {
+        this.designation = designation;
         this.xspaRole = xspaRole;
-        this.xspaFunctionalRole = xspaFunctionalRole;
     }
 
     @Override
@@ -29,14 +27,7 @@ public enum HcpRole {
         return designation;
     }
 
-    /**
-     * @return the XSPA Role
-     */
     public XSPARole getXspaRole() {
         return xspaRole;
-    }
-
-    public XSPAFunctionalRole getXspaFunctionalRole() {
-        return xspaFunctionalRole;
     }
 }

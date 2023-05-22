@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.mro;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -68,7 +68,7 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<String>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml", XSPARoleDeprecated.LICENSED_HCP);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_MRO_#1", REQ_FOLDER + "PT_CLIENT_XCA_MRO_#1.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.MRO);
@@ -87,7 +87,7 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<String>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml", XSPARoleDeprecated.LICENSED_HCP);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_MRO_#2", REQ_FOLDER + "PT_CLIENT_XCA_MRO_#2.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.MRO);
@@ -100,11 +100,11 @@ public class XcaMroRetrieveIT extends ClientGenericIT {
      * Auxiliar methods
      */
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(role);
     }
 
-    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate("182581814^^^&amp;2.16.620.1.101.10.1.1&amp;ISO", permissions, role);
     }
 }

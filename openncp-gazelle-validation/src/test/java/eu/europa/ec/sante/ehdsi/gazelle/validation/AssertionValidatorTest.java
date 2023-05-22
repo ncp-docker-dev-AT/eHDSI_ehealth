@@ -86,7 +86,7 @@ public class AssertionValidatorTest {
                 "      </saml2:AuthnContext>\n" +
                 "   </saml2:AuthnStatement>\n" +
                 "   <saml2:AttributeStatement>\n" +
-                "      <saml2:Attribute FriendlyName=\"XSPA Subject\" Name=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
+                "      <saml2:Attribute FriendlyName=\"XSPA Subject\" Name=\"urn:oasis:names:tc:xspa:1.0:subject:subject-id\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
                 "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">Jack House</saml2:AttributeValue>\n" +
                 "      </saml2:Attribute>\n" +
                 "      <saml2:Attribute FriendlyName=\"XSPA Role\" Name=\"urn:oasis:names:tc:xacml:2.0:subject:role\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
@@ -96,7 +96,7 @@ public class AssertionValidatorTest {
                 "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">eHealth OpenNCP EU Portal</saml2:AttributeValue>\n" +
                 "      </saml2:Attribute>\n" +
                 "      <saml2:Attribute FriendlyName=\"XSPA Organization ID\" Name=\"urn:oasis:names:tc:xspa:1.0:subject:organization-id\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
-                "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:anyURI\">20155.1</saml2:AttributeValue>\n" +
+                "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">20155.1</saml2:AttributeValue>\n" +
                 "      </saml2:Attribute>\n" +
                 "      <saml2:Attribute FriendlyName=\"eHealth DSI Healthcare Facility Type\" Name=\"urn:epsos:names:wp3.4:subject:healthcare-facility-type\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
                 "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">Resident Physician</saml2:AttributeValue>\n" +

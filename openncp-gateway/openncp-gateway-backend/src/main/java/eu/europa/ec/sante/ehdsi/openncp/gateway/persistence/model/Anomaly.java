@@ -6,8 +6,9 @@ import java.util.Date;
 @Entity
 @Table(name = "EHNCP_ANOMALY")
 public class Anomaly {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
     private Long id;
 

@@ -1,28 +1,28 @@
 package org.openhealthtools.openatna.anom;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
  * Audit message interface
- *
- * @author Andrew Harrison
  */
 public class AtnaMessage implements Serializable {
 
     private static final long serialVersionUID = -5502378798460439820L;
-
+    private final Set<AtnaCode> eventTypeCodes = new HashSet<>();
+    private final Set<AtnaMessageParticipant> participants = new HashSet<>();
+    private final Set<AtnaSource> sources = new HashSet<>();
+    private final Set<AtnaMessageObject> objects = new HashSet<>();
     private Long messageId;
     private AtnaCode eventCode;
-    private Set<AtnaCode> eventTypeCodes = new HashSet<>();
     private EventAction eventActionCode;
     private EventOutcome eventOutcome;
     private Date eventDateTime;
     private String sourceAddress;
-    private Set<AtnaMessageParticipant> participants = new HashSet<>();
-    private Set<AtnaSource> sources = new HashSet<>();
-    private Set<AtnaMessageObject> objects = new HashSet<>();
     private byte[] messageContent;
 
     public AtnaMessage(AtnaCode eventCode, EventOutcome eventOutcome) {
@@ -180,72 +180,58 @@ public class AtnaMessage implements Serializable {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
 
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof AtnaMessage)) {
-            return false;
-        }
+        if (o == null || getClass() != o.getClass()) return false;
 
         AtnaMessage that = (AtnaMessage) o;
-        if (!Objects.equals(eventActionCode, that.eventActionCode)) {
-            return false;
-        }
-        if (!Objects.equals(eventCode, that.eventCode)) {
-            return false;
-        }
-        if (!Objects.equals(eventDateTime, that.eventDateTime)) {
-            return false;
-        }
-        if (eventOutcome != that.eventOutcome) {
-            return false;
-        }
-        if (!Objects.equals(eventTypeCodes, that.eventTypeCodes)) {
-            return false;
-        }
-        if (!Objects.equals(objects, that.objects)) {
-            return false;
-        }
-        if (!Objects.equals(participants, that.participants)) {
-            return false;
-        }
-        return Objects.equals(sources, that.sources);
+
+        return new EqualsBuilder()
+                .append(messageId, that.messageId)
+                .append(eventCode, that.eventCode)
+                .append(eventTypeCodes, that.eventTypeCodes)
+                .append(eventActionCode, that.eventActionCode)
+                .append(eventOutcome, that.eventOutcome)
+                .append(eventDateTime, that.eventDateTime)
+                .append(sourceAddress, that.sourceAddress)
+                .append(participants, that.participants)
+                .append(sources, that.sources)
+                .append(objects, that.objects)
+                .append(messageContent, that.messageContent)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = eventCode != null ? eventCode.hashCode() : 0;
-        result = 31 * result + (eventTypeCodes != null ? eventTypeCodes.hashCode() : 0);
-        result = 31 * result + (eventActionCode != null ? eventActionCode.hashCode() : 0);
-        result = 31 * result + (eventOutcome != null ? eventOutcome.hashCode() : 0);
-        result = 31 * result + (eventDateTime != null ? eventDateTime.hashCode() : 0);
-        result = 31 * result + (participants != null ? participants.hashCode() : 0);
-        result = 31 * result + (sources != null ? sources.hashCode() : 0);
-        result = 31 * result + (objects != null ? objects.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder(17, 37)
+                .append(messageId)
+                .append(eventCode)
+                .append(eventTypeCodes)
+                .append(eventActionCode)
+                .append(eventOutcome)
+                .append(eventDateTime)
+                .append(sourceAddress)
+                .append(participants)
+                .append(sources)
+                .append(objects)
+                .append(messageContent)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
-        return "[" +
-                getClass().getName() +
-                " event code=" +
-                getEventCode() +
-                " event action=" +
-                getEventActionCode() +
-                " event outcome=" +
-                getEventOutcome() +
-                " timestamp=" +
-                getEventDateTime() +
-                " event type codes=" +
-                getEventTypeCodes() +
-                " sources=" +
-                getSources() +
-                " participants=" +
-                getParticipants() +
-                " objects=" +
-                getObjects() +
-                "]";
+        return new ToStringBuilder(this)
+                .append("eventTypeCodes", eventTypeCodes)
+                .append("participants", participants)
+                .append("sources", sources)
+                .append("objects", objects)
+                .append("messageId", messageId)
+                .append("eventCode", eventCode)
+                .append("eventActionCode", eventActionCode)
+                .append("eventOutcome", eventOutcome)
+                .append("eventDateTime", eventDateTime)
+                .append("sourceAddress", sourceAddress)
+                .append("messageContent", messageContent)
+                .toString();
     }
 }

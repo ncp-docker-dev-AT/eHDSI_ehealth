@@ -29,9 +29,10 @@ public class SearchCriteriaImpl implements SearchCriteria {
     }
 
     public SearchCriteria addPatientId(String patientId) {
+        patientId = StringEscapeUtils.unescapeXml(patientId);
         this.add(Criteria.PATIENT_ID, patientId);
-        String[] result = StringUtils.split(patientId, "^^^&|&ISO");
-        if(result.length > 1) {
+        String[] result = StringUtils.split(patientId, "^&");
+        if (result.length > 1) {
             this.patientId.setRoot(result[1]);
         }
         this.patientId.setExtension(result[0]);

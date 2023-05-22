@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +60,7 @@ public class Utils {
     }
 
     /**
-     * Given a string containing an xml structure, it parses it and returns the DOM object.
+     * Given a string containing a xml structure, it parses it and returns the DOM object.
      *
      * @param inputFile the xml string
      * @return org.w3c.dom.Document
@@ -86,14 +87,20 @@ public class Utils {
      */
     public static boolean validateSchema(String xmlDocumentUrl) throws SAXException, IOException {
 
-        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881.xsd");
+        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881_Unsigned.xsd");
         if (streamXsd == null || streamXsd.available() == 0) {
-            LOGGER.error("Cannot load XSD resource: \"RFC3881.xsd\"");
+            LOGGER.error("Cannot load XSD resource: \"RFC3881_Unsigned.xsd\"");
             return false;
         }
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         StreamSource streamSource = new StreamSource(streamXsd);
-        Schema schema = factory.newSchema(streamSource);
+        Schema schema;
+        try {
+            schema = factory.newSchema(streamSource);
+        } catch (SAXParseException e) {
+            LOGGER.error("XML Document not valid according XSD: '{}'", e.getMessage());
+            return false;
+        }
         javax.xml.validation.Validator validator = schema.newValidator();
         Source source = new StreamSource(stringToStream(xmlDocumentUrl));
 
@@ -102,18 +109,18 @@ public class Utils {
             LOGGER.debug("XML Document is valid");
             return true;
         } catch (SAXException e) {
-            LOGGER.error("XML Document not valid according XSD: '{}'", e.getMessage());
+            LOGGER.warn("XML Document not valid according XSD: '{}'", e.getMessage());
             return false;
         }
     }
 
     /**
      * To convert the InputStream to String we use the BufferedReader.readLine() method.
-     * We iterate until the BufferedReader return null which means there's no more data to read. Each line will
-     * appended to a StringBuilder and returned as String.
+     * We iterate until the BufferedReader return null which means there's no more data to read.
+     * Each line will be appended to a StringBuilder and returned as String.
      *
-     * @param is
-     * @return
+     * @param is - Audit message as an InputStream.
+     * @return Audit message as a UTF-8 String.
      */
     public static String convertStreamToString(InputStream is) {
 
@@ -138,7 +145,7 @@ public class Utils {
      * Convert String to InputString using ByteArrayInputStream class. This class constructor takes the string byte
      * array which can be done by calling the getBytes() method.
      *
-     * @param text
+     * @param text - Audit message as a String
      * @return the input stream
      */
     public static InputStream stringToStream(String text) {

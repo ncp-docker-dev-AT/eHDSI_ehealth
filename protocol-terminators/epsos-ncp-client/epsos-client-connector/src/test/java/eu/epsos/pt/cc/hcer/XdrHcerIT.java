@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.hcer;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -68,7 +68,7 @@ public class XdrHcerIT extends ClientGenericIT {
     public void testSubmitHcer() {
         List<String> permissions = new ArrayList<>(1);
         permissions.add("46");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", XSPARoleDeprecated.LICENSED_HCP);
 
         testGood("PT_CLIENT_XDR_HCER_#0", REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml");
         validateCDA(REQ_FOLDER + "PT_CLIENT_XDR_HCER_#0.xml", CdaExtraction.MessageType.PORTAL, CdaModel.HCER);
@@ -76,7 +76,7 @@ public class XdrHcerIT extends ClientGenericIT {
     }
 
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(role);
     }
 
@@ -86,7 +86,7 @@ public class XdrHcerIT extends ClientGenericIT {
      * @param permissions
      * @return a Collection of customized assertions.
      */
-    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate("", permissions, role);
     }
 }

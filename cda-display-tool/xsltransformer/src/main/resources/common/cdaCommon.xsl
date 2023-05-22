@@ -26,6 +26,17 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- show-patient-id -->
+    <xsl:template name="show-patient-id">
+        <xsl:param name="id"/>
+        <xsl:if test="not($id/@nullFlavor)">
+            <xsl:if test="$id/@extension">
+                    <xsl:value-of select="$id/@extension"/>
+            </xsl:if>
+        </xsl:if>
+    </xsl:template>
+
+
     <!-- show-performer -->
     <xsl:template name="show-performer">
         <xsl:param name="node"/>
@@ -829,29 +840,29 @@
         <xsl:param name="medFrequencyIntakeType"/>
         <xsl:param name="medFrequencyIntake"/>
         <xsl:choose>
-            <xsl:when test="$medFrequencyIntakeType='TS'">
+            <xsl:when test="$medFrequencyIntakeType='TS' or substring-after($medFrequencyIntakeType, ':')='TS'">
                 <!-- a point in time just one value -->
                 <xsl:call-template name="show-TS">
                     <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$medFrequencyIntakeType='IVL_TS'">
+            <xsl:when test="$medFrequencyIntakeType='IVL_TS' or substring-after($medFrequencyIntakeType, ':')='IVL_TS'">
                 <!-- time interval -->
                 <xsl:call-template name="show-IVL_TS">
                     <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$medFrequencyIntakeType='PIVL_TS'">
+            <xsl:when test="$medFrequencyIntakeType='PIVL_TS' or substring-after($medFrequencyIntakeType, ':')='PIVL_TS'">
                 <xsl:call-template name="show-PIVL_TS">
                     <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$medFrequencyIntakeType='EIVL_TS'">
+            <xsl:when test="$medFrequencyIntakeType='EIVL_TS' or substring-after($medFrequencyIntakeType, ':')='EIVL_TS'">
                 <xsl:call-template name="show-EIVL_TS">
                     <xsl:with-param name="node" select="$medFrequencyIntake"/>
                 </xsl:call-template>
             </xsl:when>
-            <xsl:when test="$medFrequencyIntakeType='SXPR_TS'">
+            <xsl:when test="$medFrequencyIntakeType='SXPR_TS' or substring-after($medFrequencyIntakeType, ':')='SXPR_TS'">
                 <!-- composite -->
                 <xsl:for-each select="$medFrequencyIntake/n1:comp">
                     <xsl:call-template name="frequencyComp"/>

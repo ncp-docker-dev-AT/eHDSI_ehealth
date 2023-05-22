@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.order;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -53,8 +53,8 @@ public class XCA_Retrieve_OrderServiceIT extends ServerGenericIT {
     }
 
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
-        return hcpAndTrcAssertionCreate(PATIENT_ID_ISO, XSPARole.LICENSED_HCP);
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
+        return hcpAndTrcAssertionCreate(PATIENT_ID_ISO, XSPARoleDeprecated.LICENSED_HCP);
     }
 
     /**
@@ -63,21 +63,21 @@ public class XCA_Retrieve_OrderServiceIT extends ServerGenericIT {
      */
     @Test
     public void testRetrieveDocument() {
-        this.assertions = this.getAssertions(QUERY_FILE, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE, XSPARoleDeprecated.LICENSED_HCP);
         testGood("testRetrieveDocument", QUERY_FILE);
     }
 
     @Ignore
     @Test
     public void testRetrieveInvalidDocument() {
-        this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE_INVALD_ID, XSPARoleDeprecated.LICENSED_HCP);
         testFail("testRetrieveInvalidDocument", "Failure", QUERY_FILE_INVALD_ID);
     }
 
     @Ignore
     @Test
     public void testRetrieveEmptyDocument() {
-        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(QUERY_FILE_EMPTY_ID, XSPARoleDeprecated.LICENSED_HCP);
         testFail("testRetrieveEmptyDocument", "Failure", QUERY_FILE_EMPTY_ID);
     }
 }

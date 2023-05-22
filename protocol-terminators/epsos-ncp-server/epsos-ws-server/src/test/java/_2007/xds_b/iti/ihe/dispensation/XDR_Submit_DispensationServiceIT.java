@@ -19,7 +19,7 @@
  */
 package _2007.xds_b.iti.ihe.dispensation;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -50,7 +50,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitED() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitED.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitED.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("testSubmitED", "xdr/edispensation/testSubmitED.xml");
     }
 
@@ -60,7 +60,7 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitNoEP() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitNoEP.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitNoEP.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("testSubmitNoEP", "4105", "xdr/edispensation/testSubmitNoEP.xml");
     }
 
@@ -70,12 +70,12 @@ public class XDR_Submit_DispensationServiceIT extends ServerGenericIT {
      */
     @Test
     public void testSubmitDispEP() {
-        this.assertions = this.getAssertions("xdr/edispensation/testSubmitDispEP.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions("xdr/edispensation/testSubmitDispEP.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("testSubmitDispEP", "4106", "xdr/edispensation/testSubmitDispEP.xml");
     }
 
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(role);
     }
 }

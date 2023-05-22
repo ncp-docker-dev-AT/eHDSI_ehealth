@@ -85,7 +85,7 @@
                 </saml2:AuthnStatement>
                 <saml2:AttributeStatement xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">
                     <saml2:Attribute FriendlyName="XSPA Subject"
-                                     Name="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+                                     Name="urn:oasis:names:tc:xspa:1.0:subject:subject-id"
                                      NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                         <saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
                                               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -141,7 +141,7 @@
                                      NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
                         <saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
                                               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                              xsi:type="xs:anyURI">xspaOrganizationId
+                                              xsi:type="xs:string">xspaOrganizationId
                         </saml2:AttributeValue>
                     </saml2:Attribute>
                     <saml2:Attribute FriendlyName="eHealth DSI Healthcare Facility Type"

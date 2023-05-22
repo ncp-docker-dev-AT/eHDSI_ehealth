@@ -62,7 +62,7 @@ public class ConnectionCertificateHandler {
     }
 
     /**
-     * Creates keymanagers from a keystore.
+     * Creates Key Managers from a keystore.
      */
     public static KeyManager[] createKeyManagers(final KeyStore keystore, final String password)
             throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
@@ -70,13 +70,13 @@ public class ConnectionCertificateHandler {
             throw new IllegalArgumentException("Keystore may not be null");
         }
         LOGGER.debug("Initializing key manager");
-        KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmfactory.init(keystore, password != null ? password.toCharArray() : null);
-        return kmfactory.getKeyManagers();
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keystore, password != null ? password.toCharArray() : null);
+        return keyManagerFactory.getKeyManagers();
     }
 
     /**
-     * Creates trustmanagers from a truststore.
+     * Creates Trust Managers from a truststore.
      */
     public static TrustManager[] createTrustManagers(final KeyStore keystore, SecureConnectionDescription scd)
             throws KeyStoreException, NoSuchAlgorithmException {
@@ -84,15 +84,15 @@ public class ConnectionCertificateHandler {
             throw new IllegalArgumentException("Keystore may not be null");
         }
         LOGGER.debug("Initializing trust manager");
-        TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmfactory.init(keystore);
-        TrustManager[] trustmanagers = tmfactory.getTrustManagers();
-        for (int i = 0; i < trustmanagers.length; i++) {
-            if (trustmanagers[i] instanceof X509TrustManager) {
-                trustmanagers[i] = new LoggedX509TrustManager((X509TrustManager) trustmanagers[i], scd);
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keystore);
+        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        for (int i = 0; i < trustManagers.length; i++) {
+            if (trustManagers[i] instanceof X509TrustManager) {
+                trustManagers[i] = new LoggedX509TrustManager((X509TrustManager) trustManagers[i], scd);
             }
         }
-        return trustmanagers;
+        return trustManagers;
     }
 
     /**
@@ -141,14 +141,14 @@ public class ConnectionCertificateHandler {
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             String message = "Trusted certificate '" + alias + "':";
-            Certificate trustedcert = keystore.getCertificate(alias);
-            if (trustedcert instanceof X509Certificate) {
-                X509Certificate cert = (X509Certificate) trustedcert;
-                message += "\n  Subject DN: " + cert.getSubjectDN();
-                message += "\n  Signature Algorithm: " + cert.getSigAlgName();
-                message += "\n  Valid from: " + cert.getNotBefore();
-                message += "\n  Valid until: " + cert.getNotAfter();
-                message += "\n  Issuer: " + cert.getIssuerDN();
+            Certificate trustedCertificate = keystore.getCertificate(alias);
+            if (trustedCertificate instanceof X509Certificate) {
+                X509Certificate certificate = (X509Certificate) trustedCertificate;
+                message += "\n  Subject DN: " + certificate.getSubjectDN();
+                message += "\n  Signature Algorithm: " + certificate.getSigAlgName();
+                message += "\n  Valid from: " + certificate.getNotBefore();
+                message += "\n  Valid until: " + certificate.getNotAfter();
+                message += "\n  Issuer: " + certificate.getIssuerDN();
             }
             if (!StringUtils.equals(System.getProperty(SERVER_EHEALTH_MODE), "PRODUCTION")
                     && LOGGER_CLINICAL.isDebugEnabled()) {

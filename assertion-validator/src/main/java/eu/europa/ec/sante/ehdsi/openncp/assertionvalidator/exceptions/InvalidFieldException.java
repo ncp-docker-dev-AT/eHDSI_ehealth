@@ -23,5 +23,4 @@ public class InvalidFieldException extends AssertionValidationException {
     public String getMessage() {
         return this.getErrorCode().getDescription() + messageDetailed;
     }
-
 }

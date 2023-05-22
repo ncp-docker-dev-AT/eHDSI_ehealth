@@ -4,7 +4,7 @@ import eu.epsos.exceptions.NoPatientIdDiscoveredException;
 import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xcpd.XcpdInitGateway;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -61,7 +61,7 @@ public class XCPDTest {
         patientDemographics.setCountry(PATIENT_COUNTRY);
 
         // assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARoleDeprecated.LICENSED_HCP);
         Map<AssertionEnum, Assertion> assertionEnumMap = new EnumMap<>(AssertionEnum.class);
         assertionEnumMap.put(AssertionEnum.CLINICIAN, idAssertion);
         // Call the service

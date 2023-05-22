@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.schema.XSString;
-import org.opensaml.core.xml.schema.XSURI;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
@@ -109,13 +108,13 @@ public class SamlNextOfKinIssuer {
         assertion.getSubject().setNameID(nameid);
 
         String spProvidedID = hcpIdentityAssertion.getSubject().getNameID().getSPProvidedID();
-        String humanRequestorNameID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + hcpIdentityAssertion.getSubject().getNameID().getValue()
+        String humanRequestorNameID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "<" + hcpIdentityAssertion.getSubject().getNameID().getValue()
                 + "@" + hcpIdentityAssertion.getIssuer().getValue() + ">";
 
         auditDataMap.put("humanRequestorNameID", humanRequestorNameID);
 
         var subjectIdAttr = AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+                "urn:oasis:names:tc:xspa:1.0:subject:subject-id");
         String humanRequesterAlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
         auditDataMap.put("humanRequestorSubjectID", humanRequesterAlternativeUserID);
 
@@ -209,10 +208,10 @@ public class SamlNextOfKinIssuer {
             auditDataMap.put("pointOfCare", poc);
         }
 
-        var pointOfCareIdAttr = AssertionUtil.findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        var pointOfCareIdAttr = AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
-            String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getURI();
+            String pocId = ((XSString) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
             auditDataMap.put("pointOfCareID", pocId);
         } else {
             auditDataMap.put("pointOfCareID", "No Organization ID - POC information");
@@ -223,9 +222,9 @@ public class SamlNextOfKinIssuer {
 
         auditDataMap.put("humanRequestorRole", hrRole);
 
-        String functionalRole = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xspa:1.0:subject:functional-role").getAttributeValues().get(0)).getValue();
-        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
+//        String functionalRole = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+//                "urn:oasis:names:tc:xspa:1.0:subject:functional-role").getAttributeValues().get(0)).getValue();
+//        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
 
         String facilityType = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:epsos:names:wp3.4:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();

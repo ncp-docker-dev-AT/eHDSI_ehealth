@@ -19,7 +19,7 @@
  */
 package _2009.xcpd.iti.ihe;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.server.it.ServerGenericIT;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import org.junit.BeforeClass;
@@ -67,7 +67,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testQuery() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("PT_CLIENT_XCPD_#0", REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml");
     }
 
@@ -89,7 +89,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryIdOnly() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#1", "AdditionalDemographicsRequested", REQ_FOLDER + "PT_CLIENT_XCPD_#1.xml");
     }
 
@@ -106,7 +106,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryDemographicsOnly() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#2.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#2.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#2", "DemographicsQueryNotAllowed", REQ_FOLDER + "PT_CLIENT_XCPD_#2.xml");
     }
 
@@ -123,7 +123,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryEHICardOnly() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#3.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#3.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#3", "EHICDataRequested", REQ_FOLDER + "PT_CLIENT_XCPD_#3.xml");
     }
 
@@ -139,7 +139,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryPrivateData() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#4.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#4.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#4", "PrivacyViolation", REQ_FOLDER + "PT_CLIENT_XCPD_#4.xml");
     }
 
@@ -154,7 +154,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testQueryInsRights() {
-        this.assertions = hcpAssertionCreate(new ArrayList<String>(0), XSPARole.LICENSED_HCP);
+        this.assertions = hcpAssertionCreate(new ArrayList<String>(0), XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#5", "InsufficientRights", REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml");
     }
 
@@ -171,7 +171,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryPatientAuthId() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#6", "PatientAuthenticationRequired", REQ_FOLDER + "PT_CLIENT_XCPD_#6.xml");
     }
 
@@ -186,7 +186,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testQueryMinAccur() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#7.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#7.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#7", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#7.xml");
     }
 
@@ -201,7 +201,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testQueryInvalidTraits() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#8.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#8.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#8", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#8.xml");
     }
 
@@ -218,7 +218,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testQueryConfConflict() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#9.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#9.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#9", "PolicyViolation", REQ_FOLDER + "PT_CLIENT_XCPD_#9.xml");
     }
 
@@ -236,7 +236,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testBadLivingSubjectID() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#10.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#10.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#10", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#10.xml");
     }
 
@@ -249,7 +249,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      */
     @Test
     public void testGoodLivingSubjectID() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#10.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#10.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("PT_CLIENT_XCPD_#10.1", REQ_FOLDER + "PT_CLIENT_XCPD_#10.1.xml");
     }
 
@@ -261,7 +261,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectName() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#11.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#11.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#11", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#11.xml");
     }
 
@@ -273,7 +273,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectName() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#11.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#11.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#11.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#11.1.xml");
     }
 
@@ -285,7 +285,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectBirthTime() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#12.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#12.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#12", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#12.xml");
     }
 
@@ -297,7 +297,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectBirthTime() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("PT_CLIENT_XCPD_#12.1", REQ_FOLDER + "PT_CLIENT_XCPD_#12.1.xml");
     }
 
@@ -309,7 +309,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectGender() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#13", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#13.xml");
     }
 
@@ -321,7 +321,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectGender() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#13.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#13.1.xml");
     }
 
@@ -333,7 +333,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadLivingSubjectBirthPlaceAddress() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#14", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#14.xml");
     }
 
@@ -345,7 +345,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodLivingSubjectBirthPlaceAddress() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#14.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#14.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#14.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#14.1.xml");
     }
 
@@ -357,7 +357,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testBadpatientAddress() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#15.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#15.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#15", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#15.xml");
     }
 
@@ -369,7 +369,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testGoodpatientAddress() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#15.1", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#15.1.xml");
     }
 
@@ -384,7 +384,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
     @Test
     @Ignore
     public void testInvalidField() {
-        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#16.xml", XSPARole.LICENSED_HCP);
+        this.assertions = this.getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#16.xml", XSPARoleDeprecated.LICENSED_HCP);
         testFail("PT_CLIENT_XCPD_#16", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#16.xml");
     }
 
@@ -392,7 +392,7 @@ public class XCPD_ServiceSkeletonIT extends ServerGenericIT {
      * Auxiliar methods
      */
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAssertionCreate(role);
     }
 }

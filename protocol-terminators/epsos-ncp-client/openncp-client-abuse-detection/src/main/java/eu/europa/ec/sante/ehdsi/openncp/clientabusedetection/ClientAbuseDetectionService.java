@@ -6,15 +6,15 @@ import epsos.ccd.gnomon.auditmanager.EventType;
 import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.openncp.abusedetection.*;
+import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
+import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import net.RFC3881.ActiveParticipantType;
 import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
 import net.RFC3881.ParticipantObjectIdentificationType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.quartz.Job;
@@ -44,9 +44,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ClientAbuseDetectionService implements Job {
-    public static final String DESCRIPTION_ALL = "[NCP-B] Detected %d transactions within an interval of %d seconds. This is exceeding the indicated threshold of %d transactions for the defind time interval";
-    public static final String DESCRIPTION_POC = "[NCP-B] Detected %d transactions within an interval of %d seconds from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
-    public static final String DESCRIPTION_PAT = "[NCP-B] Detected %d transactions within an interval of %d seconds for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_ALL = "[NCP-B] Detected %d transactions within an interval of %d seconds. " +
+            "This is exceeding the indicated threshold of %d transactions for the defind time interval";
+    public static final String DESCRIPTION_POC = "[NCP-B] Detected %d transactions within an interval of %d seconds " +
+            "from a specific Point of care. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    public static final String DESCRIPTION_PAT = "[NCP-B] Detected %d transactions within an interval of %d seconds " +
+            "for a specific Patient. This is exceeding the indicated threshold of %d transactions for the defined interval";
+    private static final int NUM_DAYS_LOOK_BACK = 3;
     private static final int ANOMALY_DESCRIPTION_SIZE = 2000;
     private static final int ANOMALY_TYPE_SIZE = 20;
     private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -55,6 +59,7 @@ public class ClientAbuseDetectionService implements Job {
     private static List<AbuseEvent> abuseList = new ArrayList<>();
     private static long lastIdAnalyzed = -1;
     private final Logger logger = LoggerFactory.getLogger(ClientAbuseDetectionService.class);
+    private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
 
     public ClientAbuseDetectionService() {
     }
@@ -74,12 +79,10 @@ public class ClientAbuseDetectionService implements Job {
             logger.info("AbuseDetectionService Job paused");
             scheduler.pauseJob(jobExecutionContext.getJobDetail().getKey());
 
-            //Long res = (Long)jobExecutionContext.getMergedJobDataMap().get("myKey");
-
             try {
                 String query;
                 if (lastIdAnalyzed < 0) { // If no lastId is available it starts to analyze records from n days back
-                    long lastFileTimeAnalyzed = LocalDateTime.now().minusDays(3).toDate().toInstant().toEpochMilli();
+                    long lastFileTimeAnalyzed = LocalDateTime.now().minusDays(NUM_DAYS_LOOK_BACK).toDate().toInstant().toEpochMilli();
                     LocalDateTime dt = new LocalDateTime(lastFileTimeAnalyzed, DateTimeZone.forTimeZone(TimeZone.getDefault()));
                     DateTimeFormatter dtf = DateTimeFormat.forPattern(ClientAbuseDetectionService.PATTERN);
                     String lastDateTimeFileAnalyzed = dt.toString(dtf);
@@ -174,7 +177,9 @@ public class ClientAbuseDetectionService implements Job {
         }
     }
 
-    private void setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests, AbuseEvent eventBegin, AbuseEvent eventEnd) {
+    private boolean setAbuseErrorEvent(AbuseType abuseType, String description, int numRequests, AbuseEvent eventBegin,
+                                       AbuseEvent eventEnd) {
+
         String eventDescription = description.substring(0, Math.min(description.length(), ANOMALY_DESCRIPTION_SIZE));
 
         String type = abuseType.getType();
@@ -205,8 +210,10 @@ public class ClientAbuseDetectionService implements Job {
                 throw new RuntimeException(e);
             }
         } else {
-            logger.info("Anomaly already persisted. Skipping.");
+            //  Anomaly already persisted. Skipping.
+            return false;
         }
+        return true;
     }
 
     private boolean anomalyNotPresent(String description, String type, String eventStartDate, String eventEndDate) {
@@ -300,13 +307,6 @@ public class ClientAbuseDetectionService implements Job {
                         .toInstant()
                         .toEpochMilli(),
                         DateTimeZone.forTimeZone(TimeZone.getDefault()));
-
-//                LocalDateTime now = new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault()));
-//                int val = Math.max(3600, Integer.parseInt(Constants.ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD));
-//                Period diff = new Period(dt, now);
-//                if (diff.toStandardSeconds().getSeconds() > val) {
-//                    return null; // do not process file
-//                }
 
                 boolean evtPresent = false;
                 AbuseTransactionType transactionType = AbuseTransactionType.TRANSACTION_UNKNOWN;
@@ -404,11 +404,6 @@ public class ClientAbuseDetectionService implements Job {
                 }
 
                 if (evtPresent) {
-                    logger.info("Audit found: event time ['{}'}'] event id code ['{}'}'] event id display name ['{}'}'] " +
-                                    "event id code system name ['{}'}'] event id codes ['{}'] active participants ['{}'}'] ",
-                            dt, au.getEventIdentification().getEventID().getCode(), au.getEventIdentification().getEventID().getDisplayName(),
-                            au.getEventIdentification().getEventID().getCodeSystemName(),
-                            getTypeCodes(au.getEventIdentification().getEventTypeCode()), getActiveParticipants(au.getActiveParticipant()));
 
                     String joinedPoc = au.getActiveParticipant().stream()
                             .filter(ActiveParticipantType::isUserIsRequestor)
@@ -454,8 +449,15 @@ public class ClientAbuseDetectionService implements Job {
         }
         LocalDateTime t1 = listEvt.get(beg).getRequestDateTime();
         LocalDateTime t2 = listEvt.get(end).getRequestDateTime();
+        return getElapsedSecondsBetweenDateTime(t1, t2);
+    }
+
+    protected int getElapsedSecondsBetweenDateTime(LocalDateTime t1, LocalDateTime t2) {
         Period diff = new Period(t1, t2); // time elapsed between first and last request
-        return diff.toStandardSeconds().getSeconds();
+        // able to calculate whole days between two dates easily
+        Days days = Days.daysBetween(t1, t2);
+        //return diff.toStandardSeconds().getSeconds();
+        return Seconds.secondsBetween(t1, t2).getSeconds();
     }
 
     private List<AbuseEvent> checkAnomalies(List<AbuseEvent> list) {
@@ -477,25 +479,6 @@ public class ClientAbuseDetectionService implements Job {
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
                 .collect(Collectors.toList());
         if (areqr > 0 && sortedAllList.size() > areqThreshold) { // Analyze ALL requests
-            //            for (int i = 0; i < sortedAllList.size(); i++) {
-            //                int begin;
-            //                int end;
-            //                begin = i;
-            //                end = begin + Math.min(begin + areq_threshold, sortedAllList.size() - 1 - begin);
-            //                LocalDateTime t1 = sortedAllList.get(begin).getRequestDateTime();
-            //                LocalDateTime t2 = sortedAllList.get(end).getRequestDateTime();
-            //                Period diff = new Period(t1, t2); // time elapsed between first and last request
-            //                if (diff.toStandardSeconds().getSeconds() < areqr) { // we are inside the interval for detecting
-            //                    int totreq = end - begin + 1;
-            //                    if (totreq > areq_threshold) {
-            //                        logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
-            //                                        "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
-            //                                totreq, areq_threshold, diff.toStandardSeconds().getSeconds(), sortedAllList.get(begin), sortedAllList.get(end));
-            //                        String abuseDescription = String.format(DESCRIPTION_ALL, totreq, diff.toStandardSeconds().getSeconds(), areq_threshold);
-            //                        setAbuseErrorEvent(AbuseType.ALL, abuseDescription, totreq, sortedAllList.get(begin), sortedAllList.get(end));
-            //                    }
-            //                }
-            //            }
             int index = 0;
             int lastValidIndex = 0;
             do {
@@ -520,11 +503,14 @@ public class ClientAbuseDetectionService implements Job {
                     }
                     int elapsed = getElapsedTimeBetweenEvents(sortedAllList, beg, end);
                     if (elapsed < areqr) {
-                        logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
-                                        "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
-                                tot, areqThreshold, elapsed, sortedAllList.get(beg), sortedAllList.get(end));
                         String abuseDescription = String.format(DESCRIPTION_ALL, tot, elapsed, areqThreshold);
-                        setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end));
+                        if (setAbuseErrorEvent(AbuseType.ALL, abuseDescription, tot, sortedAllList.get(beg), sortedAllList.get(end))) {
+                            if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                                loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS : [Total requests: '{}' exceeding " +
+                                                "threshold of: '{}' requests inside an interval of '{}' seconds] - begin event : ['{}'] end event: ['{}']",
+                                        tot, areqThreshold, elapsed, sortedAllList.get(beg), sortedAllList.get(end));
+                            }
+                        }
                     }
                 }
             } while (index < sortedAllList.size() && lastValidIndex < sortedAllList.size());
@@ -569,13 +555,16 @@ public class ClientAbuseDetectionService implements Job {
                             }
                             int elapsed = getElapsedTimeBetweenEvents(sortedPocList, beg, end);
                             if (elapsed < upocr) {
-                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
-                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
-                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
-                                        tot, upocThreshold, elapsed,
-                                        sortedPocList.get(beg), sortedPocList.get(end));
                                 String abuseDescription = String.format(DESCRIPTION_POC, tot, elapsed, upocThreshold);
-                                setAbuseErrorEvent(AbuseType.POC, abuseDescription, tot, sortedPocList.get(beg), sortedPocList.get(end));
+                                if (setAbuseErrorEvent(AbuseType.POC, abuseDescription, tot, sortedPocList.get(beg), sortedPocList.get(end))) {
+                                    if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+                                        loggerClinical.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE : " +
+                                                        "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
+                                                        "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
+                                                tot, upocThreshold, elapsed,
+                                                sortedPocList.get(beg), sortedPocList.get(end));
+                                    }
+                                }
                             }
                         }
                     } while (index < sortedPocList.size() && lastValidIndex < sortedPocList.size());
@@ -583,72 +572,33 @@ public class ClientAbuseDetectionService implements Job {
             }
         }
 
-          // No Patient discovery on client only on server
-//        List<AbuseEvent> distinctPatientIds = list.stream()
-//                .filter(distinctByKey(AbuseEvent::getPatientId))
-//                .collect(Collectors.toList());
-//        if (upatr > 0 && sortedAllList.size() > upatThreshold) { // Analyze unique Patient requests
-//            if (!distinctPatientIds.isEmpty()) {
-//                distinctPatientIds.forEach(pat -> {
-//                    List<AbuseEvent> sortedXcpdList = list.stream()
-//                            .filter(p -> p.getTransactionType().equals(AbuseTransactionType.XCPD_SERVICE_REQUEST))
-//                            .filter(p -> p.getPatientId().equals(pat.getPatientId()))
-//                            .sorted(Comparator.comparing(AbuseEvent::getPatientId))
-//                            .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-//                            .collect(Collectors.toList());
-//
-//                    Period diff = Period.ZERO;
-//                    int index = 0;
-//                    int lastValidIndex = 0;
-//                    do {
-//                        int tot = 0;
-//                        int beg = 0;
-//                        int end = 0;
-//                        for (index = lastValidIndex; index < sortedXcpdList.size(); index++) {
-//                            beg = lastValidIndex;
-//                            end = index;
-//                            int elapsed = getElapsedTimeBetweenEvents(sortedXcpdList, beg, end);
-//                            if (elapsed > upatr) {
-//                                lastValidIndex = index;
-//                                break;
-//                            }
-//                            tot++;
-//                        }
-//                        if (tot > upatThreshold) {
-//                            if (lastValidIndex > 0 && index < sortedXcpdList.size()) {
-//                                end = lastValidIndex - 1;
-//                            } else {
-//                                end = sortedXcpdList.size() - 1;
-//                            }
-//                            int elapsed = getElapsedTimeBetweenEvents(sortedXcpdList, beg, end);
-//                            if (elapsed < upatr) {
-//                                logger.error("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_PATIENT : " +
-//                                                "[Total requests: '{}' exceeding threshold of: '{}' requests inside an interval " +
-//                                                "of '{}' seconds] - begin event : ['{}'] end event : ['{}']",
-//                                        tot, upatThreshold, elapsed,
-//                                        sortedXcpdList.get(beg), sortedXcpdList.get(end));
-//                                String abuseDescription = String.format(DESCRIPTION_PAT, tot, elapsed, upatThreshold);
-//                                setAbuseErrorEvent(AbuseType.PAT, abuseDescription, tot, sortedXcpdList.get(beg), sortedXcpdList.get(end));
-//                            }
-//                        }
-//                    } while (index < sortedXcpdList.size() && lastValidIndex < sortedXcpdList.size());
-//                });
-//            }
-//        }
+        ///////////////////////////////////////////////////
+
+        // No Patient discovery on client only on server
+
+        ///////////////////////////////////////////////////
 
         // strip from table file older than ABUSE_ALL_REQUEST_REFERENCE_REQUEST_PERIOD
         int purgeLimit = NumberUtils.max(new int[]{areqr, upocr, upatr});
         List<AbuseEvent> ret = list.stream()
                 .sorted(Comparator.comparing(AbuseEvent::getRequestDateTime))
-                .filter(p -> Period.fieldDifference(p.getRequestDateTime(),
-                                new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault())))
-                        .toStandardSeconds().getSeconds() <= purgeLimit)
+                .filter(p -> getElapsedSecondsBetweenDateTime(
+                                p.getRequestDateTime(),
+                                new LocalDateTime(
+                                        DateTimeZone.forTimeZone(TimeZone.getDefault())
+                                )) <= purgeLimit
+                        //Period.fieldDifference(p.getRequestDateTime(),
+                        //        new LocalDateTime(DateTimeZone.forTimeZone(TimeZone.getDefault())))
+                        //.toStandardSeconds().getSeconds() <= purgeLimit
+                )
                 .collect(Collectors.toList());
 
-        if (ret.size() < list.size()) {
-            logger.info("'{}' events purged from active list, new list size; '{}'", list.size() - ret.size(), ret.size());
-        } else {
-            logger.info("Events in active list: '{}'", list.size());
+        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
+            if (ret.size() < list.size()) {
+                loggerClinical.info("'{}' events purged from active list, new list size; '{}'", list.size() - ret.size(), ret.size());
+            } else {
+                loggerClinical.info("Events in active list: '{}'", list.size());
+            }
         }
         return ret;
     }

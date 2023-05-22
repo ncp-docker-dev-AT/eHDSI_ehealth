@@ -2,7 +2,7 @@ package eu.epsos.protocolterminators.integrationtest.common;
 
 import eu.epsos.exceptions.InvalidInput;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +48,7 @@ public class HCPIAssertionCreator {
     private HCPIAssertionCreator() {
     }
 
-    public static Assertion createHCPIAssertion(XSPARole role) {
+    public static Assertion createHCPIAssertion(XSPARoleDeprecated role) {
         List<String> permissions = new ArrayList<>();
         permissions.add("4");
         permissions.add("6");
@@ -58,7 +58,7 @@ public class HCPIAssertionCreator {
         return createHCPIAssertion(permissions, role);
     }
 
-    public static Assertion createHCPIAssertion(List<String> permissions, XSPARole role) {
+    public static Assertion createHCPIAssertion(List<String> permissions, XSPARoleDeprecated role) {
         if (permissions == null) {
             throw new InvalidInput("permissions == null");
         }
@@ -114,7 +114,7 @@ public class HCPIAssertionCreator {
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             att.setFriendlyName("XSPA Subject");
-            att.setName("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+            att.setName("urn:oasis:names:tc:xspa:1.0:subject:subject-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
