@@ -3,6 +3,66 @@
 All notable changes to the <a href="https://webgate.ec.europa.eu/fpfis/wikis/x/noOhMg" rel="nofollow">MyHealth@EU project</a> will be documented in this file.<br/>
 This project adheres to <a href="http://semver.org/" rel="nofollow">Semantic Versioning</a>.
 
+## [6.2.0] - 16-05-2023
+The OpenNCP 6.3.0 is the MyHealth@EU Wave 6 HotFix release fixing the issue related to the SAML token.
+This version is planned to be used by the Member State during the MyHealth@EU Wave 6 Extended Test Event from June 2023.
+
+Detailed release note is available here: https://webgate.ec.europa.eu/fpfis/wikis/x/DYq0Ww
+
+Main changes in this release are:<br/>
+<ul>
+<li>Implementation of the XUA IHE Technical Framework Revision 19 (SAML token).</li>
+<li>ATNA secured node: Enhancement of the TLS communication (2 ways SSL).</li>
+<li>Transformation Manager: coded elements configuration update.</li>
+<li>OpenNCP Gateway improvements- Abuse detection module & eADC.</li>
+<li>CDA Display tool improvements (Wave 6 alignments and improvements).</li>
+</ul>
+
+### Bug
+    [EHEALTH-9348] - OpenNCP Commons Error Codes - Incorrect error code
+    [EHEALTH-9630] - Anomaly detection: Previous Patient anomaly being displayed in the log along with new anomaly for another patient
+    [EHEALTH-9633] - RFC-3881 Audit messages validation failed due to missing signature
+    [EHEALTH-9651] - PS-CDA- Content alignment
+    [EHEALTH-9652] - Concept mapping not ok in TSAM Exporter for concept 153 in MVC
+    [EHEALTH-9665] - HCP SAML subject-id URN is not following IHE TH revision 19
+    [EHEALTH-9705] - [CDA Display Tool] Inconsistency between CDA IG and CDA Display Tool for substitution element
+    [EHEALTH-9706] - OpenNCP Maven build process includes heterogeneous JAR libraries versions
+    [EHEALTH-9708] - Parsing HL7v2 Patient Identifier doesn't work properly during the split operation to National Connector
+    [EHEALTH-9716] - Abuse Detection module - Hibernate Key generator strategy
+    [EHEALTH-9745] - Policy Assertion Manager - problem with validations of new SAML assertions structure
+    [EHEALTH-9761] - AbuseDetectionService Job resumed error at startup
+    [EHEALTH-9771] - Audit Manager - Building SSLContext based on TLS certificate
+    [EHEALTH-9778] - OpenNCP-Gateway: "List SMP files" throws NPE when there are no SMP files
+    [EHEALTH-9808] - CDA Display Tool - Error in XPath pointing to medicinal product code
+    [EHEALTH-9824] - Configuration coded_element_list_ehdsi.xml not updated with XPaths in part elements
+    [EHEALTH-9841] - SAML tokens - Cross-Enterprise User Assertion (XUA) Rev 19 not implemented properly
+    [EHEALTH-9867] - Exported KPIs have their timestamp modified to be no later than 12:59:59
+    [EHEALTH-9964] - [CDA Display Tool] ‘OTH’ Null Flavor as value for Agent with textual description not displayed
+    [EHEALTH-9965] - [CDA Display Tool] cannot cope with a prefix before data type (PIVL_TS)
+    [EHEALTH-9971] - [CDA Display Tool] Medical Device: device ID, End date not displayed
+
+### Story
+    [EHEALTH-9936] - [CDA Display Tool] Free-text representation of strength is not displayed.
+    [EHEALTH-9937] - [CDA Display Tool] Root OID for patient identifiers must not be shown to Healthcare Professional
+
+### New Feature
+    [EHEALTH-10011] - Add Iceland and Norway to SMP ehdsi-ism-2020.xsd
+
+### Task
+    [EHEALTH-9718] - Releasing OpenNCP 6.3.0
+
+### Improvement
+    [EHEALTH-9292] - OpenNCP-Gateway - eADC Viewer export: years in the dropdown list are displayed in random order
+    [EHEALTH-9382] - Rename UnSupportedFeature exception class
+    [EHEALTH-9598] - OpenNCP Gazelle validation evidences - Colon in a name in validation files
+    [EHEALTH-9601] - OpenNCP Errors handling improvements
+    [EHEALTH-9641] - OpenNCP-Gateway: "SMP File Update" UI needs improvement
+    [EHEALTH-9773] - Enhancement of the HCP SAML token validation from modules policy manager and eADC
+    [EHEALTH-9860] - Country codes should be uppercased before persistence in eADC
+    [EHEALTH-9864] - Exported KPI data should be sorted by date/time
+    [EHEALTH-9966] - [CDA Display Tool] Medicinal product coded by ATC on the asSpecializedKind level not displayed
+
+
 ## [6.2.0] - 31-01-2023
 The OpenNCP 6.2.0 is the Wave 6 Formal PPT HotFix release including the implementation of the Wave 6 Change Proposals.
 This version is planned to be used by the Member States during the eHDSI Wave 6 - Formal Test event taking place
