@@ -19,7 +19,7 @@ public class AssertionConstants {
     public static final String URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION_ID = "urn:oasis:names:tc:xspa:1.0:subject:organization-id";
     public static final String URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE = "urn:oasis:names:tc:xacml:2.0:subject:role";
     public static final String URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE = "urn:epsos:names:wp3.4:subject:healthcare-facility-type";
-    public static final String URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID = "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
+    public static final String URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID = "urn:oasis:names:tc:xspa:1.0:subject:subject-id";
 
     private AssertionConstants() {
     }

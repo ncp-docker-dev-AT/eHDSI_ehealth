@@ -15,7 +15,6 @@ import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
-import org.opensaml.core.xml.schema.XSURI;
 import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.*;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
@@ -144,7 +143,7 @@ public class SamlTRCIssuer {
             authStmt.setAuthnInstant(issuanceInstant);
             trc.getAuthnStatements().add(authStmt);
 
-            //Creata and add AuthnContext
+            //Create and add AuthnContext
             AuthnContext ac = AssertionUtil.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
             AuthnContextClassRef accr = AssertionUtil.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
             accr.setURI(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
@@ -293,13 +292,13 @@ public class SamlTRCIssuer {
         trc.getSubject().setNameID(nameID);
 
         String spProvidedID = hcpIdentityAssertion.getSubject().getNameID().getSPProvidedID();
-        String humanRequestorNameID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "" + "<" + hcpIdentityAssertion.getSubject().getNameID().getValue()
+        String humanRequestorNameID = StringUtils.isNotBlank(spProvidedID) ? spProvidedID : "<" + hcpIdentityAssertion.getSubject().getNameID().getValue()
                 + "@" + hcpIdentityAssertion.getIssuer().getValue() + ">";
 
         auditDataMap.put("humanRequestorNameID", humanRequestorNameID);
 
         var subjectIdAttr = AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+                "urn:oasis:names:tc:xspa:1.0:subject:subject-id");
         String humanRequesterAlternativeUserID = ((XSString) subjectIdAttr.getAttributeValues().get(0)).getValue();
         auditDataMap.put("humanRequestorSubjectID", humanRequesterAlternativeUserID);
 
@@ -335,7 +334,7 @@ public class SamlTRCIssuer {
         authStmt.setAuthnInstant(issuanceInstant);
         trc.getAuthnStatements().add(authStmt);
 
-        //Creata and add AuthnContext
+        //Create and add AuthnContext
         AuthnContext ac = AssertionUtil.create(AuthnContext.class, AuthnContext.DEFAULT_ELEMENT_NAME);
         AuthnContextClassRef accr = AssertionUtil.create(AuthnContextClassRef.class, AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
         accr.setURI(AuthnContext.PREVIOUS_SESSION_AUTHN_CTX);
@@ -375,10 +374,13 @@ public class SamlTRCIssuer {
             }
         } else {
 
-            XMLObjectBuilder<XSAny> xsAnyBuilder = (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+            XMLObjectBuilder<XSAny> xsAnyBuilder = (XMLObjectBuilder<XSAny>) builderFactory.getBuilder(XSAny.TYPE_NAME);
             XSAny pou = xsAnyBuilder.buildObject("urn:hl7-org:v3", "PurposeOfUse", "");
-            pou.getUnknownAttributes().put(new QName("codeSystem"), "9.3032.1");
-            pou.setTextContent(purposeOfUse);
+            pou.getUnknownAttributes().put(new QName("code"), purposeOfUse);
+            pou.getUnknownAttributes().put(new QName("codeSystem"), "3bc18518-d305-46c2-a8d6-94bd59856e9e");
+            pou.getUnknownAttributes().put(new QName("codeSystemName"), "eHDSI XSPA PurposeOfUse");
+            pou.getUnknownAttributes().put(new QName("displayName"), purposeOfUse);
+            //pou.setTextContent(purposeOfUse);
             XSAny pouAttributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             pouAttributeValue.getUnknownXMLObjects().add(pou);
             attrPoU.getAttributeValues().add(pouAttributeValue);
@@ -417,10 +419,10 @@ public class SamlTRCIssuer {
             auditDataMap.put("pointOfCare", poc);
         }
 
-        var pointOfCareIdAttr = AssertionUtil.findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+        var pointOfCareIdAttr = AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:oasis:names:tc:xspa:1.0:subject:organization-id");
         if (pointOfCareIdAttr != null) {
-            String pocId = ((XSURI) pointOfCareIdAttr.getAttributeValues().get(0)).getURI();
+            String pocId = ((XSString) pointOfCareIdAttr.getAttributeValues().get(0)).getValue();
             auditDataMap.put("pointOfCareID", pocId);
         } else {
             auditDataMap.put("pointOfCareID", "No Organization ID - POC information");
@@ -431,9 +433,9 @@ public class SamlTRCIssuer {
 
         auditDataMap.put("humanRequestorRole", hrRole);
 
-        String functionalRole = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:oasis:names:tc:xspa:1.0:subject:functional-role").getAttributeValues().get(0)).getValue();
-        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
+//        String functionalRole = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+//                "urn:oasis:names:tc:xspa:1.0:subject:functional-role").getAttributeValues().get(0)).getValue();
+//        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
 
         String facilityType = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:epsos:names:wp3.4:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
@@ -539,7 +541,7 @@ public class SamlTRCIssuer {
 //     */
 //    protected NameID getXspaSubjectFromAttributes(List<AttributeStatement> stmts) {
 //
-//        var xspaSubjectAttribute = AssertionUtil.findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+//        var xspaSubjectAttribute = AssertionUtil.findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xspa:1.0:subject:subject-id");
 //        NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
 //        nameID.setFormat(NameID.UNSPECIFIED);
 //        nameID.setValue(((XSString) xspaSubjectAttribute.getAttributeValues().get(0)).getValue());

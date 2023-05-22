@@ -1,6 +1,6 @@
 package eu.epsos.protocolterminators.integrationtest.common;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import org.apache.commons.lang.StringUtils;
@@ -114,7 +114,7 @@ public abstract class AbstractIT {
         }
     }
 
-    protected static Collection<Assertion> hcpAssertionCreate(XSPARole role) {
+    protected static Collection<Assertion> hcpAssertionCreate(XSPARoleDeprecated role) {
 
         Collection<Assertion> assertions = new ArrayList<>(1);
         assertions.add(HCPIAssertionCreator.createHCPIAssertion(role));
@@ -122,7 +122,7 @@ public abstract class AbstractIT {
         return assertions;
     }
 
-    protected static Collection<Assertion> hcpAndTrcAssertionCreate(XSPARole role) {
+    protected static Collection<Assertion> hcpAndTrcAssertionCreate(XSPARoleDeprecated role) {
 
         Collection<Assertion> assertions = new ArrayList<>(2);
 
@@ -135,7 +135,7 @@ public abstract class AbstractIT {
         return assertions;
     }
 
-    protected static Collection<Assertion> hcpAssertionCreate(List<String> permissions, XSPARole role) {
+    protected static Collection<Assertion> hcpAssertionCreate(List<String> permissions, XSPARoleDeprecated role) {
 
         Collection<Assertion> assertions = new ArrayList<>(1);
         assertions.add(HCPIAssertionCreator.createHCPIAssertion(permissions, role));
@@ -143,7 +143,7 @@ public abstract class AbstractIT {
         return assertions;
     }
 
-    protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, XSPARole role) {
+    protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, XSPARoleDeprecated role) {
 
         Collection<Assertion> assertions = new ArrayList<>(2);
 
@@ -162,7 +162,7 @@ public abstract class AbstractIT {
         return assertions;
     }
 
-    protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, List<String> permissions, XSPARole role) {
+    protected static Collection<Assertion> hcpAndTrcAssertionCreate(String patientIdIso, List<String> permissions, XSPARoleDeprecated role) {
 
         Collection<Assertion> assertions = new ArrayList<>(2);
 
@@ -248,7 +248,7 @@ public abstract class AbstractIT {
     /*
      * Instance methods
      */
-    protected abstract Collection<Assertion> getAssertions(String requestPath, XSPARole role);
+    protected abstract Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role);
 
     protected SOAPElement testGood(String testName, String request) {
 

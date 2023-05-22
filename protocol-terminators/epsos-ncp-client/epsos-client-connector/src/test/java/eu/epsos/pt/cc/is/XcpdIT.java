@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.is;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.cc.ClientGenericIT;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -56,7 +56,7 @@ public class XcpdIT extends ClientGenericIT {
      */
     @Test
     public void testQuery() {
-        assertions = getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml", XSPARoleDeprecated.LICENSED_HCP);
         testGood("PT_CLIENT_XCPD_#0", REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml");
     }
 
@@ -150,7 +150,7 @@ public class XcpdIT extends ClientGenericIT {
      */
     @Test
     public void testQueryInsRights() {
-        this.assertions = hcpAssertionCreate(new ArrayList<>(0), XSPARole.LICENSED_HCP);
+        this.assertions = hcpAssertionCreate(new ArrayList<>(0), XSPARoleDeprecated.LICENSED_HCP);
 
         testFailScenario("PT_CLIENT_XCPD_#5", "InsufficientRights", REQ_FOLDER + "PT_CLIENT_XCPD_#0.xml");
     }
@@ -186,7 +186,7 @@ public class XcpdIT extends ClientGenericIT {
      */
     @Test
     public void testQueryMinAccur() {
-        this.assertions = getAssertions(epr, XSPARole.LICENSED_HCP);
+        this.assertions = getAssertions(epr, XSPARoleDeprecated.LICENSED_HCP);
         testFailScenario("PT_CLIENT_XCPD_#7", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#7.xml");
     }
 
@@ -244,7 +244,7 @@ public class XcpdIT extends ClientGenericIT {
      */
     @Test
     public void testBadLivingSubjectID() {
-        this.assertions = getAssertions(epr, XSPARole.LICENSED_HCP);
+        this.assertions = getAssertions(epr, XSPARoleDeprecated.LICENSED_HCP);
         testFailScenario("PT_CLIENT_XCPD_#10", "AnswerNotAvailable", REQ_FOLDER + "PT_CLIENT_XCPD_#10.xml");
     }
 
@@ -262,7 +262,7 @@ public class XcpdIT extends ClientGenericIT {
      */
     @Test
     public void testGoodLivingSubjectID() {
-        this.assertions = getAssertions(epr, XSPARole.LICENSED_HCP);
+        this.assertions = getAssertions(epr, XSPARoleDeprecated.LICENSED_HCP);
         testGood("PT_CLIENT_XCPD_#10.1", REQ_FOLDER + "PT_CLIENT_XCPD_#10.1.xml");
     }
 
@@ -429,7 +429,7 @@ public class XcpdIT extends ClientGenericIT {
      * Auxiliar methods
      */
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAssertionCreate(role);
     }
 }

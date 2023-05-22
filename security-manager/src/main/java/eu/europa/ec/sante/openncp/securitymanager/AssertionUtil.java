@@ -52,10 +52,10 @@ public class AssertionUtil {
                     XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
                     XSString attrVal = (XSString) stringBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSString.TYPE_NAME);
 
-                    if(attribute.getAttributeValues().get(0).hasChildren() == false) {
+                    if (!attribute.getAttributeValues().get(0).hasChildren()) {
                         attrVal.setValue(((XSString) attribute.getAttributeValues().get(0)).getValue());
                     } else {
-                        if(attribute.getAttributeValues().get(0).getOrderedChildren().get(0).getClass().getName().equals("org.opensaml.core.xml.schema.impl.XSAnyImpl")) {
+                        if (attribute.getAttributeValues().get(0).getOrderedChildren().get(0).getClass().getName().equals("org.opensaml.core.xml.schema.impl.XSAnyImpl")) {
                             attrVal.setValue(((XSAny) attribute.getAttributeValues().get(0).getOrderedChildren().get(0)).getTextContent());
                         } else {
                             attrVal.setValue(((XSString) attribute.getAttributeValues().get(0).getOrderedChildren().get(0)).getValue());
@@ -104,7 +104,7 @@ public class AssertionUtil {
      */
     public static NameID getXspaSubjectFromAttributes(List<AttributeStatement> stmts) {
 
-        var xspaSubjectAttribute = AssertionUtil.findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        var xspaSubjectAttribute = AssertionUtil.findStringInAttributeStatement(stmts, "urn:oasis:names:tc:xspa:1.0:subject:subject-id");
         NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         nameID.setFormat(NameID.UNSPECIFIED);
         nameID.setValue(((XSString) xspaSubjectAttribute.getAttributeValues().get(0)).getValue());
@@ -156,10 +156,13 @@ public class AssertionUtil {
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
         XMLObjectBuilder stringBuilder = builderFactory.getBuilder(XSString.TYPE_NAME);
 
-        XMLObjectBuilder<XSAny> xsAnyBuilder = (XMLObjectBuilder<XSAny>)builderFactory.getBuilder(XSAny.TYPE_NAME);
+        XMLObjectBuilder<XSAny> xsAnyBuilder = (XMLObjectBuilder<XSAny>) builderFactory.getBuilder(XSAny.TYPE_NAME);
         XSAny pou = xsAnyBuilder.buildObject("urn:hl7-org:v3", "PurposeOfUse", "");
-        pou.getUnknownAttributes().put(new QName("codeSystem"), "9.3032.1");
-        pou.setTextContent(value);
+        pou.getUnknownAttributes().put(new QName("code"), value);
+        pou.getUnknownAttributes().put(new QName("codeSystem"), "3bc18518-d305-46c2-a8d6-94bd59856e9e");
+        pou.getUnknownAttributes().put(new QName("codeSystemName"), "eHDSI XSPA PurposeOfUse");
+        pou.getUnknownAttributes().put(new QName("displayName"), value);
+        //pou.setTextContent(value);
         XSAny pouAttributeValue = xsAnyBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         pouAttributeValue.getUnknownXMLObjects().add(pou);
         attr.getAttributeValues().add(pouAttributeValue);

@@ -87,6 +87,66 @@ public class AssertionHelper {
         }
     }
 
+    public static String getPurposeOfUseFromAssertion(Assertion assertion, String attributeName) throws MissingFieldException {
+
+        for (AttributeStatement attributeStatement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : attributeStatement.getAttributes()) {
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    if (!attribute.getAttributeValues().isEmpty()) {
+                        //return attribute.getAttributeValues().get(0).getDOM().getTextContent();
+                        return attribute.getAttributeValues().get(0).getDOM().getElementsByTagName("PurposeOfUse")
+                                .item(0).getAttributes().getNamedItem("code").getTextContent();
+                    } else {
+                        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+                        throw new MissingFieldException(errorMessage);
+                    }
+                }
+            }
+        }
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+        throw new MissingFieldException(errorMessage);
+    }
+
+    public static String getRoleFromAssertion(Assertion assertion, String attributeName) throws MissingFieldException {
+
+        for (AttributeStatement attributeStatement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : attributeStatement.getAttributes()) {
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    if (!attribute.getAttributeValues().isEmpty()) {
+                        //return attribute.getAttributeValues().get(0).getDOM().getTextContent();
+                        return attribute.getAttributeValues().get(0).getDOM().getElementsByTagName("Role")
+                                .item(0).getAttributes().getNamedItem("code").getTextContent();
+                    } else {
+                        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+                        throw new MissingFieldException(errorMessage);
+                    }
+                }
+            }
+        }
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+        throw new MissingFieldException(errorMessage);
+    }
+
+    public static String getRoleNameFromAssertion(Assertion assertion, String attributeName) throws MissingFieldException {
+
+        for (AttributeStatement attributeStatement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : attributeStatement.getAttributes()) {
+                if (StringUtils.equals(attribute.getName(), attributeName)) {
+                    if (!attribute.getAttributeValues().isEmpty()) {
+                        //return attribute.getAttributeValues().get(0).getDOM().getTextContent();
+                        return attribute.getAttributeValues().get(0).getDOM().getElementsByTagName("Role")
+                                .item(0).getAttributes().getNamedItem("displayName").getTextContent();
+                    } else {
+                        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+                        throw new MissingFieldException(errorMessage);
+                    }
+                }
+            }
+        }
+        String errorMessage = MessageFormat.format(ERROR_MESSAGE, attributeName);
+        throw new MissingFieldException(errorMessage);
+    }
+
     public static boolean isExpired(Assertion assertion) {
 
         if (assertion.getConditions().getNotBefore() != null && assertion.getConditions().getNotBefore().isAfter(Instant.now())) {

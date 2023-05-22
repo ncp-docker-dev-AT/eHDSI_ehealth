@@ -195,7 +195,7 @@ public class EadcUtilWrapper {
         transactionInfo.setDuration(endTime != null && startTime != null ? String.valueOf(endTime.getTime() - startTime.getTime()) : null);
         transactionInfo.setHomeAddress(EventLogClientUtil.getSourceGatewayIdentifier());
         String sndIso = reqMsgContext != null ? extractSendingCountryIsoFromAssertion(getAssertion(reqMsgContext)) : null;
-        transactionInfo.setSndISO(sndIso);
+        transactionInfo.setSndISO(StringUtils.upperCase(sndIso));
         transactionInfo.setSndNCPOID(sndIso != null ? OidUtil.getHomeCommunityId(sndIso.toLowerCase()) : null);
 
         if (reqMsgContext != null && reqMsgContext.getOptions() != null && reqMsgContext.getOptions().getFrom() != null
@@ -223,7 +223,7 @@ public class EadcUtilWrapper {
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
                         extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
         transactionInfo.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
-        transactionInfo.setReceivingISO(countryCodeA != null ? countryCodeA.toUpperCase() : null);
+        transactionInfo.setReceivingISO(countryCodeA != null ? StringUtils.upperCase(countryCodeA) : null);
         transactionInfo.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);
 
         if (serviceClient != null && serviceClient.getOptions() != null && serviceClient.getOptions().getTo() != null && serviceClient.getOptions().getTo().getAddress() != null) {

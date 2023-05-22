@@ -1,7 +1,7 @@
 package eu.epsos.protocolterminators.integrationtest.common;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
 import eu.epsos.util.IheConstants;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.impl.AssertionMarshaller;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Test client that uses SAAJ (SOAP with Attachments API for Java) for calling web services. To be used for test
- * purposes only, for example integration-tests.
+ * Test client that uses SAAJ (SOAP with Attachments API for Java) for calling web services.
+ * To be used for testing purposes only, for example integration-tests.
  *
  * @author gareth
  */
@@ -33,10 +33,10 @@ public class SimpleSoapClient {
     private final String endpoint;
 
     /**
-     * Instanciate the SimpleSoapClient
+     * Instantiate the SimpleSoapClient
      *
      * @param endpoint URL for an NCP-A IHE Service Endpoint (eg.
-     *                 http://localhost:8090/epsos-ws-server/services/XCA_Service/)
+     *                 <a href="http://localhost:8090/epsos-ws-server/services/XCA_Service/">XCA endpoint</a>)
      */
     public SimpleSoapClient(String endpoint) {
         this.endpoint = endpoint;
@@ -44,10 +44,8 @@ public class SimpleSoapClient {
 
     /**
      * Main class for testing & development purposes
-     *
-     * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String... args) {
 
         // load SOAP body content from file system
         String bodyStr = new ResourceLoader().getResource("/xca/AdhocQueryRequest.xml");
@@ -61,7 +59,7 @@ public class SimpleSoapClient {
         }
 
         // build list of SAML2 assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARoleDeprecated.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion("", "");
         Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(idAssertion);
@@ -85,13 +83,13 @@ public class SimpleSoapClient {
      *
      * @param msg SOAP object
      * @return String
-     * @throws SOAPException
-     * @throws IOException
+     * @throws SOAPException - Exception thrown.
+     * @throws IOException   - Exception thrown.
      */
     private static String getXmlFromSOAPMessage(SOAPMessage msg) throws SOAPException, IOException {
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         msg.writeTo(byteArrayOS);
-        return new String(byteArrayOS.toByteArray());
+        return byteArrayOS.toString();
     }
 
     /**

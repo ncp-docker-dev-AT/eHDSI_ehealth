@@ -144,7 +144,7 @@ public class HCPIAssertionCreator {
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             att.setFriendlyName("XSPA Subject");
-            att.setName("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+            att.setName("urn:oasis:names:tc:xspa:1.0:subject:subject-id");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
@@ -238,8 +238,7 @@ public class HCPIAssertionCreator {
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
             attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
             QName attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
-            QName value = new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "anyURI", "xs");
-            attVal.getUnknownAttributes().put(attributeName, value);
+            attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
             att.getAttributeValues().add(attVal);
             attributeStatement.getAttributes().add(att);

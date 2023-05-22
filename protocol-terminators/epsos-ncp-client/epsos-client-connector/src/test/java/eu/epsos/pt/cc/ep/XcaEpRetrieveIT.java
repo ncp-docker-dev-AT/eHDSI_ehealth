@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.ep;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaExtraction;
 import eu.epsos.protocolterminators.integrationtest.ihe.cda.CdaModel;
 import eu.epsos.pt.cc.ClientGenericIT;
@@ -70,7 +70,7 @@ public class XcaEpRetrieveIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#9.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_EP_#9.xml", XSPARoleDeprecated.LICENSED_HCP);
 
         SOAPElement rspSoapMsg = testGood("PT_CLIENT_XCA_EP_#9", REQ_FOLDER + "PT_CLIENT_XCA_EP_#9.xml");
         validateCDA(rspSoapMsg, CdaExtraction.MessageType.PORTAL, CdaModel.EP_PIVOT);
@@ -95,11 +95,11 @@ public class XcaEpRetrieveIT extends ClientGenericIT {
      * Auxiliar methods
      */
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(role);
     }
 
-    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate("041082-995W^^^&1.2.246.21&amp;ISO", permissions, role);
     }
 }

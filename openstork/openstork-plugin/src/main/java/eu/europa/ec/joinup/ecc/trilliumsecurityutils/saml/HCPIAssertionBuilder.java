@@ -120,7 +120,7 @@ public class HCPIAssertionBuilder {
 
         var attribute = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attribute.setFriendlyName("XSPA Subject");
-        attribute.setName("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        attribute.setName("urn:oasis:names:tc:xspa:1.0:subject:subject-id");
         attribute.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
         XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
@@ -222,7 +222,7 @@ public class HCPIAssertionBuilder {
         attVal.getNamespaceManager().registerNamespaceDeclaration(ns1);
         attVal.getNamespaceManager().registerNamespaceDeclaration(ns2);
         attributeName = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi");
-        attVal.getUnknownAttributes().put(attributeName, "xs:anyURI");
+        attVal.getUnknownAttributes().put(attributeName, "xs:string");
 
         att.getAttributeValues().add(attVal);
         attributeStatement.getAttributes().add(att);

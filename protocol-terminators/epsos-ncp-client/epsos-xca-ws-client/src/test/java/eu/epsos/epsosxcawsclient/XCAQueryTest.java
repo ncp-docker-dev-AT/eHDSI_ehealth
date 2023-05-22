@@ -7,7 +7,7 @@ import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
 import eu.epsos.util.IheConstants;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import org.junit.Ignore;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -54,7 +54,7 @@ public class XCAQueryTest {
     public void doQuery() throws XCAException {
 
         // build assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARoleDeprecated.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion(HOME_COMMUNITY_ID, PATIENT_ID);
         Map<AssertionEnum, Assertion> assertionMap = new EnumMap<>(AssertionEnum.class);
         assertionMap.put(AssertionEnum.CLINICIAN, idAssertion);

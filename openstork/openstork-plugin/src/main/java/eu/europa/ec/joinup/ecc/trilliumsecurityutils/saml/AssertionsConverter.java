@@ -227,8 +227,8 @@ public class AssertionsConverter {
             LOGGER.info("Point of Care: {}", poc);
             auditDataMap.put("pointOfCare", poc);
 
-            String pocId = ((XSURI) Objects.requireNonNull(findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                    "urn:oasis:names:tc:xspa:1.0:subject:organization-id")).getAttributeValues().get(0)).getURI();
+            String pocId = ((XSString) Objects.requireNonNull(findURIInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
+                    "urn:oasis:names:tc:xspa:1.0:subject:organization-id")).getAttributeValues().get(0)).getValue();
 
             LOGGER.info("Point of Care: {}", poc);
             auditDataMap.put("pointOfCareID", pocId);
@@ -354,7 +354,7 @@ public class AssertionsConverter {
 
             // XSPA Subject
             var attrPID = createAttribute(builderFactory, "XSPA Subject",
-                    "urn:oasis:names:tc:xacml:1.0:subject:subject-id", username, "", "");
+                    "urn:oasis:names:tc:xspa:1.0:subject:subject-id", username, "", "");
             attrStmt.getAttributes().add(attrPID);
             // XSPA Role
             var attrPID_1 = createAttribute(builderFactory, "XSPA Role",
@@ -373,7 +373,7 @@ public class AssertionsConverter {
             attrStmt.getAttributes().add(attrPID_3);
             // XSPA Organization ID
             var attrPID_4 = createAttribute(builderFactory, "XSPA Organization ID",
-                    "urn:oasis:names:tc:xspa:1.0:subject:organization-id", organizationId, "AA", "");
+                    "urn:oasis:names:tc:xspa:1.0:subject:organization-id", organizationId, "", "");
             attrStmt.getAttributes().add(attrPID_4);
 
             // // On behalf of
@@ -674,7 +674,7 @@ public class AssertionsConverter {
 
     protected static NameID getXspaSubjectFromAttributes(List<AttributeStatement> attributeStatementList) {
 
-        var xspaSubjectAttribute = findStringInAttributeStatement(attributeStatementList, "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        var xspaSubjectAttribute = findStringInAttributeStatement(attributeStatementList, "urn:oasis:names:tc:xspa:1.0:subject:subject-id");
 
         NameID nameID = create(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         nameID.setFormat(NameID.UNSPECIFIED);

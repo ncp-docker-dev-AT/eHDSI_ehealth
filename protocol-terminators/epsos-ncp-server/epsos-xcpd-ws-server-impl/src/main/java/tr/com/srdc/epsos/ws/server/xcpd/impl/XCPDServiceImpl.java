@@ -89,7 +89,7 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
         eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : "" + "<" + Helper.getUserID(soapHeader)
                 + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
         eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
-        eventLog.setHR_RoleID(Helper.getFunctionalRoleID(soapHeader));
+        eventLog.setHR_RoleID(Helper.getRoleID(soapHeader));
         // Add point of care to the event log for assertion purposes
         eventLog.setPC_UserID(Helper.getPointOfCareUserId(soapHeader));
         eventLog.setPC_RoleID(Helper.getPC_RoleID(soapHeader));

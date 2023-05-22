@@ -5,7 +5,7 @@ import eu.epsos.protocolterminators.integrationtest.common.HCPIAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TRCAssertionCreator;
 import eu.epsos.protocolterminators.integrationtest.common.TestConstants;
 import eu.epsos.pt.ws.client.xca.XcaInitGateway;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType.DocumentResponse;
@@ -49,7 +49,7 @@ public class XCARetrieveTest {
     public void doRetrieve() throws XCAException {
 
         // build assertions
-        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARole.LICENSED_HCP);
+        Assertion idAssertion = HCPIAssertionCreator.createHCPIAssertion(XSPARoleDeprecated.LICENSED_HCP);
         Assertion trcAssertion = TRCAssertionCreator.createTRCAssertion(HOME_COMMUNITY_ID, PATIENT_COUNTRY);
         Map<AssertionEnum, Assertion> assertionMap = new EnumMap<>(AssertionEnum.class);
         assertionMap.put(AssertionEnum.CLINICIAN, idAssertion);

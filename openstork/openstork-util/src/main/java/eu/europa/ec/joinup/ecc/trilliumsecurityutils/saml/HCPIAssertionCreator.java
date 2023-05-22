@@ -2,7 +2,7 @@ package eu.europa.ec.joinup.ecc.trilliumsecurityutils.saml;
 
 import eu.epsos.exceptions.InvalidInput;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.PurposeOfUse;
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML;
 import eu.europa.ec.sante.ehdsi.openncp.util.security.CryptographicConstant;
 import org.opensaml.core.xml.Namespace;
@@ -66,7 +66,7 @@ public class HCPIAssertionCreator {
      * @param homeCommunityId the Home Community ID
      * @return
      */
-    public static Assertion createHCPIAssertion(final XSPARole role, final String patientId, final String homeCommunityId) {
+    public static Assertion createHCPIAssertion(final XSPARoleDeprecated role, final String patientId, final String homeCommunityId) {
 
         List<String> permissions = new ArrayList<>();
         permissions.add("4");
@@ -86,7 +86,7 @@ public class HCPIAssertionCreator {
      * @param homeCommunityId
      * @return
      */
-    public static Assertion createHCPIAssertion(final List<String> permissions, final XSPARole role, final String patientId,
+    public static Assertion createHCPIAssertion(final List<String> permissions, final XSPARoleDeprecated role, final String patientId,
                                                 final String homeCommunityId) {
 
         if (permissions == null) {

@@ -533,7 +533,7 @@ public class XDSbRepositoryServiceInvoker {
             if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization")) {
                 organization = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
-            if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
+            if (StringUtils.equals(attr.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
                 organizationId = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
         }
@@ -575,10 +575,10 @@ public class XDSbRepositoryServiceInvoker {
         attrs = attrStatements.get(0).getAttributes();
 
         for (Attribute attr : attrs) {
-            if (attr.getName().equals("urn:oasis:names:tc:xacml:1.0:subject:subject-id")) {
+            if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:subject-id")) {
                 authorIdentifier = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
-            if (attr.getName().equals("urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
+            if (StringUtils.equals(attr.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization-id")) {
                 assigningAuthorityId = Objects.requireNonNull(attr.getAttributeValues().get(0).getDOM()).getTextContent();
             }
         }

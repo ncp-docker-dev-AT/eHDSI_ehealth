@@ -102,20 +102,20 @@ public class Helper {
     }
 
     public static String getAlternateUserID(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:1.0:subject:subject-id", false);
+        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:subject-id", false);
         if (result == null) {
             return "N/A";
         }
         return result;
     }
 
-    public static String getFunctionalRoleID(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:functional-role", false);
-        if (result == null) {
-            return "N/A";
-        }
-        return result;
-    }
+//    public static String getFunctionalRoleID(Element sh) {
+//        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:functional-role", false);
+//        if (result == null) {
+//            return "N/A";
+//        }
+//        return result;
+//    }
 
     public static String getRoleID(Element sh) {
         String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:2.0:subject:role", false);

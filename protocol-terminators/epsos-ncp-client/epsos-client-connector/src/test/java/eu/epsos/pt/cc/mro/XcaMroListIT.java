@@ -19,7 +19,7 @@
  */
 package eu.epsos.pt.cc.mro;
 
-import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARole;
+import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.XSPARoleDeprecated;
 import eu.epsos.pt.cc.ClientGenericIT;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -65,17 +65,17 @@ public class XcaMroListIT extends ClientGenericIT {
         List<String> permissions = new ArrayList<>(2);
         permissions.add("4");
         permissions.add("10");
-        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#0.xml", XSPARole.LICENSED_HCP);
+        assertions = getAssertions(permissions, REQ_FOLDER + "PT_CLIENT_XCA_MRO_#0.xml", XSPARoleDeprecated.LICENSED_HCP);
 
         testGood("PT_CLIENT_XCA_MRO_#0", REQ_FOLDER + "PT_CLIENT_XCA_MRO_#0.xml");
     }
 
     @Override
-    protected Collection<Assertion> getAssertions(String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(getPatientIdIso(requestPath), role);
     }
 
-    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARole role) {
+    protected Collection<Assertion> getAssertions(List<String> permissions, String requestPath, XSPARoleDeprecated role) {
         return hcpAndTrcAssertionCreate(getPatientIdIso(requestPath), permissions, role);
     }
 }
