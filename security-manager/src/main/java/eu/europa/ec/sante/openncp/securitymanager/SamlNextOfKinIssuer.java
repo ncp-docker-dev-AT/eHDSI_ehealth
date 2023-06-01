@@ -227,7 +227,7 @@ public class SamlNextOfKinIssuer {
 //        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
 
         String facilityType = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                "urn:epsos:names:wp3.4:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
+                "urn:ehdsi:names:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
 
         auditDataMap.put("facilityType", facilityType);
 

@@ -35,7 +35,7 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     @Override
     public void HealthcareFacilityValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException {
 
-        String facilityType = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_HEALTHCARE_FACILITY_TYPE);
+        String facilityType = getAttributeFromAssertion(assertion, AssertionConstants.URN_EHDSI_NAMES_SUBJECT_HEALTHCARE_FACILITY_TYPE);
         if (StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.HOSPITAL.toString())
                 || StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.RESIDENT_PHYSICIAN.toString())
                 || StringUtils.equalsIgnoreCase(facilityType, HealthcareFacilityType.PHARMACY.toString())
@@ -43,8 +43,8 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
 
             logger.debug("HCP Identity Assertion Healthcare Facility Type: '{}'", facilityType);
         } else {
-            logger.warn("InvalidFieldException: eHealth DSI Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
-            throw new InvalidFieldException("eHealth DSI Healthcare Facility Type 'urn:epsos:names:wp3.4:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            logger.warn("InvalidFieldException: eHealth DSI Healthcare Facility Type 'urn:ehdsi:names:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
+            throw new InvalidFieldException("eHealth DSI Healthcare Facility Type 'urn:ehdsi:names:subject:healthcare-facility-type' attribute in assertion should be one of followings {'Hospital', 'Resident Physician', 'Pharmacy', 'Other'}.");
         }
     }
 
@@ -59,12 +59,12 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
     @Override
     public void OnBehalfOfValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException {
 
-        String onBehalfOfRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_EPSOS_NAMES_WP3_4_SUBJECT_ON_BEHALF_OF);
+        String onBehalfOfRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_EHDSI_NAMES_SUBJECT_ON_BEHALF_OF);
         if (XSPARole.containsCode(onBehalfOfRole)) {
 
             logger.debug("HCP Identity Assertion OnBehalfOf: '{}'", onBehalfOfRole);
         } else {
-            throw new InvalidFieldException("OnBehalfOf 'urn:epsos:names:wp3.4:subject:on-behalf-of' attribute in assertion should be one of the element from XSPA Functional Role");
+            throw new InvalidFieldException("OnBehalfOf 'urn:ehdsi:names:subject:on-behalf-of' attribute in assertion should be one of the element from XSPA Functional Role");
         }
     }
 
