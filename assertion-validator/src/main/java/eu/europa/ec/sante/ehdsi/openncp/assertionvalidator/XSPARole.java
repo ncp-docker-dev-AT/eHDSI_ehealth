@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum XSPARole {
 
-    AUDIOLOGIST("2466", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Audiologists and speech therapists"),
+    AUDIOLOGIST("2266", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Audiologists and speech therapists"),
     DENTIST("2261", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Dentists"),
     MEDICAL_DOCTORS("221", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Medical Doctors"),
     MEDICAL_TECHNICIAN("3211", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Medical imaging and therapeutic equipment technicians"),
