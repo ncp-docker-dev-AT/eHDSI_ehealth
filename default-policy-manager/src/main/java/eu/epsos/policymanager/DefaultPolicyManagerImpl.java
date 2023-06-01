@@ -105,23 +105,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
      * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
      */
     @Override
-    public void XSPAFunctionalRoleValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException {
-
-        String functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
-        logger.debug("XSPA Functional Role: '{}'", functionalRole);
-
-        if (!XSPARole.containsCode(functionalRole)) {
-            throw new InvalidFieldException("The functional Role " + functionalRole + " of the user is invalid.");
-        }
-    }
-
-    /**
-     * @param assertion - SAML user assertion.
-     * @param classCode - Type of clinical document requested by the user (if available).
-     * @throws MissingFieldException - User's assertion attribute is missing.
-     * @throws InvalidFieldException - User's assertion attribute is not correct according the specification.
-     */
-    @Override
     public void XSPASubjectValidatorForHCP(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException {
 
         String subjectId = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID);
@@ -308,7 +291,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check allowed roles
         try {
             role = getRoleFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-            //functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
@@ -372,7 +354,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check allowed roles
         try {
             role = getRoleFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-            //functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
         } catch (MissingFieldException ex) {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
@@ -470,8 +451,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check allowed roles
         try {
             role = getRoleFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-            //functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
-
         } catch (MissingFieldException ex) {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();
@@ -523,8 +502,6 @@ public class DefaultPolicyManagerImpl implements PolicyAssertionManager {
         //Check allowed roles
         try {
             role = getRoleFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE);
-            //functionalRole = getAttributeFromAssertion(assertion, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_FUNCTIONAL_ROLE);
-
         } catch (MissingFieldException ex) {
             logger.error(ERROR_ASSERTION_MISSING_FIELD_ROLE, ex.getMessage(), ex);
             throw new InsufficientRightsException();

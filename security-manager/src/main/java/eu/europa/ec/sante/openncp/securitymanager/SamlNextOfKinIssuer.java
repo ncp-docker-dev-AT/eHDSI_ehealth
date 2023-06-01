@@ -222,10 +222,6 @@ public class SamlNextOfKinIssuer {
 
         auditDataMap.put("humanRequestorRole", hrRole);
 
-//        String functionalRole = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-//                "urn:oasis:names:tc:xspa:1.0:subject:functional-role").getAttributeValues().get(0)).getValue();
-//        auditDataMap.put("humanRequesterFunctionalRole", functionalRole);
-
         String facilityType = ((XSString) AssertionUtil.findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
                 "urn:ehdsi:names:subject:healthcare-facility-type").getAttributeValues().get(0)).getValue();
 
