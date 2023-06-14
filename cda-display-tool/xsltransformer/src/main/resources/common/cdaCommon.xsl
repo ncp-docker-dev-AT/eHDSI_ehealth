@@ -31,7 +31,7 @@
         <xsl:param name="id"/>
         <xsl:if test="not($id/@nullFlavor)">
             <xsl:if test="$id/@extension">
-                    <xsl:value-of select="$id/@extension"/>
+                <xsl:value-of select="$id/@extension"/>
             </xsl:if>
         </xsl:if>
     </xsl:template>
@@ -174,6 +174,29 @@
             </xsl:otherwise>
         </xsl:choose>
         <br/>
+    </xsl:template>
+
+    <!-- show-contactInformation -->
+    <xsl:template name="show-contactInformation">
+        <xsl:param name="contactInfoRoot"/>
+        <table class="contact_information_table">
+            <colgroup>
+                <col span="1" style="width: 30%;"/>
+                <col span="1" style="width: 70%;"/>
+            </colgroup>
+            <tr>
+                <th colspan="2">
+                    <!-- Contact Information -->
+                    <xsl:call-template name="show-eHDSIDisplayLabel">
+                        <xsl:with-param name="code" select="'12'"/>
+                    </xsl:call-template>
+                </th>
+            </tr>
+            <tr/>
+            <xsl:call-template name="show-contactInfo">
+                <xsl:with-param name="contact" select="$contactInfoRoot"/>
+            </xsl:call-template>
+        </table>
     </xsl:template>
 
     <!-- show-telecom -->
