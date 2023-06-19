@@ -86,6 +86,9 @@ public enum OpenNCPErrorCode implements ErrorCode {
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS_FOR_UNIQUE_POINT_OF_CARE", "An unexpected number of requests has been detected from one specific Point of Care"),
     WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS("WARNING_SEC_UNEXPECTED_NUMBER_OF_REQUESTS", "An unexpected number of requests has been detected"),
 
+    // 11. Transformation manager
+    ERROR_UI_TRANSFORMATION("ERROR_UI_TRANSFORMATION", "An unexpected exception occurred when transforming the CDA document to HTML"),
+
     //  Old MyHealth@EU error codes
     ERROR_NOT_VALID_ASSERTION("1001", "Assertion is not valid."),
     ERROR_NOT_VALID_TRC_ASSERTION("1002", "The given TRC Assertion does not validate against the Identity Assertion"),
