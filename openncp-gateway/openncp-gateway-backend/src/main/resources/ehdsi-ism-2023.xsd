@@ -80,6 +80,7 @@
             <xs:element name="textField" type="textField" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="birthDate" type="birthDate" minOccurs="0"/>
             <xs:element name="gender" type="administrativeGender" minOccurs="0"/>
+            <xs:element name="accessCode" type="accessCode" minOccurs="0"/>
             <xs:element name="media" type="mediaDetails" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="friendlyName" type="xs:string" default="ALL"/>
@@ -113,6 +114,15 @@
         <xs:attribute name="originalContextualDescription" type="xs:string"/>
         <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
     </xs:complexType>
+
+    <!-- Patient element - LivingSubjectAccessCode -->
+        <xs:complexType name="accessCode">
+            <xs:attribute name="label" fixed="label.ism.accessToken" use="required"/>
+            <xs:attribute name="format" type="xs:string" use="required"/>
+            <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
+            <xs:attribute name="originalContextualDescription" type="xs:string"/>
+            <xs:attribute name="mandatory" type="xs:boolean" default="false"/>
+        </xs:complexType>
 
     <!-- Patient element generic Identity Traits - LivingSubjectName, PatientAddress -->
     <xs:complexType name="textField">
