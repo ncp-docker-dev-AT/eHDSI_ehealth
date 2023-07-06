@@ -117,7 +117,7 @@
 
     <!-- Patient element - LivingSubjectAccessCode -->
         <xs:complexType name="accessCode">
-            <xs:attribute name="label" fixed="label.ism.accessToken" use="required"/>
+            <xs:attribute name="label" fixed="label.ism.accessCode" use="required"/>
             <xs:attribute name="format" type="xs:string" use="required"/>
             <xs:attribute name="contextualDescription" type="xs:string" use="required"/>
             <xs:attribute name="originalContextualDescription" type="xs:string"/>
@@ -222,6 +222,7 @@
             <xs:enumeration value="label.ism.regionalPatientIdentifier"/>
             <xs:enumeration value="label.ism.regionIdentifier"/>
             <xs:enumeration value="label.ism.gender"/>
+            <xs:enumeration value="label.ism.accessCode"/>
         </xs:restriction>
     </xs:simpleType>
 

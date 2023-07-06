@@ -69,7 +69,7 @@ export const fields = {
   extension: {
     name: 'Extension',
     tooltip:
-      'National Search Mask as XML format and valid according the XSD ehdsi-ism-2020.xsd',
+      'National Search Mask as XML format and valid according the XSD ehdsi-ism-2023.xsd',
     type: 'file',
     rules: []
   },
