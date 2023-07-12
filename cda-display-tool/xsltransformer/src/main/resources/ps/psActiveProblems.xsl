@@ -125,7 +125,11 @@
 
     <xsl:template name="rareDiseases">
         <tr>
-            <th class="subtitle" colspan="5">Rare Diseases</th>
+            <th class="subtitle" colspan="5">
+                <!-- Rare Diseases -->
+                <!-- TODO Add concept to eHDSIDisplayLabel Value Set -->
+                <xsl:text>Rare Diseases</xsl:text>
+            </th>
         </tr>
         <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="activeProblems"/>
     </xsl:template>
