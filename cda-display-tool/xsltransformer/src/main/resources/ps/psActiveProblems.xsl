@@ -56,12 +56,19 @@
                         </label>
                         <div class="collapsible-content">
                             <div class="content-inner">
-                                <table class="translation_table">
+                                <table class="translation_table" width="100%">
+                                    <colgroup>
+                                        <col span="1" style="width: 15%;"/>
+                                        <col span="1" style="width: 15%;"/>
+                                        <col span="1" style="width: 15%;"/>
+                                        <col span="1" style="width: 35%;"/>
+                                        <col span="1" style="width: 20%;"/>
+                                    </colgroup>
                                     <tbody>
                                         <xsl:choose>
                                             <xsl:when test="($problemCondition/@code='no-known-problems' or $problemCondition/@code='no-problem-info')">
                                                 <tr>
-                                                    <td colspan="2">
+                                                    <td colspan="5">
                                                         <xsl:call-template name="show-eHDSIAbsentOrUnknownProblem">
                                                             <xsl:with-param name="node" select="$problemCondition"/>
                                                         </xsl:call-template>
@@ -98,7 +105,8 @@
                                                         <xsl:text>Related External Resource</xsl:text>
                                                     </th>
                                                 </tr>
-                                                <xsl:apply-templates select="n1:entry/n1:act" mode="currentProblems"/>
+                                                <xsl:call-template name="generalProblems"/>
+                                                <xsl:call-template name="rareDiseases"/>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </tbody>
@@ -111,23 +119,30 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="n1:entry/n1:act" mode="currentProblems">
-        <xsl:variable name="problem"
-                      select="n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.7']"/>
+    <xsl:template name="generalProblems">
+        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.2']" mode="activeProblems"/>
+    </xsl:template>
+
+    <xsl:template name="rareDiseases">
+        <tr>
+            <th class="subtitle" colspan="5">Rare Diseases</th>
+        </tr>
+        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="activeProblems"/>
+    </xsl:template>
+
+    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="activeProblems">
+
         <xsl:variable name="problemCondition"
-                      select="$problem/../n1:value"/>
+                      select="."/>
         <xsl:variable name="probOnSetDate"
-                      select="n1:effectiveTime/n1:low"/>
+                      select="../../../n1:effectiveTime/n1:low"/>
         <xsl:variable name="diagnosisAssertionStatus"
-                      select="$problem/../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.49']/../n1:value"/>
+                      select="../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.49']/../n1:value"/>
         <xsl:choose>
             <xsl:when test="not(@nullFlavor)">
                 <tr>
                     <td>
                         <!-- Active Problem -->
-                        <xsl:call-template name="show-eHDSIIllnessandDisorder">
-                            <xsl:with-param name="node" select="$problemCondition"/>
-                        </xsl:call-template>
                         <xsl:call-template name="show-eHDSIRareDiseases">
                             <xsl:with-param name="node" select="$problemCondition"/>
                         </xsl:call-template>
@@ -164,13 +179,86 @@
                     </td>
                     <td>
                         <!-- Related Health Professional -->
-                        <xsl:for-each select="$problem/../n1:entryRelationship[@typeCode='REFR']/n1:act/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.48']/..">
+                        <xsl:for-each select="../n1:entryRelationship/n1:act/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.48']/..">
                             <xsl:apply-templates select="n1:performer"/>
                         </xsl:for-each>
                     </td>
                     <td>
                         <!-- Related External Resource -->
-                        <xsl:for-each select="$problem/../n1:reference[@typeCode='REFR']">
+                        <xsl:for-each select="../n1:reference[@typeCode='REFR']">
+                            <xsl:apply-templates select="n1:externalDocument"/>
+                        </xsl:for-each>
+                    </td>
+                </tr>
+            </xsl:when>
+            <xsl:otherwise>
+                <tr>
+                    <td colspan="2">
+                        <xsl:call-template name="show-eHDSINullFlavor">
+                            <xsl:with-param name="code" select="./@nullFlavor"/>
+                        </xsl:call-template>
+                    </td>
+                </tr>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.2']" mode="activeProblems">
+
+        <xsl:variable name="problemCondition"
+                      select="."/>
+        <xsl:variable name="probOnSetDate"
+                      select="../../../n1:effectiveTime/n1:low"/>
+        <xsl:variable name="diagnosisAssertionStatus"
+                      select="../n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.49']/../n1:value"/>
+        <xsl:choose>
+            <xsl:when test="not(@nullFlavor)">
+                <tr>
+                    <td>
+                        <!-- Active Problem -->
+                        <xsl:call-template name="show-eHDSIIllnessandDisorder">
+                            <xsl:with-param name="node" select="$problemCondition"/>
+                        </xsl:call-template>
+                        <xsl:choose>
+                            <xsl:when test="not($problemCondition/@nullFlavor)">
+                                <xsl:text> (</xsl:text>
+                                <xsl:value-of select="$problemCondition/@code"/>
+                                <xsl:text>)</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$problemCondition/@nullFlavor='OTH'">
+                                <i>
+                                    <xsl:text> (</xsl:text>
+                                    <xsl:value-of select="$problemCondition/n1:translation/@code"/>
+                                    <xsl:if test="$problemCondition/n1:translation/@codeSystemName">
+                                        <xsl:text> - </xsl:text>
+                                        <xsl:value-of select="$problemCondition/n1:translation/@codeSystemName"/>
+                                    </xsl:if>
+                                    <xsl:text>)</xsl:text>
+                                </i>
+                            </xsl:when>
+                        </xsl:choose>
+                    </td>
+                    <td>
+                        <!-- OnSet Date -->
+                        <xsl:call-template name="show-TS">
+                            <xsl:with-param name="node" select="$probOnSetDate"/>
+                        </xsl:call-template>
+                    </td>
+                    <td>
+                        <!-- Diagnosis Assertion Status -->
+                        <xsl:call-template name="show-eHDSICertainty">
+                            <xsl:with-param name="node" select="$diagnosisAssertionStatus"/>
+                        </xsl:call-template>
+                    </td>
+                    <td>
+                        <!-- Related Health Professional -->
+                        <xsl:for-each select="../n1:entryRelationship/n1:act/n1:templateId[@root='1.3.6.1.4.1.12559.11.10.1.3.1.3.48']/..">
+                            <xsl:apply-templates select="n1:performer"/>
+                        </xsl:for-each>
+                    </td>
+                    <td>
+                        <!-- Related External Resource -->
+                        <xsl:for-each select="../n1:reference[@typeCode='REFR']">
                             <xsl:apply-templates select="n1:externalDocument"/>
                         </xsl:for-each>
                     </td>
