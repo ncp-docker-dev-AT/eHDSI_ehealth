@@ -8,7 +8,7 @@ import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditConstant;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactory;
 import net.RFC3881.*;
-import net.RFC3881.AuditMessage.ActiveParticipant;
+import net.RFC3881.ActiveParticipantContents;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
@@ -67,7 +67,9 @@ public enum AuditTrailUtils {
         String eventTypeCode = "EventTypeCode(N/A)";
         try {
             eventTypeCode = auditmessage.getEventIdentification() != null ?
-                    auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
+                    auditmessage.getEventIdentification().getEventTypeCode().get(0).getCsdCode() : "EventTypeCode(N/A)";
+            //eventTypeCode = auditmessage.getEventIdentification() != null ?
+            //      auditmessage.getEventIdentification().getEventTypeCode().get(0).getCode() : "EventTypeCode(N/A)";
             LOGGER.debug("'{}' try to convert the message to xml using JAXB", eventTypeCode);
         } catch (NullPointerException e) {
             LOGGER.warn("Unable to log AuditMessageEventTypeCode.", e);
@@ -85,7 +87,9 @@ public enum AuditTrailUtils {
 
         try {
             LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
-                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                    auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+            //LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
+              //      auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             validated = Utils.validateSchema(auditMessage);
 
         } catch (Exception e) {
@@ -95,7 +99,8 @@ public enum AuditTrailUtils {
         boolean forceWrite = Boolean.parseBoolean(Utils.getProperty("auditrep.forcewrite", "true", true));
         if (!validated) {
             LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ?
-                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                    auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                    //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             if (!forceWrite) {
                 auditMessage = "";
             }
@@ -104,36 +109,42 @@ public enum AuditTrailUtils {
 
             if (validated) {
                 LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ?
-                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                        //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             } else {
                 LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ?
-                        auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                        auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                        //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
                         auditmessage.getEventIdentification() != null ?
-                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                                auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             try {
                 // Validating XML according to XSD
                 LOGGER.debug("'{}' XML stuff: Create Dom From String",
                         auditmessage.getEventIdentification() != null ?
-                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                                auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
                     auditMessage = SecurityMgr.getSignedDocumentAsString(SecurityMgr.signDocumentEnveloped(doc));
                     LOGGER.debug("'{}' Audit Message signed",
                             auditmessage.getEventIdentification() != null ?
-                                    auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                                    auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
+                                    //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 }
             } catch (Exception e) {
                 auditMessage = "";
                 LOGGER.error("'{}' Error signing doc: '{}'",
                         auditmessage.getEventIdentification() != null ?
-                                auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
+                                auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)",
+                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
                         e.getMessage(), e);
             }
         }
@@ -280,13 +291,14 @@ public enum AuditTrailUtils {
         // while the Audit Message has been considering NCP internal actions.
 
         // Request Participant
-        ParticipantObjectIdentificationType participantRequest = createParticipantObjectIdentification("req",
+        ParticipantObjectIdentificationContents participantRequest = createParticipantObjectIdentification("req",
                 participantIdRequest, participantDetailRequest);
         auditMessage.getParticipantObjectIdentification().add(participantRequest);
 
         // Response Participant
-        ParticipantObjectIdentificationType participantResponse = createParticipantObjectIdentification("rsp",
+        ParticipantObjectIdentificationContents participantResponse = createParticipantObjectIdentification("rsp",
                 participantIdResponse, participantDetailResponse);
+
         auditMessage.getParticipantObjectIdentification().add(participantResponse);
     }
 
@@ -296,7 +308,47 @@ public enum AuditTrailUtils {
      * @param participantObjectDetail
      * @return
      */
-    private ParticipantObjectIdentificationType createParticipantObjectIdentification(String action, String participantObjectId,
+    private ParticipantObjectIdentificationContents createParticipantObjectIdentification(String action, String participantObjectId,
+                                                                                      byte[] participantObjectDetail) {
+
+        var participantObjectIdentification = new ParticipantObjectIdentificationContents();
+        participantObjectIdentification.setParticipantObjectID(participantObjectId);
+        participantObjectIdentification.setParticipantObjectTypeCode("4");
+
+        //var participantObjectIdentification = new ParticipantObjectIdentificationType();
+        //participantObjectIdentification.setParticipantObjectID(participantObjectId);
+        //participantObjectIdentification.setParticipantObjectTypeCode(Short.valueOf("4"));
+
+        //var codedValueType = new CodedValueType();
+        //codedValueType.setCode(action);
+        ParticipantObjectIDTypeCode codedValueType = new ParticipantObjectIDTypeCode();
+        codedValueType.setCsdCode(action);
+        codedValueType.setCodeSystemName("eHealth DSI Msg");
+        codedValueType.setOriginalText(action);
+        if (StringUtils.equals("rsp", action)) {
+            codedValueType.setDisplayName("Response Message");
+        } else {
+            codedValueType.setDisplayName("Request Message");
+        }
+
+        //participantObjectIdentification.setParticipantObjectIDTypeCode(codedValueType);
+        participantObjectIdentification.setParticipantObjectIDTypeCode(codedValueType);
+
+        if (ArrayUtils.isNotEmpty(participantObjectDetail)) {
+            //TypeValuePairType typeValuePairType = new TypeValuePairType();
+            //typeValuePairType.setType("securityheader");
+            //typeValuePairType.setValue(participantObjectDetail);
+            //participantObjectIdentification.getParticipantObjectDetail().add(typeValuePairType);
+
+            ParticipantObjectDetail detail = new ParticipantObjectDetail();
+            detail.setType("securityheader");
+            detail.setValue(participantObjectDetail);
+            participantObjectIdentification.getParticipantObjectDetail().add(detail);
+        }
+        return participantObjectIdentification;
+    }
+
+    private ParticipantObjectIdentificationType OldcreateParticipantObjectIdentification(String action, String participantObjectId,
                                                                                       byte[] participantObjectDetail) {
 
         var participantObjectIdentification = new ParticipantObjectIdentificationType();
@@ -622,9 +674,29 @@ public enum AuditTrailUtils {
      */
     private AuditMessage addAuditSource(AuditMessage auditMessage, String auditSource) {
 
-        AuditSourceIdentificationType auditSourceIdentification = new AuditSourceIdentificationType();
+        //AuditSourceIdentificationType auditSourceIdentification = new AuditSourceIdentificationType();
+        //auditSourceIdentification.setAuditSourceID(auditSource);
+        //auditMessage.getAuditSourceIdentification().add(auditSourceIdentification);
+
+        AuditSourceIdentificationContents auditSourceIdentification = new AuditSourceIdentificationContents();
         auditSourceIdentification.setAuditSourceID(auditSource);
-        auditMessage.getAuditSourceIdentification().add(auditSourceIdentification);
+
+        /*
+        attribute code {
+            "1" |                 ## End-user display device, diagnostic device
+            "2" |                 ## Data acquisition device or instrument
+            "3" |                 ## Web Server process or thread
+            "4" |                 ## Application Server process or thread
+            "5" |                 ## Database Server process or thread
+            "6" |                 ## Security server, e.g., a domain controller
+            "7" |                 ## ISO level 1-3 network component
+            "8" |                 ## ISO level 4-6 operating software
+            "9" |                 ## other
+            token },              ## other values are allowed if a codeSystemName is present
+        */
+        auditSourceIdentification.setCode("7");
+        auditMessage.setAuditSourceIdentification(auditSourceIdentification);
+
         return auditMessage;
     }
 
@@ -785,20 +857,31 @@ public enum AuditTrailUtils {
                                                 BigInteger eventOutcomeIndicator) {
 
         // Change EventType to new ones
-        EventIdentificationType eventIdentification = new EventIdentificationType();
+        //EventIdentificationType eventIdentification = new EventIdentificationType();
+        EventIdentificationContents eventIdentification = new EventIdentificationContents();
 
-        CodedValueType iheEventID = new CodedValueType();
-        iheEventID.setCode(getMappedEventType(eventType));
-        iheEventID.setCodeSystemName("IHE Transactions");
-        iheEventID.setDisplayName(getMappedTransactionName(transactionName));
-        eventIdentification.setEventID(iheEventID);
+        EventID eventID = new EventID();//<Code code="110112" codingScheme="DCM" display="Query"/>
+        eventID.setCsdCode("110112"); // extract it? (getMappedEventType(eventType));
+        eventID.setCodeSystemName("DCM");
+        eventID.setDisplayName(getMappedTransactionName(transactionName));
+        eventID.setOriginalText("Query"); // extract it? (getMappedTransactionName(transactionName));
+        eventIdentification.setEventID(eventID);
 
-        CodedValueType eventID = new CodedValueType();
-        eventID.setCode(eventType);
-        eventID.setCodeSystemName("eHDSI Transactions");
+        EventTypeCode eventTypeCode = new EventTypeCode();
+        eventTypeCode.setCsdCode(getMappedEventType(eventType));
+        eventTypeCode.setCodeSystemName("IHE Transactions");
+        //eventTypeCode.setDisplayName(getMappedTransactionName(transactionName));
+        eventTypeCode.setOriginalText(getMappedTransactionName(transactionName));
+        eventIdentification.getEventTypeCode().add(eventTypeCode);
+
+        /*
+        EventTypeCode eventID = new EventTypeCode();
+        eventID.setCsdCode("110112"); // AMAM
+        eventID.setCodeSystemName("DCM"); //eventID.setCodeSystemName("eHDSI Transactions");
         eventID.setDisplayName(transactionName);
+        eventID.setOriginalText("Query");
         eventIdentification.getEventTypeCode().add(eventID);
-
+        */
         if (StringUtils.equals(eventType, EventType.PATIENT_SERVICE_LIST.getCode())
                 || StringUtils.equals(eventType, EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
 
@@ -832,21 +915,22 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(eventType, EventType.SMP_QUERY.getCode())) {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-193", "SMP::Query"));
-            eventIdentification.getEventID().setCode("SMP");
+            eventIdentification.getEventID().setCsdCode("SMP");
             eventIdentification.getEventID().setCodeSystemName("EHDSI-193");
             eventIdentification.getEventID().setDisplayName("SMP::Query");
         }
         if (StringUtils.equals(eventType, EventType.SMP_PUSH.getCode())) {
 
             eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-194", "SMP::Push"));
-            eventIdentification.getEventID().setCode("SMP");
+            eventIdentification.getEventID().setCsdCode("SMP");
             eventIdentification.getEventID().setCodeSystemName("EHDSI-194");
             eventIdentification.getEventID().setDisplayName("SMP::Push");
         }
 
-        eventIdentification.setEventActionCode(eventActionCode);
+        eventIdentification.setEventActionCode(eventActionCode); // supposed tp be 'E'
         eventIdentification.setEventDateTime(eventDateTime);
-        eventIdentification.setEventOutcomeIndicator(eventOutcomeIndicator);
+        eventIdentification.setEventOutcomeIndicator(eventOutcomeIndicator.toString());
+
         auditMessage.setEventIdentification(eventIdentification);
 
         return auditMessage;
@@ -864,13 +948,14 @@ public enum AuditTrailUtils {
 
         if (StringUtils.isBlank(userId)) {
             LOGGER.debug("This is service provider and doesn't need Point of Care");
-        } else {
-            ActiveParticipant participant = new ActiveParticipant();
+        } else {//ActiveParticipantType   participant2 = new ActiveParticipantType();//participant2.setNetworkAccessPointID();
+            ActiveParticipantContents participant = new ActiveParticipantContents();
             participant.setUserID(userId);
             participant.setUserIsRequestor(userIsRequester);
-            CodedValueType codedValue = new CodedValueType();
-            codedValue.setCode(roleId);
-            codedValue.setCodeSystem(codeSystem);
+            RoleIDCode codedValue = new RoleIDCode();
+            codedValue.setCsdCode("110152");
+            codedValue.setCodeSystemName("DCM");
+            codedValue.setOriginalText(codeSystem);
             participant.getRoleIDCode().add(codedValue);
             message.getActiveParticipant().add(participant);
         }
@@ -888,12 +973,14 @@ public enum AuditTrailUtils {
     private AuditMessage addHumanRequestor(AuditMessage auditMessage, String userId, String alternativeUserID,
                                            String roleId, boolean userIsRequester) {
 
-        ActiveParticipant humanRequester = new ActiveParticipant();
+        ActiveParticipantContents humanRequester = new ActiveParticipantContents();
         humanRequester.setUserID(userId);
         humanRequester.setAlternativeUserID(alternativeUserID);
         humanRequester.setUserIsRequestor(userIsRequester);
-        CodedValueType humanRequesterRoleId = new CodedValueType();
-        humanRequesterRoleId.setCode(roleId);
+        RoleIDCode humanRequesterRoleId = new RoleIDCode();
+        humanRequesterRoleId.setCsdCode(roleId);
+        humanRequesterRoleId.setOriginalText(roleId);
+        humanRequesterRoleId.setCodeSystemName(roleId);
         humanRequester.getRoleIDCode().add(humanRequesterRoleId);
         auditMessage.getActiveParticipant().add(humanRequester);
         return auditMessage;
@@ -917,19 +1004,20 @@ public enum AuditTrailUtils {
             LOGGER.warn("No Service, as this is Service Consumer");
             throw new IllegalArgumentException("Both ServiceConsumer User ID and ServiceProvider User ID must exist!");
         } else {
-            ActiveParticipant activeParticipant = new ActiveParticipant();
+            ActiveParticipantContents activeParticipant = new ActiveParticipantContents();
             activeParticipant.setNetworkAccessPointID(ipAddress);
             if (validator.isValidInet4Address(ipAddress) || validator.isValidInet6Address(ipAddress)) {
-                activeParticipant.setNetworkAccessPointTypeCode(Short.valueOf("2"));
+                activeParticipant.setNetworkAccessPointTypeCode("2");
             } else {
-                activeParticipant.setNetworkAccessPointTypeCode(Short.valueOf("1"));
+                activeParticipant.setNetworkAccessPointTypeCode("1");
             }
             activeParticipant.setUserID(userId);
             activeParticipant.setUserIsRequestor(userIsRequester);
-            CodedValueType serviceConsumerRoleId = new CodedValueType();
-            serviceConsumerRoleId.setCode(code);
-            serviceConsumerRoleId.setCodeSystem(codeSystem);
+            RoleIDCode serviceConsumerRoleId = new RoleIDCode();
+            serviceConsumerRoleId.setCsdCode(code);
+            serviceConsumerRoleId.setCodeSystemName(codeSystem);
             serviceConsumerRoleId.setDisplayName(displayName);
+            serviceConsumerRoleId.setOriginalText(displayName);
             activeParticipant.getRoleIDCode().add(serviceConsumerRoleId);
             auditMessage.getActiveParticipant().add(activeParticipant);
         }
@@ -951,15 +1039,16 @@ public enum AuditTrailUtils {
                                               Short participantRole, String participantName, String PS_ObjectCode, String PS_ObjectCodeName,
                                               String PS_ObjectCodeValue) {
 
-        ParticipantObjectIdentificationType participantObjectIdentification = new ParticipantObjectIdentificationType();
+        ParticipantObjectIdentificationContents participantObjectIdentification = new ParticipantObjectIdentificationContents();
         participantObjectIdentification.setParticipantObjectID(participantId);
-        participantObjectIdentification.setParticipantObjectTypeCode(participantCode);
-        participantObjectIdentification.setParticipantObjectTypeCodeRole(participantRole);
+        participantObjectIdentification.setParticipantObjectTypeCode(participantCode.toString());
+        participantObjectIdentification.setParticipantObjectTypeCodeRole(participantRole.toString());
         participantObjectIdentification.setParticipantObjectName(participantName);
-        CodedValueType codedValue = new CodedValueType();
-        codedValue.setCode(PS_ObjectCode);
+        ParticipantObjectIDTypeCode codedValue = new ParticipantObjectIDTypeCode();
+        codedValue.setCsdCode(PS_ObjectCode);
         codedValue.setCodeSystemName(PS_ObjectCodeName);
         codedValue.setDisplayName(PS_ObjectCodeValue);
+        codedValue.setOriginalText(PS_ObjectCodeValue);
         participantObjectIdentification.setParticipantObjectIDTypeCode(codedValue);
         auditMessage.getParticipantObjectIdentification().add(participantObjectIdentification);
         return auditMessage;
@@ -983,17 +1072,17 @@ public enum AuditTrailUtils {
         if (StringUtils.isNotBlank(errorMessagePartObjectId)) {
 
             LOGGER.debug("Error Message Participant ID is: '{}'", errorMessagePartObjectId);
-            CodedValueType codedValueType = new CodedValueType();
-            codedValueType.setCode(errorMessageTypeCode);
+            ParticipantObjectIDTypeCode codedValueType = new ParticipantObjectIDTypeCode();
+            codedValueType.setCsdCode(errorMessageTypeCode);
 
-            ParticipantObjectIdentificationType participantObjectIdentificationType = new ParticipantObjectIdentificationType();
+            ParticipantObjectIdentificationContents participantObjectIdentificationType = new ParticipantObjectIdentificationContents();
             participantObjectIdentificationType.setParticipantObjectID(errorMessagePartObjectId);
-            participantObjectIdentificationType.setParticipantObjectTypeCode(errorMessageCode);
-            participantObjectIdentificationType.setParticipantObjectTypeCodeRole(errorMessageCodeRole);
+            participantObjectIdentificationType.setParticipantObjectTypeCode(errorMessageCode.toString());
+            participantObjectIdentificationType.setParticipantObjectTypeCodeRole(errorMessageCodeRole.toString());
             participantObjectIdentificationType.setParticipantObjectIDTypeCode(codedValueType);
 
             if (errorMessagePartObjectDetail != null) {
-                TypeValuePairType typeValuePairType = new TypeValuePairType();
+                ParticipantObjectDetail typeValuePairType = new ParticipantObjectDetail();
                 typeValuePairType.setType(errorMessageQualifier);
                 typeValuePairType.setValue(errorMessagePartObjectDetail);
                 participantObjectIdentificationType.getParticipantObjectDetail().add(typeValuePairType);
@@ -1023,14 +1112,14 @@ public enum AuditTrailUtils {
                 typeCode, typeCodeRole, errorMessageCode, action, objectDataLifeCycle);
         for (String eventTargetId : eventTargetObjectId) {
 
-            ParticipantObjectIdentificationType em = new ParticipantObjectIdentificationType();
+            ParticipantObjectIdentificationContents em = new ParticipantObjectIdentificationContents();
             em.setParticipantObjectID(eventTargetId);
-            em.setParticipantObjectTypeCode(typeCode);
-            em.setParticipantObjectTypeCodeRole(typeCodeRole);
-            CodedValueType errorMessageCodedValueType = new CodedValueType();
-            errorMessageCodedValueType.setCode(errorMessageCode);
+            em.setParticipantObjectTypeCode(typeCode.toString());
+            em.setParticipantObjectTypeCodeRole(typeCodeRole.toString());
+            ParticipantObjectIDTypeCode errorMessageCodedValueType = new ParticipantObjectIDTypeCode();
+            errorMessageCodedValueType.setCsdCode(errorMessageCode);
             if (action.equals(AuditConstant.ACTION_DISCARD) || action.equals("Pin")) {
-                em.setParticipantObjectDataLifeCycle(objectDataLifeCycle);
+                em.setParticipantObjectDataLifeCycle(objectDataLifeCycle.toString());
             }
             em.setParticipantObjectIDTypeCode(errorMessageCodedValueType);
             auditMessage.getParticipantObjectIdentification().add(em);
@@ -1056,14 +1145,14 @@ public enum AuditTrailUtils {
 
         for (String eventTargetId : eventTargetObjectId) {
 
-            ParticipantObjectIdentificationType eventTarget = new ParticipantObjectIdentificationType();
+            ParticipantObjectIdentificationContents eventTarget = new ParticipantObjectIdentificationContents();
             eventTarget.setParticipantObjectID(eventTargetId);
-            eventTarget.setParticipantObjectTypeCode(objectTypeCode);
+            eventTarget.setParticipantObjectTypeCode(objectTypeCode.toString());
             if (objectDataLifeCycle != null) {
-                eventTarget.setParticipantObjectDataLifeCycle(objectDataLifeCycle);
+                eventTarget.setParticipantObjectDataLifeCycle(objectDataLifeCycle.toString());
             }
-            CodedValueType eventTargetDescription = new CodedValueType();
-            eventTargetDescription.setCode(EM_Code);
+            ParticipantObjectIDTypeCode eventTargetDescription = new ParticipantObjectIDTypeCode();
+            eventTargetDescription.setCsdCode(EM_Code);
             eventTargetDescription.setCodeSystemName(EM_CodeSystemName);
             eventTargetDescription.setDisplayName(EM_DisplayName);
             eventTarget.setParticipantObjectIDTypeCode(eventTargetDescription);
@@ -1153,7 +1242,7 @@ public enum AuditTrailUtils {
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
-                    "Patient", "2", "RFC-3881", "Patient Number");
+                    "Patient", "2", AuditConstant.DICOM, "Patient Number");
             addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
@@ -1185,7 +1274,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider", eventLog.getTargetip());
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
-                    "Patient", "2", AuditConstant.RFC_3881, "Patient Number");
+                    "Patient", "2", AuditConstant.DICOM, "Patient Number");
             addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
         } catch (Exception e) {
@@ -1222,7 +1311,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
-                    "2", AuditConstant.RFC_3881, "Patient Number");
+                     "2", AuditConstant.DICOM, "Patient Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1256,7 +1345,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("10"), "Guarantor",
-                    "7", AuditConstant.RFC_3881, "Guarantor Number");
+                    "7", AuditConstant.DICOM, "Guarantor Number");
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
@@ -1373,9 +1462,9 @@ public enum AuditTrailUtils {
                     "Master Patient Index", eventLog.getTargetip());
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             addParticipantObject(message, eventLog.getPS_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
-                    "PatientSource", "2", AuditConstant.RFC_3881, "Patient Number");
+                    "PatientSource", "2", AuditConstant.DICOM, "Patient Number");
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"),
-                    "PatientTarget", "2", AuditConstant.RFC_3881, "Patient Number");
+                    "PatientTarget", "2", AuditConstant.DICOM, "Patient Number");
             addError(message, eventLog.getEM_ParticipantObjectID(), eventLog.getEM_ParticipantObjectDetail(), Short.valueOf("2"),
                     Short.valueOf("3"), "9", "errormsg");
             if (LOGGER.isDebugEnabled()) {
@@ -1462,10 +1551,10 @@ public enum AuditTrailUtils {
      * @param displayName    - Human readable value of the Event Code.
      * @return Initialized CodedValueType used to identify the type of Event from the Audit Messages.
      */
-    private CodedValueType createCodedValue(String code, String codeSystemName, String displayName) {
+    private EventTypeCode createCodedValue(String code, String codeSystemName, String displayName) {
 
-        CodedValueType type = new ObjectFactory().createCodedValueType();
-        type.setCode(code);
+        EventTypeCode type = new ObjectFactory().createEventTypeCode();
+        type.setCsdCode(code);
         type.setCodeSystemName(codeSystemName);
         type.setDisplayName(displayName);
         return type;

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EventLog is a java object with the minimal input variables needed to construct an AuditMessage according to RFC3881.
+ * EventLog is a java object with the minimal input variables needed to construct an AuditMessage according to DICOM.
  * Java Bean object for the Event Log object.
  * Getters and setters for all the properties Constructors for OpenNCP audit schemas.
  *
@@ -90,9 +90,9 @@ public class EventLog {
      * @param eventIdentificationTime             The datetime the event occurred
      * @param eventIdentificationOutcomeIndicator <br>
      *                                            0 for full success <br>
-     *                                            1 in case of partial delivery <br>
-     *                                            4 for temporal failures <br>
-     *                                            8 for permanent failure <br>
+     *                                            4 in case of partial delivery <br>
+     *                                            8 for temporal failures <br>
+     *                                            12 for permanent failure <br>
      * @param PC_UserID                           Point of Care: Oid of the department
      * @param PC_RoleID                           Role of the department
      * @param HR_UserID                           Identifier of the HCP initiated the event
@@ -172,9 +172,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     triggered the epsos operation
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
@@ -230,9 +230,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     processed the epsos operation
      * @param eventTargetObjectIdIn        The string encoded UUID of the source document
@@ -305,9 +305,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -358,9 +358,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -409,9 +409,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -576,9 +576,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the Point of Care: Oid of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -652,9 +652,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the Point of Care: Oid of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -730,9 +730,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param HR_UserID                    Identifier of the HCP initiated the event
      * @param HR_RoleID                    Role of the HCP initiated the event
      * @param HR_AlternativeUserID         Human readable name of the HCP as given in
@@ -812,9 +812,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Point of Care: Role of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event

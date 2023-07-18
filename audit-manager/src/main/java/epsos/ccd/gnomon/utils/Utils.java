@@ -87,9 +87,11 @@ public class Utils {
      */
     public static boolean validateSchema(String xmlDocumentUrl) throws SAXException, IOException {
 
-        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881_Unsigned.xsd");
+        //InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("RFC3881_Unsigned.xsd");
+        InputStream streamXsd = Utils.class.getClassLoader().getResourceAsStream("DICOM_Unsigned.xsd");
         if (streamXsd == null || streamXsd.available() == 0) {
-            LOGGER.error("Cannot load XSD resource: \"RFC3881_Unsigned.xsd\"");
+            //LOGGER.error("Cannot load XSD resource: \"RFC3881_Unsigned.xsd\"");
+            LOGGER.error("Cannot load XSD resource: \"DICOM_Unsigned.xsd\"");
             return false;
         }
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
