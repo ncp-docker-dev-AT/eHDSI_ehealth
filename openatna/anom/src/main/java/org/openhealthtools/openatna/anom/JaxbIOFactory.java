@@ -293,7 +293,9 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
         }
         List<AtnaSource> sources = msg.getSources();
         for (AtnaSource source : sources) {
-            auditMessage.getAuditSourceIdentification().getAuditSourceTypeCode().add(source.getSourceId());
+            AuditSourceTypeCode auditSourceTypeCode = new AuditSourceTypeCode();
+            auditSourceTypeCode.setCsdCode("1");
+            auditMessage.getAuditSourceIdentification().getAuditSourceTypeCode().add(auditSourceTypeCode);
         }
 
         List<AtnaMessageParticipant> parts = msg.getParticipants();
@@ -408,9 +410,9 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
         }
         AtnaSource ret = new AtnaSource(source.getAuditSourceID());
         ret.setEnterpriseSiteId(source.getAuditEnterpriseSiteID());
-        List<String> types = source.getAuditSourceTypeCode();
-        for (String type : types) {
-          ret.addSourceTypeCode(createCode(AtnaCode.SOURCE_TYPE, type, source));
+        List<AuditSourceTypeCode> types = source.getAuditSourceTypeCode();
+        for (AuditSourceTypeCode type : types) {
+          ret.addSourceTypeCode(createCode(AtnaCode.SOURCE_TYPE, type.getCsdCode(), source));
         }
         return ret;
     }
