@@ -42,12 +42,13 @@ public class MessageResource {
             @RequestParam(value = "searchEventEndDate", required = false) Instant searchEventEndDate,
             @RequestParam(value = "activeParticipantId", required = false) String activeParticipantId,
             @RequestParam(value = "activeTypeCode", required = false) String activeTypeCode,
+            @RequestParam(value = "messageType", required = false) String messageType,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "eventDateTime,DESC") String[] sort) {
 
         Pageable pageable = PageRequest.of(pageNumber, size, getSort(sort));
-        Page<Message> page = messageService.searchMessages(searchEventId, searchEventStartDate, searchEventEndDate, activeParticipantId, activeTypeCode, pageable);
+        Page<Message> page = messageService.searchMessages(searchEventId, searchEventStartDate, searchEventEndDate, activeParticipantId, activeTypeCode, messageType, pageable);
         return ResponseEntity.ok(page);
     }
 

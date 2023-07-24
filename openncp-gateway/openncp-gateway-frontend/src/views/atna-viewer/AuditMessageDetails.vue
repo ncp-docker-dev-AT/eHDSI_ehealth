@@ -63,7 +63,7 @@
                 <v-text-field
                   label="Event ID Code"
                   outlined
-                  :value="message.auditMessage.eventIdentification.eventID.code"
+                  :value="message.auditMessage.eventIdentification.eventID.csdCode"
                   disabled
                   hide-details="auto"
                 />
@@ -106,7 +106,7 @@
                 <v-text-field
                   label="Event Type Code"
                   outlined
-                  :value="eventTypeCode.code"
+                  :value="eventTypeCode.csdCode"
                   disabled
                   hide-details="auto"
                 />
@@ -200,7 +200,7 @@
                 <v-text-field
                   label="Role ID Code"
                   outlined
-                  :value="roleIDCode.code"
+                  :value="roleIDCode.csdCode"
                   disabled
                   hide-details="auto"
                 />
@@ -218,7 +218,7 @@
                 <v-text-field
                   label="Code System"
                   outlined
-                  :value="roleIDCode.codeSystem"
+                  :value="roleIDCode.codeSystemName"
                   disabled
                   hide-details="auto"
                 />
@@ -229,8 +229,7 @@
         <v-tab-item value="tab-audit-source-identification">
           <v-container fluid>
             <v-row
-              v-for="(auditSourceIdentification, i) in message.auditMessage
-                .auditSourceIdentification"
+              v-for="(auditSourceIdentification, i) in message.auditMessage.auditSourceIdentification"
               :key="`audit-source-${i}`"
             >
               <v-col cols="4">
@@ -321,7 +320,7 @@
                       <v-text-field
                         label="Code"
                         outlined
-                        :value="participantObjectIdentification.participantObjectIDTypeCode.code"
+                        :value="participantObjectIdentification.participantObjectIDTypeCode.csdCode"
                         disabled
                         hide-details="auto"
                       />
@@ -455,6 +454,7 @@ export default {
       .get(process.env.VUE_APP_SERVER_URL + `/api/atna/messages/${this.id}`)
       .then((response) => {
         this.message = response.data
+        console.log(this.message.auditMessage.auditSourceIdentification)
         this.loading = false
       })
   },
