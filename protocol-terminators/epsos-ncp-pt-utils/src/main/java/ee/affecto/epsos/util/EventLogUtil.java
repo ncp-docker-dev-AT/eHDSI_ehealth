@@ -49,7 +49,7 @@ public class EventLogUtil {
      * @param request
      * @param response
      */
-    public static void prepareXCPDCommonLog(EventLog eventLog, PRPAIN201305UV02 request, PRPAIN201306UV02 response) {
+    public static void prepareXCPDCommonLog(EventLog eventLog, MessageContext msgContext, PRPAIN201305UV02 request, PRPAIN201306UV02 response) {
 
         // Set Event Identification
         eventLog.setEventType(EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS);
@@ -101,24 +101,41 @@ public class EventLogUtil {
             eventLog.setEM_ParticipantObjectID(error);
             eventLog.setEM_ParticipantObjectDetail(error.getBytes());
         }
+
+        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("PRPA_IN201305UV02").hasNext()) {
+            OMElement elem_PRPA_IN201305UV02 = msgContext.getEnvelope().getBody().getChildrenWithLocalName("PRPA_IN201305UV02").next();
+            if(elem_PRPA_IN201305UV02.getChildrenWithLocalName("controlActProcess").hasNext()){
+                OMElement elem_controlActProcess = elem_PRPA_IN201305UV02.getChildrenWithLocalName("controlActProcess").next();
+                if(elem_controlActProcess.getChildrenWithLocalName("queryByParameter").hasNext()) {
+                    OMElement elem_qBP = elem_controlActProcess.getChildrenWithLocalName("queryByParameter").next();
+                    eventLog.setQueryByParameter(elem_qBP.toString());
+                }
+            }
+        }
+
+        extractHCIIdentifierFromHeader(eventLog, msgContext);
+
     }
 
     /**
      * @param eventLog
+     * @param msgContext
      * @param request
      * @param response
      * @param classCode
      */
-    public static void prepareXCACommonLogQuery(EventLog eventLog, AdhocQueryRequest request, AdhocQueryResponse response, ClassCode classCode) {
+    public static void prepareXCACommonLogQuery(EventLog eventLog, MessageContext msgContext, AdhocQueryRequest request, AdhocQueryResponse response, ClassCode classCode) {
 
         switch (classCode) {
             case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:
@@ -126,15 +143,16 @@ public class EventLogUtil {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
         }
 
         eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
 
         if (response.getRegistryObjectList() != null) {
 
@@ -191,24 +209,39 @@ public class EventLogUtil {
             eventLog.setEM_ParticipantObjectID(re.getErrorCode());
             eventLog.setEM_ParticipantObjectDetail(re.getCodeContext() == null ? null : re.getCodeContext().getBytes());
         }
+
+        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").hasNext()) {
+            OMElement elem_AdhocQueryRequest = msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").next();
+            if(elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").hasNext()){
+                OMElement elem_AdhocQuery = elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").next();
+                elem_AdhocQuery.getAttributeValue(QName.valueOf("id"));
+                eventLog.setQueryByParameter(elem_AdhocQuery.toString());
+            }
+        }
+
+        extractHCIIdentifierFromHeader(eventLog, msgContext);
+
     }
 
     /**
      * @param eventLog
+     * @param msgContext
      * @param request
      * @param response
      * @param classCode
      */
-    public static void prepareXCACommonLogRetrieve(EventLog eventLog, RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response, ClassCode classCode) {
+    public static void prepareXCACommonLogRetrieve(EventLog eventLog, MessageContext msgContext, RetrieveDocumentSetRequestType request, RetrieveDocumentSetResponseType response, ClassCode classCode) {
 
         switch (classCode) {
             case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
+                eventLog.setEI_EventActionCode(EventActionCode.CREATE);
                 break;
             case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:
@@ -216,14 +249,15 @@ public class EventLogUtil {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
         }
 
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
         //  TODO: Audit - Event Target
         eventLog.getEventTargetParticipantObjectIds().add(request.getDocumentRequest().get(0).getDocumentUniqueId());
 
@@ -246,6 +280,42 @@ public class EventLogUtil {
                 eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
             } else if (re.getValue() != null) {
                 eventLog.setEM_ParticipantObjectDetail(re.getValue().getBytes());
+            }
+        }
+
+        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("RetrieveDocumentSetRequest").hasNext()) {
+            OMElement elem_RetrieveDocumentSetRequest = msgContext.getEnvelope().getBody().getChildrenWithLocalName("RetrieveDocumentSetRequest").next();
+            if(elem_RetrieveDocumentSetRequest.getChildrenWithLocalName("DocumentRequest").hasNext()){
+                OMElement elem_AdhocQuery = elem_RetrieveDocumentSetRequest.getChildrenWithLocalName("DocumentRequest").next();
+                if(elem_AdhocQuery.getChildrenWithLocalName("HomeCommunityId").hasNext()) {
+                    OMElement elem_Id = elem_AdhocQuery.getChildrenWithLocalName("HomeCommunityId").next();
+                    eventLog.setQueryByParameter(elem_Id.getText());
+                }
+            }
+        }
+
+        extractHCIIdentifierFromHeader(eventLog, msgContext);
+    }
+
+    private static void extractHCIIdentifierFromHeader(EventLog eventLog, MessageContext msgContext) {
+        if(msgContext.getEnvelope().getHeader().getChildrenWithLocalName("Security").hasNext()) {
+            OMElement elemSecurity = msgContext.getEnvelope().getHeader().getChildrenWithLocalName("Security").next();
+            for (Iterator<OMElement> itSecurity = elemSecurity.getChildElements(); itSecurity.hasNext(); ) {
+                OMElement elemAssertion = itSecurity.next();
+                for (Iterator<OMElement> it = elemAssertion.getChildElements(); it.hasNext(); ) {
+                    OMElement elem = it.next();
+                    if("AttributeStatement".equals(elem.getLocalName())) {
+                        for (Iterator<OMElement> itAttribute = elem.getChildElements(); itAttribute.hasNext(); ) {
+                            OMElement elemAttribute = itAttribute.next();
+                            String attrib = elemAttribute.getAttributeValue(new QName("FriendlyName"));
+                            if("HCI Identifier".equals(attrib)) {
+                                Iterator<OMElement> elemAttributeValue = elemAttribute.getChildrenWithLocalName("AttributeValue");
+                                OMElement elemAttributeValueText = elemAttributeValue.next();
+                                eventLog.setHciIdentifier(elemAttributeValueText.getText());
+                            }
+                        }
+                    }
+                }
             }
         }
     }

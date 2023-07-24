@@ -109,10 +109,10 @@
         <xs:sequence>
             <xs:element minOccurs="0" maxOccurs="unbounded" ref="AuditSourceTypeCode"/>
         </xs:sequence>
-        <xs:attribute name="code" type="xs:token" use="required"/>
+        <!--xs:attribute name="code" type="xs:token" use="required"/>
         <xs:attribute name="codeSystemName" type="xs:token"/>
         <xs:attribute name="displayName" type="xs:token"/>
-        <xs:attribute name="originalText" type="xs:token"/>
+        <xs:attribute name="originalText" type="xs:token"/-->
         <xs:attribute name="AuditEnterpriseSiteID" type="xs:token">
             <xs:annotation>
                 <xs:documentation>If these are present, they define the meaning of

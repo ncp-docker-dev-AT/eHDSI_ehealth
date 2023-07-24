@@ -39,6 +39,10 @@ public class EventLog {
     // Event Identification
     private String EventType;             // one of the available epsos event ids
 
+    private String queryByParameter;      // Query by parameter
+
+    private String hciIdentifier;
+
     // Point of Care
     private String PC_UserID;  // Point of Care: Oid of the department
     private String PC_RoleID;  // Point of Care: Role of the department
@@ -158,6 +162,8 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetIp));
         // Setup Event Identification information
         eventLog.setNcpSide(ncpSide);
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog);
@@ -216,6 +222,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -272,6 +280,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -477,6 +487,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -638,6 +650,8 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceIp));
         eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
@@ -714,6 +728,8 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceIp));
         eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
@@ -798,6 +814,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -873,6 +891,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -1120,6 +1140,23 @@ public class EventLog {
     public void setNcpSide(NcpSide ncpSide) {
         this.ncpSide = ncpSide;
     }
+
+    public String getQueryByParameter() {
+        return queryByParameter;
+    }
+
+    public void setQueryByParameter(String queryByParameter) {
+        this.queryByParameter = queryByParameter;
+    }
+
+    public String getHciIdentifier() {
+        return hciIdentifier;
+    }
+
+    public void setHciIdentifier(String hciIdentifier) {
+        this.hciIdentifier = hciIdentifier;
+    }
+
 
     @Override
     public String toString() {

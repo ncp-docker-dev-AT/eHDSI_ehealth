@@ -39,6 +39,7 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.lang.StringUtils;
 import org.hl7.v3.PRPAIN201305UV02;
 import org.hl7.v3.PRPAIN201306UV02;
+import org.hl7.v3.PRPAMT201306UV02QueryByParameter;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -590,7 +591,7 @@ public class RespondingGateway_ServiceStub extends Stub {
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
-        EventLogUtil.prepareXCPDCommonLog(eventLog, sended, received);
+        EventLogUtil.prepareXCPDCommonLog(eventLog, msgContext, sended, received);
         EventLogClientUtil.sendEventLog(eventLog);
         return eventLog;
     }

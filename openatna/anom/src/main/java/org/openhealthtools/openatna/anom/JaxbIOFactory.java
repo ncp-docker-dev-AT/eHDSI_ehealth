@@ -477,8 +477,11 @@ public class JaxbIOFactory implements AtnaIOFactory, Serializable {
         if (code == null) {
             throw new AtnaException("Code has no code");
         }
-        return new AtnaCode(type, code, source.getDisplayName(), source.getCodeSystemName(),
-                source.getDisplayName(), source.getOriginalText());
+
+        String displayName = source.getAuditSourceTypeCode().size() > 0 ? source.getAuditSourceTypeCode().get(0).getDisplayName() : "";
+        String codeSystemName = source.getAuditSourceTypeCode().size() > 0 ? source.getAuditSourceTypeCode().get(0).getCodeSystemName() : "";
+        String originalText = source.getAuditSourceTypeCode().size() > 0 ? source.getAuditSourceTypeCode().get(0).getOriginalText() : "";
+        return new AtnaCode(type, code, displayName, codeSystemName, displayName, originalText);
     }
 
     private AtnaCode createCode(String type, RoleIDCode code) throws AtnaException {
