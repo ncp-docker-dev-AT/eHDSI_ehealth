@@ -69,7 +69,7 @@
                   hide-details="auto"
                 />
                 <v-text-field
-                  v-if="message.messageType === 'DICOM'"
+                  v-if="this.messageType === 'DICOM'"
                   label="Event ID Code"
                   outlined
                   :value="message.auditMessage.eventIdentification.eventID.csdCode"
