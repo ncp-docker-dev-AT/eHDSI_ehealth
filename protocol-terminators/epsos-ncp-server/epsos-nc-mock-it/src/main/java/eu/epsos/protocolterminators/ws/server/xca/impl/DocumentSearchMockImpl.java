@@ -592,7 +592,11 @@ public class DocumentSearchMockImpl extends NationalConnectorGateway implements 
         logger.info("[National Infrastructure Mock] Get ePrescription Document List: '{}'", searchCriteria.toString());
         Assertion assertion = NationalConnectorUtil.getTRCAssertionFromSOAPHeader(getSOAPHeader());
         NationalConnectorUtil.logAssertionAsXml(assertion);
-
+        if (StringUtils.equals(searchCriteria.getCriteriaValue(Criteria.PATIENT_ID), "1-9999^^^&2.16.17.710.850.1000.990.1.1000&ISO")) {
+            NoMatchException noMatchException = new NoMatchException("[National Infrastructure Mock] No eP List Found");
+            noMatchException.setOpenncpErrorCode(OpenNCPErrorCode.ERROR_EP_NOT_FOUND);
+            throw noMatchException;
+        }
         List<DocumentAssociation<EPDocumentMetaData>> metaDatas = new ArrayList<>();
         for (DocumentAssociation<EPDocumentMetaData> documentAssociation : epDocumentMetaDatas) {
             if (documentAssociation.getXMLDocumentMetaData() != null
