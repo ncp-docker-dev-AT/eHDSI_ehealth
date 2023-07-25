@@ -135,7 +135,7 @@ public class EventLogUtil {
             case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:
@@ -241,7 +241,7 @@ public class EventLogUtil {
             case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.CREATE);
                 break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:

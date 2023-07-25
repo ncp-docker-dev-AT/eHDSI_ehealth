@@ -402,7 +402,7 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
                     "Patient", "ITI-38", "IHE Transactions", "Patient Number",
                     "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
 
@@ -930,13 +930,14 @@ public enum AuditTrailUtils {
         if (StringUtils.equals(eventType, EventType.PATIENT_SERVICE_LIST.getCode())
                 || StringUtils.equals(eventType, EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
 
-            // IHE Validator will complain if we add this code
+            // IHE Validator will complain if we add this code - PS
             //eventIdentification.getEventTypeCode().add(createCodedValue("60591-5", AuditConstant.CODE_SYSTEM_LOINC, "Patient Summary Document"));
         }
         if (StringUtils.equals(eventType, EventType.ORDER_SERVICE_LIST.getCode())
                 || StringUtils.equals(eventType, EventType.ORDER_SERVICE_RETRIEVE.getCode())) {
 
-            eventIdentification.getEventTypeCode().add(createCodedValue("57833-6", AuditConstant.CODE_SYSTEM_LOINC, "Prescription for Medication"));
+            // IHE Validator will complain if we add this code - EP
+            //eventIdentification.getEventTypeCode().add(createCodedValue("57833-6", AuditConstant.CODE_SYSTEM_LOINC, "Prescription for Medication"));
         }
         if (StringUtils.equals(eventType, EventType.CONSENT_SERVICE_PUT.getCode())
                 || StringUtils.equals(eventType, EventType.CONSENT_SERVICE_DISCARD.getCode())) {
