@@ -9,6 +9,7 @@ public class AuditConstant {
     public static final String CODE_SYSTEM_LOINC = "LOINC";
     public static final String ACTION_DISCARD = "Discard";
     public static final String RFC_3881 = "RFC-3881";
+    public static final String DICOM = "DCM";
 
     private AuditConstant() {
     }

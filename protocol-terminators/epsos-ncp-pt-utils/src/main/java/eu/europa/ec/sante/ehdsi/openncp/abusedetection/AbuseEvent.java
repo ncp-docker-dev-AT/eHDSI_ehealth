@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.abusedetection;
 
 import net.RFC3881.AuditMessage;
 import net.RFC3881.CodedValueType;
+import net.RFC3881.EventID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -9,7 +10,7 @@ import org.joda.time.LocalDateTime;
 
 public class AbuseEvent {
 
-    CodedValueType requestEventType;
+    EventID requestEventType;
     String pointOfCare;
     String patientId;
     LocalDateTime requestDateTime;
@@ -18,7 +19,7 @@ public class AbuseEvent {
 
     AuditMessage audit;
 
-    public AbuseEvent(CodedValueType requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
+    public AbuseEvent(EventID requestEventType, String pointOfCare, String patientId, LocalDateTime requestDateTime,
                       String recordId, AbuseTransactionType transactionType, AuditMessage audit) {
         this.requestEventType = requestEventType;
         this.pointOfCare = pointOfCare;
@@ -29,11 +30,11 @@ public class AbuseEvent {
         this.audit = audit;
     }
 
-    public CodedValueType getRequestEventType() {
+    public EventID getRequestEventType() {
         return requestEventType;
     }
 
-    public void setRequestEventType(CodedValueType requestEventType) {
+    public void setRequestEventType(EventID requestEventType) {
         this.requestEventType = requestEventType;
     }
 
