@@ -22,8 +22,6 @@ public interface PolicyAssertionManager {
 
     void XDRPermissionValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException, InsufficientRightsException;
 
-    void XSPAFunctionalRoleValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException;
-
     void PurposeOfUseValidatorForTRC(Assertion assertion, ClassCode classCode) throws MissingFieldException, InsufficientRightsException;
 
     void XSPALocalityValidator(Assertion assertion, ClassCode classCode) throws MissingFieldException, InvalidFieldException;
