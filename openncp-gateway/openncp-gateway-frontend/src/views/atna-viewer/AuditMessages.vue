@@ -123,7 +123,7 @@
               fab
               x-small
               color="indigo"
-              :to="{ name: 'audit-details', params: { id: item.id } }"
+              :to="{ name: 'audit-details', params: { id: item.id, messageType: item.messageType } }"
             >
               <v-icon>mdi-eye</v-icon>
             </v-btn>

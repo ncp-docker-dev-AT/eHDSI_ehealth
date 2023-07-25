@@ -61,6 +61,15 @@
             <v-row>
               <v-col>
                 <v-text-field
+                  v-if="this.messageType === 'RFC3881'"
+                  label="Event ID Code"
+                  outlined
+                  :value="message.auditMessage.eventIdentification.eventID.code"
+                  disabled
+                  hide-details="auto"
+                />
+                <v-text-field
+                  v-if="message.messageType === 'DICOM'"
                   label="Event ID Code"
                   outlined
                   :value="message.auditMessage.eventIdentification.eventID.csdCode"
@@ -229,13 +238,14 @@
         <v-tab-item value="tab-audit-source-identification">
           <v-container fluid>
             <v-row
-              v-for="(auditSourceIdentification, i) in message.auditMessage.auditSourceIdentification"
+              v-for="(auditSourceIdentification, i) in message.auditMessage"
               :key="`audit-source-${i}`"
             >
               <v-col cols="4">
                 <v-text-field
                   label="Audit SourceID"
                   outlined
+                  v-if="auditSourceIdentification.auditSourceID"
                   :value="auditSourceIdentification.auditSourceID"
                   disabled
                   hide-details="auto"
@@ -415,7 +425,7 @@
 import axios from 'axios'
 
 export default {
-  props: ['id'],
+  props: ['id', 'messageType'],
   data () {
     return {
       tab: 'tab-event-identification',
