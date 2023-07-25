@@ -24,7 +24,6 @@ public class RegistryErrorUtils {
         registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, location, severity));
     }
 
-
     public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
         registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, null, severity));
     }
@@ -60,7 +59,7 @@ public class RegistryErrorUtils {
         var registryError = omFactory.createOMElement("RegistryError", ons);
         registryError.addAttribute(omFactory.createOMAttribute("codeContext", null, codeContext));
         registryError.addAttribute(omFactory.createOMAttribute("errorCode", null, errorCode));
-        String aux = severity != null? severity.getText() : null ;
+        String aux = severity != null ? severity.getText() : null;
         registryError.addAttribute(omFactory.createOMAttribute("severity", null, aux));
         // EHNCP-1131
         registryError.addAttribute(omFactory.createOMAttribute("location", null, location));

@@ -114,7 +114,7 @@
             </saml2:AttributeValue>
         </saml2:Attribute>
         <saml2:Attribute FriendlyName="eHealth DSI Healthcare Facility Type"
-                         Name="urn:epsos:names:wp3.4:subject:healthcare-facility-type"
+                         Name="urn:ehdsi:names:subject:healthcare-facility-type"
                          NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
             <saml2:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema"
                                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">xspaType

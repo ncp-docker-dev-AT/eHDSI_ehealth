@@ -130,7 +130,7 @@ public class EventLogClientUtil {
                     eventLog.setHR_AlternativeUserID(EventLogUtil.getAttributeValue(attribute));
                 } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:2.0:subject:role")) {
                     eventLog.setHR_RoleID(EventLogUtil.getAttributeValue(attribute));
-                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:epsos:names:wp3.4:subject:healthcare-facility-type")) {
+                } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:ehdsi:names:subject:healthcare-facility-type")) {
                     eventLog.setPC_RoleID(EventLogUtil.getAttributeValue(attribute));
                 } else if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:organization")) {
                     eventLog.setPC_UserID(EventLogUtil.getAttributeValue(attribute));
