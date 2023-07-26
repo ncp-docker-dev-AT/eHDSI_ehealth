@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
            attributeFormDefault="unqualified">
     <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
-    <xs:element name="AuditMessage">
+    <xs:element name="OldAuditMessage">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="EventIdentification"
