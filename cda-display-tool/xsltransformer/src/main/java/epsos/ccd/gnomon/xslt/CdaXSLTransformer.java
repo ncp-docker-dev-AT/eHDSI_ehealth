@@ -1,5 +1,7 @@
 package epsos.ccd.gnomon.xslt;
 
+import epsos.ccd.gnomon.xslt.exceptions.TerminologyFileNotFoundException;
+import epsos.ccd.gnomon.xslt.exceptions.UITransformationException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ public class CdaXSLTransformer {
         // Private constructor of the singleton.
     }
 
-    public static synchronized CdaXSLTransformer getInstance() {
+    public static synchronized CdaXSLTransformer getInstance() throws UITransformationException {
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Getting Instance of CdaXSLTransformer...");
@@ -48,7 +50,7 @@ public class CdaXSLTransformer {
     /**
      * Util method checking if the eHDSI Translation Repository has been initialized and the number of files available.
      */
-    private static void checkLanguageFiles() {
+    private static void checkLanguageFiles() throws UITransformationException {
 
         try {
             File file = new File(PATH.toUri());
@@ -72,6 +74,7 @@ public class CdaXSLTransformer {
             }
         } catch (Exception e) {
             LOGGER.error("FATAL ERROR: '{}'", e.getMessage(), e);
+            throw new UITransformationException(e);
         }
     }
 
@@ -79,7 +82,7 @@ public class CdaXSLTransformer {
      * @param xml cda xml
      * @return
      */
-    public String transformUsingStandardCDAXsl(String xml) {
+    public String transformUsingStandardCDAXsl(String xml) throws UITransformationException {
         return transform(xml, "en-US", null, PATH, true, false, STANDARD_XSLT);
     }
 
@@ -94,7 +97,7 @@ public class CdaXSLTransformer {
      * @return
      */
     private String transform(String xml, String lang, String actionPath, Path path, boolean export,
-                             boolean showNarrative, String xsl) {
+                             boolean showNarrative, String xsl) throws UITransformationException {
 
         String output = "";
         LOGGER.info("Trying to transform XML using action path for dispensation '{}' and repository path '{}' to language {}",
@@ -145,6 +148,7 @@ public class CdaXSLTransformer {
             }
         } catch (Exception e) {
             LOGGER.error("Exception: '{}'", e.getMessage(), e);
+            throw new UITransformationException(e);
         }
         return output;
     }
@@ -157,7 +161,7 @@ public class CdaXSLTransformer {
      * @param export     whether to export file to temp folder or not
      * @return the cda document in html format
      */
-    private String transform(String xml, String lang, String actionPath, Path path, boolean export) {
+    private String transform(String xml, String lang, String actionPath, Path path, boolean export) throws UITransformationException {
         return transform(xml, lang, actionPath, path, export, true, MAIN_XSLT);
     }
 
@@ -168,7 +172,7 @@ public class CdaXSLTransformer {
      * @param repositoryPath the path of the epsos repository files
      * @return the cda document in html format
      */
-    public String transform(String xml, String lang, String actionPath, Path repositoryPath) {
+    public String transform(String xml, String lang, String actionPath, Path repositoryPath) throws UITransformationException {
         return transform(xml, lang, actionPath, repositoryPath, false);
     }
 
@@ -180,12 +184,12 @@ public class CdaXSLTransformer {
      * @param actionPath the url that you want to post the dispensation form
      * @return the cda document in html format
      */
-    public String transform(String xml, String lang, String actionPath) {
+    public String transform(String xml, String lang, String actionPath) throws UITransformationException {
         return transform(xml, lang, actionPath, PATH, false);
     }
 
     /* hides links that exist in html */
-    public String transformForPDF(String xml, String lang, boolean export) {
+    public String transformForPDF(String xml, String lang, boolean export) throws UITransformationException {
         return transform(xml, lang, "", PATH, export, false, MAIN_XSLT);
     }
 
@@ -198,7 +202,7 @@ public class CdaXSLTransformer {
      * @param actionPath the url that you want to post the dispensation form
      * @return the cda document in html format
      */
-    public String transformWithOutputAndUserHomePath(String xml, String lang, String actionPath) {
+    public String transformWithOutputAndUserHomePath(String xml, String lang, String actionPath) throws UITransformationException {
         return transform(xml, lang, actionPath, PATH, true);
     }
 
@@ -212,7 +216,7 @@ public class CdaXSLTransformer {
      * @param repositoryPath the path of the epsos repository files
      * @return the cda document in html format
      */
-    public String transformWithOutputAndDefinedPath(String xml, String lang, String actionPath, Path repositoryPath) {
+    public String transformWithOutputAndDefinedPath(String xml, String lang, String actionPath, Path repositoryPath) throws UITransformationException {
         return transform(xml, lang, actionPath, repositoryPath, true);
     }
 
