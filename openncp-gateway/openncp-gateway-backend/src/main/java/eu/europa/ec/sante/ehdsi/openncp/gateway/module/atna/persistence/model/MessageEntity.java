@@ -9,7 +9,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "messages")
-public class MessageEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "messageType", discriminatorType = DiscriminatorType.STRING)
+public abstract class MessageEntity {
 
     @Id
     private Long id;
@@ -19,6 +21,9 @@ public class MessageEntity {
     private Instant eventDateTime;
 
     private String eventOutcome;
+
+    @Column(insertable = false, updatable = false)
+    private String messageType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Code eventId;
@@ -69,5 +74,8 @@ public class MessageEntity {
 
     public byte[] getMessageContent() {
         return messageContent;
+    }
+    public String getMessageType() {
+        return messageType;
     }
 }

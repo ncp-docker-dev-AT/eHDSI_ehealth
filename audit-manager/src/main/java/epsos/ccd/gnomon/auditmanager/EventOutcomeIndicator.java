@@ -35,10 +35,10 @@ import java.math.BigInteger;
  */
 public enum EventOutcomeIndicator {
 
-    FULL_SUCCESS(new BigInteger("0")),
-    PARTIAL_DELIVERY(new BigInteger("1")),
-    TEMPORAL_FAILURE(new BigInteger("4")),
-    PERMANENT_FAILURE(new BigInteger("8"));
+    FULL_SUCCESS(new BigInteger("0")), // Success [0]
+    PARTIAL_DELIVERY(new BigInteger("4")), // Minor Failure [1]
+    TEMPORAL_FAILURE(new BigInteger("8")), // Serious Failure [4]
+    PERMANENT_FAILURE(new BigInteger("12")); // Major Failure [8]
 
     private BigInteger code;
 

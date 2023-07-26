@@ -1,4 +1,4 @@
-package epsos.ccd.gnomon.xslt;
+package epsos.ccd.gnomon.xslt.exceptions;
 
 public class TerminologyFileNotFoundException extends Exception {
 

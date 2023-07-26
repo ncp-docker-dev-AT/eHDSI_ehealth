@@ -69,6 +69,16 @@
               </v-menu>
             </v-col>
             <v-col>
+              <v-combobox
+                v-model="messageType"
+                clearable
+                label="Message Type"
+                :items="MessageTypeItems"
+                single-line
+                hide-details
+              ></v-combobox>
+            </v-col>
+            <v-col>
               <v-menu
                 v-model="searchEndDateMenu"
                 :close-on-content-click="false"
@@ -113,7 +123,7 @@
               fab
               x-small
               color="indigo"
-              :to="{ name: 'audit-details', params: { id: item.id } }"
+              :to="{ name: 'audit-details', params: { id: item.id, messageType: item.messageType } }"
             >
               <v-icon>mdi-eye</v-icon>
             </v-btn>
@@ -140,6 +150,7 @@ export default {
           sortable: false
         },
         { text: 'Event Date Time (UTC)', value: 'eventDateTime', sortable: false },
+        { text: 'Message type', value: 'messageType', sortable: false },
         {
           text: 'Event Outcome Indicator',
           value: 'eventOutcome',
@@ -193,6 +204,10 @@ export default {
         'Resident Physician',
         'ServiceConsumer',
         'ServiceProvider'
+      ],
+      MessageTypeItems: [
+        'RFC3881',
+        'DICOM'
       ]
     }
   },
@@ -235,6 +250,12 @@ export default {
       get () { return this.$store.getters.searchAtnaOpts.activeTypeCode },
       set (value) {
         this.$store.commit('searchAtnaOpts', { activeTypeCode: value })
+      }
+    },
+    messageType: {
+      get () { return this.$store.getters.searchAtnaOpts.messageType },
+      set (value) {
+        this.$store.commit('searchAtnaOpts', { messageType: value })
       }
     },
     searchEventStartDate: {
@@ -282,6 +303,7 @@ export default {
           searchEventId: this.searchEventId,
           activeParticipantId: this.activeParticipantId,
           activeTypeCode: this.activeTypeCode,
+          messageType: this.messageType,
           searchEventStartDate: this.searchEventStartDate
             ? new Date(this.searchEventStartDate).toISOString()
             : '',

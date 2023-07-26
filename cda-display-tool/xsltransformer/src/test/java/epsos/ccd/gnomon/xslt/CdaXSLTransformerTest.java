@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -89,7 +90,7 @@ public class CdaXSLTransformerTest {
         return readFromInputStream(inputStream);
     }
 
-    private String executeXslTransformation(String cda, TransformationType transformationType) throws IOException {
+    private String executeXslTransformation(String cda, TransformationType transformationType) throws Exception {
 
         switch (transformationType) {
             case WITH_OUTPUT_AND_DEFINED_PATH:

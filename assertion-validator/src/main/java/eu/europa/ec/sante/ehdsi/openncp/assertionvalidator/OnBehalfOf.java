@@ -4,7 +4,7 @@ package eu.europa.ec.sante.ehdsi.openncp.assertionvalidator;
  * From WP3.4 Deliverable D.3.4.2
  * Delegated Rights
  * FriendlyName:  OnBehalfOf
- * Name:  urn:epsos:names:wp3.4:subject:on-behalf-of
+ * Name:  urn:ehdsi:names:subject:on-behalf-of
  */
 public enum OnBehalfOf {
 
