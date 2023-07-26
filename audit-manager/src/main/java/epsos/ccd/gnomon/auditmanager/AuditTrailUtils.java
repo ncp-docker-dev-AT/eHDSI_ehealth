@@ -422,6 +422,9 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
+            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                    "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), "", "");
@@ -525,6 +528,10 @@ public enum AuditTrailUtils {
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         // Event Target
         if (message != null) {
+            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("20"),
+                    "Patient", "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd", "IHE XDS Metadata", "Patient Number",
+                    "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+
             if (action.equals(AuditConstant.ACTION_DISCARD)) {
                 addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                         "12", AuditConstant.ACTION_DISCARD, Short.valueOf("14"), "", "");
@@ -915,7 +922,11 @@ public enum AuditTrailUtils {
         EventIdentificationContents eventIdentification = new EventIdentificationContents();
 
         EventID eventID = new EventID();
-        eventID.setCsdCode("ITI-39".equals(getMappedEventType(eventType)) ? "110107" : "110112"); // TODO : extract it?
+        if("ITI-39".equals(getMappedEventType(eventType)) || "ITI-41".equals(getMappedEventType(eventType))) { // TODO : extract it?
+            eventID.setCsdCode("110107");
+        } else {
+            eventID.setCsdCode("110112");
+        }
         eventID.setCodeSystemName("DCM");
         eventID.setDisplayName(getMappedTransactionName(transactionName));
         eventID.setOriginalText("Query"); // extract it? (getMappedTransactionName(transactionName));
@@ -949,7 +960,8 @@ public enum AuditTrailUtils {
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
         if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
-            eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
+            // IHE Validator will complain if we add this code - Discard
+            //eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
 

@@ -143,7 +143,7 @@ public class EventLogUtil {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
@@ -398,12 +398,12 @@ public class EventLogUtil {
         } else if (StringUtils.equals(classCode, ClassCode.ED_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
-            eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
+            eventLog.setEI_EventActionCode(EventActionCode.CREATE);
 
         } else if (StringUtils.equals(classCode, ClassCode.EDD_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
-            eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
+            eventLog.setEI_EventActionCode(EventActionCode.CREATE);
             eventLog.getEventTargetParticipantObjectIds().add(discardId);
         }
 
