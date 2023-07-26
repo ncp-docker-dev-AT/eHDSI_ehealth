@@ -235,7 +235,7 @@ public class HCPIAssertionBuilder {
         // Set Type of HCPO
         var attribute = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attribute.setFriendlyName("eHealth DSI Healthcare Facility Type");
-        attribute.setName("urn:epsos:names:wp3.4:subject:healthcare-facility-type");
+        attribute.setName("urn:ehdsi:names:subject:healthcare-facility-type");
         attribute.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
         XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
@@ -300,7 +300,7 @@ public class HCPIAssertionBuilder {
 
         Attribute attribute = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
         attribute.setFriendlyName("OnBehalfOf");
-        attribute.setName("urn:epsos:names:wp3.4:subject:on-behalf-of");
+        attribute.setName("urn:ehdsi:names:subject:on-behalf-of");
         attribute.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
         XMLObjectBuilder<?> resourceIdBuilder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);

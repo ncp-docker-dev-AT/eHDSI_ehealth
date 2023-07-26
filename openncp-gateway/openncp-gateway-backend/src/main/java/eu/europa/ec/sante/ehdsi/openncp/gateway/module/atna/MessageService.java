@@ -47,12 +47,13 @@ public class MessageService {
     }
 
     public Page<Message> searchMessages(String searchEventId, Instant searchEventStartDate, Instant searchEventEndDate,
-                                      String activeParticipantId, String activeTypeCode, Pageable pageable) {
+                                      String activeParticipantId, String activeTypeCode, String messageType, Pageable pageable) {
 
         SearchPredicatesBuilder builder = new SearchPredicatesBuilder();
         builder.with(MessageEntity.class, "eventId.codeName", ":", searchEventId);
         builder.with(ParticipantEntity.class, "userId", ":", activeParticipantId);
         builder.with(Code.class, "codeName", ":", activeTypeCode);
+        builder.with(MessageEntity.class, "messageType", ":", messageType);
         builder.with(MessageEntity.class, "eventDateTime", ">", searchEventStartDate);
         builder.with(MessageEntity.class, "eventDateTime", "<", searchEventEndDate);
 
