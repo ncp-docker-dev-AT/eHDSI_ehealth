@@ -89,11 +89,11 @@
                     </tr>
                     <xsl:for-each select="$participantPRS">
                         <xsl:call-template name="displayAssignedPerson">
-                            <xsl:with-param name="assignedPerson" select="$legalAuthenticatorAssignedPerson"/>
-                            <xsl:with-param name="contactInfoRoot" select="n1:legalAuthenticator/n1:assignedEntity"/>
+                            <xsl:with-param name="assignedPerson" select="../n1:associatedPerson"/>
+                            <xsl:with-param name="contactInfoRoot" select="."/>
                         </xsl:call-template>
                         <xsl:call-template name="displayRepresentedOrganization">
-                            <xsl:with-param name="representedOrganization" select="$legalAuthenticatorRepresentedOrganization"/>
+                            <xsl:with-param name="representedOrganization" select="../n1:scopingOrganization"/>
                         </xsl:call-template>
                     </xsl:for-each>
                 </tbody>
