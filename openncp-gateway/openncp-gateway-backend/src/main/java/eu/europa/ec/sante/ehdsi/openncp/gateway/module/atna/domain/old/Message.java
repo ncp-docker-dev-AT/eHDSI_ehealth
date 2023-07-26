@@ -16,6 +16,8 @@ public class Message {
 
     private String eventTypes;
 
+    private String messageType;
+
     public Long getId() {
         return id;
     }
@@ -62,5 +64,13 @@ public class Message {
 
     public void setEventTypes(String eventTypes) {
         this.eventTypes = eventTypes;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }

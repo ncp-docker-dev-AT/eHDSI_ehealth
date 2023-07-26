@@ -21,6 +21,7 @@ public class EntityConverter {
 
         CodeEntity code = createCode(message.getEventCode(), CodeEntity.CodeType.EVENT_ID);
         MessageEntity messageEntity = new MessageEntity((EventIdCodeEntity) code, message.getEventOutcome().value());
+        messageEntity.setMessageType("DICOM");
         messageEntity.setEventDateTime(message.getEventDateTime());
         if (message.getSourceAddress() != null) {
             messageEntity.setSourceAddress(message.getSourceAddress());

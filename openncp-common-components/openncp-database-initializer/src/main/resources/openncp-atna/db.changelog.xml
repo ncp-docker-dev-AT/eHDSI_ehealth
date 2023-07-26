@@ -292,4 +292,13 @@
     <changeSet id="3" author="subigje">
         <modifyDataType columnName="userId" newDataType="varchar(1000)" tableName="participants"/>
     </changeSet>
+
+    <changeSet id="4" author="karouja">
+        <addColumn tableName="messages" >
+            <column name="messageType" type="varchar(31)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

@@ -9,6 +9,7 @@ import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -35,7 +36,7 @@ public class DisplayIntegrationTest extends TestCase {
 
         Path path = Paths.get("samples");
         try {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (!attrs.isDirectory()) {
@@ -49,6 +50,7 @@ public class DisplayIntegrationTest extends TestCase {
                             LOGGER.error("File not found");
                         }
                         String out = "";
+                        try {
                         switch (TRANSFORMATION.WithOutputAndUserHomePath) {
                             case ForPDF:
                                 out = CdaXSLTransformer.getInstance().transformForPDF(cda, "el_GR", false);
@@ -63,6 +65,10 @@ public class DisplayIntegrationTest extends TestCase {
                             case WithOutputAndUserHomePath:
                                 out = CdaXSLTransformer.getInstance().transformWithOutputAndUserHomePath(cda, "el_GR", "");
                                 break;
+                        }
+                        } catch (Exception e) {
+                            LOGGER.error("{}: '{}'", e.getClass(), e.getMessage(), e);
+                            fail("IOException while executing the folderTest");
                         }
                         String filename = Paths.get(input).getFileName().toString();
                         String stripExt = filename.substring(0, filename.lastIndexOf("."));

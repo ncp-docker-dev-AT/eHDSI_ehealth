@@ -240,7 +240,7 @@ public class AssertionsConverter {
             auditDataMap.put("humanRequestorRole", hrRole);
 
             String facilityType = ((XSString) Objects.requireNonNull(findStringInAttributeStatement(hcpIdentityAssertion.getAttributeStatements(),
-                    "urn:epsos:names:wp3.4:subject:healthcare-facility-type")).getAttributeValues().get(0)).getValue();
+                    "urn:ehdsi:names:subject:healthcare-facility-type")).getAttributeValues().get(0)).getValue();
 
             LOGGER.info("Facility Type {}", facilityType);
             auditDataMap.put("facilityType", facilityType);
@@ -379,11 +379,11 @@ public class AssertionsConverter {
             // // On behalf of
             // Attribute attrPID_4 =
             // createAttribute(builderFactory,"OnBehalfOf",
-            // "urn:epsos:names:wp3.4:subject:on-behalf-of",organizationId,role,"");
+            // "urn:ehdsi:names:subject:on-behalf-of",organizationId,role,"");
             // attrStmt.getAttributes().add(attrPID_4);
             // eHealth DSI Healthcare Facility Type
             var attrPID_5 = createAttribute(builderFactory, "eHealth DSI Healthcare Facility Type",
-                    "urn:epsos:names:wp3.4:subject:healthcare-facility-type", facilityType, "", "");
+                    "urn:ehdsi:names:subject:healthcare-facility-type", facilityType, "", "");
             attrStmt.getAttributes().add(attrPID_5);
             // XSPA Purpose of Use
             var attrPID_6 = createAttributePurposeOfUse(builderFactory, "XSPA Purpose Of Use",
@@ -472,7 +472,7 @@ public class AssertionsConverter {
 
         // MANDATORY: HealthCare Facility Type
         try {
-            healthCareFacilityType = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, "urn:epsos:names:wp3.4:subject:healthcare-facility-type");
+            healthCareFacilityType = AssertionHelper.getAttributeFromAssertion(epsosHcpAssertion, "urn:ehdsi:names:subject:healthcare-facility-type");
             assertionBuilder.healthCareFacilityType(healthCareFacilityType);
 
         } catch (MissingFieldException ex) {
