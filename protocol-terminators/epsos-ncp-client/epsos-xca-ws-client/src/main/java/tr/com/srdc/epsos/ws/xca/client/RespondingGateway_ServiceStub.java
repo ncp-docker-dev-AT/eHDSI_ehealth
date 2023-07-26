@@ -1080,7 +1080,7 @@ public class RespondingGateway_ServiceStub extends Stub {
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
-        EventLogUtil.prepareXCACommonLogQuery(eventLog, request, response, classCode);
+        EventLogUtil.prepareXCACommonLogQuery(eventLog, msgContext, request, response, classCode);
         eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
 
@@ -1094,7 +1094,7 @@ public class RespondingGateway_ServiceStub extends Stub {
         EventLog eventLog = EventLogClientUtil.prepareEventLog(msgContext, _returnEnv, address);
         EventLogClientUtil.logIdAssertion(eventLog, idAssertion);
         EventLogClientUtil.logTrcAssertion(eventLog, trcAssertion);
-        EventLogUtil.prepareXCACommonLogRetrieve(eventLog, request, response, classCode);
+        EventLogUtil.prepareXCACommonLogRetrieve(eventLog, msgContext, request, response, classCode);
         eventLog.setNcpSide(NcpSide.NCP_B);
         EventLogClientUtil.sendEventLog(eventLog);
 

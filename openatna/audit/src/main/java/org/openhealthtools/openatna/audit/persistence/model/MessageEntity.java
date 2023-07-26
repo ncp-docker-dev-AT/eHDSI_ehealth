@@ -28,6 +28,7 @@ public class MessageEntity extends PersistentEntity {
     private Set<MessageParticipantEntity> messageParticipants = new HashSet<>();
     private Set<MessageObjectEntity> messageObjects = new HashSet<>();
     private Set<MessageSourceEntity> messageSources = new HashSet<>();
+    private String messageType;
 
     public MessageEntity() {
     }
@@ -158,6 +159,14 @@ public class MessageEntity extends PersistentEntity {
     private String formatDate() {
         DateFormat format = new SimpleDateFormat("yyyy:MM:dd'T'HH:mm:SS");
         return format.format(getEventDateTime());
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     @Override

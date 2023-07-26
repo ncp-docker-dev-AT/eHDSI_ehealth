@@ -7,10 +7,7 @@ import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import net.RFC3881.ActiveParticipantType;
-import net.RFC3881.AuditMessage;
-import net.RFC3881.CodedValueType;
-import net.RFC3881.ParticipantObjectIdentificationType;
+import net.RFC3881.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.joda.time.*;
@@ -309,94 +306,94 @@ public class AbuseDetectionService implements Job {
 
                 boolean evtPresent = false;
                 AbuseTransactionType transactionType = AbuseTransactionType.TRANSACTION_UNKNOWN;
-                if (StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCPD_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.PATIENT_SERVICE_LIST.getCode())) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         ClassCode.PS_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.PATIENT_SERVICE_RETRIEVE.getCode())) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         ClassCode.PS_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.ORDER_SERVICE_LIST.getCode())) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         ClassCode.EP_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.ORDER_SERVICE_RETRIEVE.getCode())) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         ClassCode.EP_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.DISPENSATION_SERVICE_DISCARD.getCode())) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         ClassCode.EDD_CLASSCODE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XDR_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.ORCD_SERVICE_LIST.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.ORCD_SERVICE_LIST.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
-                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCode(),
+                if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
                         IHEEventType.ORCD_SERVICE_RETRIEVE.getCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
-                                .anyMatch(c -> StringUtils.equals(c.getCode(),
+                                .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
                                         EventType.ORCD_SERVICE_RETRIEVE.getCode()))) {
                     evtPresent = true;
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
@@ -405,19 +402,19 @@ public class AbuseDetectionService implements Job {
                 if (evtPresent) {
 
                     String joinedPoc = au.getActiveParticipant().stream()
-                            .filter(ActiveParticipantType::isUserIsRequestor)
-                            .map(ActiveParticipantType::getUserID)
+                            .filter(ActiveParticipantContents::isUserIsRequestor)
+                            .map(ActiveParticipantContents::getUserID)
                             .collect(Collectors.joining("-"));
 
                     String simplePoc = au.getActiveParticipant().stream()
                             .filter(auid -> auid.getAlternativeUserID() != null)
-                            .filter(ActiveParticipantType::isUserIsRequestor)
-                            .map(ActiveParticipantType::getUserID)
+                            .filter(ActiveParticipantContents::isUserIsRequestor)
+                            .map(ActiveParticipantContents::getUserID)
                             .collect(Collectors.joining());
 
                     String participant = au.getParticipantObjectIdentification().stream()
-                            .filter(a -> a.getParticipantObjectTypeCode() == 1 && a.getParticipantObjectTypeCodeRole() == 1)
-                            .map(ParticipantObjectIdentificationType::getParticipantObjectID)
+                            .filter(a -> a.getParticipantObjectTypeCode().equals("1") && a.getParticipantObjectTypeCodeRole().equals(""))
+                            .map(ParticipantObjectIdentificationContents::getParticipantObjectID)
                             .collect(Collectors.joining());
 
                     abuseList.add(
@@ -602,9 +599,9 @@ public class AbuseDetectionService implements Job {
         return ret;
     }
 
-    private String getActiveParticipants(List<AuditMessage.ActiveParticipant> activeParticipant) {
+    private String getActiveParticipants(List<ActiveParticipantContents> activeParticipant) {
         StringBuilder val = new StringBuilder();
-        for (AuditMessage.ActiveParticipant p : activeParticipant) {
+        for (ActiveParticipantContents p : activeParticipant) {
             val.append("ActiveParticipant ").append(p.getUserID()).append(" - ").append(p.isUserIsRequestor()).append(" ");
         }
         return StringUtils.trim(val.toString());
