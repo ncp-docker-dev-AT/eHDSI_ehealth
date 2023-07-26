@@ -180,7 +180,7 @@
                                 </xsl:choose>
                             </td>
                             <td>
-                                <xsl:call-template name="displayContactInformation">
+                                <xsl:call-template name="show-contactInformation">
                                     <xsl:with-param name="contactInfoRoot" select="$assignedAuthor"/>
                                 </xsl:call-template>
                             </td>
@@ -340,7 +340,7 @@
                 </xsl:call-template>
             </td>
             <td>
-                <xsl:call-template name="displayContactInformation">
+                <xsl:call-template name="show-contactInformation">
                     <xsl:with-param name="contactInfoRoot" select="$contactInfoRoot"/>
                 </xsl:call-template>
             </td>
@@ -380,24 +380,5 @@
                 </table>
             </td>
         </tr>
-    </xsl:template>
-
-    <xsl:template name="displayContactInformation">
-        <xsl:param name="contactInfoRoot"/>
-        <table class="contact_information_table">
-            <tr>
-                <th colspan="2">
-                    <!-- Contact Information -->
-                    <xsl:call-template name="show-eHDSIDisplayLabel">
-                        <xsl:with-param name="code" select="'12'"/>
-                    </xsl:call-template>
-                </th>
-            </tr>
-            <tr>
-                <xsl:call-template name="show-contactInfo">
-                    <xsl:with-param name="contact" select="$contactInfoRoot"/>
-                </xsl:call-template>
-            </tr>
-        </table>
     </xsl:template>
 </xsl:stylesheet>
