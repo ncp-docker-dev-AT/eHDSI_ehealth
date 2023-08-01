@@ -86,7 +86,7 @@ public enum AuditTrailUtils {
             LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
                     auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
             //LOGGER.debug("'{}' Validating Schema", auditmessage.getEventIdentification() != null ?
-              //      auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+            //      auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             validated = Utils.validateSchema(auditMessage);
 
         } catch (Exception e) {
@@ -97,7 +97,7 @@ public enum AuditTrailUtils {
         if (!validated) {
             LOGGER.debug("'{}' Message not validated", auditmessage.getEventIdentification() != null ?
                     auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                    //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+            //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             if (!forceWrite) {
                 auditMessage = "";
             }
@@ -107,18 +107,18 @@ public enum AuditTrailUtils {
             if (validated) {
                 LOGGER.debug("'{}' Audit Message validated", auditmessage.getEventIdentification() != null ?
                         auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                        //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             } else {
                 LOGGER.debug("'{}' Audit Message not validated", auditmessage.getEventIdentification() != null ?
                         auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                        //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             if (forceWrite && !validated) {
                 LOGGER.debug("'{}' AuditManager is force to send the message. So trying ...",
                         auditmessage.getEventIdentification() != null ?
                                 auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
             }
 
             try {
@@ -126,7 +126,7 @@ public enum AuditTrailUtils {
                 LOGGER.debug("'{}' XML stuff: Create Dom From String",
                         auditmessage.getEventIdentification() != null ?
                                 auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 Document doc = Utils.createDomFromString(auditMessage);
                 if (sign) {
 
@@ -134,14 +134,14 @@ public enum AuditTrailUtils {
                     LOGGER.debug("'{}' Audit Message signed",
                             auditmessage.getEventIdentification() != null ?
                                     auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)");
-                                    //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
+                    //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)");
                 }
             } catch (Exception e) {
                 auditMessage = "";
                 LOGGER.error("'{}' Error signing doc: '{}'",
                         auditmessage.getEventIdentification() != null ?
                                 auditmessage.getEventIdentification().getEventID().getCsdCode() : "EventTypeCode(N/A)",
-                                //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
+                        //auditmessage.getEventIdentification().getEventID().getCode() : "EventTypeCode(N/A)",
                         e.getMessage(), e);
             }
         }
@@ -306,7 +306,7 @@ public enum AuditTrailUtils {
      * @return
      */
     private ParticipantObjectIdentificationContents createParticipantObjectIdentification(String action, String participantObjectId,
-                                                                                      byte[] participantObjectDetail) {
+                                                                                          byte[] participantObjectDetail) {
 
         var participantObjectIdentification = new ParticipantObjectIdentificationContents();
         participantObjectIdentification.setParticipantObjectID(participantObjectId);
@@ -334,7 +334,7 @@ public enum AuditTrailUtils {
     }
 
     private ParticipantObjectIdentificationType OldcreateParticipantObjectIdentification(String action, String participantObjectId,
-                                                                                      byte[] participantObjectDetail) {
+                                                                                         byte[] participantObjectDetail) {
 
         var participantObjectIdentification = new ParticipantObjectIdentificationType();
         participantObjectIdentification.setParticipantObjectID(participantObjectId);
@@ -422,6 +422,9 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
+            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                    "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), "", "");
@@ -525,6 +528,10 @@ public enum AuditTrailUtils {
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         // Event Target
         if (message != null) {
+            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("20"),
+                    "Patient", "urn:uuid:a54d6aa5-d40d-43f9-88c5-b4633d873bdd", "IHE XDS Metadata", "Patient Number",
+                    "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+
             if (action.equals(AuditConstant.ACTION_DISCARD)) {
                 addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                         "12", AuditConstant.ACTION_DISCARD, Short.valueOf("14"), "", "");
@@ -915,7 +922,11 @@ public enum AuditTrailUtils {
         EventIdentificationContents eventIdentification = new EventIdentificationContents();
 
         EventID eventID = new EventID();
-        eventID.setCsdCode("ITI-39".equals(getMappedEventType(eventType)) ? "110107" : "110112"); // TODO : extract it?
+        if("ITI-39".equals(getMappedEventType(eventType)) || "ITI-41".equals(getMappedEventType(eventType))) { // TODO : extract it?
+            eventID.setCsdCode("110107");
+        } else {
+            eventID.setCsdCode("110112");
+        }
         eventID.setCodeSystemName("DCM");
         eventID.setDisplayName(getMappedTransactionName(transactionName));
         eventID.setOriginalText("Query"); // extract it? (getMappedTransactionName(transactionName));
@@ -949,7 +960,8 @@ public enum AuditTrailUtils {
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
         if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
-            eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
+            // IHE Validator will complain if we add this code - Discard
+            //eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
 
@@ -1130,7 +1142,7 @@ public enum AuditTrailUtils {
                                               String PS_ObjectCodeValue, String PS_originalText,
                                               String PS_getQueryByParameterPayload, String PS_getHciIdentifierPayload) {
 
-        ParticipantObjectIdentificationContents participantObjectIdentification = new ParticipantObjectIdentificationContents();
+        var participantObjectIdentification = new ParticipantObjectIdentificationContents();
         participantObjectIdentification.setParticipantObjectID(participantId);
         participantObjectIdentification.setParticipantObjectTypeCode(participantCode.toString());
         participantObjectIdentification.setParticipantObjectTypeCodeRole(participantRole.toString());
@@ -1146,13 +1158,17 @@ public enum AuditTrailUtils {
             ParticipantObjectDetail participantObjectDetail = new ParticipantObjectDetail();
             participantObjectDetail.setType("ihe:homeCommunityID");
             try {
-                participantObjectDetail.setValue(PS_getHciIdentifierPayload.getBytes("UTF-8"));
+                if (StringUtils.isNotBlank(PS_getHciIdentifierPayload)) {
+                    participantObjectDetail.setValue(PS_getHciIdentifierPayload.getBytes("UTF-8"));
+                }
             } catch (UnsupportedEncodingException e) {
                 participantObjectDetail.setValue(new byte[]{2});
                 LOGGER.debug("Error addParticipantObject() - participantObjectDetail: '{}'", e.getMessage());
             }
             try {
-                participantObjectIdentification.setParticipantObjectQuery(PS_getQueryByParameterPayload.getBytes("UTF-8"));
+                if (StringUtils.isNotBlank(PS_getQueryByParameterPayload)) {
+                    participantObjectIdentification.setParticipantObjectQuery(PS_getQueryByParameterPayload.getBytes("UTF-8"));
+                }
             } catch (UnsupportedEncodingException e) {
                 participantObjectIdentification.setParticipantObjectQuery(new byte[]{2});
                 LOGGER.debug("Error addParticipantObject() - participantObjectIdentification: '{}'", e.getMessage());
@@ -1431,7 +1447,7 @@ public enum AuditTrailUtils {
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI, "Service Provider",
                     eventLog.getTargetip());
             addParticipantObject(message, eventLog.getPT_ParticipantObjectID(), Short.valueOf("1"), Short.valueOf("1"), "Patient",
-                     "2", AuditConstant.DICOM, "Patient Number",
+                    "2", AuditConstant.DICOM, "Patient Number",
                     "Patient Number", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage(), e);

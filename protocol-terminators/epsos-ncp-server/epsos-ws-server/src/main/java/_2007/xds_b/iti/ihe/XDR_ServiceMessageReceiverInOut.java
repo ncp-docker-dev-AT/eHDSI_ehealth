@@ -160,6 +160,9 @@ public class XDR_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_ParticipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
+                    eventLog.setQueryByParameter("");
+                    eventLog.setHciIdentifier("");
+
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
 
