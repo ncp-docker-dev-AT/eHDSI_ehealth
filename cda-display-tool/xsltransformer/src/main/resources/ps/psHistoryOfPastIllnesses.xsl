@@ -44,9 +44,9 @@
                                         <col span="1" style="width: 15%;"/>
                                         <col span="1" style="width: 8%;"/>
                                         <col span="1" style="width: 8%;"/>
-                                        <col span="1" style="width: 15%;"/>
-                                        <col span="1" style="width: 15%;"/>
-                                        <col span="1" style="width: 20%;"/>
+                                        <col span="1" style="width: 10%;"/>
+                                        <col span="1" style="width: 10%;"/>
+                                        <col span="1" style="width: 30%;"/>
                                         <col span="1" style="width: 19%;"/>
                                     </colgroup>
                                     <tbody>
@@ -116,10 +116,10 @@
                 <xsl:text>Rare Diseases</xsl:text>
             </th>
         </tr>
-        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="historyOfPastIllnesses"/>
+        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="historyOfRareDiseases"/>
     </xsl:template>
 
-    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="historyOfPastIllnesses">
+    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="historyOfRareDiseases">
 
         <xsl:variable name="problemCondition"
                       select="."/>
@@ -198,7 +198,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="5">
                         <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="./@nullFlavor"/>
                         </xsl:call-template>
