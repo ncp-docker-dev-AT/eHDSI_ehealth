@@ -102,17 +102,7 @@ public class EventLogUtil {
             eventLog.setEM_ParticipantObjectDetail(error.getBytes());
         }
 
-        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("PRPA_IN201305UV02").hasNext()) {
-            OMElement elem_PRPA_IN201305UV02 = msgContext.getEnvelope().getBody().getChildrenWithLocalName("PRPA_IN201305UV02").next();
-            if(elem_PRPA_IN201305UV02.getChildrenWithLocalName("controlActProcess").hasNext()){
-                OMElement elem_controlActProcess = elem_PRPA_IN201305UV02.getChildrenWithLocalName("controlActProcess").next();
-                if(elem_controlActProcess.getChildrenWithLocalName("queryByParameter").hasNext()) {
-                    OMElement elem_qBP = elem_controlActProcess.getChildrenWithLocalName("queryByParameter").next();
-                    eventLog.setQueryByParameter(elem_qBP.toString());
-                }
-            }
-        }
-
+        extractXcpdQueryByParamFromHeader(eventLog, msgContext, "PRPA_IN201305UV02", "controlActProcess", "queryByParameter");
         extractHCIIdentifierFromHeader(eventLog, msgContext);
 
     }
@@ -210,17 +200,8 @@ public class EventLogUtil {
             eventLog.setEM_ParticipantObjectDetail(re.getCodeContext() == null ? null : re.getCodeContext().getBytes());
         }
 
-        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").hasNext()) {
-            OMElement elem_AdhocQueryRequest = msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").next();
-            if(elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").hasNext()){
-                OMElement elem_AdhocQuery = elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").next();
-                elem_AdhocQuery.getAttributeValue(QName.valueOf("id"));
-                eventLog.setQueryByParameter(elem_AdhocQuery.toString());
-            }
-        }
-
+        extractQueryByParamFromHeader(eventLog, msgContext, "AdhocQueryRequest", "AdhocQuery", "id");
         extractHCIIdentifierFromHeader(eventLog, msgContext);
-
     }
 
     /**
@@ -283,21 +264,35 @@ public class EventLogUtil {
             }
         }
 
-        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("RetrieveDocumentSetRequest").hasNext()) {
-            OMElement elem_RetrieveDocumentSetRequest = msgContext.getEnvelope().getBody().getChildrenWithLocalName("RetrieveDocumentSetRequest").next();
-            if(elem_RetrieveDocumentSetRequest.getChildrenWithLocalName("DocumentRequest").hasNext()){
-                OMElement elem_AdhocQuery = elem_RetrieveDocumentSetRequest.getChildrenWithLocalName("DocumentRequest").next();
-                if(elem_AdhocQuery.getChildrenWithLocalName("HomeCommunityId").hasNext()) {
-                    OMElement elem_Id = elem_AdhocQuery.getChildrenWithLocalName("HomeCommunityId").next();
-                    eventLog.setQueryByParameter(elem_Id.getText());
-                }
-            }
-        }
-
+        extractQueryByParamFromHeader(eventLog, msgContext, "RetrieveDocumentSetRequest", "DocumentRequest", "HomeCommunityId");
         extractHCIIdentifierFromHeader(eventLog, msgContext);
     }
 
-    private static void extractHCIIdentifierFromHeader(EventLog eventLog, MessageContext msgContext) {
+    public static void extractXcpdQueryByParamFromHeader(EventLog eventLog, MessageContext msgContext, String elem1, String elem2, String elem3) {
+        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName(elem1).hasNext()) {
+            OMElement elem_PRPA_IN201305UV02 = msgContext.getEnvelope().getBody().getChildrenWithLocalName(elem1).next();
+            if(elem_PRPA_IN201305UV02.getChildrenWithLocalName(elem2).hasNext()){
+                OMElement elem_controlActProcess = elem_PRPA_IN201305UV02.getChildrenWithLocalName(elem2).next();
+                if(elem_controlActProcess.getChildrenWithLocalName(elem3).hasNext()) {
+                    OMElement elem_qBP = elem_controlActProcess.getChildrenWithLocalName(elem3).next();
+                    eventLog.setQueryByParameter(elem_qBP.toString());
+                }
+            }
+        }
+    }
+
+    public static void extractQueryByParamFromHeader(EventLog eventLog, MessageContext msgContext, String elem1, String elem2, String elem3) {
+        if(msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").hasNext()) {
+            OMElement elem_AdhocQueryRequest = msgContext.getEnvelope().getBody().getChildrenWithLocalName("AdhocQueryRequest").next();
+            if(elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").hasNext()){
+                OMElement elem_AdhocQuery = elem_AdhocQueryRequest.getChildrenWithLocalName("AdhocQuery").next();
+                elem_AdhocQuery.getAttributeValue(QName.valueOf("id"));
+                eventLog.setQueryByParameter(elem_AdhocQuery.toString());
+            }
+        }
+    }
+
+    public static void extractHCIIdentifierFromHeader(EventLog eventLog, MessageContext msgContext) {
         if(msgContext.getEnvelope().getHeader().getChildrenWithLocalName("Security").hasNext()) {
             OMElement elemSecurity = msgContext.getEnvelope().getHeader().getChildrenWithLocalName("Security").next();
             for (Iterator<OMElement> itSecurity = elemSecurity.getChildElements(); itSecurity.hasNext(); ) {
@@ -312,6 +307,7 @@ public class EventLogUtil {
                                 Iterator<OMElement> elemAttributeValue = elemAttribute.getChildrenWithLocalName("AttributeValue");
                                 OMElement elemAttributeValueText = elemAttributeValue.next();
                                 eventLog.setHciIdentifier(elemAttributeValueText.getText());
+                                break;
                             }
                         }
                     }

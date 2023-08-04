@@ -1188,6 +1188,8 @@ public class EventLog {
                 .append("ResM_ParticipantObjectID", ResM_ParticipantObjectID)
                 .append("sourceip", sourceip)
                 .append("targetip", targetip)
+                .append("queryByParameter", queryByParameter)
+                .append("hciIdentifier", hciIdentifier)
                 .toString();
     }
 }
