@@ -152,7 +152,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);

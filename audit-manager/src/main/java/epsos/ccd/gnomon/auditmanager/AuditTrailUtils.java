@@ -426,9 +426,15 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
-                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
-                    "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            if(message.getEventIdentification().getEventTypeCode() != null && "ITI-39".equals(message.getEventIdentification().getEventTypeCode().get(0).getCsdCode())) {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("3"),
+                        "Patient", "ITI-39", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            } else {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                        "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            }
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), "", "");
@@ -606,9 +612,16 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
-                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
-                    "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            if(message.getEventIdentification().getEventTypeCode() != null && "ITI-39".equals(message.getEventIdentification().getEventTypeCode().get(0).getCsdCode())) {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("3"),
+                        "Patient", "ITI-39", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            } else {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                        "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            }
+
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), AuditConstant.DICOM, "Cross Gateway Query");
