@@ -79,7 +79,7 @@ public class DisplayTest {
 
     @Test
     public void runFile() throws UITransformationException, IOException {
-        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/2-1234-W6.xml", TRANSFORMATION.WithOutputAndDefinedPath);
+        fileTest("/Users/mathiasghys/Development/EC/ehealth/cda-display-tool/xsltransformer/samples/1-1234-W6.xml", TRANSFORMATION.WithOutputAndDefinedPath);
     }
 
     @Test
