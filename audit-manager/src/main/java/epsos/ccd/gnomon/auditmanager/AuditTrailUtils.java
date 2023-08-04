@@ -20,7 +20,6 @@ import javax.xml.bind.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -402,10 +401,15 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
-                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
-                    "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
-
+            if(message.getEventIdentification().getEventTypeCode() != null && "ITI-39".equals(message.getEventIdentification().getEventTypeCode().get(0).getCsdCode())) {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("3"),
+                        "Patient", "ITI-39", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            } else {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                        "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            }
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), AuditConstant.DICOM, "Cross Gateway Query");
         }
@@ -911,11 +915,12 @@ public enum AuditTrailUtils {
      * @param eventActionCode
      * @param eventDateTime
      * @param eventOutcomeIndicator
+     * @param ncpSide
      * @return
      */
     private AuditMessage addEventIdentification(AuditMessage auditMessage, String eventType, String transactionName,
                                                 String eventActionCode, XMLGregorianCalendar eventDateTime,
-                                                BigInteger eventOutcomeIndicator) {
+                                                BigInteger eventOutcomeIndicator, NcpSide ncpSide) {
 
         // Change EventType to new ones
         //EventIdentificationType eventIdentification = new EventIdentificationType();
@@ -923,7 +928,11 @@ public enum AuditTrailUtils {
 
         EventID eventID = new EventID();
         if("ITI-39".equals(getMappedEventType(eventType)) || "ITI-41".equals(getMappedEventType(eventType))) { // TODO : extract it?
-            eventID.setCsdCode("110107");
+            if(ncpSide == NcpSide.NCP_A) {
+                eventID.setCsdCode("110106");
+            } else {
+                eventID.setCsdCode("110107");
+            }
         } else {
             eventID.setCsdCode("110112");
         }
@@ -960,6 +969,7 @@ public enum AuditTrailUtils {
             eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
         if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
+            eventID.setCodeSystemName("DCM");
             // IHE Validator will complain if we add this code - Discard
             //eventIdentification.getEventTypeCode().add(createCodedValue("DISCARD-60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Discard Medication Dispensed"));
         }
@@ -1006,7 +1016,20 @@ public enum AuditTrailUtils {
     private AuditMessage addPointOfCare(AuditMessage message, String userId, String roleId, boolean userIsRequester, String codeSystem) {
 
         if (StringUtils.isBlank(userId)) {
-            LOGGER.debug("This is service provider and doesn't need Point of Care");
+            //LOGGER.debug("This is service provider and doesn't need Point of Care");
+            ActiveParticipantContents participant = new ActiveParticipantContents();
+            participant.setUserID("SP");
+            participant.setAlternativeUserID("SP");
+            participant.setNetworkAccessPointID("127.0.0.1");
+            participant.setNetworkAccessPointTypeCode("1");
+            participant.setUserIsRequestor(userIsRequester);
+
+            RoleIDCode codedValue = new RoleIDCode();
+            codedValue.setCsdCode("110152");
+            codedValue.setCodeSystemName("DCM");
+            codedValue.setOriginalText(codeSystem); // Should be "Destination Role ID"
+            participant.getRoleIDCode().add(codedValue);
+            message.getActiveParticipant().add(participant);
         } else {//ActiveParticipantType   participant2 = new ActiveParticipantType();//participant2.setNetworkAccessPointID();
             ActiveParticipantContents participant = new ActiveParticipantContents();
             participant.setUserID(userId);
@@ -1154,8 +1177,9 @@ public enum AuditTrailUtils {
         codedValue.setOriginalText(PS_originalText);
 
         // SystemObject and Query
-        if(participantCode == 2 && participantRole == 24) {
+        if(participantCode == 2 && (participantRole == 3 || participantRole == 24)) {
             ParticipantObjectDetail participantObjectDetail = new ParticipantObjectDetail();
+            // 'ihe:homeCommunityID' or 'Repository Unique Id'
             participantObjectDetail.setType("ihe:homeCommunityID");
             try {
                 if (StringUtils.isNotBlank(PS_getHciIdentifierPayload)) {
@@ -1309,7 +1333,7 @@ public enum AuditTrailUtils {
             message = of.createAuditMessage();
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER, AuditConstant.CODE_SYSTEM_EHDSI,
                     "Service Consumer", eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI,
@@ -1337,7 +1361,7 @@ public enum AuditTrailUtils {
             message = of.createAuditMessage();
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Consumer", eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
@@ -1365,7 +1389,7 @@ public enum AuditTrailUtils {
             message = of.createAuditMessage();
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), false,
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
             addHumanRequestor(message, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
@@ -1401,7 +1425,7 @@ public enum AuditTrailUtils {
             addAuditSource(message, "N/A");
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addHumanRequestor(message, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
             addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER,
@@ -1435,7 +1459,7 @@ public enum AuditTrailUtils {
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             // Event Identification
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
-                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             // Point Of Care
             addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), true,
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
@@ -1470,7 +1494,7 @@ public enum AuditTrailUtils {
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             // Event Identification
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
-                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             // Point Of Care
             addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), true,
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
@@ -1507,7 +1531,7 @@ public enum AuditTrailUtils {
             // Event Identification
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER,
                     AuditConstant.CODE_SYSTEM_EHDSI, "Service Consumer", eventLog.getSourceip());
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER,
@@ -1532,7 +1556,7 @@ public enum AuditTrailUtils {
             message = of.createAuditMessage();
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
-                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
 
             addService(message, eventLog.getSP_UserID(), false, AuditConstant.SERVICE_PROVIDER, AuditConstant.CODE_SYSTEM_EHDSI,
                     "Service Provider", eventLog.getTargetip());
@@ -1558,7 +1582,7 @@ public enum AuditTrailUtils {
             addAuditSource(message, eventLog.getAS_AuditSourceId());
             // Event Identification
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(), "E",
-                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventDateTime(), eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             // Point Of Care
             addPointOfCare(message, eventLog.getPC_UserID(), eventLog.getPC_RoleID(), true,
                     "1.3.6.1.4.1.12559.11.10.1.3.2.2.2");
@@ -1589,7 +1613,7 @@ public enum AuditTrailUtils {
             message = of.createAuditMessage();
             addEventIdentification(message, eventLog.getEventType(), eventLog.getEI_TransactionName(),
                     eventLog.getEI_EventActionCode(), eventLog.getEI_EventDateTime(),
-                    eventLog.getEI_EventOutcomeIndicator());
+                    eventLog.getEI_EventOutcomeIndicator(), eventLog.getNcpSide());
             addHumanRequestor(message, eventLog.getHR_UserID(), eventLog.getHR_AlternativeUserID(), eventLog.getHR_RoleID(),
                     true);
             addService(message, eventLog.getSC_UserID(), true, AuditConstant.SERVICE_CONSUMER, AuditConstant.CODE_SYSTEM_EHDSI,

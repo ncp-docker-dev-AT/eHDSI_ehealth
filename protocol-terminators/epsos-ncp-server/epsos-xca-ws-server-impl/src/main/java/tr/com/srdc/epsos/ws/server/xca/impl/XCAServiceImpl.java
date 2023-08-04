@@ -147,14 +147,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case EP_CLASSCODE:
                 eventLog.setEventType(EventType.ORDER_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
                 eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:
@@ -162,13 +165,13 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
+                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
             default:
                 logger.warn("No event identification information found!");
                 //  TODO: Analyzing if some specific codes are needed in this situation
                 break;
         }
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
         eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.setPS_ParticipantObjectID(getDocumentEntryPatientId(request));
 
