@@ -1533,7 +1533,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             <statusCode code="completed"/>
                                             <performer typeCode="PRF">
                                                 <assignedEntity>
-                                                    <id>123</id>
+                                                    <id root="2.9999.1"/>
                                                     <addr>
                                                         <streetName>Breydelstraat 4</streetName>
                                                         <city>Brussels</city>
@@ -1550,7 +1550,7 @@ Although being real choices for the different diseases and conditions, the selec
                                             </performer>
                                             <performer typeCode="PRF">
                                                 <assignedEntity>
-                                                    <id>456</id>
+                                                    <id root="2.9999.2"/>
                                                     <representedOrganization>
                                                         <name>Rare Disease center</name>
                                                         <telecom value="mailto:rdc@rarediseasecenter.com" use="WP"/>
@@ -1566,10 +1566,10 @@ Although being real choices for the different diseases and conditions, the selec
                                     </entryRelationship>
                                     <reference typeCode="REFR">
                                         <externalDocument>
-                                            <id>123</id>
-                                            <code>url</code>
+                                            <id root="2.9999.3"/>
+                                            <code code="url"/>
                                             <text>
-                                                <reference>https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert=199</reference>
+                                                <reference value="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert=199"/>
                                             </text>
                                         </externalDocument>
                                     </reference>

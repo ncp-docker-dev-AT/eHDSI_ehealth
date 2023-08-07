@@ -281,7 +281,7 @@
     </xsl:template>
 
     <xsl:template match="n1:externalDocument">
-        <xsl:value-of select="n1:text/n1:reference/text()"/>
+        <xsl:value-of select="n1:text/n1:reference/@value"/>
     </xsl:template>
 
     <xsl:template match="n1:performer">
