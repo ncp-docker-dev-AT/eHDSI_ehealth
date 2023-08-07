@@ -307,7 +307,6 @@ public class EventLogUtil {
                                 Iterator<OMElement> elemAttributeValue = elemAttribute.getChildrenWithLocalName("AttributeValue");
                                 OMElement elemAttributeValueText = elemAttributeValue.next();
                                 eventLog.setHciIdentifier(elemAttributeValueText.getText());
-                                LOGGER.error("HCIIdentifier : " + elemAttributeValueText.getText());
                                 break;
                             }
                         }
