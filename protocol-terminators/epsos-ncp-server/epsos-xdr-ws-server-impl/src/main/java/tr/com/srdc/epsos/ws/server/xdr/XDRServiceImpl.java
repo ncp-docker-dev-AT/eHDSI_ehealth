@@ -127,7 +127,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
         eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
+        eventLog.setEI_EventActionCode(EventActionCode.CREATE);
         eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.getEventTargetParticipantObjectIds().add(discardId);
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
@@ -181,7 +181,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
         eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
+        eventLog.setEI_EventActionCode(EventActionCode.CREATE);
         eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
 
         if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
