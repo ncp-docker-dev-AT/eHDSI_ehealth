@@ -307,7 +307,6 @@ public class EventLogUtil {
                                 Iterator<OMElement> elemAttributeValue = elemAttribute.getChildrenWithLocalName("AttributeValue");
                                 OMElement elemAttributeValueText = elemAttributeValue.next();
                                 eventLog.setHciIdentifier(elemAttributeValueText.getText());
-                                LOGGER.error("HCIIdentifier : " + elemAttributeValueText.getText());
                                 break;
                             }
                         }
@@ -395,12 +394,12 @@ public class EventLogUtil {
         } else if (StringUtils.equals(classCode, ClassCode.ED_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
-            eventLog.setEI_EventActionCode(EventActionCode.CREATE);
+            eventLog.setEI_EventActionCode(EventActionCode.READ);
 
         } else if (StringUtils.equals(classCode, ClassCode.EDD_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_DISCARD);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_DISCARD);
-            eventLog.setEI_EventActionCode(EventActionCode.CREATE);
+            eventLog.setEI_EventActionCode(EventActionCode.READ);
             eventLog.getEventTargetParticipantObjectIds().add(discardId);
         }
 
