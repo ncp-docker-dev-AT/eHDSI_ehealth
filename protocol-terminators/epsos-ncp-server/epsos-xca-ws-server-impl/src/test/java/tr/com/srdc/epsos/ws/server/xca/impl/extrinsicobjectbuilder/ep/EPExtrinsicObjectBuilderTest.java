@@ -21,7 +21,6 @@ import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
-@Ignore
 public class EPExtrinsicObjectBuilderTest extends AbstractExtrinsicObjectBuilderTest {
 
 

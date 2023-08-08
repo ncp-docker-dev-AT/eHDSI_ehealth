@@ -13,7 +13,6 @@ import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.AbstractExtri
 
 import java.util.Date;
 
-@Ignore
 public class PSExtrinsicObjectBuilderTest extends AbstractExtrinsicObjectBuilderTest {
 
     @Test
