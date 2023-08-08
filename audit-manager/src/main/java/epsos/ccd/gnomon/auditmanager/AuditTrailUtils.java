@@ -426,9 +426,15 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
-                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
-                    "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            if(message.getEventIdentification().getEventTypeCode() != null && "ITI-39".equals(message.getEventIdentification().getEventTypeCode().get(0).getCsdCode())) {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("3"),
+                        "Patient", "ITI-39", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            } else {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                        "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            }
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), "", "");
@@ -606,9 +612,16 @@ public enum AuditTrailUtils {
 
         AuditMessage message = createAuditTrailForHCPAssurance(eventLog);
         if (message != null) {
-            addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
-                    "Patient", "ITI-38", "IHE Transactions", "Patient Number",
-                    "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            if(message.getEventIdentification().getEventTypeCode() != null && "ITI-39".equals(message.getEventIdentification().getEventTypeCode().get(0).getCsdCode())) {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("3"),
+                        "Patient", "ITI-39", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Patient Discovery", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            } else {
+                addParticipantObject(message, eventLog.getReqM_ParticipantObjectID(), Short.valueOf("2"), Short.valueOf("24"),
+                        "Patient", "ITI-38", "IHE Transactions", "Patient Number",
+                        "Cross Gateway Query", eventLog.getQueryByParameter(), eventLog.getHciIdentifier());
+            }
+
 
             addEventTarget(message, eventLog.getEventTargetParticipantObjectIds(), Short.valueOf("2"), Short.valueOf("4"),
                     "12", "", Short.valueOf("0"), AuditConstant.DICOM, "Cross Gateway Query");
@@ -927,18 +940,28 @@ public enum AuditTrailUtils {
         EventIdentificationContents eventIdentification = new EventIdentificationContents();
 
         EventID eventID = new EventID();
-        if("ITI-39".equals(getMappedEventType(eventType)) || "ITI-41".equals(getMappedEventType(eventType))) { // TODO : extract it?
-            if(ncpSide == NcpSide.NCP_A) {
+        if("ITI-39".equals(getMappedEventType(eventType))) { // TODO : extract it?
+            if (ncpSide == NcpSide.NCP_A) {
                 eventID.setCsdCode("110106");
+                eventID.setOriginalText("Export");
             } else {
                 eventID.setCsdCode("110107");
+                eventID.setOriginalText("Import");
+            }
+        } else if("ITI-41".equals(getMappedEventType(eventType))) {
+            if(ncpSide == NcpSide.NCP_A) {
+                eventID.setCsdCode("110107");
+                eventID.setOriginalText("Import");
+            } else {
+                eventID.setCsdCode("110106");
+                eventID.setOriginalText("Export");
             }
         } else {
             eventID.setCsdCode("110112");
+            eventID.setOriginalText("Query"); // TODO : extract it? (getMappedTransactionName(transactionName));
         }
         eventID.setCodeSystemName("DCM");
         eventID.setDisplayName(getMappedTransactionName(transactionName));
-        eventID.setOriginalText("Query"); // extract it? (getMappedTransactionName(transactionName));
         eventIdentification.setEventID(eventID);
 
         EventTypeCode eventTypeCode = new EventTypeCode();
@@ -949,7 +972,6 @@ public enum AuditTrailUtils {
 
         if (StringUtils.equals(eventType, EventType.PATIENT_SERVICE_LIST.getCode())
                 || StringUtils.equals(eventType, EventType.PATIENT_SERVICE_RETRIEVE.getCode())) {
-
             // IHE Validator will complain if we add this code - PS
             //eventIdentification.getEventTypeCode().add(createCodedValue("60591-5", AuditConstant.CODE_SYSTEM_LOINC, "Patient Summary Document"));
         }
@@ -961,12 +983,12 @@ public enum AuditTrailUtils {
         }
         if (StringUtils.equals(eventType, EventType.CONSENT_SERVICE_PUT.getCode())
                 || StringUtils.equals(eventType, EventType.CONSENT_SERVICE_DISCARD.getCode())) {
-
-            eventIdentification.getEventTypeCode().add(createCodedValue("57016-8", AuditConstant.CODE_SYSTEM_LOINC, "Privacy Policy Acknowledgement Document"));
+            // IHE Validator will complain if we add this code - Discard
+            //eventIdentification.getEventTypeCode().add(createCodedValue("57016-8", AuditConstant.CODE_SYSTEM_LOINC, "Privacy Policy Acknowledgement Document"));
         }
         if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_INITIALIZE.getCode())) {
-
-            eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
+            // IHE Validator will complain if we add this code - Dispense
+            //eventIdentification.getEventTypeCode().add(createCodedValue("60593-1", AuditConstant.CODE_SYSTEM_LOINC, "Medication Dispensed Document"));
         }
         if (StringUtils.equals(eventType, EventType.DISPENSATION_SERVICE_DISCARD.getCode())) {
             eventID.setCodeSystemName("DCM");

@@ -21,8 +21,6 @@ Run in a terminal the command
 npm install
 ```
 
-
-
 ### Compiles and hot-reloads for development
 
 ```
@@ -41,3 +39,5 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+Warning: Do not execute the command "npm audit fix --force" as it might introduce breaking changes into the project.

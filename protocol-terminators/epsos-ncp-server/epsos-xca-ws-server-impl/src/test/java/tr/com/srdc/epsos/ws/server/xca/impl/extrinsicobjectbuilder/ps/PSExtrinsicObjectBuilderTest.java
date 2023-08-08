@@ -6,6 +6,7 @@ import fi.kela.se.epsos.data.model.PSDocumentMetaData;
 import fi.kela.se.epsos.data.model.PSDocumentMetaDataImpl;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.AbstractExtrinsicObjectBuilderTest;

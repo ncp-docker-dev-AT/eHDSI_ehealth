@@ -152,7 +152,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case PS_CLASSCODE:
                 eventLog.setEventType(EventType.PATIENT_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_LIST);
@@ -165,7 +165,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_LIST);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
             default:
                 logger.warn("No event identification information found!");
@@ -253,14 +253,17 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 case EP_CLASSCODE:
                     eventLog.setEventType(EventType.ORDER_SERVICE_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.ORDER_SERVICE_RETRIEVE);
+                    eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
                 case PS_CLASSCODE:
                     eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
+                    eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
                 case MRO_CLASSCODE:
                     eventLog.setEventType(EventType.MRO_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
+                    eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
                 case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                 case ORCD_LABORATORY_RESULTS_CLASSCODE:
@@ -268,14 +271,15 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 case ORCD_MEDICAL_IMAGES_CLASSCODE:
                     eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
+                    eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
                 default:
                     logger.warn("No event identification information found!");
                     //  TODO: Analyzing if some specific codes are needed in this situation
+                    eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
             }
         }
-        eventLog.setEI_EventActionCode(EventActionCode.READ);
         eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
         eventLog.getEventTargetParticipantObjectIds().add(request.getDocumentRequest().get(0).getDocumentUniqueId());
 

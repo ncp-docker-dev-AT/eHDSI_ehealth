@@ -106,7 +106,7 @@
                                                     </th>
                                                 </tr>
                                                 <xsl:call-template name="generalProblems"/>
-                                                <xsl:call-template name="rareDiseases"/>
+                                                <xsl:call-template name="rareDiseasesForActiveProblems"/>
                                             </xsl:otherwise>
                                         </xsl:choose>
                                     </tbody>
@@ -123,7 +123,7 @@
         <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.2']" mode="activeProblems"/>
     </xsl:template>
 
-    <xsl:template name="rareDiseases">
+    <xsl:template name="rareDiseasesForActiveProblems">
         <tr>
             <th class="subtitle" colspan="5">
                 <!-- Rare Diseases -->
@@ -131,10 +131,10 @@
                 <xsl:text>Rare Diseases</xsl:text>
             </th>
         </tr>
-        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="activeProblems"/>
+        <xsl:apply-templates select="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="rarediseases"/>
     </xsl:template>
 
-    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="activeProblems">
+    <xsl:template match="n1:entry/n1:act/n1:entryRelationship[@typeCode='SUBJ']/n1:observation/n1:value[@codeSystem='1.3.6.1.4.1.12559.11.10.1.3.1.44.5']" mode="rarediseases">
 
         <xsl:variable name="problemCondition"
                       select="."/>
@@ -197,7 +197,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="5">
                         <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="./@nullFlavor"/>
                         </xsl:call-template>
@@ -270,7 +270,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="5">
                         <xsl:call-template name="show-eHDSINullFlavor">
                             <xsl:with-param name="code" select="./@nullFlavor"/>
                         </xsl:call-template>
@@ -281,7 +281,7 @@
     </xsl:template>
 
     <xsl:template match="n1:externalDocument">
-        <xsl:value-of select="n1:text/n1:reference/text()"/>
+        <xsl:value-of select="n1:text/n1:reference/@value"/>
     </xsl:template>
 
     <xsl:template match="n1:performer">
