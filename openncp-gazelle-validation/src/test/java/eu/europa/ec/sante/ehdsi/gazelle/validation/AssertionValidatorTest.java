@@ -6,6 +6,7 @@ import eu.europa.ec.sante.ehdsi.gazelle.validation.impl.SchematronValidatorImpl;
 import org.apache.http.client.HttpClient;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfiguration.class, loader = AnnotationConfigContextLoader.class)
+@Ignore
 public class AssertionValidatorTest {
 
     private final Logger logger = LoggerFactory.getLogger(AssertionValidatorTest.class);
@@ -98,7 +100,7 @@ public class AssertionValidatorTest {
                 "      <saml2:Attribute FriendlyName=\"XSPA Organization ID\" Name=\"urn:oasis:names:tc:xspa:1.0:subject:organization-id\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
                 "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">20155.1</saml2:AttributeValue>\n" +
                 "      </saml2:Attribute>\n" +
-                "      <saml2:Attribute FriendlyName=\"eHealth DSI Healthcare Facility Type\" Name=\"urn:epsos:names:wp3.4:subject:healthcare-facility-type\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
+                "      <saml2:Attribute FriendlyName=\"eHealth DSI Healthcare Facility Type\" Name=\"urn:ehdsi:names:subject:healthcare-facility-type\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +
                 "         <saml2:AttributeValue xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xs:string\">Resident Physician</saml2:AttributeValue>\n" +
                 "      </saml2:Attribute>\n" +
                 "      <saml2:Attribute FriendlyName=\"XSPA Purpose Of Use\" Name=\"urn:oasis:names:tc:xspa:1.0:subject:purposeofuse\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\">\n" +

@@ -15,8 +15,6 @@ import javax.xml.transform.dom.DOMSource;
 
 /**
  * TODO: improve the implementation by implementing a method which picks attribute values by attribute names
- * (avoid repetition in current methods)
- * TODO: Wave 2 review source code Assertions
  */
 public class Helper {
 
@@ -25,18 +23,18 @@ public class Helper {
     private Helper() {
     }
 
-    public static Assertion getHCPAssertion(Element sh) {
+    public static Assertion getHCPAssertion(Element soapHeader) {
 
         try {
             // TODO: Since the XCA simulator sends this value in a wrong way, we are trying like this for the moment
-            NodeList securityList = sh.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
+            NodeList securityList = soapHeader.getElementsByTagNameNS("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
             Element security;
             if (securityList.getLength() > 0) {
                 security = (Element) securityList.item(0);
             } else {
                 throw (new MissingFieldException("Security element is required."));
             }
-            NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
+            NodeList assertionList = security.getElementsByTagNameNS(AssertionConstants.URN_OASIS_NAMES_TC_SAML_2_0_ASSERTION, "Assertion");
             Element hcpAss;
             Assertion hcpAssertion = null;
 
@@ -63,9 +61,9 @@ public class Helper {
         }
     }
 
-    public static String getAssertionsIssuer(Element sh) {
+    public static String getAssertionsIssuer(Element soapHeader) {
 
-        Assertion assertion = getHCPAssertion(sh);
+        Assertion assertion = getHCPAssertion(soapHeader);
         if (assertion != null) {
             return assertion.getIssuer().getValue();
         } else {
@@ -73,9 +71,9 @@ public class Helper {
         }
     }
 
-    public static String getAssertionsSPProvidedId(Element sh) {
+    public static String getAssertionsSPProvidedId(Element soapHeader) {
 
-        Assertion assertion = getHCPAssertion(sh);
+        Assertion assertion = getHCPAssertion(soapHeader);
         if (assertion != null) {
             return assertion.getSubject().getNameID().getSPProvidedID();
         } else {
@@ -83,11 +81,11 @@ public class Helper {
         }
     }
 
-    public static String getUserID(Element sh) {
+    public static String getUserID(Element soapHeader) {
         String result = "N/A";
 
         try {
-            Assertion assertion = getHCPAssertion(sh);
+            Assertion assertion = getHCPAssertion(soapHeader);
             if (assertion != null) {
                 String val = assertion.getSubject().getNameID().getValue();
                 if (StringUtils.isNotBlank(val)) {
@@ -101,24 +99,16 @@ public class Helper {
         return result;
     }
 
-    public static String getAlternateUserID(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:subject-id", false);
+    public static String getAlternateUserID(Element soapHeader) {
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_SUBJECT_SUBJECT_ID, false);
         if (result == null) {
             return "N/A";
         }
         return result;
     }
 
-//    public static String getFunctionalRoleID(Element sh) {
-//        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:functional-role", false);
-//        if (result == null) {
-//            return "N/A";
-//        }
-//        return result;
-//    }
-
-    public static String getRoleID(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xacml:2.0:subject:role", false);
+    public static String getRoleID(Element soapHeader) {
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XACML_2_0_SUBJECT_ROLE, false);
         if (result == null) {
             return "N/A";
         }
@@ -127,7 +117,7 @@ public class Helper {
 
     public static String getXSPALocality(Element soapHeader) {
 
-        String result = getXSPAAttributeByName(soapHeader, "urn:oasis:names:tc:xspa:1.0:environment:locality", false);
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_ENVIRONMENT_LOCALITY, false);
         return StringUtils.isBlank(result) ? "N/A" : result;
     }
 
@@ -135,33 +125,33 @@ public class Helper {
      * Util method which return the Point of Care information related to the HCP assertions, based on the element provided
      * Organization is the subject:Organization (Optional) value or if not present the environment:locality value (Required).
      */
-    public static String getPointOfCareUserId(Element sh) {
+    public static String getPointOfCareUserId(Element soapHeader) {
 
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:organization", false);
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION, false);
         if (result == null) {
-            result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:environment:locality", false);
+            result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_ENVIRONMENT_LOCALITY, false);
         }
         return StringUtils.isBlank(result) ? "N/A" : result;
     }
 
-    public static String getOrganizationId(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:organization-id", false);
+    public static String getOrganizationId(Element soapHeader) {
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION_ID, false);
         if (result == null) {
             return "N/A";
         }
         return result;
     }
 
-    public static String getOrganization(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:oasis:names:tc:xspa:1.0:subject:organization", false);
+    public static String getOrganization(Element soapHeader) {
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_OASIS_NAMES_TC_XSPA_1_0_SUBJECT_ORGANIZATION, false);
         if (result == null) {
             return "N/A";
         }
         return result;
     }
 
-    public static String getPC_RoleID(Element sh) {
-        String result = getXSPAAttributeByName(sh, "urn:epsos:names:wp3.4:subject:healthcare-facility-type", false);
+    public static String getPC_RoleID(Element soapHeader) {
+        String result = getXSPAAttributeByName(soapHeader, AssertionConstants.URN_EHDSI_NAMES_SUBJECT_HEALTHCARE_FACILITY_TYPE, false);
         if (result == null) {
             return "N/A";
         }
@@ -171,10 +161,10 @@ public class Helper {
     /**
      * @author Konstantin.Hypponen@kela.fi
      */
-    public static Assertion getTRCAssertion(Element soapHeaderElement) {
+    public static Assertion getTRCAssertion(Element soapHeader) {
 
         try {
-            NodeList securityList = soapHeaderElement.getElementsByTagNameNS(
+            NodeList securityList = soapHeader.getElementsByTagNameNS(
                     "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
             Element security;
             if (securityList.getLength() > 0) {
@@ -182,7 +172,7 @@ public class Helper {
             } else {
                 throw (new MissingFieldException("Security element is required."));
             }
-            NodeList assertionList = security.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:assertion", "Assertion");
+            NodeList assertionList = security.getElementsByTagNameNS(AssertionConstants.URN_OASIS_NAMES_TC_SAML_2_0_ASSERTION, "Assertion");
             Assertion trcAssertion = null;
 
             if (assertionList.getLength() > 0) {
@@ -213,7 +203,7 @@ public class Helper {
      */
     public static String getDocumentEntryPatientIdFromTRCAssertion(Element soapHeaderElement) {
 
-        String patientId = getXSPAAttributeByName(soapHeaderElement, "urn:oasis:names:tc:xacml:1.0:resource:resource-id", true);
+        String patientId = getXSPAAttributeByName(soapHeaderElement, AssertionConstants.URN_OASIS_NAMES_TC_XACML_1_0_RESOURCE_RESOURCE_ID, true);
         if (patientId == null) {
             logger.error("Patient ID not found in TRC assertion");
         }

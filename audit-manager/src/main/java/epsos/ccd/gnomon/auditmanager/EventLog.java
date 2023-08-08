@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EventLog is a java object with the minimal input variables needed to construct an AuditMessage according to RFC3881.
+ * EventLog is a java object with the minimal input variables needed to construct an AuditMessage according to DICOM.
  * Java Bean object for the Event Log object.
  * Getters and setters for all the properties Constructors for OpenNCP audit schemas.
  *
@@ -38,6 +38,10 @@ public class EventLog {
     private BigInteger EI_EventOutcomeIndicator; // Possible values are: 0:full success,1:partial delivery,4:temporal or recoverable failures,8:permanent failure
     // Event Identification
     private String EventType;             // one of the available epsos event ids
+
+    private String queryByParameter;      // Query by parameter
+
+    private String hciIdentifier;
 
     // Point of Care
     private String PC_UserID;  // Point of Care: Oid of the department
@@ -90,9 +94,9 @@ public class EventLog {
      * @param eventIdentificationTime             The datetime the event occurred
      * @param eventIdentificationOutcomeIndicator <br>
      *                                            0 for full success <br>
-     *                                            1 in case of partial delivery <br>
-     *                                            4 for temporal failures <br>
-     *                                            8 for permanent failure <br>
+     *                                            4 in case of partial delivery <br>
+     *                                            8 for temporal failures <br>
+     *                                            12 for permanent failure <br>
      * @param PC_UserID                           Point of Care: Oid of the department
      * @param PC_RoleID                           Role of the department
      * @param HR_UserID                           Identifier of the HCP initiated the event
@@ -158,6 +162,8 @@ public class EventLog {
         eventLog.setTargetip(nullToEmptyString(targetIp));
         // Setup Event Identification information
         eventLog.setNcpSide(ncpSide);
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog Details: '{}'", eventLog);
@@ -172,9 +178,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param SC_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     triggered the epsos operation
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
@@ -216,6 +222,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -230,9 +238,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param SP_UserID                    The string encoded CN of the TLS certificate of the NCP
      *                                     processed the epsos operation
      * @param eventTargetObjectIdIn        The string encoded UUID of the source document
@@ -272,6 +280,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectID(nullToEmptyString(ResM_ParticipantObjectID));
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -305,9 +315,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -358,9 +368,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -409,9 +419,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the point of care
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -477,6 +487,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -576,9 +588,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the Point of Care: Oid of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -638,6 +650,8 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceIp));
         eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
@@ -652,9 +666,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Role of the Point of Care: Oid of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -714,6 +728,8 @@ public class EventLog {
         eventLog.setSourceip(nullToEmptyString(sourceIp));
         eventLog.setTargetip(nullToEmptyString(targetIp));
         eventLog.ncpSide = ncpSide;
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("EventLog: '{}'", eventLog);
@@ -730,9 +746,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param HR_UserID                    Identifier of the HCP initiated the event
      * @param HR_RoleID                    Role of the HCP initiated the event
      * @param HR_AlternativeUserID         Human readable name of the HCP as given in
@@ -798,6 +814,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -812,9 +830,9 @@ public class EventLog {
      * @param EI_EventDateTime             The datetime the event occurred
      * @param EI_EventOutcomeIndicator     <br>
      *                                     0 for full success <br>
-     *                                     1 in case of partial delivery <br>
-     *                                     4 for temporal failures <br>
-     *                                     8 for permanent failure <br>
+     *                                     4 in case of partial delivery <br>
+     *                                     8 for temporal failures <br>
+     *                                     12 for permanent failure <br>
      * @param PC_UserID                    Point of Care: Oid of the department
      * @param PC_RoleID                    Point of Care: Role of the department
      * @param HR_UserID                    Identifier of the HCP initiated the event
@@ -873,6 +891,8 @@ public class EventLog {
         eventLog.setResM_ParticipantObjectDetail(ResM_ParticipantObjectDetail);
         eventLog.setSourceip(nullToEmptyString(sourceip));
         eventLog.setTargetip(nullToEmptyString(targetip));
+        eventLog.setQueryByParameter("");
+        eventLog.setHciIdentifier("");
 
         if (LOGGER_CLINICAL.isDebugEnabled() && !StringUtils.equals(System.getProperty(OpenNCPConstants.SERVER_EHEALTH_MODE), ServerMode.PRODUCTION.name())) {
             LOGGER_CLINICAL.debug("'{}'", eventLog);
@@ -1121,6 +1141,23 @@ public class EventLog {
         this.ncpSide = ncpSide;
     }
 
+    public String getQueryByParameter() {
+        return queryByParameter;
+    }
+
+    public void setQueryByParameter(String queryByParameter) {
+        this.queryByParameter = queryByParameter;
+    }
+
+    public String getHciIdentifier() {
+        return hciIdentifier;
+    }
+
+    public void setHciIdentifier(String hciIdentifier) {
+        this.hciIdentifier = hciIdentifier;
+    }
+
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -1151,6 +1188,8 @@ public class EventLog {
                 .append("ResM_ParticipantObjectID", ResM_ParticipantObjectID)
                 .append("sourceip", sourceip)
                 .append("targetip", targetip)
+                .append("queryByParameter", queryByParameter)
+                .append("hciIdentifier", hciIdentifier)
                 .toString();
     }
 }

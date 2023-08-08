@@ -145,6 +145,10 @@ public class XCPD_ServiceMessageReceiverInOut extends AbstractInOutMessageReceiv
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_ParticipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
+
+                    EventLogUtil.extractXcpdQueryByParamFromHeader(eventLog, msgContext, "PRPA_IN201305UV02", "controlActProcess", "queryByParameter");
+                    EventLogUtil.extractHCIIdentifierFromHeader(eventLog, msgContext);
+
                     AuditService auditService = AuditServiceFactory.getInstance();
                     auditService.write(eventLog, "", "1");
                     LOGGER.info("EventLog: '{}' generated.", eventLog.getEventType());

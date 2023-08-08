@@ -9,6 +9,7 @@ import fi.kela.se.epsos.data.model.EpListParam;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ClassificationType;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import tr.com.srdc.epsos.data.model.SimpleConfidentialityEnum;
 import tr.com.srdc.epsos.data.model.SubstitutionCodeEnum;
@@ -19,7 +20,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
-
 
 public class EPExtrinsicObjectBuilderTest extends AbstractExtrinsicObjectBuilderTest {
 

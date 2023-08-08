@@ -63,7 +63,7 @@ public class PatientDemographics {
      * <p>
      * NOTICE: If need to use multiple id's, use: getId(int i)
      *
-     * @return he extension part of the first patient ID.
+     * @return The extension part of the first patient ID.
      */
     public String getId() {
         return getId(0);
@@ -83,7 +83,7 @@ public class PatientDemographics {
      * 0.2.0
      *
      * @param i index number of id's
-     * @return he extension part of the first patient ID.
+     * @return The extension part of the first patient ID.
      */
     public String getId(int i) {
         if (idList != null && !idList.isEmpty() && idList.size() > i) {

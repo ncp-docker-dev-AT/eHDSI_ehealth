@@ -221,7 +221,7 @@ public class EadcUtilWrapper {
         transactionInfo.setUserId("N/A GDPR");
         transactionInfo.setPOC(reqMsgContext != null ?
                 extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:environment:locality") + " (" +
-                        extractAssertionInfo(getAssertion(reqMsgContext), "urn:epsos:names:wp3.4:subject:healthcare-facility-type") + ")" : null);
+                        extractAssertionInfo(getAssertion(reqMsgContext), "urn:ehdsi:names:subject:healthcare-facility-type") + ")" : null);
         transactionInfo.setPOCID(reqMsgContext != null ? extractAssertionInfo(getAssertion(reqMsgContext), "urn:oasis:names:tc:xspa:1.0:subject:organization-id") : null);
         transactionInfo.setReceivingISO(countryCodeA != null ? StringUtils.upperCase(countryCodeA) : null);
         transactionInfo.setReceivingNCPOID(countryCodeA != null ? OidUtil.getHomeCommunityId(countryCodeA.toLowerCase()) : null);

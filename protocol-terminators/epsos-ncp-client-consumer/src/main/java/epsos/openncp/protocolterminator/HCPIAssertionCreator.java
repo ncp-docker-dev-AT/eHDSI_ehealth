@@ -248,7 +248,7 @@ public class HCPIAssertionCreator {
         if (true) {
             Attribute att = saml.create(Attribute.class, Attribute.DEFAULT_ELEMENT_NAME);
             att.setFriendlyName("eHealth DSI Healthcare Facility Type");
-            att.setName("urn:epsos:names:wp3.4:subject:healthcare-facility-type");
+            att.setName("urn:ehdsi:names:subject:healthcare-facility-type");
             att.setNameFormat("urn:oasis:names:tc:SAML:2.0:attrname-format:uri");
 
             XMLObjectBuilder<?> builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);

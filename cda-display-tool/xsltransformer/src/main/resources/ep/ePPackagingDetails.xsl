@@ -67,7 +67,52 @@
                         </td>
                     </tr>
                     <xsl:if test="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part">
-                        <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging"/>
+                        <table class="ep_table" width="100%">
+                            <colgroup>
+                                <col span="1" style="width: 15%;"/>
+                                <col span="1" style="width: 15%;"/>
+                                <col span="1" style="width: 10%;"/>
+                                <col span="1" style="width: 20%;"/>
+                                <col span="1" style="width: 20%;"/>
+                                <col span="1" style="width: 20%;"/>
+                            </colgroup>
+                            <tbody>
+                                <tr>
+                                    <th/>
+                                    <th>
+                                        <!-- Code Header -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'113'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <th>
+                                        <!-- Name Header -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'114'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <th>
+                                        <!-- Description Header -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'192'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <th>
+                                        <!-- Form Code Header -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'25'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                    <th>
+                                        <!-- package Size Header -->
+                                        <xsl:call-template name="show-eHDSIDisplayLabel">
+                                            <xsl:with-param name="code" select="'50'"/>
+                                        </xsl:call-template>
+                                    </th>
+                                </tr>
+                                <xsl:apply-templates select="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging"/>
+                            </tbody>
+                        </table>
                     </xsl:if>
                 </tbody>
             </table>
@@ -76,13 +121,28 @@
 
     <xsl:template match="n1:consumable/n1:manufacturedProduct/n1:manufacturedMaterial/pharm:part" mode="packaging">
         <tr>
-            <th>
+            <td>
                 <center>
                     <!-- Part -->
                     <xsl:text>Part </xsl:text>
                     <xsl:value-of select="position()"/>
                 </center>
-            </th>
+            </td>
+            <td>
+                <xsl:value-of select="pharm:partProduct/pharm:code"/>
+            </td>
+            <td>
+                <xsl:value-of select="pharm:partProduct/pharm:name"/>
+            </td>
+            <td>
+                <xsl:value-of select="pharm:partProduct/pharm:desc"/>
+            </td>
+            <td>
+                <xsl:call-template name="show-eHDSIDoseForm">
+                    <xsl:with-param name="node"
+                                    select="pharm:partProduct/pharm:formCode"/>
+                </xsl:call-template>
+            </td>
             <td>
                 <xsl:call-template name="show-package-size">
                     <xsl:with-param name="quantity" select="pharm:quantity"/>

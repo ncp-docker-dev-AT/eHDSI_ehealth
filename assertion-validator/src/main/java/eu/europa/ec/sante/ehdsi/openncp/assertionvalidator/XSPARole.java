@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public enum XSPARole {
 
-    AUDIOLOGIST("2466", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Audiologists and speech therapists"),
+    AUDIOLOGIST("2266", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Audiologists and speech therapists"),
     DENTIST("2261", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Dentists"),
     MEDICAL_DOCTORS("221", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Medical Doctors"),
     MEDICAL_TECHNICIAN("3211", "2.16.840.1.113883.2.9.6.2.7", "ISCO", "Medical imaging and therapeutic equipment technicians"),
@@ -37,8 +37,8 @@ public enum XSPARole {
 
     public static boolean containsCode(String label) {
 
-        for (XSPARole e : values()) {
-            if (StringUtils.equalsIgnoreCase(e.code, label)) {
+        for (XSPARole role : values()) {
+            if (StringUtils.equalsIgnoreCase(role.code, label)) {
                 return true;
             }
         }
@@ -46,12 +46,28 @@ public enum XSPARole {
     }
 
     public static boolean validateRole(String code, String name) {
-        for (XSPARole e : values()) {
-            if (StringUtils.equalsIgnoreCase(e.code, code) && StringUtils.equalsIgnoreCase(e.displayName, name)) {
+        for (XSPARole role : values()) {
+            if (StringUtils.equalsIgnoreCase(role.code, code) && StringUtils.equalsIgnoreCase(role.displayName, name)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getCodeSystem() {
+        return codeSystem;
+    }
+
+    public String getCodeSystemName() {
+        return codeSystemName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

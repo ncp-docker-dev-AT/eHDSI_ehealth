@@ -164,6 +164,12 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                                 randomUUID, envelope.getHeader().toString());
                     }
                     eventLog.setNcpSide(NcpSide.NCP_A);
+                    eventLog.setQueryByParameter(" ");
+                    eventLog.setHciIdentifier(" ");
+
+                    EventLogUtil.extractQueryByParamFromHeader(eventLog, msgContext, "PRPA_IN201305UV02", "controlActProcess", "queryByParameter");
+                    EventLogUtil.extractHCIIdentifierFromHeader(eventLog, msgContext);
+
                     AuditServiceFactory.getInstance().write(eventLog, "", "1");
 
                     /* Validate outgoing query response */
@@ -202,6 +208,11 @@ public class XCA_ServiceMessageReceiverInOut extends AbstractInOutMessageReceive
                     eventLog.setResM_ParticipantObjectID(randomUUID);
                     eventLog.setResM_ParticipantObjectDetail(envelope.getHeader().toString().getBytes());
                     eventLog.setNcpSide(NcpSide.NCP_A);
+                    eventLog.setQueryByParameter(" ");
+                    eventLog.setHciIdentifier(" ");
+
+                    EventLogUtil.extractQueryByParamFromHeader(eventLog, msgContext, "PRPA_IN201305UV02", "controlActProcess", "queryByParameter");
+                    EventLogUtil.extractHCIIdentifierFromHeader(eventLog, msgContext);
 
                     AuditServiceFactory.getInstance().write(eventLog, "", "1");
 

@@ -238,7 +238,7 @@
                                 <observation classCode="OBS" moodCode="EVN">
                                     <templateId root="1.3.6.1.4.1.12559.11.10.1.3.1.3.17" />
                                     <id root="2.999.2.1.1" extension="__example only__" />
-                                    <code code="609328004" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" codeSystemVersion="2021-09-30" displayName="Allergic disposition " />
+                                    <code code="609328004" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT" codeSystemVersion="2022-07-31" displayName="Allergic disposition " />
                                     <text>
                                         <reference value="#Allergies_None" />
                                     </text>

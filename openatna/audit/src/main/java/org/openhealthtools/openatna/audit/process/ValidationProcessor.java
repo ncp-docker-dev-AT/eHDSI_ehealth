@@ -145,7 +145,7 @@ public class ValidationProcessor implements AtnaProcessor {
         }
         AtnaObject obj = object.getObject();
         if (obj.getObjectId() == null) {
-            LOGGER.error("ATNA Error: ATNAObject does not contain ID - TOTO: Review implementation");
+            LOGGER.error("ATNA Error: ATNAObject does not contain ID - TODO: Review implementation");
             //  TODO: Review this Error management
             //  throw new AtnaException("no participant object id defined",AtnaException.AtnaError.NO_PARTICIPANT_OBJECT_ID);
         }

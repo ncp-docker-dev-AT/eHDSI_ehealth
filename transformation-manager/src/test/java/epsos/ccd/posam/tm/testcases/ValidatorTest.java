@@ -16,7 +16,7 @@ public class ValidatorTest {
     @Test
     public void testSchemaValidationPSL3() {
         final boolean result = validateXml("src/test/resources/schema/CDA_Pharma.xsd",
-                "src/test/resources/samples/PS_L3_W6.xml");
+                "src/test/resources/samples/PS_L3_W7.xml");
         Assert.assertTrue(result);
     }
 
