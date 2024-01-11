@@ -354,10 +354,14 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
     }
 
     private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context) {
-        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context, "AE");
+        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context, "AE", "");
     }
 
-    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code) {
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String location) {
+        fillOutputMessage(outputMessage, xcpdErrorCode, openncpErrorCode, context, "AE", location);
+    }
+
+    private void fillOutputMessage(PRPAIN201306UV02 outputMessage, XCPDErrorCode xcpdErrorCode, OpenNCPErrorCode openncpErrorCode, String context, String code, String locationText) {
 
         // Set queryAck/statusCode and queryAck/queryResponseCode
         outputMessage.getControlActProcess().getQueryAck().setStatusCode(objectFactory.createCS());
@@ -380,10 +384,12 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
             acknowledgementDetail.setCode(codeCE);
 
             acknowledgementDetail.setText(objectFactory.createED());
-            acknowledgementDetail.getText().setContent(openncpErrorCode.getDescription());
+            //acknowledgementDetail.getText().setContent(openncpErrorCode.getDescription());
+            acknowledgementDetail.getText().setContent(context);
 
             ST location = objectFactory.createST();
-            location.setContent(context);
+            //location.setContent(context);
+            location.setContent(locationText);
             acknowledgementDetail.getLocation().add(location);
 
             acknowledgement.getAcknowledgementDetail().add(acknowledgementDetail);
@@ -737,17 +743,15 @@ public class XCPDServiceImpl implements XCPDServiceInterface {
                 fillOutputMessage(outputMessage, XCPDErrorCode.DemographicsQueryNotAllowed, OpenNCPErrorCode.ERROR_PI_GENERIC, "Queries are only available with patient identifiers");
             }
         } catch (OpenNCPErrorCodeException e) {
-
+            logger.error(e.getMessage(), e);
             fillOutputMessage(outputMessage, XCPDErrorCode.InsufficientRights, e.getErrorCode(), e.getMessage());
-            logger.error(e.getMessage(), e);
         } catch (XCPDNIException e) {
-
-            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), e.getMessage());
             logger.error(e.getMessage(), e);
+            var codeContext = e.getOpenncpErrorCode().getDescription() + "^" + e.getMessage();
+            fillOutputMessage(outputMessage, e.getXcpdErrorCode(), e.getOpenncpErrorCode(), codeContext, Arrays.stream(ExceptionUtils.getRootCauseStackTrace(e)).findFirst().orElse(org.apache.commons.lang.StringUtils.EMPTY));
         } catch (Exception e) {
-
-            fillOutputMessage(outputMessage, XCPDErrorCode.InternalError, OpenNCPErrorCode.ERROR_PI_GENERIC, e.getMessage());
             logger.error(e.getMessage(), e);
+            fillOutputMessage(outputMessage, XCPDErrorCode.InternalError, OpenNCPErrorCode.ERROR_PI_GENERIC, e.getMessage());
         }
         // Set queryByParameter
         var prpamt201306UV02QueryByParameter = objectFactory.createPRPAMT201306UV02QueryByParameter();

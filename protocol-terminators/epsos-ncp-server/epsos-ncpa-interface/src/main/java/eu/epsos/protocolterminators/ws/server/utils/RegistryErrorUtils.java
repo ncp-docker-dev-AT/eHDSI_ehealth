@@ -1,9 +1,9 @@
-package tr.com.srdc.epsos.ws.server.xca.impl.errorlist;
+package eu.epsos.protocolterminators.ws.server.utils;
 
+import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axiom.om.OMAbstractFactory;
@@ -16,8 +16,8 @@ public class RegistryErrorUtils {
     private static final OMFactory omFactory = OMAbstractFactory.getOMFactory();
     private static final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs = new oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory();
 
-    public static void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, null, severity));
+    public static void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String location, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), openncpErrorCode.getDescription(), location, severity));
     }
 
     public static void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String location, RegistryErrorSeverity severity) {
