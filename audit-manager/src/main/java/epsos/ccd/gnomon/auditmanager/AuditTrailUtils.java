@@ -997,22 +997,22 @@ public enum AuditTrailUtils {
         }
         if (StringUtils.equals(eventType, EventType.HCER_PUT.getCode())) {
 
-            eventIdentification.getEventTypeCode().add(createCodedValue("34133-9", AuditConstant.CODE_SYSTEM_LOINC, "Summary of Episode Note"));
+            eventIdentification.getEventTypeCode().add(createCodedValue("34133-9", AuditConstant.CODE_SYSTEM_LOINC, "Summary of Episode Note", null));
         }
         if (StringUtils.equals(eventType, EventType.PAC_RETRIEVE.getCode())) {
 
-            eventIdentification.getEventTypeCode().add(createCodedValue("N/A", AuditConstant.CODE_SYSTEM_LOINC, "PAC"));
+            eventIdentification.getEventTypeCode().add(createCodedValue("N/A", AuditConstant.CODE_SYSTEM_LOINC, "PAC", null));
         }
         if (StringUtils.equals(eventType, EventType.SMP_QUERY.getCode())) {
 
-            eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-193", "SMP::Query"));
+            eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-193", "SMP::Query", null));
             eventIdentification.getEventID().setCsdCode("SMP");
             eventIdentification.getEventID().setCodeSystemName("EHDSI-193");
             eventIdentification.getEventID().setDisplayName("SMP::Query");
         }
         if (StringUtils.equals(eventType, EventType.SMP_PUSH.getCode())) {
 
-            eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-194", "SMP::Push"));
+            eventIdentification.getEventTypeCode().add(createCodedValue("SMP", "EHDSI-194", "SMP::Push", "SMP::Push"));
             eventIdentification.getEventID().setCsdCode("SMP");
             eventIdentification.getEventID().setCodeSystemName("EHDSI-194");
             eventIdentification.getEventID().setDisplayName("SMP::Push");
@@ -1737,12 +1737,15 @@ public enum AuditTrailUtils {
      * @param displayName    - Human readable value of the Event Code.
      * @return Initialized CodedValueType used to identify the type of Event from the Audit Messages.
      */
-    private EventTypeCode createCodedValue(String code, String codeSystemName, String displayName) {
+    private EventTypeCode createCodedValue(String code, String codeSystemName, String displayName, String originalText) {
 
         EventTypeCode type = new ObjectFactory().createEventTypeCode();
         type.setCsdCode(code);
         type.setCodeSystemName(codeSystemName);
         type.setDisplayName(displayName);
+        if(!StringUtils.isEmpty(originalText)){
+            type.setOriginalText(originalText);
+        }
         return type;
     }
 }
