@@ -453,9 +453,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             logger.error(e.getMessage(), e);
             RegistryErrorUtils.addErrorMessage(
                     registryErrorList,
-                    e.getErrorCode(),
-                    e.getMessage(),
-                    StringUtils.EMPTY,
+                    e,
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (Exception e) {
             OpenNCPErrorCode code = OpenNCPErrorCode.ERROR_GENERIC;
@@ -477,7 +475,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     registryErrorList,
                     code,
                     e.getMessage(),
-                    StringUtils.EMPTY,
+                    e,
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             throw e;
         }
@@ -504,7 +502,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     registryErrorList,
                     code,
                     code.getDescription(),
-                    StringUtils.EMPTY,
+                    null,
                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
         }
 
@@ -534,7 +532,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             RegistryErrorUtils.addErrorMessage(
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_NO_CONSENT,
-                    StringUtils.EMPTY,
+                    null,
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -542,7 +540,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             RegistryErrorUtils.addErrorMessage(
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN,
-                    StringUtils.EMPTY,
+                    null,
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -565,7 +563,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             RegistryErrorUtils.addErrorMessage(
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_SEC_GENERIC,
-                    StringUtils.EMPTY,
+                    null,
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -580,14 +578,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             RegistryErrorUtils.addErrorMessage(
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_EP_REGISTRY_NOT_ACCESSIBLE,
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else if (prescriptions.isEmpty()) {
                             RegistryErrorUtils.addErrorMessage(
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_EP_NOT_FOUND,
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else {
@@ -621,7 +619,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             RegistryErrorUtils.addErrorMessage(
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_PS_NOT_FOUND,
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
@@ -655,7 +653,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                             RegistryErrorUtils.addErrorMessage(
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_MRO_NO_DATA,
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
@@ -705,14 +703,14 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_ORCD_GENERIC,
                                     "orCD registry could not be accessed.",
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                             responseStatus = AdhocQueryResponseStatus.FAILURE;
                         } else if (orCDDocumentMetaDataList.isEmpty()) {
                             RegistryErrorUtils.addErrorMessage(
                                     registryErrorList,
                                     OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND,
-                                    StringUtils.EMPTY,
+                                    null,
                                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
@@ -730,7 +728,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 registryErrorList,
                                 OpenNCPErrorCode.ERROR_GENERIC_SERVICE_SIGNIFIER_UNKNOWN,
                                 "Class code not supported for XCA query(" + classCodeValue + ").",
-                                StringUtils.EMPTY,
+                                null,
                                 RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         break;
@@ -749,7 +747,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         registryErrorList,
                         e.getOpenncpErrorCode(),
                         codeContext,
-                        Arrays.stream(ExceptionUtils.getRootCauseStackTrace(e)).findFirst().orElse(StringUtils.EMPTY),
+                        e,
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 responseStatus = AdhocQueryResponseStatus.FAILURE;
             }
@@ -961,7 +959,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList,
                         e.getOpenncpErrorCode(),
                         codeContext,
-                        String.valueOf(stackTraceLines[0]), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 failure = true;
                 break processLabel;
             }
@@ -1267,8 +1266,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
             }
             RegistryErrorUtils.addErrorMessage(registryErrorList,
                     openNCPErrorCode,
-                    openNCPErrorCode.getDescription(),
-                    Arrays.stream(ExceptionUtils.getRootCauseStackTrace(e)).findFirst().orElse(StringUtils.EMPTY),
+                    e,
                     RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
         }
         adhocQueryResponse.setRegistryErrorList(registryErrorList);
