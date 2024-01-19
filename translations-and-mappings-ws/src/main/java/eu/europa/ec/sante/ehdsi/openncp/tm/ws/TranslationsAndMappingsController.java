@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMResponseStructure;
+import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMStatus;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TranscodeRequest;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TranslateRequest;
 import eu.europa.ec.sante.ehdsi.openncp.tm.persistence.model.Property;
@@ -76,12 +77,13 @@ public class TranslationsAndMappingsController {
 
     public ResponseEntity<TMResponseStructure> translateDocument(@RequestBody TranslateRequest translateRequest) {
         logger.info("Entering translateDocument() method");
-        Document pivotCDA = null;
+        Document pivotCDA;
         try {
             pivotCDA = Base64Util.decode(translateRequest.getPivotCDA());
         } catch (Exception e) {
             TMResponseStructure tmResponseStructure = new TMResponseStructure();
             tmResponseStructure.setErrors(Collections.singletonList(TMError.BASE64_DOM_DECODING_EXCEPTION));
+            tmResponseStructure.setStatus(TMStatus.ERROR);
             return ResponseEntity.badRequest().body(tmResponseStructure);
         }
         String targetLanguageCode = translateRequest.getTargetLanguageCode();
@@ -94,12 +96,13 @@ public class TranslationsAndMappingsController {
 
     public ResponseEntity<TMResponseStructure> transcodeDocument(@RequestBody TranscodeRequest transcodeRequest) {
         logger.info("Entering transcodeDocument() method");
-        Document friendlyCDA = null;
+        Document friendlyCDA;
         try {
             friendlyCDA = Base64Util.decode(transcodeRequest.getFriendlyCDA());
         } catch (Exception e) {
             TMResponseStructure tmResponseStructure = new TMResponseStructure();
             tmResponseStructure.setErrors(Collections.singletonList(TMError.BASE64_DOM_DECODING_EXCEPTION));
+            tmResponseStructure.setStatus(TMStatus.ERROR);
             return ResponseEntity.badRequest().body(tmResponseStructure);
         }
         logger.info("Transcoding CDA document into PIVOT");

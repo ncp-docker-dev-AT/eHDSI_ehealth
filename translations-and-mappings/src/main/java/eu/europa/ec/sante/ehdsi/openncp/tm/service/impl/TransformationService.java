@@ -11,6 +11,7 @@ import eu.europa.ec.sante.ehdsi.constant.error.TMError;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.tm.config.TMConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMResponseStructure;
+import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMStatus;
 import eu.europa.ec.sante.ehdsi.openncp.tm.exception.TMException;
 import eu.europa.ec.sante.ehdsi.openncp.tm.exception.TmErrorCtx;
 import eu.europa.ec.sante.ehdsi.openncp.tm.service.ITransformationService;
@@ -144,9 +145,8 @@ public class TransformationService implements ITransformationService, TMConstant
 
         try {
             if (inputDocument == null) {
-                status = STATUS_FAILURE;
                 errors.add(TMError.ERROR_NULL_INPUT_DOCUMENT);
-                responseStructure = new TMResponseStructure(null, status, errors, warnings);
+                responseStructure = new TMResponseStructure(null, errors, warnings);
                 logger.error("Error, null input document!");
                 return responseStructure;
             } else {
@@ -178,7 +178,6 @@ public class TransformationService implements ITransformationService, TMConstant
                     boolean schemaValid = validator.validateToSchema(namespaceAwareDoc);
                     // if model validation is enabled schema validation is done as part of it so there is no point doing it again
                     if (!schemaValid) {
-                        status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_XSD_VALIDATION_FAILED);
                     }
                 }
@@ -190,7 +189,6 @@ public class TransformationService implements ITransformationService, TMConstant
                     boolean validateFriendly = isTranscode;
                     SchematronResult result = validator.validateSchematron(inputDocument, cdaDocumentType, validateFriendly);
                     if (result == null || !result.isValid()) {
-                        status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_INPUT_SCHEMATRON_VALIDATION_FAILED);
                         logger.error("Schematron validation error, input document is invalid!");
                         if (result != null) {
@@ -202,9 +200,11 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
                 logger.info(isTranscode ? "Transcoding of the CDA Document: '{}'" : "Translating of the CDA Document: '{}'", cdaDocumentType);
                 // transcode/translate document
-                status = isTranscode ? transcodeDocument(namespaceNotAwareDoc, errors, warnings,
-                        cdaDocumentType) : translateDocument(namespaceNotAwareDoc, targetLanguageCode,
-                        errors, warnings, cdaDocumentType);
+                if (isTranscode) {
+                    transcodeDocument(namespaceNotAwareDoc, errors, warnings, cdaDocumentType);
+                } else {
+                    translateDocument(namespaceNotAwareDoc, targetLanguageCode, errors, warnings, cdaDocumentType);
+                }
 
                 Document finalDoc = XmlUtil.removeEmptyXmlns(namespaceNotAwareDoc);
 
@@ -223,9 +223,8 @@ public class TransformationService implements ITransformationService, TMConstant
 
                     SchematronResult result = validator.validateSchematron(finalDoc, cdaDocumentType, !isTranscode);
                     if (result == null || !result.isValid()) {
-                        status = STATUS_FAILURE;
                         warnings.add(TMError.WARNING_OUTPUT_SCHEMATRON_VALIDATION_FAILED);
-                        responseStructure = new TMResponseStructure(Base64Util.encode(finalDoc), status, errors, warnings);
+                        responseStructure = new TMResponseStructure(Base64Util.encode(finalDoc), errors, warnings);
                         logger.error("Schematron validation error, result document is invalid!");
                         if (logger.isErrorEnabled() && result != null) {
                             logger.error(result.toString());
@@ -237,7 +236,7 @@ public class TransformationService implements ITransformationService, TMConstant
                 }
 
                 // create & fill TMResponseStructure
-                responseStructure = new TMResponseStructure(Base64Util.encode(finalDoc), status, errors, warnings);
+                responseStructure = new TMResponseStructure(Base64Util.encode(finalDoc), errors, warnings);
                 if (logger.isDebugEnabled()) {
                     logger.debug("TM result:\n{}", responseStructure);
                 }
@@ -246,17 +245,15 @@ public class TransformationService implements ITransformationService, TMConstant
 
             // Writing TMException to ResponseStructure
             logger.error("TMException: '{}'\nReason: '{}'", e.getMessage(), e.getReason().toString(), e);
-            status = STATUS_FAILURE;
             errors.add(e.getReason());
-            responseStructure = new TMResponseStructure(Base64Util.encode(inputDocument), status, errors, warnings);
+            responseStructure = new TMResponseStructure(Base64Util.encode(inputDocument), errors, warnings);
 
         } catch (Exception e) {
 
             // Writing ERROR to ResponseStructure
             logger.error("Exception: '{}'", e.getMessage(), e);
-            status = STATUS_FAILURE;
             errors.add(TMError.ERROR_PROCESSING_ERROR);
-            responseStructure = new TMResponseStructure(Base64Util.encode(inputDocument), status, errors, warnings);
+            responseStructure = new TMResponseStructure(Base64Util.encode(inputDocument), errors, warnings);
             logger.error("Exception: TM Error Code: '{}'", TMError.ERROR_PROCESSING_ERROR, e);
         }
 
@@ -338,14 +335,13 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param targetLanguageCode - language Code
      * @param errors             empty list for TMErrors
      * @param warnings           empty list for TMWarnings
-     * @return String - final status of transcoding
+     * @return
      */
-    private String translateDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
+    private void translateDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
                                      List<ITMTSAMError> warnings, String cdaDocumentType) {
 
         logger.info("Translating Document '{}' to target Language: '{}'", cdaDocumentType, targetLanguageCode);
-        return processDocument(document, targetLanguageCode, errors, warnings,
-                cdaDocumentType, false);
+        processDocument(document, targetLanguageCode, errors, warnings, cdaDocumentType, Boolean.FALSE);
     }
 
     /**
@@ -357,12 +353,12 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param errors          Empty list for TMErrors
      * @param warnings        Empty list for TMWarnings
      * @param cdaDocumentType Type of CDA document to process
-     * @return String - Final status of transcoding
+     * @return
      */
-    private String transcodeDocument(Document document, List<ITMTSAMError> errors, List<ITMTSAMError> warnings, String cdaDocumentType) {
+    private void transcodeDocument(Document document, List<ITMTSAMError> errors, List<ITMTSAMError> warnings, String cdaDocumentType) {
 
         logger.info("Transcoding Document '{}'", cdaDocumentType);
-        return processDocument(document, null, errors, warnings, cdaDocumentType, true);
+        processDocument(document, null, errors, warnings, cdaDocumentType, Boolean.TRUE);
     }
 
     /**
@@ -374,15 +370,13 @@ public class TransformationService implements ITransformationService, TMConstant
      * @param isTranscode
      * @return
      */
-    private String processDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
+    private void processDocument(Document document, String targetLanguageCode, List<ITMTSAMError> errors,
                                    List<ITMTSAMError> warnings, String cdaDocumentType, boolean isTranscode) {
 
         //TODO: Check is an attribute shall/can also be translated anr/or transcoded like the XML element.
         logger.info("Processing Document '{}' to target Language: '{}' Transcoding: '{}'", cdaDocumentType, targetLanguageCode, isTranscode);
-        boolean processingOK = true;
         // hashMap for ID of referencedValues and transcoded/translated DisplayNames
         HashMap<String, String> hmReffId_DisplayName = new HashMap<>();
-        boolean isProcessingSuccesful;
 
         if (CodedElementList.getInstance().isConfigurableElementIdentification()) {
 
@@ -396,7 +390,6 @@ public class TransformationService implements ITransformationService, TMConstant
             }
             if (ceList.isEmpty()) {
                 warnings.add(TMError.WARNING_CODED_ELEMENT_LIST_EMPTY);
-                return STATUS_SUCCESS;
             }
             Iterator<CodedElementListItem> iProcessed = ceList.iterator();
             CodedElementListItem codedElementListItem;
@@ -429,7 +422,6 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (logger.isErrorEnabled()) {
                         logger.error("Required element is missing: '{}'", codedElementListItem);
                     }
-                    processingOK = false;
                     errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
                 } else {
 
@@ -444,13 +436,12 @@ public class TransformationService implements ITransformationService, TMConstant
                                 checkCodedElementType(originalElement, warnings);
 
                                 // Calling TSAM transcode/translate method for each coded element configured according CDA type.
-                                isProcessingSuccesful = (isTranscode ?
+                                boolean success = (isTranscode ?
                                         transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings)
                                         : translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
 
                                 // If is required & processing is unsuccessful, report ERROR
-                                if (isRequired && !isProcessingSuccesful) {
-                                    processingOK = false;
+                                if (isRequired && !success) {
                                     String ctx = XmlUtil.getElementPath(originalElement);
                                     errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
                                             : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
@@ -485,17 +476,15 @@ public class TransformationService implements ITransformationService, TMConstant
                     checkCodedElementType(originalElement, warnings);
 
                     // call TSAM transcode/translate method for each coded element
-                    isProcessingSuccesful = (isTranscode ?
+                    boolean success = (isTranscode ?
                             transcodeElement(originalElement, document, hmReffId_DisplayName, null, null, errors, warnings) :
                             translateElement(originalElement, document, targetLanguageCode, hmReffId_DisplayName, null, null, errors, warnings));
-                    if(!isProcessingSuccesful) {
-                        processingOK = false;
+                    if(!success) {
                         logger.error("Required coded element was not translated");
                     }
                 }
             }
         }
-        return (processingOK ? STATUS_SUCCESS : STATUS_FAILURE);
     }
 
     /**
@@ -677,7 +666,7 @@ public class TransformationService implements ITransformationService, TMConstant
                         TransactionName.PIVOT_TRANSLATION,
                         EventActionCode.EXECUTE,
                         DATATYPE_FACTORY.newXMLGregorianCalendar(calendar),
-                        responseStructure.getStatus().equals(STATUS_SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
+                        responseStructure.getStatus().equals(TMStatus.SUCCESS) ? EventOutcomeIndicator.FULL_SUCCESS : EventOutcomeIndicator.PERMANENT_FAILURE,
                         HTTPUtil.getSubjectDN(false),
                         getOIDFromDocument(responseStructure.getDocument()),
                         getOIDFromDocument(responseStructure.getDocument()),

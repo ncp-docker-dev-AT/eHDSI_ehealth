@@ -27,8 +27,6 @@ public interface TMConstants {
     String RESPONSE_STATUS = "responseStatus";
     String STATUS = "status";
     String RESULT = "result";
-    String STATUS_SUCCESS = "success";
-    String STATUS_FAILURE = "failure";
     String ERRORS = "errors";
     String ERROR = "error";
     String WARNINGS = "warnings";

@@ -60,19 +60,22 @@ public class TMResponseStructure implements TMConstants {
      */
     private List<ITMTSAMError> warnings;
 
-    /**
-     * failure or success
-     */
-    private String status;
+    private TMStatus status;
 
     public TMResponseStructure() {}
 
-    public TMResponseStructure(String responseCDA, String status, List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
+    public TMResponseStructure(String responseCDA, List<ITMTSAMError> errors, List<ITMTSAMError> warnings) {
         this.requestId = UUID.randomUUID().toString();
         this.responseCDA = responseCDA;
         this.errors = errors;
         this.warnings = warnings;
-        this.status = status;
+        if (!errors.isEmpty()) {
+            this.status = TMStatus.ERROR;
+        } else if (!warnings.isEmpty()) {
+            this.status = TMStatus.WARNING;
+        } else {
+            this.status = TMStatus.SUCCESS;
+        }
     }
 
     /**
@@ -101,7 +104,7 @@ public class TMResponseStructure implements TMConstants {
             // write status/ errors/ warnings into responseStatus
             Node responseStatus = document.getElementsByTagName(RESPONSE_STATUS).item(0);
             Element elementStatus = document.createElement(STATUS);
-            elementStatus.setAttribute(RESULT, this.status);
+            elementStatus.setAttribute(RESULT, this.status.toString());
             responseStatus.appendChild(elementStatus);
 
             // errors
@@ -136,11 +139,11 @@ public class TMResponseStructure implements TMConstants {
         }
     }
 
-    public String getStatus() {
+    public TMStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TMStatus status) {
         this.status = status;
     }
 
@@ -212,7 +215,7 @@ public class TMResponseStructure implements TMConstants {
      */
     @JsonIgnore
     public boolean isStatusSuccess() {
-        return (status != null && status.equals(STATUS_SUCCESS));
+        return (status != null && status.equals(TMStatus.SUCCESS));
     }
 
     /**
