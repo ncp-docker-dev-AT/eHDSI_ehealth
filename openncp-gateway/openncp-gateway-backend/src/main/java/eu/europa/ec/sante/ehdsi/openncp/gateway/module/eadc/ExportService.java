@@ -24,7 +24,7 @@ public class ExportService {
 
     public final ZoneId zoneId = ZoneId.systemDefault();
 
-    private final String TEMPLATE_FILE = "eHDSI_KPIs-Reporting_template_V1.1.1.xlsx";
+    private final String TEMPLATE_FILE = "MyHealth@EU_KPIs-Reporting_template_V1.4.xlsx";
 
     private final String SHEET_KPI_1_2 = "KPI-1.2";
     private final String SHEET_KPI_1_3 = "KPI-1.3";
@@ -32,6 +32,11 @@ public class ExportService {
     private final String SHEET_KPI_1_5 = "KPI-1.5";
     private final String SHEET_KPI_1_6 = "KPI-1.6";
     private final String SHEET_KPI_1_7 = "KPI-1.7";
+    private final String SHEET_KPI_1_8_1 = "KPI-1.8.1";
+    private final String SHEET_KPI_1_8_2 = "KPI-1.8.2";
+    private final String SHEET_KPI_1_8_3 = "KPI-1.8.3";
+    private final String SHEET_KPI_1_8_4 = "KPI-1.8.4";
+    private final String SHEET_KPI_1_8_5 = "KPI-1.8.5";
 
     private final TransactionService transactionService;
 
@@ -66,6 +71,11 @@ public class ExportService {
             writeTransactions(workbook.getSheet(SHEET_KPI_1_5), getTransactionsForKPI_1_5(filteredTransactionsSortedAsc));
             writeTransactions(workbook.getSheet(SHEET_KPI_1_6), getTransactionsForKPI_1_6(filteredTransactionsSortedAsc));
             writeTransactions(workbook.getSheet(SHEET_KPI_1_7), getTransactionsForKPI_1_7(filteredTransactionsSortedAsc));
+            writeTransactions(workbook.getSheet(SHEET_KPI_1_8_1), getTransactionsForKPI_1_8_1(filteredTransactionsSortedAsc));
+            writeTransactions(workbook.getSheet(SHEET_KPI_1_8_2), getTransactionsForKPI_1_8_2(filteredTransactionsSortedAsc));
+            writeTransactions(workbook.getSheet(SHEET_KPI_1_8_3), getTransactionsForKPI_1_8_3(filteredTransactionsSortedAsc));
+            writeTransactions(workbook.getSheet(SHEET_KPI_1_8_4), getTransactionsForKPI_1_8_4(filteredTransactionsSortedAsc));
+            writeTransactions(workbook.getSheet(SHEET_KPI_1_8_5), getTransactionsForKPI_1_8_5(filteredTransactionsSortedAsc));
 
             workbook.write(out);
             out.close();
