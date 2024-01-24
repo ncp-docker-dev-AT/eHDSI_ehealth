@@ -120,5 +120,12 @@
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-core</artifactId>
         </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
