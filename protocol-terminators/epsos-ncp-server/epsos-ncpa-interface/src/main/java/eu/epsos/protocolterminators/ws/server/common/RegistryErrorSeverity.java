@@ -1,4 +1,4 @@
-package eu.europa.ec.sante.ehdsi.openncp.pt.common;
+package eu.epsos.protocolterminators.ws.server.common;
 
 public enum RegistryErrorSeverity {
 
