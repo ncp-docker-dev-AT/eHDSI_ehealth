@@ -30,6 +30,7 @@ public class MySqlDatabaseTool implements DatabaseTool {
 
         try {
             Process process = Runtime.getRuntime().exec(command);
+            System.out.println("Ici la commande"+command);
             if (process.waitFor() != 0) {
                 throw new DatabaseToolException("Database backup operation failed");
             }

@@ -51,7 +51,7 @@ public class TsamSyncManager {
     @Value("${pageable.page-size:250}")
     private Integer pageSize;
 
-    private static final String AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY = "AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY";
+    private static final String AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY = "AVAILABLE_TRANSLATION_LANGUAGES";
 
     @SuppressWarnings("squid:S00107")
     public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient,
@@ -111,7 +111,7 @@ public class TsamSyncManager {
 
             logger.info("Starting value sets synchronization");
             int index = 1;
-            Property property = null;
+
             for (ValueSetVersionModel valueSetVersionModel : catalogue.getValueSetVersions()) {
 
                 ValueSetVersion valueSetVersion = valueSetVersionRepository.save(
@@ -120,6 +120,7 @@ public class TsamSyncManager {
                 int page = 0;
                 int total = 0;
                 int numberOfMapping = 0;
+                Property property = propertyService.getProperty(AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY);
                 List<String> languagesAvailable = null;
                 while (hasNext || page == 0) {
                     List<Concept> concepts = ctsClient.fetchConcepts(valueSetVersionModel.getValueSet().getId(),
