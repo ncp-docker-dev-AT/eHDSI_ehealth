@@ -1,7 +1,7 @@
 package tr.com.srdc.epsos.ws.server.xca.impl.errorlist;
 
+import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
-import eu.europa.ec.sante.ehdsi.constant.error.IheErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
@@ -16,24 +16,16 @@ public class RegistryErrorUtils {
     private static final OMFactory omFactory = OMAbstractFactory.getOMFactory();
     private static final oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory ofRs = new oasis.names.tc.ebxml_regrep.xsd.rs._3.ObjectFactory();
 
-    public static void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, null, severity));
+    public static void addErrorMessage(RegistryErrorList registryErrorList, ErrorCode errorCode, String codeContext, String location, RegistryErrorSeverity severity) {
+        registryErrorList.getRegistryError().add(createErrorMessage(errorCode.getCode(), codeContext, location, severity));
     }
 
-    public static void addErrorMessage(RegistryErrorList registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String location, RegistryErrorSeverity severity) {
-        registryErrorList.getRegistryError().add(createErrorMessage(openncpErrorCode.getCode(), codeContext, location, severity));
+    public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ErrorCode errorCode, String codeContext, RegistryErrorSeverity severity) {
+        registryErrorList.addChild(createErrorOMMessage(ons, errorCode.getCode(), codeContext, null, severity));
     }
 
-    public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, null, severity));
-    }
-
-    public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, IheErrorCode iheErrorCode, String codeContext, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, iheErrorCode.getCode(), codeContext, null, severity));
-    }
-
-    public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, OpenNCPErrorCode openncpErrorCode, String codeContext, String location, RegistryErrorSeverity severity) {
-        registryErrorList.addChild(createErrorOMMessage(ons, openncpErrorCode.getCode(), codeContext, location, severity));
+    public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ErrorCode errorCode, String codeContext, String location, RegistryErrorSeverity severity) {
+        registryErrorList.addChild(createErrorOMMessage(ons, errorCode.getCode(), codeContext, location, severity));
     }
 
     public static void addErrorOMMessage(OMNamespace ons, OMElement registryErrorList, ITMTSAMError error, String operationType, RegistryErrorSeverity severity) {
