@@ -24,10 +24,7 @@ import org.springframework.util.StopWatch;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,6 +109,9 @@ public class TsamSyncManager {
             logger.info("Starting value sets synchronization");
             int index = 1;
 
+            Property property =  new Property(AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY, "");
+            List<String> languagesAvailable = new ArrayList<>();
+
             for (ValueSetVersionModel valueSetVersionModel : catalogue.getValueSetVersions()) {
 
                 ValueSetVersion valueSetVersion = valueSetVersionRepository.save(
@@ -120,8 +120,6 @@ public class TsamSyncManager {
                 int page = 0;
                 int total = 0;
                 int numberOfMapping = 0;
-                Property property = propertyService.getProperty(AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY);
-                List<String> languagesAvailable = null;
                 while (hasNext || page == 0) {
                     List<Concept> concepts = ctsClient.fetchConcepts(valueSetVersionModel.getValueSet().getId(),
                                     valueSetVersionModel.getVersionId(), page++, getPageSize())
@@ -131,15 +129,7 @@ public class TsamSyncManager {
                     concepts.forEach(concept -> concept.addValueSetVersion(valueSetVersion));
                     for (Concept concept : concepts) {
                         numberOfMapping += concept.getMappings().size();
-                        if(property == null){
-                            property = new Property(AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY, "");
-                        }
-                        if(property.getValue() == null){
-                            property.setValue("");
-                        }
 
-                        String[] split = property.getValue().split(",");
-                        languagesAvailable = Arrays.stream(split).collect(Collectors.toList());
                         for(Designation designation : concept.getDesignations()) {
                             if(!languagesAvailable.contains(designation.getLanguageCode())){
                                 languagesAvailable.add(designation.getLanguageCode());
