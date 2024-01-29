@@ -6,6 +6,10 @@ spring:
     datasource1:
       driver-class-name: ${tsam-sync.datasource.driver}
       jdbc-url: jdbc:mysql://${tsam-sync.datasource.host}:${tsam-sync.datasource.port}/${tsam-sync.datasource.database}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=${tsam-sync.datasource.timezone}
+      username: ${tsam-sync.datasource.username}
+      password: ${tsam-sync.datasource.password}
     datasource2:
       driver-class-name: ${tsam-sync.datasource.driver}
       jdbc-url: jdbc:mysql://${tsam-sync.datasource-ehealth-properties.host}:${tsam-sync.datasource-ehealth-properties.port}/${tsam-sync.datasource-ehealth-properties.database}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=${tsam-sync.datasource.timezone}
+      username: ${tsam-sync.datasource-ehealth-properties.username}
+      password: ${tsam-sync.datasource-ehealth-properties.password}

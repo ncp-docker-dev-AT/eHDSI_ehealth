@@ -1,14 +1,14 @@
 debug: false
 tsam-sync:
   database:
-    backup: false
+    backup: true
   datasource:
     host: 127.0.0.1
     port: 3306
     username: username
     password: password
     database: ehealth_ltrdb
-    #    dialect: org.hibernate.dialect.MySQL8Dialect
+    dialect: org.hibernate.dialect.MySQL8Dialect
     driver: com.mysql.cj.jdbc.Driver
     timezone: Europe/Brussels
   datasource-ehealth-properties:
@@ -26,9 +26,9 @@ tsam-sync:
     username:
     password:
   cts:
-    url: https://webgate.training.ec.europa.eu/ehealth-term-server
-    username: ncpeh@dk
-    password: kJTE54wY6Q
+    url: https://webgate.acceptance.ec.testa.eu/ehealth-term-server
+    username: ncpeh@eu
+    password: Azerty#1234
 spring:
   jpa:
     show_sql: false
