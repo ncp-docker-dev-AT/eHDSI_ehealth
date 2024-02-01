@@ -50,7 +50,6 @@
         <module>protocol-terminators</module>
         <module>openatna</module>
         <module>openncp-common-components</module>
-        <module>openstork</module>
         <module>openncp-gateway</module>
         <module>openncp-gazelle-validation</module>
         <module>openncp-ncp-commons</module>

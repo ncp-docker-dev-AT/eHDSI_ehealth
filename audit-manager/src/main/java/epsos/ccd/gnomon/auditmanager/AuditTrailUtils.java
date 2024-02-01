@@ -967,6 +967,7 @@ public enum AuditTrailUtils {
         EventTypeCode eventTypeCode = new EventTypeCode();
         eventTypeCode.setCsdCode(getMappedEventType(eventType));
         eventTypeCode.setCodeSystemName("IHE Transactions");
+        eventTypeCode.setDisplayName(transactionName);
         eventTypeCode.setOriginalText(getMappedTransactionOriginalName(transactionName));
         eventIdentification.getEventTypeCode().add(eventTypeCode);
 
@@ -1018,7 +1019,7 @@ public enum AuditTrailUtils {
             eventIdentification.getEventID().setDisplayName("SMP::Push");
         }
 
-        eventIdentification.setEventActionCode(eventActionCode); // supposed tp be 'E'
+        eventIdentification.setEventActionCode(eventActionCode); // supposed to be 'E'
         eventIdentification.setEventDateTime(eventDateTime);
         eventIdentification.setEventOutcomeIndicator(eventOutcomeIndicator.toString());
 
@@ -1674,7 +1675,7 @@ public enum AuditTrailUtils {
 
             String tap = Utils.getProperty("TEST_AUDITS_PATH");
             try {
-                if (auditmessage.getEventIdentification() != null) {
+                if (auditmessage.getEventIdentification() != null && auditmessage.getEventIdentification().getEventTypeCode().get(0).getDisplayName() != null) {
                     Utils.writeXMLToFile(auditmsg, tap + (auditmessage.getEventIdentification().getEventTypeCode()
                             .get(0).getDisplayName().split("::"))[0] + "-" +
                             new SimpleDateFormat("yyyy.MM.dd'at'HH-mm-ss.SSS").format(new Date(System.currentTimeMillis())) + ".xml");

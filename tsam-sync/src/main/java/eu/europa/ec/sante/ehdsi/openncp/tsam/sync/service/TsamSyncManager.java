@@ -7,7 +7,10 @@ import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.converter.ValueSetVersionConve
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.cts.CtsClient;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.db.DatabaseTool;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.Concept;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.Designation;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domainehealthproperty.model.Property;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domain.ValueSetVersion;
+import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.domainehealthproperty.service.PropertyService;
 import eu.europa.ec.sante.ehdsi.openncp.tsam.sync.repository.*;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetCatalogModel;
 import eu.europa.ec.sante.ehdsi.termservice.web.rest.model.sync.ValueSetVersionModel;
@@ -21,9 +24,7 @@ import org.springframework.util.StopWatch;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,17 +41,21 @@ public class TsamSyncManager {
     private final ValueSetVersionRepository valueSetVersionRepository;
     private final MappingRepository mappingRepository;
     private final ConceptConverter conceptConverter;
+    private final PropertyService propertyService;
 
     private final ValueSetVersionConverter valueSetVersionConverter;
+
     @Value("${pageable.page-size:250}")
     private Integer pageSize;
+
+    private static final String AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY = "AVAILABLE_TRANSLATION_LANGUAGES";
 
     @SuppressWarnings("squid:S00107")
     public TsamSyncManager(DatabaseTool databaseTool, CtsProperties ctsProperties, CtsClient ctsClient,
                            DatabaseProperties databaseProperties, CodeSystemRepository codeSystemRepository,
                            ConceptRepository conceptRepository, MappingRepository mappingRepository,
                            ValueSetRepository valueSetRepository, ValueSetVersionRepository valueSetVersionRepository,
-                           ConceptConverter conceptConverter, ValueSetVersionConverter valueSetVersionConverter) {
+                           ConceptConverter conceptConverter, PropertyService propertyService, ValueSetVersionConverter valueSetVersionConverter) {
         this.databaseTool = databaseTool;
         this.ctsProperties = ctsProperties;
         this.ctsClient = ctsClient;
@@ -61,6 +66,7 @@ public class TsamSyncManager {
         this.valueSetRepository = valueSetRepository;
         this.valueSetVersionRepository = valueSetVersionRepository;
         this.conceptConverter = conceptConverter;
+        this.propertyService = propertyService;
         this.valueSetVersionConverter = valueSetVersionConverter;
     }
 
@@ -68,7 +74,6 @@ public class TsamSyncManager {
     public void synchronize() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
         logger.info("Authenticating user '{}'", ctsProperties.getUsername());
         ctsClient.authenticate();
         logger.info("User '{}' authenticated successfully to the Central Terminology Services ({})", ctsProperties.getUsername(), ctsProperties.getUrl());
@@ -92,12 +97,20 @@ public class TsamSyncManager {
             }
 
             // Cleaning current LTR Database.
+            logger.info("Cleaning current LTR Database");
+
+            logger.info("Cleaning Mappings");
             mappingRepository.deleteAll();
+            logger.info("Cleaning ValueSets");
             valueSetRepository.deleteAll();
+            logger.info("Cleaning CodeSystems");
             codeSystemRepository.deleteAll();
 
             logger.info("Starting value sets synchronization");
             int index = 1;
+
+            Property property =  new Property(AVAILABLE_TRANSLATION_LANGUAGES_PROPERTY_KEY, "");
+            List<String> languagesAvailable = new ArrayList<>();
 
             for (ValueSetVersionModel valueSetVersionModel : catalogue.getValueSetVersions()) {
 
@@ -109,15 +122,29 @@ public class TsamSyncManager {
                 int numberOfMapping = 0;
                 while (hasNext || page == 0) {
                     List<Concept> concepts = ctsClient.fetchConcepts(valueSetVersionModel.getValueSet().getId(),
-                                    valueSetVersionModel.getVersionId(), page++, pageSize)
+                                    valueSetVersionModel.getVersionId(), page++, getPageSize())
                             .stream()
                             .map(conceptConverter::convert)
                             .collect(Collectors.toList());
                     concepts.forEach(concept -> concept.addValueSetVersion(valueSetVersion));
                     for (Concept concept : concepts) {
                         numberOfMapping += concept.getMappings().size();
+
+                        for(Designation designation : concept.getDesignations()) {
+                            if(!languagesAvailable.contains(designation.getLanguageCode())){
+                                languagesAvailable.add(designation.getLanguageCode());
+                            }
+                        }
                     }
                     conceptRepository.saveAll(concepts);
+                    if(languagesAvailable != null){
+                        property.setValue(String.join(",", languagesAvailable));
+                        if(StringUtils.isNotBlank(property.getValue()) && property.getValue().charAt(0) == ',') {
+                            property.setValue(property.getValue().substring(1));
+                        }
+                        propertyService.save(property);
+                    }
+
                     total += concepts.size();
                     hasNext = concepts.size() == pageSize;
                 }
@@ -128,5 +155,17 @@ public class TsamSyncManager {
             stopWatch.stop();
             logger.info("Catalogue '{}' synchronized successfully ({} ms)", catalogue.getName(), stopWatch.getTotalTimeMillis());
         }
+    }
+
+    public Integer getPageSize(){
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize){
+        this.pageSize = pageSize;
+    }
+
+    public String getLanguageCode(Concept concept, List<String> languageAvailable){
+        return "";
     }
 }

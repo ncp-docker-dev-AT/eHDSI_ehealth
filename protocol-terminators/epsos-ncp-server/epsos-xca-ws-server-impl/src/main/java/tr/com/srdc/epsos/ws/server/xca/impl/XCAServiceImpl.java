@@ -2,7 +2,9 @@ package tr.com.srdc.epsos.ws.server.xca.impl;
 
 import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
-import eu.epsos.exceptions.DocumentTransformationException;
+import epsos.ccd.posam.tm.response.TMResponseStructure;
+import epsos.ccd.posam.tm.service.ITransformationService;
+import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
@@ -22,9 +24,6 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.Insufficie
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.OpenNCPErrorCodeException;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
-import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMResponseStructure;
-import eu.europa.ec.sante.ehdsi.openncp.tm.util.Base64Util;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.openncp.util.UUIDHelper;
@@ -38,8 +37,6 @@ import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExternalIdentifierType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.ExtrinsicObjectType;
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.SlotType1;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
-import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
-import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryResponseType;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -48,7 +45,6 @@ import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axis2.util.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
@@ -62,7 +58,7 @@ import tr.com.srdc.epsos.util.Constants;
 import tr.com.srdc.epsos.util.DateUtil;
 import tr.com.srdc.epsos.util.XMLUtil;
 import tr.com.srdc.epsos.util.http.HTTPUtil;
-import tr.com.srdc.epsos.ws.server.xca.impl.errorlist.RegistryErrorUtils;
+import eu.epsos.protocolterminators.ws.server.utils.RegistryErrorUtils;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.ep.EPExtrinsicObjectBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.orcd.OrCDExtrinsicObjectBuilder;
 import tr.com.srdc.epsos.ws.server.xca.impl.extrinsicobjectbuilder.ps.PSExtrinsicObjectBuilder;
@@ -431,27 +427,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     /**
-     * adds the error to the error registry and to the response.
-     */
-    private void registerErrorAndAddToResponse(final RegistryResponseType response, final String responseStatus,
-                                               final RegistryErrorList registryErrorList, final OpenNCPErrorCodeException exception,
-                                               final RegistryErrorSeverity registryErrorSeverity) {
-        Validate.notNull(response);
-        Validate.notNull(registryErrorList);
-        Validate.notNull(exception);
-        Validate.notNull(registryErrorSeverity);
-        Validate.notNull(responseStatus);
-
-        RegistryErrorUtils.addErrorMessage(registryErrorList, exception.getErrorCode(), exception.getMessage(),
-                                           Arrays.stream(ExceptionUtils.getRootCauseStackTrace(exception)).findFirst().orElse(StringUtils.EMPTY),
-                                           registryErrorSeverity);
-        if (!registryErrorList.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(registryErrorList);
-        }
-        response.setStatus(responseStatus);
-    }
-
-    /**
      * Main part of the XCA query operation implementation, fills the AdhocQueryResponse with details
      */
     private void adhocQueryResponseBuilder(AdhocQueryRequest request, AdhocQueryResponse response, SOAPHeader soapHeader, EventLog eventLog)
@@ -470,10 +445,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
             shElement = XMLUtils.toDOM(soapHeader);
             documentSearchService.setSOAPHeader(shElement);
             sigCountryCode = SAML2Validator.validateXCAHeader(shElement, getClassCode(classCodeValues));
-        } catch (InsufficientRightsException ire) {
-            logger.error(ire.getMessage(), ire);
-            registerErrorAndAddToResponse(response, responseStatus, registryErrorList, ire, RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
-            return;
         } catch (OpenNCPErrorCodeException e) {
             logger.error(e.getMessage(), e);
             RegistryErrorUtils.addErrorMessage(registryErrorList, e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
@@ -649,7 +620,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                 DocumentFactory.createSearchCriteria().addPatientId(fullPatientId));
 
                         if (mro == null || (mro.getPDFDocumentMetaData() == null && mro.getXMLDocumentMetaData() == null)) {
-
                             RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_MRO_NO_DATA,
                                                                OpenNCPErrorCode.ERROR_MRO_NO_DATA.getDescription(), "",
                                                                RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
@@ -704,7 +674,8 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         } else if (orCDDocumentMetaDataList.isEmpty()) {
                             RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND,
                                                                "There is no original clinical data of the requested type registered for the given " +
-                                                               "patient.", "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                                                               "patient.",
+                                                               "", RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
                             responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         } else {
 
@@ -935,8 +906,9 @@ public class XCAServiceImpl implements XCAServiceInterface {
                                                                             .add(Criteria.REPOSITORY_ID, repositoryId));
             } catch (NIException e) {
                 logger.error("NIException: '{}'", e.getMessage(), e);
-                RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList, e.getOpenncpErrorCode(),
-                                                     e.getOpenncpErrorCode().getDescription(), e.getMessage(),
+                var stackTraceLines = e.getStackTrace();
+                var codeContext = e.getOpenncpErrorCode().getDescription() + "^" + e.getMessage();
+                RegistryErrorUtils.addErrorOMMessage(omNamespace, registryErrorList, e.getOpenncpErrorCode(), codeContext, e,
                                                      RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 failure = true;
                 break processLabel;
@@ -1176,7 +1148,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         Iterator<OMElement> it = registryErrorList.getChildElements();
 
         while (it.hasNext()) {
-
             element = it.next();
             if (StringUtils.equals(element.getAttribute(QName.valueOf("severity")).getAttributeValue(),
                                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText())) {
@@ -1211,44 +1182,31 @@ public class XCAServiceImpl implements XCAServiceInterface {
         adhocQueryResponse.setRegistryObjectList(ofRim.createRegistryObjectListType());
 
         List<ClassCode> classCodeValues = getDocumentEntryClassCodes(request);
-
+        OpenNCPErrorCode openNCPErrorCode;
         for (ClassCode classCodeValue : classCodeValues) {
             switch (classCodeValue) {
                 case EP_CLASSCODE:
-                    RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_EP_NOT_FOUND,
-                                                       "The XDS repository does not contain any ePrescription related to the current patient",
-                                                       "No ePrescriptions are registered for the given patient.",
-                                                       RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    openNCPErrorCode = OpenNCPErrorCode.ERROR_EP_NOT_FOUND;
                     break;
                 case PS_CLASSCODE:
-                    RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_PS_NOT_FOUND,
-                                                       "The XDS repository does not contain any Patient Summary related to the current patient",
-                                                       "No patient summary is registered for the given patient.",
-                                                       RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    openNCPErrorCode = OpenNCPErrorCode.ERROR_PS_NOT_FOUND;
                     break;
                 case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
                 case ORCD_LABORATORY_RESULTS_CLASSCODE:
                 case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
                 case ORCD_MEDICAL_IMAGES_CLASSCODE:
-                    RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND,
-                                                       "The XDS repository does not contain any OrCD of the requested type related to the current " +
-                                                       "patient",
-                                                       "No original clinical document of the requested type is registered for the given patient.",
-                                                       RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    openNCPErrorCode = OpenNCPErrorCode.ERROR_ORCD_NOT_FOUND;
                     break;
                 default:
-                    RegistryErrorUtils.addErrorMessage(registryErrorList, OpenNCPErrorCode.ERROR_DOCUMENT_NOT_FOUND,
-                                                       "The XDS repository does not contain any documents related to the current patient",
-                                                       "No documents are registered for the given patient.",
-                                                       RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
+                    openNCPErrorCode = OpenNCPErrorCode.ERROR_DOCUMENT_NOT_FOUND;
                     break;
             }
+            RegistryErrorUtils.addErrorMessage(registryErrorList, openNCPErrorCode, openNCPErrorCode.getDescription(), "",
+                                               RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
         }
-
         adhocQueryResponse.setRegistryErrorList(registryErrorList);
         // Errors managed are only WARNING so the AdhocQueryResponse is considered as successful.
         adhocQueryResponse.setStatus(AdhocQueryResponseStatus.SUCCESS);
-
         return adhocQueryResponse;
     }
 
