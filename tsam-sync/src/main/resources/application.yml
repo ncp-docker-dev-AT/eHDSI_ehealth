@@ -28,7 +28,7 @@ tsam-sync:
   cts:
     url: https://webgate.acceptance.ec.testa.eu/ehealth-term-server
     username: ncpeh@eu
-    password: **********
+    password: password
 spring:
   jpa:
     show_sql: false
