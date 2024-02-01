@@ -1,8 +1,11 @@
 package eu.epsos.protocolterminators.ws.server.utils;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
-import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.OpenNCPErrorCodeException;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
@@ -12,9 +15,6 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 public class RegistryErrorUtils {
 
@@ -52,6 +52,16 @@ public class RegistryErrorUtils {
                 .findFirst()
                 .map(StackTraceElement::toString)
                 .orElse(StringUtils.EMPTY));
+        registryError.setSeverity(severity.getText());
+        registryError.setCodeContext(codeContext);
+        return registryError;
+    }
+
+    private static RegistryError createErrorMessage(String errorCode, String codeContext, String location, RegistryErrorSeverity severity) {
+
+        var registryError = ofRs.createRegistryError();
+        registryError.setErrorCode(errorCode);
+        registryError.setLocation(location);
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
         return registryError;
