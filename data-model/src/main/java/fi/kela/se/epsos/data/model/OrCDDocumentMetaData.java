@@ -58,6 +58,8 @@ public interface OrCDDocumentMetaData extends EPSOSDocumentMetaData {
         }
     }
 
+    String getDescription();
+
     DocumentFileType getDocumentFileType();
 
     Date getServiceStartTime();

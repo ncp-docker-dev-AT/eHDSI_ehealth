@@ -1,24 +1,24 @@
 package eu.epsos.exceptions;
 
-import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
 
 public abstract class ExceptionWithContext extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final OpenNCPErrorCode openncpErrorCode;
+    private ErrorCode errorCode;
 
     //Use to pass information from the National Country A
     private String context;
 
-    public ExceptionWithContext(OpenNCPErrorCode openncpErrorCode, Throwable cause) {
+    public ExceptionWithContext(ErrorCode errorCode, Throwable cause) {
         super(cause);
-        this.openncpErrorCode = openncpErrorCode;
+        this.errorCode = errorCode;
     }
 
-    public ExceptionWithContext(OpenNCPErrorCode openncpErrorCode, String message, String context) {
+    public ExceptionWithContext(ErrorCode errorCode, String message, String context) {
         super(message);
-        this.openncpErrorCode = openncpErrorCode;
+        this.errorCode = errorCode;
         this.context = context;
     }
 
@@ -26,7 +26,7 @@ public abstract class ExceptionWithContext extends Exception {
         return context;
     }
 
-    public OpenNCPErrorCode getOpenncpErrorCode() {
-        return openncpErrorCode;
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 }

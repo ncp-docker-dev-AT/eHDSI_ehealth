@@ -1,9 +1,9 @@
 package epsos.ccd.posam.tsam.response;
 
-import epsos.ccd.posam.tsam.exception.TSAMErrorCtx;
 import epsos.ccd.posam.tsam.util.CodedElement;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TSAMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TSAMErrorCtx;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -3,13 +3,15 @@ package tr.com.srdc.epsos.ws.server.xdr;
 import epsos.ccd.gnomon.auditmanager.*;
 import epsos.ccd.netsmart.securitymanager.exceptions.SMgrException;
 import eu.epsos.exceptions.DocumentTransformationException;
+import eu.epsos.protocolterminators.ws.server.utils.RegistryErrorUtils;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.exception.NationalInfrastructureException;
 import eu.epsos.protocolterminators.ws.server.exception.NoConsentException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentProcessingException;
 import eu.epsos.protocolterminators.ws.server.xdr.DocumentSubmitInterface;
 import eu.epsos.protocolterminators.ws.server.xdr.XDRServiceInterface;
-import eu.epsos.pt.transformation.TMServices;
+import eu.epsos.pt.transformation.DomUtils;
+import eu.epsos.pt.transformation.TranslationsAndMappingsClient;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.IheConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -25,7 +27,7 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.exceptions.OpenNCPErr
 import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
+import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import fi.kela.se.epsos.data.model.DocumentFactory;
@@ -55,10 +57,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Objects;
-import java.util.ServiceLoader;
+import java.util.*;
 
 public class XDRServiceImpl implements XDRServiceInterface {
 
@@ -99,9 +98,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private RegistryError createErrorMessage(OpenNCPErrorCode openncpErrorCode, String codeContext, String value, String location, RegistryErrorSeverity severity) {
 
+
         RegistryError registryError = ofRs.createRegistryError();
         registryError.setErrorCode(openncpErrorCode.getCode());
-        registryError.setLocation(getLocation(location));
+        registryError.setLocation(location);
         registryError.setSeverity(severity.getText());
         registryError.setCodeContext(codeContext);
         registryError.setValue(value);
@@ -110,16 +110,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
     private RegistryError createErrorMessage(OpenNCPErrorCode openncpErrorCode, String codeContext, String value, RegistryErrorSeverity severity) {
 
-        return createErrorMessage(openncpErrorCode, codeContext, value, null, severity);
-    }
-
-    /**
-     * Returning HOME COMMUNITY ID instead of RegisteredService.CONSENT_SERVICE.
-     *
-     * @return Home Community ID URN encoded.
-     */
-    protected String getLocation(String location) {
-        return org.apache.commons.lang.StringUtils.isBlank(location) ? Constants.OID_PREFIX + Constants.HOME_COMM_ID : location;
+        return createErrorMessage(openncpErrorCode, codeContext, value, StringUtils.EMPTY, severity);
     }
 
     private void prepareEventLogForDiscardMedication(EventLog eventLog, String discardId, ProvideAndRegisterDocumentSetRequestType request,
@@ -338,10 +329,18 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         String fullPatientId = getDocumentEntryPatientId(request);
@@ -366,7 +365,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    e.getOpenncpErrorCode(),
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         RegistryResponseType response = new RegistryResponseType();
@@ -375,7 +379,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
         String discardDate = "";
 
         try {
-            org.w3c.dom.Document domDocument = TMServices.byteToDocument(request.getDocument().get(0).getValue());
+            org.w3c.dom.Document domDocument = DomUtils.byteToDocument(request.getDocument().get(0).getValue());
             EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
             documentId = getDocumentId(epsosDocument.getDocument());
             // Evidence for call to NI for XDR submit (dispensation)
@@ -431,13 +435,19 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (NationalInfrastructureException e) {
             logger.error("DocumentSubmitException: '{}'-'{}'", e.getOpenncpErrorCode(), e.getMessage());
+            var codeContext = e.getOpenncpErrorCode().getDescription() + "^" + e.getMessage();
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription() + " ( " + documentId + " )", "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (NIException e) {
             logger.error("NIException: '{}'", e.getMessage());
             registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
         } catch (Exception e) {
             logger.error("Generic Exception: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    OpenNCPErrorCode.ERROR_ED_GENERIC,
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         if (registryErrorList.getRegistryError().isEmpty()) {
@@ -480,10 +490,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    e.getErrorCode(),
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         String fullPatientId = getDocumentEntryPatientId(request);
@@ -512,7 +532,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
         if (!SAML2Validator.isConsentGiven(fullPatientId, countryCode)) {
             logger.debug("No consent given, throwing InsufficientRightsException");
             NoConsentException e = new NoConsentException(null);
-            registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    registryErrorList,
+                    e.getOpenncpErrorCode(),
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
         if (!registryErrorList.getRegistryError().isEmpty()) {
             response.setRegistryErrorList(registryErrorList);
@@ -530,6 +555,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 Document doc = request.getDocument().get(i);
                 String documentId = "";
                 byte[] docBytes = doc.getValue();
+                org.w3c.dom.Document domDocument = null;
                 try {
 
                     //  Validate CDA epSOS Pivot.
@@ -539,7 +565,10 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     }
 
                     //  Reset the response document to a translated version.
-                    docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
+                    TMResponseStructure tmResponseStructure = TranslationsAndMappingsClient.translate(DomUtils.byteToDocument(docBytes), Constants.LANGUAGE_CODE);
+                    domDocument = Base64Util.decode(tmResponseStructure.getResponseCDA());
+                    docBytes = XMLUtils.toOM(domDocument.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
+
 
                     // Validate CDA epSOS Pivot
                     if (OpenNCPValidation.isValidationEnable()) {
@@ -551,7 +580,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
                 try {
-                    org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
                     EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.ED_CLASSCODE, domDocument);
                     // Evidence for call to NI for XDR submit (dispensation)
                     // Joao: here we have a Document, so we can generate the mandatory NRO
@@ -595,7 +623,12 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(), "", e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
                 } catch (Exception e) {
                     logger.error("Generic Exception: '{}'", e.getMessage(), e);
-                    registryErrorList.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                    RegistryErrorUtils.addErrorMessage(
+                            registryErrorList,
+                            OpenNCPErrorCode.ERROR_ED_GENERIC,
+                            e.getMessage(),
+                            e,
+                            RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 }
             }
             if (!registryErrorList.getRegistryError().isEmpty()) {
@@ -679,10 +712,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
 
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    rel,
+                    e.getErrorCode(),
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    rel,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         String fullPatientId = getDocumentEntryPatientId(request);
@@ -711,7 +754,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 }
 
                 //Resets the response document to a translated version.
-                docBytes = TMServices.transformDocument(docBytes, Constants.LANGUAGE_CODE);
+                //Resets the response document to a translated version.
+                TMResponseStructure tmResponseStructure = TranslationsAndMappingsClient.transcode(DomUtils.byteToDocument(docBytes));
+                org.w3c.dom.Document domDocument = Base64Util.decode(tmResponseStructure.getResponseCDA());
+                docBytes = XMLUtils.toOM(domDocument.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
+
 
                 /* Validate CDA epSOS Pivot */
                 if (OpenNCPValidation.isValidationEnable()) {
@@ -725,7 +772,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 logger.error(null, ex);
             }
             try {
-                org.w3c.dom.Document domDocument = TMServices.byteToDocument(docBytes);
+                org.w3c.dom.Document domDocument = DomUtils.byteToDocument(docBytes);
                 EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.CONSENT_CLASSCODE, domDocument);
 
                 // Evidence for call to NI for XDR submit (patient consent)
@@ -761,10 +808,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
 //                }
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                RegistryErrorUtils.addErrorMessage(
+                        rel,
+                        e.getOpenncpErrorCode(),
+                        e.getMessage(),
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                RegistryErrorUtils.addErrorMessage(
+                        rel,
+                        OpenNCPErrorCode.ERROR_ED_GENERIC,
+                        e.getMessage(),
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
         }
         if (!rel.getRegistryError().isEmpty()) {
@@ -814,10 +871,20 @@ public class XDRServiceImpl implements XDRServiceInterface {
             sigCountryCode = validateXDRHeader(shElement, ClassCode.HCER_CLASSCODE);
         } catch (OpenNCPErrorCodeException e) {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    rel,
+                    e.getErrorCode(),
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
-            rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_SEC_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+            RegistryErrorUtils.addErrorMessage(
+                    rel,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    e.getMessage(),
+                    e,
+                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
         String fullPatientId = getDocumentEntryPatientId(request);
@@ -838,7 +905,11 @@ public class XDRServiceImpl implements XDRServiceInterface {
                             NcpSide.NCP_A, obtainClassCode(request), true);
                 }
 
-                String documentString = new String(TMServices.transformDocument(doc.getValue(), Constants.LANGUAGE_CODE), StandardCharsets.UTF_8);
+                TMResponseStructure tmResponseStructure = TranslationsAndMappingsClient.translate(DomUtils.byteToDocument(doc.getValue()), Constants.LANGUAGE_CODE);
+                org.w3c.dom.Document cdaDocument = Base64Util.decode(tmResponseStructure.getResponseCDA());
+                byte[] docBytes = XMLUtils.toOM(cdaDocument.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
+                String documentString = new String(docBytes, StandardCharsets.UTF_8);
+
 
                 /* Validate CDA epSOS Pivot */
                 if (OpenNCPValidation.isValidationEnable()) {
@@ -850,13 +921,28 @@ public class XDRServiceImpl implements XDRServiceInterface {
                 documentSubmitService.submitHCER(epsosDocument);
             } catch (DocumentProcessingException e) {
                 logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getOpenncpErrorCode(), e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                RegistryErrorUtils.addErrorMessage(
+                        rel,
+                        e.getOpenncpErrorCode(),
+                        e.getMessage(),
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(e.getErrorCode(), e.getCodeContext(), e.getMessage(), RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                RegistryErrorUtils.addErrorMessage(
+                        rel,
+                        e.getErrorCode(),
+                        e.getMessage(),
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
-                rel.getRegistryError().add(createErrorMessage(OpenNCPErrorCode.ERROR_ED_GENERIC, e.getMessage(), "", RegistryErrorSeverity.ERROR_SEVERITY_ERROR));
+                RegistryErrorUtils.addErrorMessage(
+                        rel,
+                        OpenNCPErrorCode.ERROR_ED_GENERIC,
+                        e.getMessage(),
+                        e,
+                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
         }
         if (!rel.getRegistryError().isEmpty()) {

@@ -10,6 +10,7 @@ import eu.epsos.pt.eadc.util.EadcUtil.Direction;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
+import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.eadc.ServiceType;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
@@ -18,7 +19,6 @@ import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
 import eu.europa.ec.sante.ehdsi.openncp.ssl.HttpsClientConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
-import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetRequestType;
 import ihe.iti.xds_b._2007.RetrieveDocumentSetResponseType;
 import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryRequest;
@@ -856,13 +856,17 @@ public class RespondingGateway_ServiceStub extends Stub {
             LOGGER.info("XCA Retrieve Request received. EVIDENCE NRR");
 
             // Invoke eADC
-            if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
+            if (EadcUtilWrapper.hasTransactionErrors(returnEnv)) {
+                eadcError = EadcUtilWrapper.getTransactionErrorDescription(returnEnv);
+            } else {
+                if (retrieveDocumentSetResponse.getDocumentResponse() != null && !retrieveDocumentSetResponse.getDocumentResponse().isEmpty()) {
 
-                cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
+                    cda = EadcUtilWrapper.toXmlDocument(retrieveDocumentSetResponse.getDocumentResponse().get(0).getDocument());
+                }
+                EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
+                        transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
+                        Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
             }
-            EadcUtilWrapper.invokeEadc(_messageContext, _returnMessageContext, this._getServiceClient(), cda,
-                    transactionStartTime, transactionEndTime, this.countryCode, EadcEntry.DsTypes.EADC,
-                    Direction.OUTBOUND, ServiceType.DOCUMENT_EXCHANGED_QUERY);
 
             //  Create Audit messages
             EventLog eventLog = createAndSendEventLogRetrieve(retrieveDocumentSetRequest, retrieveDocumentSetResponse,
