@@ -51,8 +51,8 @@
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <packagingExcludes>
                         WEB-INF/lib/slf4j-simple-1.7.30.jar,
-<!--                        WEB-INF/lib/swagger-annotations-1.5.20.jar,-->
-<!--                        WEB-INF/lib/swagger-models-1.5.20.jar-->
+                        <!--                        WEB-INF/lib/swagger-annotations-1.5.20.jar,-->
+                        <!--                        WEB-INF/lib/swagger-models-1.5.20.jar-->
                     </packagingExcludes>
                 </configuration>
             </plugin>
@@ -94,13 +94,13 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>Dicom</id>
+                        <id>rfc3881</id>
                         <goals>
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/DICOM.xsd</source>
+                                <source>src/main/resources/RFC3881.xsd</source>
                             </sources>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>
@@ -285,6 +285,26 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>3.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mapstruct</groupId>
+                    <artifactId>mapstruct</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
             <version>3.0.0</version>
         </dependency>
         <dependency>

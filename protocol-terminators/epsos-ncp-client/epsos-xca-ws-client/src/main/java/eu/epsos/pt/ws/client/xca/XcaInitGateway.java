@@ -5,7 +5,8 @@ import eu.epsos.dts.xds.AdhocQueryRequestCreator;
 import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.pt.transformation.TMServices;
+import eu.epsos.pt.transformation.DomUtils;
+import eu.epsos.pt.transformation.TranslationsAndMappingsClient;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
@@ -13,6 +14,7 @@ import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.tm.util.Base64Util;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
@@ -195,11 +197,14 @@ public class XcaInitGateway {
                     queryResponse.getDocumentResponse().get(0).setDocument(pivotDocument);
                 } else {
                     //  Resets the response document to a translated version.
-                    friendlyDocument = TMServices.transformDocument(pivotDocument, targetLanguage);
-                    queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
+                    var tmResponseStructure = TranslationsAndMappingsClient.translate(DomUtils.byteToDocument(pivotDocument), targetLanguage);
+                    var domDocument = tmResponseStructure.getResponseCDA();
+                    byte[] translatedCDA = XMLUtils.toOM(Base64Util.decode(domDocument).getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
+                    queryResponse.getDocumentResponse().get(0).setDocument(translatedCDA);
+
                 }
 
-            } catch (DocumentTransformationException e) {
+            } catch (Exception e) {
                 LOGGER.warn("DocumentTransformationException: CDA cannot be translated: Please check the TM result");
             } finally {
                 LOGGER.debug("[XCA Init Gateway] Returns Original Document");

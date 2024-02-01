@@ -8,6 +8,7 @@ import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
 import eu.epsos.protocolterminators.ws.server.exception.NIException;
 import eu.epsos.protocolterminators.ws.server.xca.DocumentSearchInterface;
 import eu.epsos.protocolterminators.ws.server.xca.XCAServiceInterface;
+import eu.epsos.pt.transformation.TranslationsAndMappingsClient;
 import eu.epsos.util.EvidenceUtils;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -86,7 +87,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
 
     private final Logger logger = LoggerFactory.getLogger(XCAServiceImpl.class);
     private final Logger loggerClinical = LoggerFactory.getLogger("LOGGER_CLINICAL");
-    private final ITransformationService transformationService;
     private final OMFactory omFactory;
     private final oasis.names.tc.ebxml_regrep.xsd.query._3.ObjectFactory ofQuery;
     private final oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory ofRim;
@@ -116,9 +116,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
         ofRim = new oasis.names.tc.ebxml_regrep.xsd.rim._3.ObjectFactory();
 
         omFactory = OMAbstractFactory.getOMFactory();
-
-        var applicationContext = new ClassPathXmlApplicationContext("ctx_tm.xml");
-        transformationService = (ITransformationService) applicationContext.getBean(ITransformationService.class.getName());
     }
 
     private static String trimDocumentEntryPatientId(String patientId) {
@@ -755,7 +752,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
     }
 
     private Document transformDocument(Document doc, OMElement registryErrorList, OMElement registryResponseElement, boolean isTranscode,
-                                       EventLog eventLog) {
+                                       EventLog eventLog) throws DocumentTransformationException {
 
         logger.debug("Transforming document, isTranscode: '{}' - Event Type: '{}'", isTranscode, eventLog.getEventType());
         if (eventLog.getReqM_ParticipantObjectDetail() != null) {
@@ -780,11 +777,11 @@ public class XCAServiceImpl implements XCAServiceInterface {
             if (isTranscode) {
                 operationType = "toEpSOSPivot";
                 logger.debug("Transforming document to epSOS pivot...");
-                tmResponse = transformationService.toEpSOSPivot(doc);
+                tmResponse = TranslationsAndMappingsClient.transcode(doc);
             } else {
                 operationType = "translate";
                 logger.debug("Translating document to '{}'", Constants.LANGUAGE_CODE);
-                tmResponse = transformationService.translate(doc, Constants.LANGUAGE_CODE);
+                tmResponse = TranslationsAndMappingsClient.translate(doc, Constants.LANGUAGE_CODE);
             }
 
             OMNamespace ns = registryResponseElement.getNamespace();
@@ -800,7 +797,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 RegistryErrorUtils.addErrorOMMessage(ons, registryErrorList, error, operationType, RegistryErrorSeverity.ERROR_SEVERITY_WARNING);
             }
 
-            returnDoc = tmResponse.getResponseCDA();
+            returnDoc = Base64Util.decode(tmResponse.getResponseCDA());
             if (registryErrorList.getChildElements().hasNext()) {
                 registryResponseElement.addChild(registryErrorList);
             }
