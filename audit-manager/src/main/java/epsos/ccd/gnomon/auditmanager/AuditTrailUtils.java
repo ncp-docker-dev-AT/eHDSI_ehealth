@@ -1019,7 +1019,7 @@ public enum AuditTrailUtils {
             eventIdentification.getEventID().setDisplayName("SMP::Push");
         }
 
-        eventIdentification.setEventActionCode(eventActionCode); // supposed tp be 'E'
+        eventIdentification.setEventActionCode(eventActionCode); // supposed to be 'E'
         eventIdentification.setEventDateTime(eventDateTime);
         eventIdentification.setEventOutcomeIndicator(eventOutcomeIndicator.toString());
 
