@@ -1,16 +1,20 @@
 package eu.epsos.pt.cc;
 
 import eu.epsos.exceptions.ExceptionWithContext;
+import eu.europa.ec.sante.ehdsi.constant.error.ErrorCode;
+import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Optional;
 
 public class ClientConnectorServiceUtils {
 
@@ -28,9 +32,7 @@ public class ClientConnectorServiceUtils {
         if (e instanceof AxisFault) {
             return (AxisFault) e;
         }
-        String errorMessage = "";
-        String errorCode = "";
-        String faultMessage = "";
+        String errorCode = StringUtils.EMPTY;
         OMElement response = null;
         Throwable throwable = e;
         AxisFault axisFault;
@@ -42,19 +44,12 @@ public class ClientConnectorServiceUtils {
             response = OM_FACTORY.createOMElement(
                     new QName(TASK_NAMESPACE, throwable.getClass().getSimpleName(), TASK_NAMESPACE_PREFIX));
             // OpenNCP Error Code
-            errorCode = ((ExceptionWithContext) throwable).getOpenncpErrorCode().getCode();
-            // OpenNCP additional information
-            errorMessage = throwable.getMessage();
+            errorCode = Optional.ofNullable(((ExceptionWithContext) throwable).getErrorCode()).map(ErrorCode::getCode).orElse(StringUtils.EMPTY);
             // National Country additional information
-            faultMessage = ((ExceptionWithContext) throwable).getContext();
-            response.setText(faultMessage);
-        } else { //
-            errorMessage = throwable.getMessage();
+            response.setText(((ExceptionWithContext) throwable).getContext());
         }
-
-        axisFault = new AxisFault(errorMessage, new QName(errorCode));
+        axisFault = new AxisFault(throwable.getMessage(), new QName(errorCode));
         axisFault.setDetail(response);
-
         return axisFault;
     }
 }
