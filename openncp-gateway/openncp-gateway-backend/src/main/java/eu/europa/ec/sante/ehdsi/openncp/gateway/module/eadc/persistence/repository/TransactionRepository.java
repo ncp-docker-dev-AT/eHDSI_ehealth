@@ -11,7 +11,7 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
     @Query(
             // @formatter:off
-            "select trim(substring(t.startTime, 12, 5)) as year from Transaction t where trim(substring(t.startTime, 12, 5)) <> '' group by year order by trim(substring(t.startTime, 12, 5)) desc"
+            "select trim(substr(t.startTime, 12, 5)) as year from Transaction t where trim(substr(t.startTime, 12, 5)) is not null group by trim(substr(t.startTime, 12, 5)) order by trim(substr(t.startTime, 12, 5)) desc"
             // @formatter:on
     )
     List<String> findAllYears();
