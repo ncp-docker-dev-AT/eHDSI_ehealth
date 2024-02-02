@@ -694,7 +694,12 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         responseStatus = AdhocQueryResponseStatus.SUCCESS;
                         break;
                 }
-
+            } catch (NIException e) {
+                var stackTraceLines = e.getStackTrace();
+                RegistryErrorUtils.addErrorMessage(registryErrorList, e.getOpenncpErrorCode(), e.getOpenncpErrorCode().getDescription(),
+                        String.valueOf(stackTraceLines[0]), RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
+                responseStatus = AdhocQueryResponseStatus.FAILURE;
+            } finally {
                 try {
                     prepareEventLogForQuery(eventLog, request, response, shElement, classCodeValue);
                 } catch (Exception e) {
