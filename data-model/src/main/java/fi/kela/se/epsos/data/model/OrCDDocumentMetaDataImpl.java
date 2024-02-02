@@ -13,19 +13,28 @@ public class OrCDDocumentMetaDataImpl extends EPSOSDocumentMetaDataImpl implemen
 
     private DocumentFileType documentFileType;
     private Date serviceStartTime;
+
+    private String description;
     private List<Author> authors;
     private ReasonOfHospitalisation reasonOfHospitalisation;
 
     public OrCDDocumentMetaDataImpl(EPSOSDocumentMetaData metaData,
                                     DocumentFileType documentFileType,
+                                    String description,
                                     Date serviceStartTime,
                                     List<Author> authors,
                                     ReasonOfHospitalisation reasonOfHospitalisation) {
         super(metaData);
         this.documentFileType = documentFileType;
+        this.description = description;
         this.serviceStartTime = serviceStartTime;
         this.authors = authors;
         this.reasonOfHospitalisation = reasonOfHospitalisation;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

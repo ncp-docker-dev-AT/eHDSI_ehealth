@@ -20,7 +20,8 @@ atlassian-ide-plugin.xml
 /audit-manager/nb-configuration.xml
 /eadc/nb-configuration.xml
 /tsam/nb-configuration.xml
-/transformation-manager/nb-configuration.xml
+/translations-and-mappings/nb-configuration.xml
+/translations-and-mappings-ws/nb-configuration.xml
 /openncp-common-components/nb-configuration.xml
 /configuration-manager/nb-configuration.xml
 /consent-manager/nb-configuration.xml

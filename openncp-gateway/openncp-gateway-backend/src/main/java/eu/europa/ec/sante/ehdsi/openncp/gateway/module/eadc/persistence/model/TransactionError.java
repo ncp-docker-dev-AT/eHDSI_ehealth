@@ -12,7 +12,7 @@ public class TransactionError {
     private Long id;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Transaction_FK")
     private Transaction transaction;
 
