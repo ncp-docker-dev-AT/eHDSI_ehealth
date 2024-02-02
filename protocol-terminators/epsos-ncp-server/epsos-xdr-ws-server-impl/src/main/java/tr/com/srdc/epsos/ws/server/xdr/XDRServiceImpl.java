@@ -28,6 +28,8 @@ import eu.europa.ec.sante.ehdsi.openncp.assertionvalidator.saml.SAML2Validator;
 import eu.europa.ec.sante.ehdsi.openncp.model.DiscardDispenseDetails;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.AdhocQueryResponseStatus;
 import eu.epsos.protocolterminators.ws.server.common.RegistryErrorSeverity;
+import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMResponseStructure;
+import eu.europa.ec.sante.ehdsi.openncp.tm.util.Base64Util;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import fi.kela.se.epsos.data.model.DocumentFactory;
@@ -331,7 +333,9 @@ public class XDRServiceImpl implements XDRServiceInterface {
             logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
             RegistryErrorUtils.addErrorMessage(
                     registryErrorList,
-                    e,
+                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
+                    e.getMessage(),
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
@@ -339,7 +343,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_SEC_GENERIC,
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -369,7 +373,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     e.getOpenncpErrorCode(),
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -446,7 +450,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_ED_GENERIC,
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -494,7 +498,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     e.getErrorCode(),
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
@@ -502,7 +506,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     OpenNCPErrorCode.ERROR_SEC_GENERIC,
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -536,7 +540,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     registryErrorList,
                     e.getOpenncpErrorCode(),
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
         if (!registryErrorList.getRegistryError().isEmpty()) {
@@ -627,7 +631,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                             registryErrorList,
                             OpenNCPErrorCode.ERROR_ED_GENERIC,
                             e.getMessage(),
-                            e,
+                            e.getLocalizedMessage(),
                             RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
                 }
             }
@@ -716,7 +720,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     rel,
                     e.getErrorCode(),
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
@@ -724,7 +728,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     rel,
                     OpenNCPErrorCode.ERROR_SEC_GENERIC,
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -812,7 +816,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         rel,
                         e.getOpenncpErrorCode(),
                         e.getMessage(),
-                        e,
+                        e.getLocalizedMessage(),
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
@@ -820,7 +824,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         rel,
                         OpenNCPErrorCode.ERROR_ED_GENERIC,
                         e.getMessage(),
-                        e,
+                        e.getLocalizedMessage(),
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
         }
@@ -875,7 +879,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     rel,
                     e.getErrorCode(),
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         } catch (SMgrException e) {
             logger.error("SMgrException: '{}'", e.getMessage(), e);
@@ -883,7 +887,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                     rel,
                     OpenNCPErrorCode.ERROR_SEC_GENERIC,
                     e.getMessage(),
-                    e,
+                    e.getLocalizedMessage(),
                     RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
         }
 
@@ -925,7 +929,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         rel,
                         e.getOpenncpErrorCode(),
                         e.getMessage(),
-                        e,
+                        e.getLocalizedMessage(),
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (DocumentTransformationException e) {
                 logger.error("DocumentTransformationException: '{}'", e.getMessage(), e);
@@ -933,7 +937,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         rel,
                         e.getErrorCode(),
                         e.getMessage(),
-                        e,
+                        e.getLocalizedMessage(),
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             } catch (Exception e) {
                 logger.error("Exception: '{}'", e.getMessage(), e);
@@ -941,7 +945,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         rel,
                         OpenNCPErrorCode.ERROR_ED_GENERIC,
                         e.getMessage(),
-                        e,
+                        e.getLocalizedMessage(),
                         RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
             }
         }
