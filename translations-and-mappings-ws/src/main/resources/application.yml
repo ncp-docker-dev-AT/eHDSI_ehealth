@@ -25,6 +25,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   jackson:
     default-property-inclusion: non_empty
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 server:
   error:
     include-message: always
