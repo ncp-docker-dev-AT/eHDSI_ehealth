@@ -351,6 +351,9 @@
                         <xsl:call-template name="show-eHDSIActiveIngredient">
                             <xsl:with-param name="node" select="$medActiveIngredientNodeCode"/>
                         </xsl:call-template>
+                        <xsl:call-template name="show-eHDSISubstance">
+                            <xsl:with-param name="node" select="$medActiveIngredientNodeCode"/>
+                        </xsl:call-template>
                         <xsl:text> (</xsl:text>
                         <xsl:value-of select="$medActiveIngredientID"/>
                         <xsl:text>)</xsl:text>
