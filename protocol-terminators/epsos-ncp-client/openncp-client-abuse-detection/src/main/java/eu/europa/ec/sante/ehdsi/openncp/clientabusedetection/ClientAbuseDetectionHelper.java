@@ -27,6 +27,12 @@ public class ClientAbuseDetectionHelper implements ApplicationContextAware {
         boolean schedulerEnabled = Boolean.parseBoolean(Constants.ABUSE_SCHEDULER_ENABLE);
         if (schedulerEnabled) {
             LOGGER.info("Stopping AbuseDetectionServiceFactory Service...");
+
+            try {
+                scheduler.shutdown(true);
+            } catch (SchedulerException e) {
+                LOGGER.warn("Stopping AbuseDetectionServiceFactory Service: " + e.getMessage());
+            }
         }
     }
 
