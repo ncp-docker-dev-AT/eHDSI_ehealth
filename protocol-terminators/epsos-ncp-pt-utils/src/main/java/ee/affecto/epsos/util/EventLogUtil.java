@@ -230,7 +230,7 @@ public class EventLogUtil {
             case ORCD_MEDICAL_IMAGES_CLASSCODE:
                 eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
+                eventLog.setEI_EventActionCode(EventActionCode.CREATE);
                 break;
             case MRO_CLASSCODE:
                 eventLog.setEventType(EventType.MRO_RETRIEVE);

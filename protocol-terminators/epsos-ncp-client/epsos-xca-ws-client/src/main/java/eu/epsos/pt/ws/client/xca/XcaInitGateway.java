@@ -5,15 +5,16 @@ import eu.epsos.dts.xds.AdhocQueryRequestCreator;
 import eu.epsos.dts.xds.AdhocQueryResponseConverter;
 import eu.epsos.exceptions.DocumentTransformationException;
 import eu.epsos.exceptions.XCAException;
-import eu.epsos.pt.transformation.TMServices;
+import eu.epsos.pt.transformation.DomUtils;
+import eu.epsos.pt.transformation.TranslationsAndMappingsClient;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.constant.error.OpenNCPErrorCode;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
-import eu.europa.ec.sante.ehdsi.openncp.pt.common.RegistryErrorSeverity;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.gazelle.validation.OpenNCPValidation;
 import eu.europa.ec.sante.ehdsi.openncp.configmanager.RegisteredService;
 import eu.europa.ec.sante.ehdsi.openncp.pt.common.DynamicDiscoveryService;
+import eu.europa.ec.sante.ehdsi.openncp.tm.util.Base64Util;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
 import eu.europa.ec.sante.ehdsi.openncp.util.ServerMode;
 import eu.europa.ec.sante.ehdsi.constant.assertion.AssertionEnum;
@@ -25,6 +26,8 @@ import oasis.names.tc.ebxml_regrep.xsd.query._3.AdhocQueryResponse;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryError;
 import oasis.names.tc.ebxml_regrep.xsd.rs._3.RegistryErrorList;
 import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,8 @@ public class XcaInitGateway {
     private static final Logger LOGGER = LoggerFactory.getLogger(XcaInitGateway.class);
     private static final Logger LOGGER_CLINICAL = LoggerFactory.getLogger("LOGGER_CLINICAL");
     private static final List<String> TM_ERROR_CODES = Arrays.stream(TMError.values()).map(TMError::getCode).collect(Collectors.toList());
+
+    private static final String ERROR_SEVERITY_ERROR = "urn:oasis:names:tc:ebxml-regrep:ErrorSeverityType:Error";
 
     /**
      * Private constructor to disable class instantiation.
@@ -193,11 +198,14 @@ public class XcaInitGateway {
                     queryResponse.getDocumentResponse().get(0).setDocument(pivotDocument);
                 } else {
                     //  Resets the response document to a translated version.
-                    friendlyDocument = TMServices.transformDocument(pivotDocument, targetLanguage);
-                    queryResponse.getDocumentResponse().get(0).setDocument(friendlyDocument);
+                    var tmResponseStructure = TranslationsAndMappingsClient.translate(DomUtils.byteToDocument(pivotDocument), targetLanguage);
+                    var domDocument = tmResponseStructure.getResponseCDA();
+                    byte[] translatedCDA = XMLUtils.toOM(Base64Util.decode(domDocument).getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
+                    queryResponse.getDocumentResponse().get(0).setDocument(translatedCDA);
+
                 }
 
-            } catch (DocumentTransformationException e) {
+            } catch (Exception e) {
                 LOGGER.warn("DocumentTransformationException: CDA cannot be translated: Please check the TM result");
             } finally {
                 LOGGER.debug("[XCA Init Gateway] Returns Original Document");
@@ -241,7 +249,7 @@ public class XcaInitGateway {
 
                     // Marcelo Fonseca: Added error situation where no document is found or registered, 1101/1102.
                     // (Needs to be revised according to new error communication strategy to the portal).
-                    if (RegistryErrorSeverity.ERROR_SEVERITY_ERROR.getText().equals(severity)
+                    if (StringUtils.equals(ERROR_SEVERITY_ERROR,severity)
                             || errorCode.equals(OpenNCPErrorCode.ERROR_EP_NOT_FOUND.getCode())
                             || errorCode.equals(OpenNCPErrorCode.ERROR_PS_NOT_FOUND.getCode())) {
                         msg.append(errorCode).append(" ").append(codeContext).append(" ").append(value);

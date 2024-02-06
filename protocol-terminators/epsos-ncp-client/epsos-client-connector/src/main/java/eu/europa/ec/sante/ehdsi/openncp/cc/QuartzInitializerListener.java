@@ -29,5 +29,11 @@ public class QuartzInitializerListener implements ServletContextListener {
         if (logger.isDebugEnabled()) {
             logger.info("Web Application Destroyed");
         }
+
+        try {
+            ClientAbuseDetectionHelper.abuseDetectionShutdown();
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
+        }
     }
 }

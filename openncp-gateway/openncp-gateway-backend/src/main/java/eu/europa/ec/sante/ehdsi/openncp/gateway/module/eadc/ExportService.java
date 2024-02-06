@@ -24,7 +24,7 @@ public class ExportService {
 
     public final ZoneId zoneId = ZoneId.systemDefault();
 
-    private final String TEMPLATE_FILE = "eHDSI_KPIs-Reporting_template_V1.1.1.xlsx";
+    private final String TEMPLATE_FILE = "MyHealth@EU_KPIs-Reporting_template_V1.4.xlsx";
 
     private final String SHEET_KPI_1_2 = "KPI-1.2";
     private final String SHEET_KPI_1_3 = "KPI-1.3";
