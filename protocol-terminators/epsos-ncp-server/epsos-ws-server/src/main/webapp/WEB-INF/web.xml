@@ -41,11 +41,11 @@
 
     <context-param>
         <param-name>quartz:shutdown-on-unload</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
     </context-param>
     <context-param>
         <param-name>quartz:wait-on-shutdown</param-name>
-        <param-value>false</param-value>
+        <param-value>true</param-value>
     </context-param>
     <context-param>
         <param-name>quartz:start-scheduler-on-load</param-name>

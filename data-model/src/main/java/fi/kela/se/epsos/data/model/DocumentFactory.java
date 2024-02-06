@@ -430,6 +430,7 @@ public class DocumentFactory {
                                                            String patientId,
                                                            Date effectiveDate,
                                                            Date serviceStartTime,
+                                                           String description,
                                                            String repositoryId,
                                                            String title,
                                                            String author,
@@ -445,7 +446,7 @@ public class DocumentFactory {
                 new OrCDDocumentMetaDataImpl.SimpleConfidentialityMetadata(confidentiality);
         EPSOSDocumentMetaData metaData = new EPSOSDocumentMetaDataImpl(id, patientId, documentFormat, effectiveDate,
                 orCDClassCode, repositoryId, title, author, confidentialityMetadata, languageCode, size, hash);
-        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, serviceStartTime, authors, reasonOfHospitalisation);
+        return new OrCDDocumentMetaDataImpl(metaData, documentFileType, description, serviceStartTime, authors, reasonOfHospitalisation);
     }
 
     /**
@@ -455,6 +456,7 @@ public class DocumentFactory {
                                                                            String patientId,
                                                                            Date effectiveDate,
                                                                            Date serviceStartTime,
+                                                                           String description,
                                                                            String repositoryId,
                                                                            String title,
                                                                            String author,
@@ -465,7 +467,7 @@ public class DocumentFactory {
                                                                            String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_LABORATORY_RESULTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML,
-                id, patientId, effectiveDate, serviceStartTime, repositoryId, title, author, confidentiality,
+                id, patientId, effectiveDate, serviceStartTime, description, repositoryId, title, author, confidentiality,
                 languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, null, hash);
     }
 
@@ -476,6 +478,7 @@ public class DocumentFactory {
                                                                                   String patientId,
                                                                                   Date effectiveDate,
                                                                                   Date serviceStartTime,
+                                                                                  String description,
                                                                                   String repositoryId,
                                                                                   String title,
                                                                                   String author,
@@ -487,7 +490,7 @@ public class DocumentFactory {
                                                                                   String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML,
-                id, patientId, effectiveDate, serviceStartTime, repositoryId, title, author, confidentiality,
+                id, patientId, effectiveDate, serviceStartTime, description, repositoryId, title, author, confidentiality,
                 languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, reasonOfHospitalisation, hash);
     }
 
@@ -498,6 +501,7 @@ public class DocumentFactory {
                                                                                String patientId,
                                                                                Date effectiveDate,
                                                                                Date serviceStartTime,
+                                                                               String description,
                                                                                String repositoryId,
                                                                                String title,
                                                                                String author,
@@ -509,7 +513,7 @@ public class DocumentFactory {
                                                                                String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML,
-                id, patientId, effectiveDate, serviceStartTime, repositoryId, title, author, confidentiality,
+                id, patientId, effectiveDate, serviceStartTime, description, repositoryId, title, author, confidentiality,
                 languageCode, OrCDDocumentMetaData.DocumentFileType.PDF, size, authors, reasonOfHospitalisation, hash);
     }
 
@@ -520,6 +524,7 @@ public class DocumentFactory {
                                                                        String patientId,
                                                                        Date effectiveDate,
                                                                        Date serviceStartTime,
+                                                                       String description,
                                                                        String repositoryId,
                                                                        String title,
                                                                        String author,
@@ -532,7 +537,7 @@ public class DocumentFactory {
                                                                        String hash) {
 
         return createOrCDDocument(ClassCode.ORCD_MEDICAL_IMAGES_CLASSCODE, EPSOSDocumentMetaData.EPSOSDOCUMENT_FORMAT_XML,
-                id, patientId, effectiveDate, serviceStartTime, repositoryId, title, author, confidentiality,
+                id, patientId, effectiveDate, serviceStartTime, description, repositoryId, title, author, confidentiality,
                 languageCode, documentFileType, size, authors, reasonOfHospitalisation, hash);
     }
 

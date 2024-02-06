@@ -1,20 +1,38 @@
-logging:
-  level:
-    com.zaxxer.hikari: error
-    org.apache.http: error
-    org.hibernate: error
-    org.springframework: error
-spring:
-  main:
-    allow-circular-references: true
-  datasource:
-    username: ${tsam-sync.datasource.username}
-    password: ${tsam-sync.datasource.password}
-  jpa:
-    hibernate:
-      ddl-auto: validate
+debug: false
 tsam-sync:
   database:
     backup: true
-  pageable:
-    default-page-size: 250
+  datasource:
+    host: 127.0.0.1
+    port: 3306
+    username: username
+    password: password
+    database: ehealth_ltrdb
+    dialect: org.hibernate.dialect.MySQL8Dialect
+    driver: com.mysql.cj.jdbc.Driver
+    timezone: Europe/Brussels
+  datasource-ehealth-properties:
+    host: 127.0.0.1
+    port: 3306
+    username: username
+    password: password
+    database: ehealth_properties
+    dialect: org.hibernate.dialect.MySQL8Dialect
+    driver: com.mysql.cj.jdbc.Driver
+    timezone: Europe/Brussels
+  proxy:
+    host:
+    port:
+    username:
+    password:
+  cts:
+    url: https://webgate.acceptance.ec.testa.eu/ehealth-term-server
+    username: ncpeh@eu
+    password: password
+spring:
+  jpa:
+    show_sql: false
+  main:
+    allow-circular-references: true
+  profiles:
+    active: mysql

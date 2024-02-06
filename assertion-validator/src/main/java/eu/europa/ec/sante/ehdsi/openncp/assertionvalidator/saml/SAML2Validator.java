@@ -340,8 +340,8 @@ public class SAML2Validator {
         return sigCountryCode;
     }
 
-    private static void checkTRCAssertion(Assertion assertion, ClassCode classCode) throws MissingFieldException,
-            InvalidFieldException, InsufficientRightsException {
+    public static void checkTRCAssertion(Assertion assertion, ClassCode classCode) throws MissingFieldException,
+            InvalidFieldException, InsufficientRightsException, SMgrException {
 
         RequiredFieldValidators.validateVersion(assertion);
         RequiredFieldValidators.validateID(assertion);
@@ -375,6 +375,8 @@ public class SAML2Validator {
 
         policyManager.PurposeOfUseValidatorForTRC(assertion, classCode);
         policyManager.XSPASubjectValidatorForTRC(assertion, classCode);
+
+        new SignatureManager().verifySAMLAssertion(assertion);
     }
 
     public static String getCountryCodeFromHCPAssertion(Element soapHeader) throws MissingFieldException, XSDValidationException, SMgrException {

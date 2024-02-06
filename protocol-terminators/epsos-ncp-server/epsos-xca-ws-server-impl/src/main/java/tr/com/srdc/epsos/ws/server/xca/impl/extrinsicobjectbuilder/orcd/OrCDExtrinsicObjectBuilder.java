@@ -81,6 +81,11 @@ public class OrCDExtrinsicObjectBuilder extends AbstractExtrinsicObjectBuilder {
 
         build(request, eot, orCDDocumentMetaData, ofRim, uuid, title);
 
+        // Description
+        eot.setDescription(ofRim.createInternationalStringType());
+        eot.getDescription().getLocalizedString().add(ofRim.createLocalizedStringType());
+        eot.getDescription().getLocalizedString().get(0).setValue(orCDDocumentMetaData.getDescription());
+
         // FormatCode
         eot.getClassification().add(ClassificationBuilder.build(ClassificationScheme.FORMAT_CODE.getUuid(),
                 uuid, nodeRepresentation, "eHDSI formatCodes", displayName));

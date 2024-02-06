@@ -20,7 +20,8 @@ openncp-gazelle-validation
 openstork
 protocol-terminators
 security-manager
-transformation-manager
+translations-and-mappings
+translations-and-mappings-ws
 trc-sts
 trc-sts-client
 tsam
