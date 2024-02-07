@@ -2,6 +2,7 @@ package eu.europa.ec.sante.ehdsi.openncp.tm.exception;
 
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMErrorCtx;
 
 public class TMException extends Exception {
 
@@ -11,7 +12,7 @@ public class TMException extends Exception {
         this.reason = reason;
     }
 
-    public TMException(TmErrorCtx reason) {
+    public TMException(TMErrorCtx reason) {
         this.reason = reason;
     }
 
