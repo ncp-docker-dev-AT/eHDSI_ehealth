@@ -4,6 +4,9 @@ import eu.europa.ec.sante.ehdsi.openncp.configmanager.ConfigurationManagerFactor
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.FileSystems;
+import java.util.Optional;
+
 public class Constants {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(Constants.class);
@@ -77,9 +80,9 @@ public class Constants {
     private static final String PROPS_ENV_VAR = "EPSOS_PROPS_PATH";
 
     static {
-        String epsosPath = System.getenv(PROPS_ENV_VAR);
-        if (!epsosPath.endsWith(System.getProperty("file.separator"))) {
-            epsosPath += System.getProperty("file.separator");
+        String epsosPath = Optional.ofNullable(System.getenv(PROPS_ENV_VAR)).orElseGet(() -> System.getProperty(PROPS_ENV_VAR));
+        if (!epsosPath.endsWith(FileSystems.getDefault().getSeparator())) {
+            epsosPath += FileSystems.getDefault().getSeparator();
         }
         EPSOS_PROPS_PATH = epsosPath;
         LOGGER.info("OpenNCP Util Constants Initialization - EPSOS_PROPS_PATH: '{}'", EPSOS_PROPS_PATH);

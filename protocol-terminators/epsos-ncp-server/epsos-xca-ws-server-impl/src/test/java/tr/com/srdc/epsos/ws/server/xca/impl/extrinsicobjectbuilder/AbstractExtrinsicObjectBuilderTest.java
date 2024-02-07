@@ -18,6 +18,12 @@ public class AbstractExtrinsicObjectBuilderTest {
 
     @BeforeClass
     public static void beforeTest() {
+        final String EPSOS_PROP_KEY = "EPSOS_PROPS_PATH";
+        final String epsosPropsPath = System.getenv(EPSOS_PROP_KEY);
+        if (epsosPropsPath == null) {
+            System.setProperty(EPSOS_PROP_KEY, "/opt/test");
+        }
+
         Configuration CONFIGURATION = new Configuration()
                 .addAnnotatedClass(Property.class)
                 .setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect")
