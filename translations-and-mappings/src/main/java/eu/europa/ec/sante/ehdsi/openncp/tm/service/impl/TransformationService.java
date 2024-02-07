@@ -8,12 +8,12 @@ import epsos.ccd.posam.tsam.util.CodedElement;
 import eu.epsos.validation.datamodel.common.NcpSide;
 import eu.europa.ec.sante.ehdsi.constant.error.ITMTSAMError;
 import eu.europa.ec.sante.ehdsi.constant.error.TMError;
+import eu.europa.ec.sante.ehdsi.constant.error.TMErrorCtx;
 import eu.europa.ec.sante.ehdsi.openncp.audit.AuditServiceFactory;
 import eu.europa.ec.sante.ehdsi.openncp.tm.config.TMConfiguration;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMResponseStructure;
 import eu.europa.ec.sante.ehdsi.openncp.tm.domain.TMStatus;
 import eu.europa.ec.sante.ehdsi.openncp.tm.exception.TMException;
-import eu.europa.ec.sante.ehdsi.openncp.tm.exception.TmErrorCtx;
 import eu.europa.ec.sante.ehdsi.openncp.tm.service.ITransformationService;
 import eu.europa.ec.sante.ehdsi.openncp.tm.util.*;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -320,7 +320,7 @@ public class TransformationService implements ITransformationService, TMConstant
         }
 
         if (docTypeConstant == null) {
-            throw new TMException(new TmErrorCtx(TMError.ERROR_DOCUMENT_CODE_UNKNOWN, docTypeCode));
+            throw new TMException(new TMErrorCtx(TMError.ERROR_DOCUMENT_CODE_UNKNOWN, docTypeCode));
         }
         return docTypeConstant;
     }
@@ -422,7 +422,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     if (logger.isErrorEnabled()) {
                         logger.error("Required element is missing: '{}'", codedElementListItem);
                     }
-                    errors.add(new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
+                    errors.add(new TMErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_MISSING, codedElementListItem.toString()));
                 } else {
 
                     Element originalElement;
@@ -443,8 +443,8 @@ public class TransformationService implements ITransformationService, TMConstant
                                 // If is required & processing is unsuccessful, report ERROR
                                 if (isRequired && !success) {
                                     String ctx = XmlUtil.getElementPath(originalElement);
-                                    errors.add(isTranscode ? new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
-                                            : new TmErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
+                                    errors.add(isTranscode ? new TMErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSCODED, ctx)
+                                            : new TMErrorCtx(TMError.ERROR_REQUIRED_CODED_ELEMENT_NOT_TRANSLATED, ctx));
                                     logger.error("Required coded element was not translated");
                                 }
                             }
@@ -777,7 +777,7 @@ public class TransformationService implements ITransformationService, TMConstant
                     return true;
                 } else {
                     logger.debug("Element has no \"code or \"codeSystem\" attribute: '{}'", elName);
-                    warnings.add(new TmErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
+                    warnings.add(new TMErrorCtx(TMError.WARNING_MANDATORY_ATTRIBUTES_MISSING, "Element " + elName));
                     return false;
                 }
             }
