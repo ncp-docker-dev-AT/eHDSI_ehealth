@@ -47,7 +47,7 @@ public class TranslationsAndMappingsClient {
                         Charsets.toCharset(encodingHeader.getValue());
 
                 var json = EntityUtils.toString(responseEntity, encoding);
-                LOGGER.error("json : " + json);
+                LOGGER.debug("Generated json response : " + json);
                 var tmResponse = mapper.readValue(json, TMResponseStructure.class);
 
                 LOGGER.debug("TM - TRANSLATION STOP");
