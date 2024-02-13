@@ -1727,6 +1727,8 @@ public enum AuditTrailUtils {
             OpenNCPValidation.validateAuditMessage(convertAuditObjectToXML(auditMessage), eventLog.getEventType(), ncpSide);
         } catch (JAXBException e) {
             LOGGER.error("JAXBException: {}", e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.error("General exception: {}", e.getMessage(), e);
         }
     }
 
