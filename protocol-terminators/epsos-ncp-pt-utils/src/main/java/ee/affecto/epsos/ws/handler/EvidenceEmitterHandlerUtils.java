@@ -1,6 +1,6 @@
 package ee.affecto.epsos.ws.handler;
 
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
+import epsos.ccd.gnomon.auditmanager.EventType;
 import eu.epsos.util.xca.XCAConstants;
 import eu.epsos.util.xcpd.XCPDConstants;
 import eu.epsos.util.xdr.XDRConstants;
@@ -59,25 +59,23 @@ public class EvidenceEmitterHandlerUtils {
 
         Map<String, String> map = new HashMap<>();
         // ITI-55
-        map.put(XCPDConstants.PATIENT_DISCOVERY_REQUEST, IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode());
-        map.put(XCPDConstants.PATIENT_DISCOVERY_RESPONSE, IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode());
+        map.put(XCPDConstants.PATIENT_DISCOVERY_REQUEST, EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getIheCode());
+        map.put(XCPDConstants.PATIENT_DISCOVERY_RESPONSE, EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getIheCode());
 
         // ITI-38: same for PS or eP List
-        map.put(XCAConstants.ADHOC_QUERY_REQUEST, IHEEventType.PATIENT_SERVICE_LIST.getCode());
-        map.put(XCAConstants.ADHOC_QUERY_RESPONSE, IHEEventType.PATIENT_SERVICE_LIST.getCode());
+        map.put(XCAConstants.ADHOC_QUERY_REQUEST, EventType.PATIENT_SERVICE_LIST.getIheCode());
+        map.put(XCAConstants.ADHOC_QUERY_RESPONSE, EventType.PATIENT_SERVICE_LIST.getIheCode());
 
         // ITI-39: same for PS or eP Retrieve
-        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
-        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE, IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode());
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_REQUEST, EventType.PATIENT_SERVICE_RETRIEVE.getIheCode());
+        map.put(XCAConstants.RETRIEVE_DOCUMENT_SET_RESPONSE, EventType.PATIENT_SERVICE_RETRIEVE.getIheCode());
 
         // ITI-41: same for Dispensation Initialize/Discard
-        map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode());
+        map.put(XDRConstants.PROVIDE_AND_REGISTER_DOCUMENT_SET_REQ_STR, EventType.DISPENSATION_SERVICE_INITIALIZE.getIheCode());
 
-        // ITI-41: same for Consent Put/Discard
-        map.put(XDRConstants.DOC_RCP_PRVDANDRGSTDOCSETB_STR, IHEEventType.CONSENT_SERVICE_PUT.getCode());
         // ITI-41: same for Dispensation Initialize/Discard and Consent Put/Discard
 
-        map.put(XDRConstants.REGISTRY_RESPONSE_STR, IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode());
+        map.put(XDRConstants.REGISTRY_RESPONSE_STR, EventType.DISPENSATION_SERVICE_INITIALIZE.getIheCode());
 
         // Portal-NCP interactions
         map.put(CLIENT_CONNECTOR_SUBMIT_DOCUMENT_REQUEST, "PORTAL_PD_REQ");

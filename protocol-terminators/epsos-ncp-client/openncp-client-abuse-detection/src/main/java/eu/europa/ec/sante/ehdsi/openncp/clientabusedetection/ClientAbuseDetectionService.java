@@ -3,7 +3,6 @@ package eu.europa.ec.sante.ehdsi.openncp.clientabusedetection;
 import com.ibatis.common.jdbc.ScriptRunner;
 import epsos.ccd.gnomon.auditmanager.AuditTrailUtils;
 import epsos.ccd.gnomon.auditmanager.EventType;
-import epsos.ccd.gnomon.auditmanager.IHEEventType;
 import eu.europa.ec.sante.ehdsi.constant.ClassCode;
 import eu.europa.ec.sante.ehdsi.openncp.abusedetection.*;
 import eu.europa.ec.sante.ehdsi.openncp.util.OpenNCPConstants;
@@ -376,7 +375,7 @@ public class ClientAbuseDetectionService implements Job {
                 boolean evtPresent = false;
                 AbuseTransactionType transactionType = AbuseTransactionType.TRANSACTION_UNKNOWN;
                 if (StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getCode()) &&
+                        EventType.IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -385,7 +384,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCPD_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
+                        EventType.PATIENT_SERVICE_LIST.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -398,7 +397,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
+                        EventType.PATIENT_SERVICE_RETRIEVE.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -411,7 +410,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.PATIENT_SERVICE_LIST.getCode()) &&
+                        EventType.PATIENT_SERVICE_LIST.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -424,7 +423,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode()) &&
+                        EventType.PATIENT_SERVICE_RETRIEVE.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -437,7 +436,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode()) &&
+                        EventType.DISPENSATION_SERVICE_INITIALIZE.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -450,7 +449,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XDR_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.ORCD_SERVICE_LIST.getCode()) &&
+                        EventType.ORCD_SERVICE_LIST.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
@@ -459,7 +458,7 @@ public class ClientAbuseDetectionService implements Job {
                     transactionType = AbuseTransactionType.XCA_SERVICE_REQUEST;
                 }
                 if (!evtPresent && StringUtils.equals(au.getEventIdentification().getEventID().getCsdCode(),
-                        IHEEventType.ORCD_SERVICE_RETRIEVE.getCode()) &&
+                        EventType.ORCD_SERVICE_RETRIEVE.getIheCode()) &&
                         au.getEventIdentification().getEventTypeCode()
                                 .stream()
                                 .anyMatch(c -> StringUtils.equals(c.getCsdCode(),
