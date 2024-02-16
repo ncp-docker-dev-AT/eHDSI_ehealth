@@ -233,7 +233,7 @@ public abstract class AbstractAuditMessageBuilder {
             ParticipantObjectIDTypeCode codedValueType = new ParticipantObjectIDTypeCode();
             codedValueType.setCsdCode(errorMessageTypeCode);
             codedValueType.setOriginalText("error message");
-            codedValueType.setCodeSystemName("DCM");
+            codedValueType.setCodeSystemName("eHealth DSI Security");
 
             ParticipantObjectIdentificationContents participantObjectIdentificationType = new ParticipantObjectIdentificationContents();
             participantObjectIdentificationType.setParticipantObjectID(errorMessagePartObjectId);
@@ -403,6 +403,7 @@ public abstract class AbstractAuditMessageBuilder {
                         .codeSystemName(eventType.getCode())
                         .csdCode("SMP")
                         .displayName("SMP::Query")
+                        .originalText("SMP::Query")
                         .build();
                 break;
             case SMP_PUSH:
@@ -410,6 +411,7 @@ public abstract class AbstractAuditMessageBuilder {
                         .codeSystemName(eventType.getCode())
                         .csdCode("SMP")
                         .displayName("SMP::Push")
+                        .originalText("SMP::Query")
                         .build();
                 break;
         }
@@ -424,6 +426,7 @@ public abstract class AbstractAuditMessageBuilder {
                         .codeSystemName("EHDSI-193")
                         .csdCode("SMP")
                         .displayName("SMP::Query")
+                        .originalText("SMP::Query")
                         .build();
                 break;
             case SMP_PUSH:
@@ -431,6 +434,7 @@ public abstract class AbstractAuditMessageBuilder {
                         .codeSystemName("EHDSI-194")
                         .csdCode("SMP")
                         .displayName("SMP::Push")
+                        .originalText("SMP::Push")
                         .build();
                 break;
             default:
