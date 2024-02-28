@@ -126,11 +126,9 @@ public class ValidatorUtil {
         // Infer model according to NCP Side and EventCode
         if (ncpSide == NcpSide.NCP_A) {
             if (StringUtils.equals(eventType, "EHDSI-11")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE;
             }
             if (StringUtils.equals(eventType, "EHDSI-94")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
             if (StringUtils.equals(eventType, "EHDSI-21")
@@ -148,32 +146,25 @@ public class ValidatorUtil {
             }
             if (StringUtils.equals(eventType, "EHDSI-41") || StringUtils.equals(eventType, "EHDSI-42")
                     || StringUtils.equals(eventType, "EHDSI-51")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_PROVIDE_DATA_SERVICE_SP;
             }
             if (StringUtils.equals(eventType, "EHDSI-193")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_QUERY;
             }
             if (StringUtils.equals(eventType, "EHDSI-194")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_SMP_SERVICE_CONSUMER_PUSH;
             }
         } else {
-
             if (StringUtils.equals(eventType, "EHDSI-11")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE;
             }
             if (StringUtils.equals(eventType, "EHDSI-94")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_PIVOT_TRANSLATION;
             }
             if (StringUtils.equals(eventType, "ITI-38")
                     || StringUtils.equals(eventType, "ITI-39")
                     || StringUtils.equals(eventType, "EHDSI-95")
                     || StringUtils.equals(eventType, "EHDSI-97")) {
-
                 model = ValidatorUtil.EHDSI_AUDIT_HCP_ASSURANCE;
             }
             if (StringUtils.equals(eventType, "EHDSI-21") || StringUtils.equals(eventType, "EHDSI-22")

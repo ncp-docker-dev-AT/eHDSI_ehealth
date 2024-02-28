@@ -37,7 +37,7 @@ public class EventLog {
     private String EI_EventActionCode;    //  C:create, R:Read,View,Print,Query, U:Update, D:Delete, E:Execute
     private BigInteger EI_EventOutcomeIndicator; // Possible values are: 0:full success,1:partial delivery,4:temporal or recoverable failures,8:permanent failure
     // Event Identification
-    private String EventType;             // one of the available epsos event ids
+    private EventType eventType;
 
     private String queryByParameter;      // Query by parameter
 
@@ -989,12 +989,12 @@ public class EventLog {
         this.eventTargetParticipantObjectIds = eventTargetParticipantObjectIds;
     }
 
-    public String getEventType() {
-        return EventType;
+    public EventType getEventType() {
+        return this.eventType;
     }
 
-    public void setEventType(EventType EventType) {
-        this.EventType = EventType.getCode();
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
     public byte[] getEM_ParticipantObjectDetail() {
@@ -1167,7 +1167,7 @@ public class EventLog {
                 .append("EI_EventDateTime", EI_EventDateTime)
                 .append("EI_EventActionCode", EI_EventActionCode)
                 .append("EI_EventOutcomeIndicator", EI_EventOutcomeIndicator)
-                .append("EventType", EventType)
+                .append("EventType", eventType)
                 .append("PC_UserID", PC_UserID)
                 .append("PC_RoleID", PC_RoleID)
                 .append("HR_UserID", HR_UserID)

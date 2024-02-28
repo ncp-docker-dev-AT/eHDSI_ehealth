@@ -135,11 +135,6 @@ public class EventLogUtil {
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_LIST);
                 eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
-            case MRO_CLASSCODE:
-                eventLog.setEventType(EventType.MRO_LIST);
-                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
-                break;
         }
 
         eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
@@ -231,11 +226,6 @@ public class EventLogUtil {
                 eventLog.setEventType(EventType.ORCD_SERVICE_RETRIEVE);
                 eventLog.setEI_TransactionName(TransactionName.ORCD_SERVICE_RETRIEVE);
                 eventLog.setEI_EventActionCode(EventActionCode.CREATE);
-                break;
-            case MRO_CLASSCODE:
-                eventLog.setEventType(EventType.MRO_RETRIEVE);
-                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
                 break;
         }
 
@@ -378,20 +368,7 @@ public class EventLogUtil {
             }
         }
         LOGGER.info("EventLogUtil: '{}'", classCode);
-        if (StringUtils.equals(classCode, ClassCode.CONSENT_CLASSCODE.getCode()) && eventCode != null) {
-
-            if (eventCode.endsWith(Constants.CONSENT_PUT_SUFFIX)) {
-
-                eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
-                eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
-                eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
-            } else if (eventCode.endsWith(Constants.CONSENT_DISCARD_SUFFIX)) {
-
-                eventLog.setEventType(EventType.CONSENT_SERVICE_DISCARD);
-                eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_DISCARD);
-                eventLog.setEI_EventActionCode(EventActionCode.DELETE);
-            }
-        } else if (StringUtils.equals(classCode, ClassCode.ED_CLASSCODE.getCode())) {
+        if (StringUtils.equals(classCode, ClassCode.ED_CLASSCODE.getCode())) {
             eventLog.setEventType(EventType.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_TransactionName(TransactionName.DISPENSATION_SERVICE_INITIALIZE);
             eventLog.setEI_EventActionCode(EventActionCode.READ);
