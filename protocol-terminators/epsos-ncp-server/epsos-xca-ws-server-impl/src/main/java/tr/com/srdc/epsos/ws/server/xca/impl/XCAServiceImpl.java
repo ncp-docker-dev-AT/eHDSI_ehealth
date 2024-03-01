@@ -151,11 +151,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_LIST);
                 eventLog.setEI_EventActionCode(EventActionCode.EXECUTE);
                 break;
-            case MRO_CLASSCODE:
-                eventLog.setEventType(EventType.MRO_LIST);
-                eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_LIST);
-                eventLog.setEI_EventActionCode(EventActionCode.READ);
-                break;
             case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
             case ORCD_LABORATORY_RESULTS_CLASSCODE:
             case ORCD_MEDICAL_IMAGING_REPORTS_CLASSCODE:
@@ -255,11 +250,6 @@ public class XCAServiceImpl implements XCAServiceInterface {
                 case PS_CLASSCODE:
                     eventLog.setEventType(EventType.PATIENT_SERVICE_RETRIEVE);
                     eventLog.setEI_TransactionName(TransactionName.PATIENT_SERVICE_RETRIEVE);
-                    eventLog.setEI_EventActionCode(EventActionCode.READ);
-                    break;
-                case MRO_CLASSCODE:
-                    eventLog.setEventType(EventType.MRO_RETRIEVE);
-                    eventLog.setEI_TransactionName(TransactionName.MRO_SERVICE_RETRIEVE);
                     eventLog.setEI_EventActionCode(EventActionCode.READ);
                     break;
                 case ORCD_HOSPITAL_DISCHARGE_REPORTS_CLASSCODE:
@@ -534,7 +524,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                     Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
                     Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                     Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH, Constants.NCP_SIG_KEYSTORE_PASSWORD,
-                    Constants.NCP_SIG_PRIVATEKEY_ALIAS, IHEEventType.PATIENT_SERVICE_LIST.getCode(), new DateTime(),
+                    Constants.NCP_SIG_PRIVATEKEY_ALIAS, EventType.PATIENT_SERVICE_LIST.getIheCode(), new DateTime(),
                     EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_LIST_REQ", messageUUID);
         } catch (Exception e) {
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -891,7 +881,7 @@ public class XCAServiceImpl implements XCAServiceInterface {
                         Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                         Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
                         Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.PATIENT_SERVICE_RETRIEVE.getCode(), new DateTime(),
+                        EventType.PATIENT_SERVICE_RETRIEVE.getIheCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XCA_RETRIEVE_REQ",
                         Helper.getTRCAssertion(soapHeaderElement).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {

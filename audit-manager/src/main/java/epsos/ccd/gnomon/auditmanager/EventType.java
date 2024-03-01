@@ -1,67 +1,59 @@
 package epsos.ccd.gnomon.auditmanager;
 
-/**
- * Enumeration for populating the EventType of the AuditMessage.
- * One of the available eHDSI event ids:
- * <p>
- * EHDSI-11:    epsosIdentificationService
- * EHDSI-21:    epsosPatientServiceList
- * EHDSI-22:    epsosPatientServiceRetrieve
- * EHDSI-31:    epsosOrderServiceList
- * EHDSI-32:    epsosOrderServiceRetrieve
- * EHDSI-41:    epsosDispensationServiceInitialize
- * EHDSI-42:    epsosDispensationServiceDiscard
- * EHDSI-51:    epsosConsentServicePut
- * EHDSI-52:    epsosConsentServiceDiscard
- * EHDSI-53:    epsosConsentServicePin
- * EHDSI-91:    epsosHcpAuthentication
- * EHDSI-92:    epsosTRCAssertion
- * EHDSI-93:    epsosNCPTrustedServiceList
- * EHDSI-94:    epsosPivotTranslation
- * EHDSI-95:    epsosPACRetrieve
- * EHDSI-96:    epsosHCERPut
- * EHDSI-193:   ehealthSMPQuery
- * EHDSI-194:   ehealthSMPPush
- * EHDSI-CF:    epsosCommunicationFailure
- * ITI-38:      epsosMroList
- * ITI-39       epsosMroRetrieve
- *
- * @author Kostas Karkaletsis
- */
+import epsos.ccd.gnomon.auditmanager.auditmessagebuilders.*;
+import net.RFC3881.AuditMessage;
+
 public enum EventType {
 
-    IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("EHDSI-11"),
-    PATIENT_SERVICE_LIST("EHDSI-21"),
-    PATIENT_SERVICE_RETRIEVE("EHDSI-22"),
-    ORDER_SERVICE_LIST("EHDSI-31"),
-    ORDER_SERVICE_RETRIEVE("EHDSI-32"),
-    ORCD_SERVICE_LIST("EHDSI-61"),
-    ORCD_SERVICE_RETRIEVE("EHDSI-62"),
-    DISPENSATION_SERVICE_INITIALIZE("EHDSI-41"),
-    DISPENSATION_SERVICE_DISCARD("EHDSI-42"),
-    CONSENT_SERVICE_PUT("EHDSI-51"),
-    CONSENT_SERVICE_DISCARD("EHDSI-52"),
-    CONSENT_SERVICE_PIN("EHDSI-53"),
-    HCP_AUTHENTICATION("EHDSI-91"),
-    TRC_ASSERTION("EHDSI-92"),
-    NOK_ASSERTION("EHDSI-96"),
-    NCP_TRUSTED_SERVICE_LIST("EHDSI-93"),
-    PIVOT_TRANSLATION("EHDSI-94"),
-    PAC_RETRIEVE("EHDSI-95"),
-    HCER_PUT("EHDSI-97"),
-    SMP_QUERY("EHDSI-193"),
-    SMP_PUSH("EHDSI-194"),
-    MRO_LIST("ITI-38"),
-    MRO_RETRIEVE("ITI-39"),
-    COMMUNICATION_FAILURE("EHDSI-CF");
+    IDENTIFICATION_SERVICE_FIND_IDENTITY_BY_TRAITS("EHDSI-11", "ITI-55", "XCPD::CrossGatewayPatientDiscovery", new IdentificationServiceAuditMessageBuilder()),
+    PATIENT_SERVICE_LIST("EHDSI-21", "ITI-38", "XCA::CrossGatewayQuery", new XCAListAuditMessageBuilder()),
+    PATIENT_SERVICE_RETRIEVE("EHDSI-22", "ITI-39", "XCA::CrossGatewayRetrieve", new XCARetrieveAuditMessageBuilder()),
+    ORDER_SERVICE_LIST("EHDSI-31", "ITI-38", "XCA::CrossGatewayQuery", new XCAListAuditMessageBuilder()),
+    ORDER_SERVICE_RETRIEVE("EHDSI-32","ITI-39", "XCA::CrossGatewayRetrieve", new XCARetrieveAuditMessageBuilder()),
+    ORCD_SERVICE_LIST("EHDSI-61", "ITI-38", "XCA::CrossGatewayQuery", new XCAListAuditMessageBuilder()),
+    ORCD_SERVICE_RETRIEVE("EHDSI-62","ITI-39", "XCA::CrossGatewayRetrieve", new XCARetrieveAuditMessageBuilder()),
+    DISPENSATION_SERVICE_INITIALIZE("EHDSI-41", "ITI-41", "XDR::ProvideandRegisterDocumentSet-b", new DispensationServiceAuditMessageBuilder()),
+    DISPENSATION_SERVICE_DISCARD("EHDSI-42", "ITI-41", "XDR::ProvideandRegisterDocumentSet-b", new DispensationDiscardServiceAuditMessageBuilder()),
+    HCP_AUTHENTICATION("EHDSI-91", "ITI-40", "XUA::ProvideX-UserAssertion", new HCPAuthenticationAuditMessageBuilder()),
+    TRC_ASSERTION("EHDSI-92", "EHDSI-92", "ncp::TrcAssertion", new TRCAssertionAuditMessageBuilder()),
+    NOK_ASSERTION("EHDSI-96", "EHDSI-96", "ncp::NokAssertion", new NOKAssertionAuditMessageBuilder()),
+    NCP_TRUSTED_SERVICE_LIST("EHDSI-93", "EHDSI-93", "ncpConfigurationManager::ImportNSL", new NCPTrustedServiceListAuditMessageBuilder()),
+    PIVOT_TRANSLATION("EHDSI-94", "EHDSI-94", "ncpTransformationMgr::Translate", new PivotTranslationAuditMessageBuilder()),
+    SMP_QUERY("EHDSI-193", "EHDSI-193", "SMP::Query", new SMPAuditMessageBuilder()),
+    SMP_PUSH("EHDSI-194", "EHDSI-194", "SMP::Push", new SMPAuditMessageBuilder()),
+    COMMUNICATION_FAILURE("EHDSI-CF", "EHDSI-CF", "epsosCommunicationFailure", new CommunicationFailureAuditMessageBuilder());
 
     private final String code;
+    private final String iheCode;
+    private final String iheTransactionName;
 
-    EventType(String c) {
-        code = c;
-    }
+    private final AuditMessageBuilder builder;
 
     public String getCode() {
         return code;
+    }
+
+    public String getIheCode() {
+        return iheCode;
+    }
+
+    public String getIheTransactionName() {
+        return iheTransactionName;
+    }
+
+    public AuditMessageBuilder getBuilder() { return builder; }
+
+    EventType(String code,
+              String iheCode,
+              String iheTransactionName,
+              AuditMessageBuilder builder) {
+        this.code = code;
+        this.iheCode = iheCode;
+        this.iheTransactionName = iheTransactionName;
+        this.builder = builder;
+    }
+
+    public AuditMessage buildAuditMessage(EventLog eventLog) {
+        return getBuilder().build(eventLog);
     }
 }

@@ -219,63 +219,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
     }
 
-    /**
-     * Prepare audit log for the consent service, put() operation, i.e. consent submission.
-     *
-     * @param eventLog
-     * @param request
-     * @param response
-     * @param soapHeader
-     */
-    public void prepareEventLogForConsentPut(EventLog eventLog, ProvideAndRegisterDocumentSetRequestType request,
-                                             RegistryResponseType response, Element soapHeader) {
-
-        eventLog.setEventType(EventType.CONSENT_SERVICE_PUT);
-        eventLog.setEI_TransactionName(TransactionName.CONSENT_SERVICE_PUT);
-        eventLog.setEI_EventActionCode(EventActionCode.UPDATE);
-        eventLog.setEI_EventDateTime(DATATYPE_FACTORY.newXMLGregorianCalendar(new GregorianCalendar()));
-
-        if (request.getSubmitObjectsRequest().getRegistryObjectList() != null) {
-
-            for (int i = 0; i < request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().size(); i++) {
-
-                if (!(request.getSubmitObjectsRequest().getRegistryObjectList().getIdentifiable().get(i).getValue()
-                        instanceof ExtrinsicObjectType)) {
-                    continue;
-                }
-                ExtrinsicObjectType eot = (ExtrinsicObjectType) request.getSubmitObjectsRequest().getRegistryObjectList()
-                        .getIdentifiable().get(i).getValue();
-                String documentId = "";
-                for (ExternalIdentifierType eit : eot.getExternalIdentifier()) {
-                    if (StringUtils.equals(eit.getIdentificationScheme(), XDRConstants.EXTRINSIC_OBJECT.XDSDOC_UNIQUEID_SCHEME)) {
-                        documentId = eit.getValue();
-                    }
-                }
-                eventLog.getEventTargetParticipantObjectIds().add(documentId);
-                break;
-            }
-        }
-
-        if (response.getRegistryErrorList() != null) {
-            eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.PERMANENT_FAILURE);
-        } else {
-            eventLog.setEI_EventOutcomeIndicator(EventOutcomeIndicator.FULL_SUCCESS);
-        }
-        String userIdAlias = Helper.getAssertionsSPProvidedId(soapHeader);
-        eventLog.setHR_UserID(StringUtils.isNotBlank(userIdAlias) ? userIdAlias : ""
-                + "<" + Helper.getUserID(soapHeader) + "@" + Helper.getAssertionsIssuer(soapHeader) + ">");
-        eventLog.setHR_AlternativeUserID(Helper.getAlternateUserID(soapHeader));
-        eventLog.setHR_RoleID(Helper.getRoleID(soapHeader));
-        eventLog.setSP_UserID(HTTPUtil.getSubjectDN(true));
-        eventLog.setPT_ParticipantObjectID(getDocumentEntryPatientId(request));
-        eventLog.setAS_AuditSourceId(Constants.COUNTRY_PRINCIPAL_SUBDIVISION);
-
-        if (response.getRegistryErrorList() != null) {
-            RegistryError re = response.getRegistryErrorList().getRegistryError().get(0);
-            eventLog.setEM_ParticipantObjectID(re.getErrorCode());
-            eventLog.setEM_ParticipantObjectDetail(re.getCodeContext().getBytes());
-        }
-    }
 
     private String getDocumentEntryPatientId(ProvideAndRegisterDocumentSetRequestType request) {
 
@@ -394,7 +337,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                         Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                         Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
                         Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                        IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode(), new DateTime(),
+                        EventType.DISPENSATION_SERVICE_INITIALIZE.getIheCode(), new DateTime(),
                         EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
                         Objects.requireNonNull(Helper.getTRCAssertion(soapHeaderElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
             } catch (Exception e) {
@@ -593,7 +536,7 @@ public class XDRServiceImpl implements XDRServiceInterface {
                                 Constants.SP_KEYSTORE_PATH, Constants.SP_KEYSTORE_PASSWORD,
                                 Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
                                 Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                                IHEEventType.DISPENSATION_SERVICE_INITIALIZE.getCode(), new DateTime(),
+                                EventType.DISPENSATION_SERVICE_INITIALIZE.getIheCode(), new DateTime(),
                                 EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_DISP_REQ",
                                 Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
                     } catch (Exception e) {
@@ -688,160 +631,6 @@ public class XDRServiceImpl implements XDRServiceInterface {
         }
 
         return reportDocumentTypeError(request);
-    }
-
-    /**
-     * @param request
-     * @param sh
-     * @param eventLog
-     * @return
-     */
-    public RegistryResponseType saveConsent(ProvideAndRegisterDocumentSetRequestType request, SOAPHeader
-            sh, EventLog eventLog) {
-
-        RegistryResponseType response = new RegistryResponseType();
-        String sealCountryCode = null;
-
-        Element shElement = null;
-        try {
-            shElement = XMLUtils.toDOM(sh);
-        } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
-        }
-        documentSubmitService.setSOAPHeader(shElement);
-
-        RegistryErrorList rel = ofRs.createRegistryErrorList();
-        try {
-            sealCountryCode = SAML2Validator.validateXDRHeader(shElement, ClassCode.CONSENT_CLASSCODE);
-
-        } catch (OpenNCPErrorCodeException e) {
-            logger.error("OpenncpErrorCodeException: '{}'", e.getMessage(), e);
-            RegistryErrorUtils.addErrorMessage(
-                    rel,
-                    e.getErrorCode(),
-                    e.getMessage(),
-                    e.getLocalizedMessage(),
-                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
-        } catch (SMgrException e) {
-            logger.error("SMgrException: '{}'", e.getMessage(), e);
-            RegistryErrorUtils.addErrorMessage(
-                    rel,
-                    OpenNCPErrorCode.ERROR_SEC_GENERIC,
-                    e.getMessage(),
-                    e.getLocalizedMessage(),
-                    RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
-        }
-
-        String fullPatientId = getDocumentEntryPatientId(request);
-        if (OpenNCPConstants.NCP_SERVER_MODE != ServerMode.PRODUCTION && loggerClinical.isDebugEnabled()) {
-            loggerClinical.info("Received a eConsent document for patient: '{}'", fullPatientId);
-        }
-        /*
-         * Here PDP checks and related calls are skipped, necessary checks to be performed in the NI while processing
-         * the consent document.
-         */
-        try {
-            shElement = XMLUtils.toDOM(sh);
-        } catch (Exception e) {
-            logger.error("Exception: '{}'", e.getMessage(), e);
-        }
-
-        for (int i = 0; i < request.getDocument().size(); i++) {
-            Document doc = request.getDocument().get(i);
-            byte[] docBytes = doc.getValue();
-            try {
-
-                /* Validate CDA epSOS Pivot */
-                if (OpenNCPValidation.isValidationEnable()) {
-                    OpenNCPValidation.validateCdaDocument(new String(doc.getValue(), StandardCharsets.UTF_8),
-                            NcpSide.NCP_A, obtainClassCode(request), true);
-                }
-
-                //Resets the response document to a translated version.
-                //Resets the response document to a translated version.
-                TMResponseStructure tmResponseStructure = TranslationsAndMappingsClient.transcode(DomUtils.byteToDocument(docBytes));
-                org.w3c.dom.Document domDocument = Base64Util.decode(tmResponseStructure.getResponseCDA());
-                docBytes = XMLUtils.toOM(domDocument.getDocumentElement()).toString().getBytes(StandardCharsets.UTF_8);
-
-
-                /* Validate CDA epSOS Pivot */
-                if (OpenNCPValidation.isValidationEnable()) {
-                    OpenNCPValidation.validateCdaDocument(new String(docBytes, StandardCharsets.UTF_8),
-                            NcpSide.NCP_A, obtainClassCode(request), true);
-                }
-
-            } catch (DocumentTransformationException ex) {
-                logger.error(ex.getLocalizedMessage(), ex);
-            } catch (Exception ex) {
-                logger.error(null, ex);
-            }
-            try {
-                org.w3c.dom.Document domDocument = DomUtils.byteToDocument(docBytes);
-                EPSOSDocument epsosDocument = DocumentFactory.createEPSOSDocument(fullPatientId, ClassCode.CONSENT_CLASSCODE, domDocument);
-
-                // Evidence for call to NI for XDR submit (patient consent)
-                // Joao: here we have a Document, so we can generate the mandatory NRO
-                try {
-                    EvidenceUtils.createEvidenceREMNRO(epsosDocument.getDocument(), Constants.NCP_SIG_KEYSTORE_PATH,
-                            Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS, Constants.SP_KEYSTORE_PATH,
-                            Constants.SP_KEYSTORE_PASSWORD, Constants.SP_PRIVATEKEY_ALIAS, Constants.NCP_SIG_KEYSTORE_PATH,
-                            Constants.NCP_SIG_KEYSTORE_PASSWORD, Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-                            IHEEventType.CONSENT_SERVICE_PUT.getCode(), new DateTime(),
-                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(), "NI_XDR_CONSENT_REQ",
-                            Objects.requireNonNull(Helper.getTRCAssertion(shElement)).getID() + "__" + DateUtil.getCurrentTimeGMT());
-                } catch (Exception e) {
-                    logger.error(ExceptionUtils.getStackTrace(e));
-                }
-
-                documentSubmitService.submitPatientConsent(epsosDocument);
-                // Evidence for response from NI for XDR submit (patient consent)
-                /* Joao: the NRR is being generated based on the request message (submitted document). The interface for document submission does not return
-                    any response for the submit service. This NRR is optional as per the CP. Left commented for now. */
-//                try {
-//                    EvidenceUtils.createEvidenceREMNRR(epsosDocument.toString(),
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PATH,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_KEYSTORE_PASSWORD,
-//                            tr.com.srdc.epsos.util.Constants.NCP_SIG_PRIVATEKEY_ALIAS,
-//                            IHEEventType.epsosConsentServicePut.getCode(),
-//                            new DateTime(),
-//                            EventOutcomeIndicator.FULL_SUCCESS.getCode().toString(),
-//                            "NI_XDR_CONSENT_RES",
-//                            Helper.getDocumentEntryPatientIdFromTRCAssertion(shElement) + "__" + DateUtil.getCurrentTimeGMT());
-//                } catch (Exception e) {
-//                    logger.error(ExceptionUtils.getStackTrace(e));
-//                }
-            } catch (DocumentProcessingException e) {
-                logger.error("DocumentProcessingException: '{}'", e.getMessage(), e);
-                RegistryErrorUtils.addErrorMessage(
-                        rel,
-                        e.getOpenncpErrorCode(),
-                        e.getMessage(),
-                        e.getLocalizedMessage(),
-                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
-            } catch (Exception e) {
-                logger.error("Exception: '{}'", e.getMessage(), e);
-                RegistryErrorUtils.addErrorMessage(
-                        rel,
-                        OpenNCPErrorCode.ERROR_ED_GENERIC,
-                        e.getMessage(),
-                        e.getLocalizedMessage(),
-                        RegistryErrorSeverity.ERROR_SEVERITY_ERROR);
-            }
-        }
-        if (!rel.getRegistryError().isEmpty()) {
-            response.setRegistryErrorList(rel);
-            response.setStatus(AdhocQueryResponseStatus.FAILURE);
-        } else {
-            response.setStatus(AdhocQueryResponseStatus.SUCCESS);
-        }
-
-        try {
-            prepareEventLogForConsentPut(eventLog, request, response, shElement);
-        } catch (Exception ex) {
-            logger.error(null, ex);
-            // Is this fatal?
-        }
-        return response;
     }
 
     protected String validateXDRHeader(Element sh, ClassCode classCode) throws MissingFieldException, InvalidFieldException,

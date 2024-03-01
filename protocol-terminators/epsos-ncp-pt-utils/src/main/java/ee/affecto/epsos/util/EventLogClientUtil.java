@@ -146,7 +146,7 @@ public class EventLogClientUtil {
 
         for (AttributeStatement attributeStatement : idAssertion.getAttributeStatements()) {
             for (Attribute attribute : attributeStatement.getAttributes()) {
-                if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xacml:1.0:resource:resource-id")) {
+                if (StringUtils.equalsIgnoreCase(attribute.getName(), "urn:oasis:names:tc:xspa:1.0:subject:subject-id")) {
                     eventLog.setPT_ParticipantObjectID(EventLogUtil.getAttributeValue(attribute));
                     break;
                 }
