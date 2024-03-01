@@ -1,12 +1,15 @@
 variables:
   MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
 
+include:
+    - project: 'digit.s.1/sa/security-scan-template'
+      file: '.gitlab-ci-security-scan-mvn.yml'
+
 stages:
     - build
     - test
     - package
     - deploy
-
 
 cache:
   paths:
@@ -21,7 +24,6 @@ build_job:
   script: 
     - echo "Maven compile started"
     - "mvn compile"
-
 
 test_job:
   stage: test

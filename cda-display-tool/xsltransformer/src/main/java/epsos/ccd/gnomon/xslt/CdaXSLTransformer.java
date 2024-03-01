@@ -2,7 +2,7 @@ package epsos.ccd.gnomon.xslt;
 
 import epsos.ccd.gnomon.xslt.exceptions.TerminologyFileNotFoundException;
 import epsos.ccd.gnomon.xslt.exceptions.UITransformationException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
