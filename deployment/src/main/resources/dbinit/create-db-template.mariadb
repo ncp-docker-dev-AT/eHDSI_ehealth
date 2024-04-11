@@ -1,0 +1,31 @@
+CREATE DATABASE IF NOT EXISTS `ehealth_properties`;
+CREATE DATABASE IF NOT EXISTS `ehealth_eadc`;
+CREATE DATABASE IF NOT EXISTS `ehealth_ltrdb`;
+CREATE DATABASE IF NOT EXISTS `ehealth_atna`;
+
+CREATE USER 'openncp'@'localhost' IDENTIFIED BY 'local';
+GRANT ALL PRIVILEGES ON *.* TO 'openncp'@'%';
+
+SET autocommit=0;
+SET foreign_key_checks=0;
+
+-- ehealth_properties
+USE ehealth_properties;
+
+@openncp-properties-schema@
+@openncp-properties-data@
+
+-- ehealth_eadc transactions
+use ehealth_eadc;
+
+@openncp-eadc-schema@
+
+-- ehealth_ltrdb terminology imports
+USE ehealth_ltrdb;
+
+@openncp-ltrdb-schema@
+
+-- ehealth_atna terminology imports
+USE ehealth_atna;
+
+@openncp-atna-schema@

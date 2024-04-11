@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.europa.ec.sante.ehdsi</groupId>
+        <artifactId>openncp</artifactId>
+        <version>7.1.0</version>
+    </parent>
+
+    <artifactId>docker-compose-deployment</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <ehealth-portal.git.repo>https://code.europa.eu/ehdsi/ehealth-portal.git</ehealth-portal.git.repo>
+        <ehealth-portal.git.branch>master</ehealth-portal.git.branch>
+        <openncp.properties>${project.basedir}/openncp-configuration/openncp-configuration.properties
+        </openncp.properties>
+        <db.dialect>mariadb</db.dialect>
+        <liquibase.dialect>mysql</liquibase.dialect>
+        <admin.username>admin</admin.username>
+        <admin.email>ncpadmin@ehealth.gv.eu</admin.email>
+        <admin.password>openncp1234</admin.password>
+    </properties>
+
+    <name>Docker Deployment</name>
+
+    <repositories>
+        <repository>
+            <id>project-repository</id>
+            <url>file://${project.basedir}/repository</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-configuration-init</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-database-initializer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
+            <artifactId>openncp-ws-server</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client</groupId>
+            <artifactId>openncp-client-connector</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server</groupId>
+            <artifactId>openncp-nc-mock-it</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
+            <artifactId>openatna-web</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>translations-and-mappings-ws</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-trc-sts</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-gateway-backend</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-gateway-frontend</artifactId>
+            <version>${project.version}</version>
+            <classifier>dist</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-configuration-utility</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi</groupId>
+            <artifactId>openncp-tsam-sync</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.sante.ehdsi.openncp-cdadisplaytool</groupId>
+            <artifactId>openncp-tsamexporter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt-cli</artifactId>
+            <version>0.10.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>20.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js-scriptengine</artifactId>
+            <version>20.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mariadb.com/kb/en/about-mariadb-connector-j/#java-compatibility -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>9.0.83</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>openncp-tomcat-deployment</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <stripVersion>true</stripVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>unpack-openncp-gateway-frontend</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>eu.europa.ec.sante.ehdsi</includeGroupIds>
+                            <includeArtifactIds>openncp-gateway-frontend</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/artifacts/openncp-officer</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-mariadb-java-client</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mariadb.jdbc</groupId>
+                                    <artifactId>mariadb-java-client</artifactId>
+                                    <version>3.2.0</version>
+                                    <outputDirectory>${project.build.outputDirectory}/tomcat/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-slf4j-api</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.slf4j</groupId>
+                                    <artifactId>slf4j-api</artifactId>
+                                    <version>1.7.36</version>
+                                    <outputDirectory>${project.build.outputDirectory}/tomcat/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hikaricp</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.zaxxer</groupId>
+                                    <artifactId>HikariCP</artifactId>
+                                    <version>4.0.3</version>
+                                    <outputDirectory>${project.build.outputDirectory}/tomcat/lib</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-gateway-backend</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>openncp-gateway-backend</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer/openncp-gateway-backend
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-trc-sts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>openncp-trc-sts</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>${project.build.directory}/artifacts/openncp-officer/TRC-STS
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-client-connector</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>
+                                        eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-client
+                                    </groupId>
+                                    <artifactId>openncp-client-connector</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-b/openncp-client-connector
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-openatna-web</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi.openncp-openatna</groupId>
+                                    <artifactId>openatna-web</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>${project.build.directory}/artifacts/openncp-officer/openatna-web
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-translations-and-mappings-ws</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>translations-and-mappings-ws</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer/translations-and-mappings-ws
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-ws-server</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>
+                                        eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server
+                                    </groupId>
+                                    <artifactId>openncp-ws-server</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <outputDirectory>${project.build.directory}/artifacts/openncp-a/openncp-ws-server
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-configuration-utility</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>openncp-configuration-utility</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer/openncp-configuration-utility
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-nc-mock-it</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>
+                                        eu.europa.ec.sante.ehdsi.openncp-protocol-terminators.openncp-ncp-server
+                                    </groupId>
+                                    <artifactId>openncp-nc-mock-it</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${project.build.directory}/artifacts/openncp-a</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-tsam-sync</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>openncp-tsam-sync</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer/openncp-tsam-sync
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-tsam-exporter</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi.openncp-cdadisplaytool</groupId>
+                                    <artifactId>openncp-tsamexporter</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer/openncp-tsam-exporter
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-configuration-init</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>eu.europa.ec.sante.ehdsi</groupId>
+                                    <artifactId>openncp-configuration-init</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>
+                                        ${project.build.directory}/artifacts/openncp-officer
+                                    </outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/main/resources/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                                <tstamp>
+                                    <format property="DATE_TIME" pattern="ddMMyyyy-HHmmss"
+                                            locale="de,AT"/>
+                                </tstamp>
+
+                                <!-- generate initial configuration directory -->
+                                <unzip src="${project.build.directory}/artifacts/openncp-officer/openncp-configuration-init.jar"
+                                       dest="${project.build.directory}/artifacts/openncp-officer/test">
+                                    <patternset>
+                                        <include name="**/config/**"/>
+                                    </patternset>
+                                </unzip>
+                                <move quiet="true" failonerror="false"
+                                      file="${project.build.directory}/artifacts/openncp-officer/test/BOOT-INF/classes/config"
+                                      tofile="${project.build.directory}/artifacts/openncp-officer/openncp-configuration"/>
+                                <replace
+                                        dir="${project.build.directory}/artifacts/openncp-officer/openncp-configuration"
+                                        value="@missing@">
+                                    <include name="**/*.*"/>
+                                    <replacefilter token="org.hibernate.dialect.MySQL8Dialect"
+                                                   value="org.hibernate.dialect.MariaDBDialect"/>
+                                    <replacefilter token="org.hibernate.dialect.MySQL5InnoDBDialect"
+                                                   value="org.hibernate.dialect.MariaDBDialect"/>
+                                    <replacefilter token="com.mysql.jdbc.Driver" value="org.mariadb.jdbc.Driver"/>
+                                    <replacefilter token="jdbc:mysql://hostname:3306/openatna"
+                                                   value="jdbc:mariadb://openncp-db:3306/ehealth_atna"/>
+                                    <replacefilter token="jdbc:mysql://127.0.0.1:3307/"
+                                                   value="jdbc:mariadb://openncp-db:3306/"/>
+                                    <replacefilter token="db.username=username" value="db.username=openncp"/>
+                                    <replacefilter token="db.password=password" value="db.password=openncp1234"/>
+                                </replace>
+                                <delete dir="${project.build.directory}/artifacts/openncp-officer/test"/>
+
+                                <!-- change ws-server urls as defined in the documentation
+                                <property file="${openncp.properties}" prefix="pre"/>
+                                <script language="javascript" classpath="${compile_classpath}">
+                                    project.setProperty("pre.COUNTRY_CODE" , project.getProperty( "pre.COUNTRY_CODE").toLowerCase());
+                                </script>
+                                <propertyfile file="${openncp.properties}">
+                                    <entry key="_VERSION" value="v${DATE_TIME}"/>
+                                    <entry key="secman.nextOfKin.url" value="https://openncp-officer:8443/TRC-STS/NextOfKinService"/>
+                                    <entry key="secman.sts.url" value="https://openncp-officer:8443/TRC-STS/STSServiceService"/>
+                                    <entry key="PORTAL_CLIENT_CONNECTOR_URL" value="https://openncp-b:8443/openncp-client-connector/services/ClientConnectorService"/>
+                                    <entry key="${pre.COUNTRY_CODE}.PatientIdentificationService.WSE" value="https://openncp-a:8443/openncp-ws-server/services/XCPD_Service"/>
+                                    <entry key="${pre.COUNTRY_CODE}.OrderService.WSE" value="https://openncp-a:8443/openncp-ws-server/services/XCA_Service"/>
+                                    <entry key="${pre.COUNTRY_CODE}.PatientService.WSE" value="https://openncp-a:8443/openncp-ws-server/services/XCA_Service"/>
+                                    <entry key="${pre.COUNTRY_CODE}.OrCDService.WSE" value="https://openncp-a:8443/openncp-ws-server/services/XCA_Service"/>
+                                    <entry key="${pre.COUNTRY_CODE}.DispensationService.WSE" value="https://openncp-a:8443/openncp-ws-server/services/XDR_Service"/>
+                                </propertyfile>
+                                -->
+                                <!-- replace escape characters after saving
+                                <replaceregexp file="${openncp.properties}" match="\\:" replace=":" byline="true" flags="mg"/>
+                                <replaceregexp file="${openncp.properties}" match="\\," replace="," byline="true" flags="mg"/>
+                                <replaceregexp file="${openncp.properties}" match="\\!" replace="!" byline="true" flags="mg"/>
+                                <replaceregexp file="${openncp.properties}" match="\\t" replace="" byline="true" flags="mg"/>
+                                -->
+                                <!-- re-load properties
+                                <property file="${openncp.properties}"/>
+                                <echo message="OpenNCP Configuration Properties loaded from '${openncp.properties}'"/>
+                                -->
+
+                                <!-- generate admin password hash -->
+                                <property name="database.dialect" value="${db.dialect}"/>
+                                <property name="admin.username" value="${admin.username}"/>
+                                <property name="admin.email" value="${admin.email}"/>
+                                <property name="admin.password" value="${admin.password}"/>
+                                <java
+                                        jar="${project.basedir}/repository/at/favre/lib/bcrypt-cli/0.10.2/bcrypt-cli-0.10.2.jar"
+                                        fork="true" outputproperty="admin.password.bcrypt">
+                                    <arg value="${admin.password}"/>
+                                    <arg value="-b12"/>
+                                    <jvmarg value="--add-opens=java.management/com.sun.jmx.mbeanserver=ALL-UNNAMED"/>
+                                </java>
+
+                                <!-- collect all liquibase generated sql files and insert them into the create-db template file + add the admin user sql -->
+                                <copy todir="${project.build.directory}/sql">
+                                    <fileset dir="${project.basedir}/..">
+                                        <include name="**/target/liquibase/**/*-mysql.sql"/>
+                                    </fileset>
+                                    <mapper type="regexp" from="^(.*)/([^/]+)/([^/]*)$$" to="\2-\3"/>
+                                </copy>
+                                <copy
+                                        file="${project.basedir}/src/main/resources/dbinit/create-db-template.${database.dialect}"
+                                        tofile="${project.build.directory}/sql/initdb.sql"/>
+                                <copy
+                                        file="${project.basedir}/src/main/resources/dbinit/create-admin-user-template.${database.dialect}"
+                                        tofile="${project.build.directory}/sql/openncp-properties-data.sql"/>
+                                <replace
+                                        file="${project.build.directory}/sql/openncp-properties-data.sql"
+                                        token="@admin-username@" value="${admin.username}"/>
+                                <replace
+                                        file="${project.build.directory}/sql/openncp-properties-data.sql"
+                                        token="@admin-email@" value="${admin.email}"/>
+                                <replace
+                                        file="${project.build.directory}/sql/openncp-properties-data.sql"
+                                        token="@admin-password@" value="${admin.password.bcrypt}"/>
+                                <loadfile property="openncp-properties-schema"
+                                          srcFile="${project.build.directory}/sql/openncp-properties-schema-${liquibase.dialect}.sql"/>
+                                <loadfile property="openncp-properties-data"
+                                          srcFile="${project.build.directory}/sql/openncp-properties-data.sql"/>
+                                <loadfile property="openncp-eadc-schema"
+                                          srcFile="${project.build.directory}/sql/openncp-eadc-schema-${liquibase.dialect}.sql"/>
+                                <loadfile property="openncp-ltrdb-schema"
+                                          srcFile="${project.build.directory}/sql/openncp-ltrdb-schema-${liquibase.dialect}.sql"/>
+                                <script language="javascript" classpath="${compile_classpath}">
+                                    project.setProperty("openncp-ltrdb-schema-lowercase" ,
+                                    project.getProperty( "openncp-ltrdb-schema" ).toLowerCase());
+                                </script>
+                                <loadfile property="openncp-atna-schema"
+                                          srcFile="${project.build.directory}/sql/openncp-atna-schema-${liquibase.dialect}.sql"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token="@openncp-properties-schema@"
+                                         value="${openncp-properties-schema}"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token="@openncp-properties-data@"
+                                         value="${openncp-properties-data}"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token="@openncp-eadc-schema@" value="${openncp-eadc-schema}"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token="@openncp-ltrdb-schema@"
+                                         value="${openncp-ltrdb-schema-lowercase}"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token="@openncp-atna-schema@" value="${openncp-atna-schema}"/>
+                                <replace file="${project.build.directory}/sql/initdb.sql"
+                                         token=", UNIQUE (participantTypeCodes_id)" value=""/>
+
+                                <!-- move ehealth-portal artifacts -->
+                                <unwar dest="${project.build.directory}/artifacts/openncp-officer/ehealth-portal-backend">
+                                    <fileset dir="${project.build.directory}">
+                                        <include name="**/ehealth-portal-backend/target/*.war"/>
+                                    </fileset>
+                                </unwar>
+                                <copy quiet="true" failonerror="false"
+                                      todir="${project.build.directory}/artifacts/openncp-officer/ehealth-portal">
+                                    <fileset
+                                            dir="${project.build.directory}/ehealth-portal/ehealth-portal-frontend/build">
+                                        <include name="**/*"/>
+                                    </fileset>
+                                </copy>
+                                <move quiet="true" failonerror="false"
+                                      file="${project.build.directory}/artifacts/openncp-officer/dist"
+                                      tofile="${project.build.directory}/artifacts/openncp-officer/openncp-gateway"/>
+                                <delete dir="${project.build.directory}/ehealth-portal/"/>
+
+
+                                <!-- cli tools section -->
+                                <copy quiet="true" failonerror="true"
+                                      file="${project.build.directory}/${project.build.finalName}.jar"
+                                      todir="${project.build.outputDirectory}/tomcat/lib"/>
+
+                                <copy overwrite="true" quiet="true" failonerror="false"
+                                      todir="${project.build.directory}/artifacts/openncp-officer/openncp-configuration-utility">
+                                    <fileset dir="${project.build.outputDirectory}/openncp-configuration-utility">
+                                        <include name="**/*"/>
+                                    </fileset>
+                                </copy>
+                                <copy overwrite="true" quiet="true" failonerror="false"
+                                      todir="${project.build.directory}/artifacts/openncp-officer/openncp-tsam-exporter">
+                                    <fileset dir="${project.build.outputDirectory}/openncp-tsam-exporter">
+                                        <include name="**/*"/>
+                                    </fileset>
+                                </copy>
+                                <copy overwrite="true" quiet="true" failonerror="false"
+                                      todir="${project.build.directory}/artifacts/openncp-officer/openncp-tsam-sync">
+                                    <fileset dir="${project.build.outputDirectory}/openncp-tsam-sync">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+
+                                <!-- fix missing maven string substitution -->
+                                <replace file="${project.build.directory}/artifacts/openncp-officer/translations-and-mappings-ws/WEB-INF/classes/application.yml" token="@project.version@-@timestamp@" value="${project.version}-${DATE_TIME}"/>
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pptx</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.43.4</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>openncp/openncp-db:latest</name>
+                            <build>
+                                <contextDir>${project.build.directory}/sql</contextDir>
+                                <dockerFile>${project.basedir}/src/main/resources/openncp-db/Dockerfile</dockerFile>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <args>
+                                    <INIT_SQL_FILE>./initdb.sql</INIT_SQL_FILE>
+                                </args>
+                            </build>
+                        </image>
+                        <image>
+                            <name>openncp/openncp-tomcat-base:latest</name>
+                            <build>
+                                <contextDir>${project.build.outputDirectory}</contextDir>
+                                <dockerFile>${project.basedir}/src/main/resources/openncp-tomcat-base/Dockerfile
+                                </dockerFile>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <args>
+                                    <CONTEXT_DIRECTORY>.</CONTEXT_DIRECTORY>
+                                </args>
+                            </build>
+                        </image>
+                        <image>
+                            <name>openncp/openncp-a:latest</name>
+                            <build>
+                                <contextDir>${project.build.directory}/artifacts/openncp-a</contextDir>
+                                <dockerFile>${project.basedir}/src/main/resources/openncp-a/Dockerfile</dockerFile>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <args>
+                                    <CONTEXT_DIRECTORY>.</CONTEXT_DIRECTORY>
+                                </args>
+                            </build>
+                        </image>
+                        <image>
+                            <name>openncp/openncp-b:latest</name>
+                            <build>
+                                <contextDir>${project.build.directory}/artifacts/openncp-b</contextDir>
+                                <dockerFile>${project.basedir}/src/main/resources/openncp-b/Dockerfile</dockerFile>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <args>
+                                    <CONTEXT_DIRECTORY>.</CONTEXT_DIRECTORY>
+                                </args>
+                            </build>
+                        </image>
+                        <image>
+                            <name>openncp/openncp-officer:latest</name>
+                            <build>
+                                <contextDir>${project.build.directory}/artifacts/openncp-officer</contextDir>
+                                <dockerFile>${project.basedir}/src/main/resources/openncp-officer/Dockerfile
+                                </dockerFile>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <args>
+                                    <CONTEXT_DIRECTORY>.</CONTEXT_DIRECTORY>
+                                </args>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>openncp-push-docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.43.4</version>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>ehealth-portal</id>
+            <activation>
+                <file>
+                    <missing>./target/artifacts/openncp-officer/ehealth-portal</missing>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>1_clean-ehealth-portal-clone</id>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <filesets>
+                                        <fileset>
+                                            <directory>${project.build.directory}/ehealth-portal</directory>
+                                            <includes>
+                                                <include>**</include>
+                                            </includes>
+                                            <followSymlinks>false</followSymlinks>
+                                        </fileset>
+                                    </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>1_ehealth-portal-clone</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <executable>git</executable>
+                                    <arguments>
+                                        <argument>clone</argument>
+                                        <argument>-b</argument>
+                                        <argument>${ehealth-portal.git.branch}</argument>
+                                        <argument>${ehealth-portal.git.repo}</argument>
+                                        <argument>${project.build.directory}/ehealth-portal</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>2_fix_portal_pom_xml</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <executable>mvn</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>
+                                            io.github.floverfelt:find-and-replace-maven-plugin:1.1.0:find-and-replace
+                                        </argument>
+                                        <argument>-DbaseDir=target/ehealth-portal/ehealth-portal-frontend/</argument>
+                                        <argument>-DreplacementType=file-contents</argument>
+                                        <argument>-DfindRegex=1\.1\.0-SNAPSHOT</argument>
+                                        <argument>-DreplaceValue=1.1.0</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>3_ehealth-portal-mvn-build</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <executable>mvn</executable>
+                                    <workingDirectory>${project.build.directory}/ehealth-portal</workingDirectory>
+                                    <arguments>
+                                        <argument>clean</argument>
+                                        <argument>install</argument>
+                                        <argument>-DskipTests</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>4_ehealth-portal-node-install</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <executable>npm</executable>
+                                    <workingDirectory>
+                                        ${project.build.directory}/ehealth-portal/ehealth-portal-frontend
+                                    </workingDirectory>
+                                    <arguments>
+                                        <argument>install</argument>
+                                        <argument>--force</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>5_ehealth-portal-node-build</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <environmentVariables>
+                                        <SNOWPACK_PUBLIC_API_URL>
+                                            /ehealth-portal-backend/api
+                                        </SNOWPACK_PUBLIC_API_URL>
+                                    </environmentVariables>
+                                    <executable>npm</executable>
+                                    <workingDirectory>
+                                        ${project.build.directory}/ehealth-portal/ehealth-portal-frontend
+                                    </workingDirectory>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>build</argument>
+                                        <argument>--max-old-space-size=4096</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

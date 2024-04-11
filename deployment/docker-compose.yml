@@ -1,0 +1,137 @@
+version: "3.0"
+
+services:
+
+  openncp-db:
+    image: openncp/openncp-db
+    container_name: 'openncp-db'
+    restart: always
+    environment:
+      MYSQL_USER: ${OPENNCP_DATABASE_USER}
+      MYSQL_PASSWORD: ${OPENNCP_DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${OPENNCP_DATABASE_ROOT_PASSWORD}
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    command: --default-time-zone=Europe/Vienna
+    volumes:
+      - openncp-db-volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+    networks:
+      bridge:
+        aliases:
+          - openncp-db
+    profiles:
+      - database
+
+  openncp-officer:
+    image: openncp/openncp-officer
+    container_name: 'openncp-officer'
+    environment:
+      OPENNCP_PROPERTIES_FILE: '/opt/openncp-configuration/openncp-configuration.properties'
+    depends_on:
+      openncp-db:
+        condition: service_healthy
+    volumes:
+      - "./logs:/usr/local/tomcat/logs"
+      - "$OPENNCP_CONFIGURATION:/opt/openncp-configuration"
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-s", "-f", "-i", "https://localhost:8443/openncp-gateway/"]
+      interval: 5s
+      timeout: 1s
+      retries: 3
+      start_period: 1m
+    ports:
+      - "8443:8443"
+      - "5443:5005"
+    networks:
+      bridge:
+        aliases:
+          - openncp-officer
+
+  openncp-a:
+    image: openncp/openncp-a
+    container_name: 'openncp-a'
+    depends_on:
+      openncp-db:
+        condition: service_healthy
+      openncp-officer:
+        condition: service_healthy
+    volumes:
+      - "./logs:/usr/local/tomcat/logs"
+      - "$OPENNCP_CONFIGURATION:/opt/openncp-configuration"
+    ports:
+      - "8444:8443"
+      - "5444:5005"
+    networks:
+      bridge:
+        aliases:
+          - openncp-a
+
+  openncp-b:
+    image: openncp/openncp-b
+    container_name: 'openncp-b'
+    depends_on:
+      openncp-db:
+        condition: service_healthy
+      openncp-officer:
+        condition: service_healthy
+    volumes:
+      - "./logs:/usr/local/tomcat/logs"
+      - "$OPENNCP_CONFIGURATION:/opt/openncp-configuration"
+    ports:
+      - "8445:8443"
+      - "5445:5005"
+
+    networks:
+      bridge:
+        aliases:
+          - openncp-b
+
+  openncp-db-admin:
+    image: phpmyadmin/phpmyadmin
+    container_name: 'openncp-db-admin'
+    expose:
+      - "8081"
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+    links:
+      - openncp-db
+    networks:
+      bridge:
+        aliases:
+          - openncp-db-admin
+    profiles:
+      - database
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: openncp-portainer
+    command: --admin-password '$$2y$$05$$rOYOQDvL.szwEyRROYr51uVmVOJAX.J1YMIMmmYCnPbsYHbLbfwn'
+    ports:
+      - 9443:9443
+    volumes:
+      - openncp-portainer-volume:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    profiles:
+      - management
+
+volumes:
+  openncp-portainer-volume:
+    driver: local
+  openncp-db-volume:
+    driver: local
+
+networks:
+  bridge:
+    driver: bridge

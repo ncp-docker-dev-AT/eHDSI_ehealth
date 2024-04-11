@@ -14,7 +14,7 @@
     <name>OpenNCP Database Initializer</name>
 
     <properties>
-        <liquibase.version>4.10.0</liquibase.version>
+        <liquibase.version>4.22.0</liquibase.version>
     </properties>
 
     <build>

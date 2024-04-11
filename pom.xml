@@ -53,6 +53,7 @@
         <module>openncp-gateway</module>
         <module>openncp-gazelle-validation</module>
         <module>openncp-ncp-commons</module>
+        <module>deployment</module>
     </modules>
 
     <scm>
@@ -78,7 +79,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <java.optimize>true</java.optimize>
         <sonar.host.url>http://127.0.0.1:9000</sonar.host.url>
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>

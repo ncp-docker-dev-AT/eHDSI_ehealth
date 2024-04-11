@@ -1,0 +1,5 @@
+tsam-sync:
+  cts:
+    url: https://webgate.training.ec.europa.eu/ehealth-term-server
+    username: CTS_USER
+    password: CTS_PWD

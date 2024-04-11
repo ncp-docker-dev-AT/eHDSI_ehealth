@@ -1,0 +1,20 @@
+debug: false
+tsam-sync:
+  database:
+    backup: false
+  datasource:
+    driver: org.mariadb.jdbc.Driver
+    dialect: org.hibernate.dialect.MariaDBDialect
+    host: openncp-db
+    port: 3306
+    username: openncp
+    password: openncp1234
+    database: ehealth_ltrdb
+  proxy:
+    host:
+    port:
+    username:
+    password:
+spring:
+  profiles:
+    active: mariadb

@@ -15,6 +15,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 @SpringBootApplication
 @Configurable
@@ -35,7 +36,7 @@ public class OpenNCPInitializeApplication {
         LOGGER.info("JRE: {} ({})", System.getProperty("java.version"), System.getProperty("java.vendor"));
         LOGGER.info("JVM: {} ({})", System.getProperty("java.vm.version"), System.getProperty("java.vm.name"));
 
-        String path = "/opt/test/";
+        String path = Objects.toString(args.length == 1 ? args[0] : null, "/opt/test/");
         LOGGER.info("OpenNCP root directory: '{}')", path);
 
         if (StringUtils.isNotBlank(path)) {

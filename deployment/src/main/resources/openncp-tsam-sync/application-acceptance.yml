@@ -1,0 +1,5 @@
+tsam-sync:
+  cts:
+    url: https://webgate.acceptance.ec.testa.eu/ehealth-term-server
+    username: CTS_USER
+    password: CTS_PWD
